@@ -1,3 +1,6 @@
+import '@fontsource-variable/archivo/wght.css'
+import '@fontsource-variable/google-sans-flex/wght.css'
+
 import config from '@payload-config'
 import { handleServerFunctions, RootLayout } from '@payloadcms/next/layouts'
 import type { ServerFunctionClient } from 'payload'
