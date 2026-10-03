@@ -18,9 +18,17 @@ import { resolveLink } from '@/lib/links'
 export async function Header({ locale }: { locale: Locale }) {
   const [header, settings, dict] = [await getHeader(locale), await getSettings(locale), getDictionary(locale)]
 
-  const links: NavLink[] = (header.navItems ?? [])
+  const configuredLinks: NavLink[] = (header.navItems ?? [])
     .map((item) => resolveLink(item.link, locale))
     .filter((link): link is NavLink => link !== null)
+
+  const links: NavLink[] = configuredLinks.length
+    ? configuredLinks
+    : [
+        { href: localizedPath(locale, '/trips'), label: dict.nav.trips, newTab: false },
+        { href: localizedPath(locale, '/destinations'), label: dict.nav.destinations, newTab: false },
+        { href: localizedPath(locale, '/blog'), label: dict.nav.blog, newTab: false },
+      ]
 
   const actions: NavLink[] = (header.actions ?? [])
     .map((item) => resolveLink(item.link, locale))

@@ -4,10 +4,12 @@ import { localeMeta, locales, localizedPath, type Locale } from '@/i18n/config'
 import type { Blog, Destination, Media, Trip } from '@/payload-types'
 import { lexicalToPlainText, truncate } from './format'
 
-export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(
-  /\/$/,
-  '',
-)
+const vercelHost = process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL
+
+export const siteUrl = (
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (vercelHost ? `https://${vercelHost}` : 'http://localhost:3000')
+).replace(/\/$/, '')
 
 export const absoluteUrl = (path: string): string =>
   path.startsWith('http') ? path : `${siteUrl}${path.startsWith('/') ? path : `/${path}`}`

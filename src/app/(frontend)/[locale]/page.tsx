@@ -7,7 +7,7 @@ import { HomeFallback } from '@/components/views/home-fallback'
 import { isLocale, type Locale } from '@/i18n/config'
 import { getSettings } from '@/lib/data'
 import { getPage } from '@/lib/data'
-import { buildMetadata, organizationJsonLd, seoFromDoc, websiteJsonLd } from '@/lib/seo'
+import { buildMetadata, organizationJsonLd, seoFromDoc, siteUrl, websiteJsonLd } from '@/lib/seo'
 
 /**
  * ============================================================================
@@ -59,18 +59,16 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         data={[
           organizationJsonLd({
             name: settings.legalName || settings.siteName,
-            url: siteUrlValue(),
+            url: siteUrl,
             logo: typeof settings.logo === 'object' && settings.logo?.url ? settings.logo.url : undefined,
             email: settings.email,
             phone: settings.phone,
             address: settings.address,
             socials: settings.socials?.map((social) => ({ platform: social.platform, url: social.url })),
           }),
-          websiteJsonLd({ name: settings.siteName, url: siteUrlValue() }),
+          websiteJsonLd({ name: settings.siteName, url: siteUrl }),
         ]}
       />
     </>
   )
 }
-
-const siteUrlValue = () => (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/\/$/, '')

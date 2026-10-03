@@ -4,6 +4,25 @@ import configPromise from '@payload-config'
 import { getPayload, type Payload, type TypedLocale } from 'payload'
 
 /**
+ * Returns true when a Postgres connection string is present in the environment.
+ * Accepts Payload (`DATABASE_URI`), Neon/Supabase (`DATABASE_URL`), and Vercel Postgres (`POSTGRES_URL`).
+ */
+export const isDatabaseConfigured = (): boolean => {
+  const uri = (
+    process.env.DATABASE_URI ||
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL ||
+    ''
+  ).trim()
+
+  if (!uri) return false
+  if (uri.includes('@host:') || uri.includes('user:password@host')) return false
+  return true
+}
+
+let buildTimeInitError: Error | null = null
+
+/**
  * Payload Local API client.
  *
  * WHY THE LOCAL API: it runs the query directly against Postgres inside your server component —
@@ -14,7 +33,24 @@ import { getPayload, type Payload, type TypedLocale } from 'payload'
  * of components can call `getPayloadClient()` and share one connection from the pool.
  */
 export const getPayloadClient = cache(async (): Promise<Payload> => {
-  return getPayload({ config: configPromise })
+  if (!isDatabaseConfigured()) {
+    throw new Error(
+      'Database connection string (DATABASE_URI / DATABASE_URL / POSTGRES_URL) is not configured.',
+    )
+  }
+
+  if (buildTimeInitError && process.env.NEXT_PHASE === 'phase-production-build') {
+    throw buildTimeInitError
+  }
+
+  try {
+    return await getPayload({ config: configPromise })
+  } catch (error) {
+    if (process.env.NEXT_PHASE === 'phase-production-build') {
+      buildTimeInitError = error instanceof Error ? error : new Error(String(error))
+    }
+    throw error
+  }
 })
 
 /**
