@@ -1,4 +1,5 @@
 import path from 'path'
+import { tmpdir } from 'os'
 import { fileURLToPath } from 'url'
 
 import { postgresAdapter } from '@payloadcms/db-postgres'
@@ -36,14 +37,24 @@ const payloadSecret =
   process.env.NEXTAUTH_SECRET ||
   'hike-globally-default-payload-secret-change-in-production'
 
+// Allow high-resolution photos and long-form expedition footage without keeping uploads in RAM.
+const maxMediaUploadSize = 1024 * 1024 * 1024
+
 export default buildConfig({
   admin: {
     user: 'users',
+    theme: 'light',
     components: {
       beforeLogin: ['@/components/admin/login-gallery'],
       afterLogin: ['@/components/admin/login-footer'],
       graphics: {
         Logo: '@/components/admin/admin-logo',
+        Icon: '@/components/admin/admin-icon',
+      },
+      views: {
+        dashboard: {
+          Component: '@/components/admin/dashboard',
+        },
       },
     },
     importMap: {
@@ -112,8 +123,14 @@ export default buildConfig({
   csrf: [siteUrl, 'http://localhost:3000'].filter(Boolean),
 
   upload: {
+    // Leave headroom for multipart form fields and let temporary files handle large video uploads.
+    requestSizeLimit: maxMediaUploadSize + 10 * 1024 * 1024,
+    uploadTimeout: 10 * 60 * 1000,
+    useTempFiles: true,
+    tempFileDir: tmpdir(),
+    abortOnLimit: true,
     limits: {
-      fileSize: 12_000_000, // 12 MB — plenty for photos, keeps the DB and Blob bill sane
+      fileSize: maxMediaUploadSize,
     },
   },
 
@@ -122,6 +139,8 @@ export default buildConfig({
     // With no token present the plugin is a no-op and uploads fall back to ./public/media.
     vercelBlobStorage({
       collections: { media: true },
+      // Upload directly from the browser to avoid Vercel Functions' 4.5 MB request limit.
+      clientUploads: true,
       token: process.env.BLOB_READ_WRITE_TOKEN,
       addRandomSuffix: false,
       cacheControlMaxAge: 60 * 60 * 24 * 365,

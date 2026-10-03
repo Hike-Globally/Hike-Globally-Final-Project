@@ -1,0 +1,44 @@
+diff --git a/node_modules/@payloadcms/plugin-cloud-storage/dist/hooks/afterChange.js b/node_modules/@payloadcms/plugin-cloud-storage/dist/hooks/afterChange.js
+index 18b3b5e..afbe325 100644
+--- a/node_modules/@payloadcms/plugin-cloud-storage/dist/hooks/afterChange.js
++++ b/node_modules/@payloadcms/plugin-cloud-storage/dist/hooks/afterChange.js
+@@ -9,11 +9,15 @@ const getObjectFolder = (doc)=>{
+         prefix: record.prefix
+     });
+ };
+-export const getAfterChangeHook = ({ adapter, collection, collectionPrefix, useCompositePrefixes })=>async ({ doc, operation, previousDoc, req })=>{
++export const getAfterChangeHook = ({ adapter, collection, collectionPrefix, useCompositePrefixes })=>async ({ data, doc, operation, previousDoc, req })=>{
+         // Skip if this is an internal update to prevent infinite loop
+         if (req.context?.skipCloudStorage) {
+             return doc;
+         }
++        const uploadData = {
++            ...doc,
++            _objectKey: data?._objectKey ?? doc._objectKey
++        };
+         const isDraftSave = doc._status === 'draft';
+         const isDraftOverPublished = isDraftSave && previousDoc?._status === 'published';
+         try {
+@@ -24,8 +28,8 @@ export const getAfterChangeHook = ({ adapter, collection, collectionPrefix, useC
+             if (files.length > 0) {
+                 // Fold `_objectKey` so generated sizes land in the same folder as the original.
+                 const dataForUpload = {
+-                    ...doc,
+-                    prefix: getObjectFolder(doc)
++                    ...uploadData,
++                    prefix: getObjectFolder(uploadData)
+                 };
+                 const uploadResults = await Promise.all(files// Files with a clientUploadContext are already in storage (uploaded
+                 // directly by the browser), so skip re-uploading them here.
+@@ -111,7 +115,10 @@ export const getAfterChangeHook = ({ adapter, collection, collectionPrefix, useC
+                     const newKeys = new Set([
+                         ...newFilenames
+                     ].map((filename)=>resolveKey({
+-                            data: docWithMetadata,
++                            data: {
++                                ...uploadData,
++                                ...uploadMetadata
++                            },
+                             filename
+                         })));
+                     const deletionPromises = filesToDelete.map(async (filename)=>{
