@@ -1,0 +1,28 @@
+{
+  "name": "hike-globally-final-project",
+  "version": "1.0.0",
+  "description": "This is a Hike Globally Final Project, which will be deployed ultimately.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hike-Globally/Hike-Globally-Final-Project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Hike-Globally/Hike-Globally-Final-Project/issues"
+  },
+  "homepage": "https://github.com/Hike-Globally/Hike-Globally-Final-Project#readme",
+  "dependencies": {
+    "@gsap/react": "^2.1.2",
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.26",
+    "lucide-react": "^1.51.0",
+    "motion": "^14.0.0",
+    "next-themes": "^0.4.6"
+  }
+}
