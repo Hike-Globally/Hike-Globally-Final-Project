@@ -10,7 +10,9 @@ next-env.d.ts
 *.tsbuildinfo
 
 # payload
+# Payload writes uploads to public/media (and /media if you change uploadDir) — never commit them.
 /media
+/public/media
 src/app/(payload)/admin/importMap.js
 importMap.js
 
