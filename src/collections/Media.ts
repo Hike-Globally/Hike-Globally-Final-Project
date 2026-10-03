@@ -37,7 +37,8 @@ export const Media: CollectionConfig = {
     // takes over as soon as BLOB_READ_WRITE_TOKEN is present (see payload.config.ts).
     staticDir: path.join(dirname, '../../public/media'),
     adminThumbnail: 'card',
-    mimeTypes: ['image/*'],
+    // Keep images and video in one library so editors can use either in the CMS.
+    mimeTypes: ['image/*', 'video/*'],
     imageSizes: [
       { name: 'thumbnail', width: 400, height: 300, position: 'centre' },
       { name: 'card', width: 800, height: 600, position: 'centre' },
@@ -54,7 +55,7 @@ export const Media: CollectionConfig = {
       required: true,
       admin: {
         description:
-          'Describe the image for screen readers and image search. Required — it is also the single biggest accessibility win on the site.',
+          'Describe the image for screen readers and image search, or briefly describe the video. Required for every media asset.',
       },
     },
     {

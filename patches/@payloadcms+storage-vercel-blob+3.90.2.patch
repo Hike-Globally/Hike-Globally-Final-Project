@@ -1,0 +1,44 @@
+diff --git a/node_modules/@payloadcms/storage-vercel-blob/dist/adapter.js b/node_modules/@payloadcms/storage-vercel-blob/dist/adapter.js
+index ee49efb..682f71b 100644
+--- a/node_modules/@payloadcms/storage-vercel-blob/dist/adapter.js
++++ b/node_modules/@payloadcms/storage-vercel-blob/dist/adapter.js
+@@ -19,7 +19,7 @@ export function createVercelBlobAdapter({ access, addRandomSuffix, baseUrl, cach
+                     storageFilePath,
+                     token
+                 }),
+-            handleUpload: async ({ data, file: { buffer, mimeType }, storageFilePath })=>{
++            handleUpload: async ({ file: { buffer, mimeType, tempFilePath }, storageFilePath })=>{
+                 const result = await uploadFile({
+                     access,
+                     addRandomSuffix,
+@@ -27,12 +27,10 @@ export function createVercelBlobAdapter({ access, addRandomSuffix, baseUrl, cach
+                     cacheControlMaxAge,
+                     mimeType,
+                     storageFilePath,
++                    tempFilePath,
+                     token
+                 });
+-                if (result.filename) {
+-                    data.filename = result.filename;
+-                }
+-                return data;
++                return result;
+             },
+             staticHandler: (req, { doc, headers, params: { clientUploadContext, filename } })=>getFile({
+                     baseUrl,
+diff --git a/node_modules/@payloadcms/storage-vercel-blob/dist/uploadFile.js b/node_modules/@payloadcms/storage-vercel-blob/dist/uploadFile.js
+index 4dfd56f..25ca0a5 100644
+--- a/node_modules/@payloadcms/storage-vercel-blob/dist/uploadFile.js
++++ b/node_modules/@payloadcms/storage-vercel-blob/dist/uploadFile.js
+@@ -1,7 +1,9 @@
+ import { put } from '@vercel/blob';
++import { createReadStream } from 'fs';
+ import path from 'path';
+-export async function uploadFile({ access, addRandomSuffix, buffer, cacheControlMaxAge, mimeType, storageFilePath, token }) {
+-    const result = await put(storageFilePath, buffer, {
++export async function uploadFile({ access, addRandomSuffix, buffer, cacheControlMaxAge, mimeType, storageFilePath, tempFilePath, token }) {
++    const body = tempFilePath ? createReadStream(tempFilePath) : buffer;
++    const result = await put(storageFilePath, body, {
+         access,
+         addRandomSuffix,
+         allowOverwrite: true,

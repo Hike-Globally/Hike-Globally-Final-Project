@@ -180,7 +180,7 @@ export interface User {
 export interface Media {
   id: number;
   /**
-   * Describe the image for screen readers and image search. Required — it is also the single biggest accessibility win on the site.
+   * Describe the image for screen readers and image search, or briefly describe the video. Required for every media asset.
    */
   alt: string;
   /**
