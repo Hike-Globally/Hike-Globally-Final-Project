@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
+import { resolveSiteUrl } from '@/lib/site-url'
 import type { Locale } from '@/i18n/config'
 import { getDictionary, type Dictionary } from '@/i18n/dictionaries'
 
@@ -42,7 +43,9 @@ export function InquiryForm({
 
   const endpoint = `https://formsubmit.co/${email}`
   const successPath = process.env.NEXT_PUBLIC_FORMSUBMIT_SUCCESS_PATH || '/inquiry/thank-you'
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || '').replace(/\/$/, '')
+  // Normalized so a schemeless NEXT_PUBLIC_SITE_URL still produces a usable absolute return URL.
+  // Unset means "no absolute URL": Formsubmit then redirects to a relative path on our own domain.
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() ? resolveSiteUrl() : ''
   const nextUrl = siteUrl ? `${siteUrl}/${locale}${successPath}` : `/${locale}${successPath}`
 
   const onSubmit = () => {

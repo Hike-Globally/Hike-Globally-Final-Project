@@ -8,7 +8,8 @@ import { SmoothScroll } from '@/components/providers/smooth-scroll'
 import { getDictionary } from '@/i18n/dictionaries'
 import { isLocale, localeMeta, locales, type Locale } from '@/i18n/config'
 import { getSettings } from '@/lib/data'
-import { absoluteUrl, siteUrl } from '@/lib/seo'
+import { absoluteUrl } from '@/lib/seo'
+import { resolveSiteUrlObject } from '@/lib/site-url'
 import '../globals.css'
 
 /**
@@ -49,7 +50,9 @@ export async function generateMetadata({
   const settings = await getSettings(locale)
 
   return {
-    metadataBase: new URL(siteUrl),
+    // `undefined` rather than a thrown `TypeError` if the configured URL is unusable — a bad env
+    // var must degrade the metadata, not fail the build.
+    metadataBase: resolveSiteUrlObject(),
     title: {
       default: `${settings.siteName} — ${settings.tagline ?? 'Trekking & expeditions in Nepal'}`,
       template: `%s · ${settings.siteName}`,

@@ -18,6 +18,7 @@ import { Header } from './globals/Header'
 import { Settings } from './globals/Settings'
 import { defaultLocale, localeMeta, locales } from './i18n/config'
 import { migrations } from './migrations'
+import { resolveSiteUrl } from './lib/site-url'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -26,10 +27,9 @@ const dirname = path.dirname(filename)
 const databaseUri =
   process.env.DATABASE_URI || process.env.DATABASE_URL || process.env.POSTGRES_URL || ''
 const isLocalDatabase = /localhost|127\.0\.0\.1/.test(databaseUri)
-const vercelHost = process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  (vercelHost ? `https://${vercelHost}` : 'http://localhost:3000')
+// Normalized: Payload logs "Failed to create URL object" and silently falls back to http://localhost
+// for a schemeless `serverURL`, which then breaks admin CORS/CSRF and live preview.
+const siteUrl = resolveSiteUrl()
 const payloadSecret =
   process.env.PAYLOAD_SECRET ||
   process.env.AUTH_SECRET ||
