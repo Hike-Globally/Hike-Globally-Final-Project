@@ -28,7 +28,7 @@ Seeded admin login: `admin@hikeglobally.com` / `hike-globally-2026` — change i
 | --- | --- |
 | `DATABASE_URI` | PostgreSQL connection string (required) |
 | `PAYLOAD_SECRET` | Payload encryption key (required) |
-| `NEXT_PUBLIC_SITE_URL` | Canonical origin — used for OG tags, sitemap, emails |
+| `NEXT_PUBLIC_SITE_URL` | Canonical origin — used for OG tags, sitemap, emails. Include the scheme (`https://hikeglobally.com`); a bare host is auto-repaired to `https://`, but don't rely on it |
 | `REVALIDATE_SECRET` | Bearer token for `POST /api/revalidate` |
 | `NEXT_PUBLIC_FORMSUBMIT_EMAIL` | Fallback recipient for the inquiry form |
 | `NEXT_PUBLIC_FORMSUBMIT_SUCCESS_PATH` | Where visitors land after submitting (default `/inquiry/thank-you`) |
@@ -39,6 +39,7 @@ Seeded admin login: `admin@hikeglobally.com` / `hike-globally-2026` — change i
 | --- | --- |
 | `dev` / `build` / `start` | Next.js |
 | `typecheck` | `tsc --noEmit` |
+| `test` | Node's built-in runner — unit tests for the site-URL normalization |
 | `lint` | ESLint |
 | `migrate` / `migrate:create` / `migrate:status` / `migrate:down` | Payload migrations |
 | `generate:types` | Regenerate `src/payload-types.ts` after a schema change |

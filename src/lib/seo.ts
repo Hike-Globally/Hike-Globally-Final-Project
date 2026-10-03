@@ -3,13 +3,11 @@ import type { Metadata } from 'next'
 import { localeMeta, locales, localizedPath, type Locale } from '@/i18n/config'
 import type { Blog, Destination, Media, Trip } from '@/payload-types'
 import { lexicalToPlainText, truncate } from './format'
+import { resolveSiteUrl } from './site-url'
 
-const vercelHost = process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL
-
-export const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  (vercelHost ? `https://${vercelHost}` : 'http://localhost:3000')
-).replace(/\/$/, '')
+// Normalized so a bare `hikeglobally.com` (no scheme) can never reach `new URL()` and blow up the
+// build. See src/lib/site-url.ts.
+export const siteUrl = resolveSiteUrl()
 
 export const absoluteUrl = (path: string): string =>
   path.startsWith('http') ? path : `${siteUrl}${path.startsWith('/') ? path : `/${path}`}`
