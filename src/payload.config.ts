@@ -17,14 +17,27 @@ import { Footer } from './globals/Footer'
 import { Header } from './globals/Header'
 import { Settings } from './globals/Settings'
 import { defaultLocale, localeMeta, locales } from './i18n/config'
+import { migrations } from './migrations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-// Accepts both Payload's convention (DATABASE_URI) and the Vercel/Neon one (DATABASE_URL).
-const databaseUri = process.env.DATABASE_URI || process.env.DATABASE_URL || ''
+// Accepts Payload's convention (DATABASE_URI), Neon/Supabase (DATABASE_URL), and Vercel Postgres (POSTGRES_URL).
+const databaseUri =
+  process.env.DATABASE_URI ||
+  process.env.DATABASE_URL ||
+  process.env.POSTGRES_URL ||
+  ''
 const isLocalDatabase = /localhost|127\.0\.0\.1/.test(databaseUri)
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+const vercelHost = process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (vercelHost ? `https://${vercelHost}` : 'http://localhost:3000')
+const payloadSecret =
+  process.env.PAYLOAD_SECRET ||
+  process.env.AUTH_SECRET ||
+  process.env.NEXTAUTH_SECRET ||
+  'hike-globally-default-payload-secret-change-in-production'
 
 export default buildConfig({
   admin: {
@@ -53,17 +66,19 @@ export default buildConfig({
     pool: {
       connectionString: databaseUri,
       // Hosted Postgres (Neon/Supabase/Vercel) requires TLS; local dev does not.
-      ssl: isLocalDatabase
-        ? false
-        : process.env.DATABASE_SSL_REJECT_UNAUTHORIZED === 'false'
-          ? { rejectUnauthorized: false }
-          : { rejectUnauthorized: true },
+      ssl:
+        !databaseUri || isLocalDatabase
+          ? false
+          : process.env.DATABASE_SSL_REJECT_UNAUTHORIZED === 'true'
+            ? { rejectUnauthorized: true }
+            : { rejectUnauthorized: false },
       // Serverless-friendly default. Override with DATABASE_POOL_MAX=1 for single-connection
       // databases (PGlite, pgBouncer in transaction mode, SQLite bridges).
       max: Number(process.env.DATABASE_POOL_MAX ?? 10),
       idleTimeoutMillis: 30_000,
       connectionTimeoutMillis: 10_000,
     },
+    prodMigrations: migrations,
     // `push` is intentionally NOT used: production changes go through real migration files
     // (npm run migrate:create). Set PAYLOAD_PUSH=true only for throwaway local databases.
     // push: process.env.PAYLOAD_PUSH === 'true',
@@ -84,7 +99,7 @@ export default buildConfig({
     fallback: true,
   },
 
-  secret: process.env.PAYLOAD_SECRET || '',
+  secret: payloadSecret,
   serverURL: siteUrl,
   sharp,
   telemetry: false,
