@@ -24,10 +24,7 @@ const dirname = path.dirname(filename)
 
 // Accepts Payload's convention (DATABASE_URI), Neon/Supabase (DATABASE_URL), and Vercel Postgres (POSTGRES_URL).
 const databaseUri =
-  process.env.DATABASE_URI ||
-  process.env.DATABASE_URL ||
-  process.env.POSTGRES_URL ||
-  ''
+  process.env.DATABASE_URI || process.env.DATABASE_URL || process.env.POSTGRES_URL || ''
 const isLocalDatabase = /localhost|127\.0\.0\.1/.test(databaseUri)
 const vercelHost = process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL
 const siteUrl =
@@ -42,6 +39,13 @@ const payloadSecret =
 export default buildConfig({
   admin: {
     user: 'users',
+    components: {
+      beforeLogin: ['@/components/admin/login-gallery'],
+      afterLogin: ['@/components/admin/login-footer'],
+      graphics: {
+        Logo: '@/components/admin/admin-logo',
+      },
+    },
     importMap: {
       baseDir: path.resolve(dirname),
     },
