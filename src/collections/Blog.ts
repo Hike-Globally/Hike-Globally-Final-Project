@@ -1,0 +1,107 @@
+import type { CollectionConfig } from 'payload'
+
+import { adminOrEditor, publishedOrSignedIn } from '../access'
+import { metaField } from '../fields/meta'
+import { slugField } from '../fields/slug'
+import { populatePublishedAt, revalidatePost, revalidatePostDelete } from '../hooks/revalidate'
+
+export const Blog: CollectionConfig = {
+  slug: 'blog',
+  admin: {
+    useAsTitle: 'title',
+    defaultColumns: ['title', 'author', 'publishedAt', 'featured', 'updatedAt'],
+    group: 'Content',
+    livePreview: {
+      url: ({ data, locale }) => `/${locale ?? 'en'}/blog/${data?.slug ?? ''}`,
+    },
+  },
+  versions: {
+    drafts: { autosave: { interval: 250 } },
+    maxPerDoc: 25,
+  },
+  access: {
+    read: publishedOrSignedIn,
+    create: adminOrEditor,
+    update: adminOrEditor,
+    delete: adminOrEditor,
+  },
+  hooks: {
+    // Sets publishedAt the first time a post is published, and never overwrites it afterwards.
+    beforeChange: [populatePublishedAt],
+    afterChange: [revalidatePost],
+    afterDelete: [revalidatePostDelete],
+  },
+  fields: [
+    { name: 'title', type: 'text', localized: true, required: true },
+    slugField('title'),
+    {
+      name: 'excerpt',
+      type: 'textarea',
+      localized: true,
+      required: true,
+      maxLength: 220,
+      admin: { description: 'Shown on cards and used as the meta description fallback.' },
+    },
+    {
+      name: 'featuredImage',
+      type: 'upload',
+      relationTo: 'media',
+      required: true,
+    },
+    {
+      name: 'content',
+      type: 'richText',
+      localized: true,
+    },
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'author',
+          type: 'relationship',
+          relationTo: 'users',
+          required: true,
+          admin: { width: '50%' },
+        },
+        {
+          name: 'publishedAt',
+          type: 'date',
+          // Not required: drafts are saved before they are published. populatePublishedAt()
+          // fills it in on first publish, and the frontend falls back to `createdAt`.
+          admin: { width: '50%', date: { pickerAppearance: 'dayAndTime' } },
+        },
+      ],
+    },
+    {
+      name: 'categories',
+      type: 'select',
+      hasMany: true,
+      options: [
+        { label: 'Trekking guides', value: 'trekking-guides' },
+        { label: 'Gear & packing', value: 'gear' },
+        { label: 'Destination guides', value: 'destinations' },
+        { label: 'Culture & people', value: 'culture' },
+        { label: 'Health & safety', value: 'health-safety' },
+        { label: 'Sustainability', value: 'sustainability' },
+        { label: 'Trip reports', value: 'trip-reports' },
+        { label: 'News', value: 'news' },
+      ],
+      admin: { description: 'Drives the category filter on /blog.' },
+    },
+    {
+      name: 'relatedPosts',
+      type: 'relationship',
+      relationTo: 'blog',
+      hasMany: true,
+      filterOptions: ({ id }) => (id ? { id: { not_equals: id } } : true),
+      admin: { description: 'Leave empty to auto-fill with the most recent posts.' },
+    },
+    {
+      name: 'featured',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: { description: 'Featured posts are pinned on /blog and can be highlighted on the homepage.' },
+    },
+    metaField(),
+  ],
+}
