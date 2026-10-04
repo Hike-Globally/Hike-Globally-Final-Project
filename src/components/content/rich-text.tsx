@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 
 import { PayloadImage } from '@/components/ui/payload-image'
 import type { Locale } from '@/i18n/config'
@@ -14,12 +14,18 @@ import { cn } from '@/lib/utils'
  * shipped to the browser — the CMS copy arrives as plain HTML in the initial response.
  */
 
+/**
+ * Lexical overloads the `format` property: on a *text* node it is a bitmask of
+ * bold/italic/underline/…, on an *element* node (paragraph, heading, list, quote) it is an
+ * alignment keyword. Both shapes are handled below.
+ */
 type TextFormat = number | undefined
+type ElementFormat = 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | ''
 
 type RichTextNode = {
   type?: string
   tag?: string
-  format?: TextFormat
+  format?: TextFormat | ElementFormat
   text?: string
   style?: string
   indent?: number
@@ -46,8 +52,14 @@ const FORMAT = {
   superscript: 1 << 6,
 } as const
 
-const withFormat = (children: ReactNode, format: TextFormat, key: string): ReactNode => {
-  if (!format) return children
+const withFormat = (
+  children: ReactNode,
+  format: TextFormat | ElementFormat,
+  key: string,
+): ReactNode => {
+  // An element's alignment keyword can never reach a text node's bitmask; bail out on anything
+  // that is not a number rather than coercing it.
+  if (!format || typeof format !== 'number') return children
   let node: ReactNode = children
 
   if (format & FORMAT.bold) node = <strong key={`b-${key}`}>{node}</strong>
@@ -64,6 +76,36 @@ const withFormat = (children: ReactNode, format: TextFormat, key: string): React
   if (format & FORMAT.subscript) node = <sub key={`sub-${key}`}>{node}</sub>
 
   return node
+}
+
+const ALIGNMENTS: ReadonlySet<string> = new Set([
+  'left',
+  'start',
+  'center',
+  'right',
+  'end',
+  'justify',
+])
+
+/**
+ * Block-level layout: alignment and indentation.
+ *
+ * The editor's toolbar exposes align and indent buttons, so the values they write have to reach
+ * the page or those buttons are decoration. Payload's own HTML exporter maps them to
+ * `text-align` and a 40px inset per indent level; this mirrors that exactly so the CMS and the
+ * rendered site agree. Returns `undefined` (rather than an empty object) when there is nothing to
+ * apply, keeping the markup clean for the common unaligned paragraph.
+ */
+const blockStyle = (node: RichTextNode): CSSProperties | undefined => {
+  const align =
+    typeof node.format === 'string' && ALIGNMENTS.has(node.format)
+      ? (node.format as CSSProperties['textAlign'])
+      : undefined
+  const indent =
+    typeof node.indent === 'number' && node.indent > 0 ? node.indent * 40 : undefined
+
+  if (!align && !indent) return undefined
+  return { textAlign: align, paddingInlineStart: indent }
 }
 
 type MediaValue = (Media & { slug?: string }) | number | null | undefined
@@ -89,28 +131,36 @@ const renderNode = (node: RichTextNode, locale: Locale, index: number): ReactNod
 
   switch (node.type) {
     case 'text':
-      return (
-        <span key={key} style={node.style ? undefined : undefined}>
-          {withFormat(node.text ?? '', node.format, key)}
-        </span>
-      )
+      return <span key={key}>{withFormat(node.text ?? '', node.format, key)}</span>
 
     case 'linebreak':
       return <br key={key} />
 
     case 'paragraph':
-      return <p key={key}>{children}</p>
+      return (
+        <p key={key} style={blockStyle(node)}>
+          {children}
+        </p>
+      )
 
     case 'heading': {
       const tag = node.tag ?? 'h2'
       const Tag = (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tag) ? tag : 'h2') as 'h2'
-      return <Tag key={key}>{children}</Tag>
+      return (
+        <Tag key={key} style={blockStyle(node)}>
+          {children}
+        </Tag>
+      )
     }
 
     case 'list': {
       const ListTag = node.listType === 'number' ? 'ol' : 'ul'
       return (
-        <ListTag key={key} className={node.listType === 'check' ? 'list-none' : undefined}>
+        <ListTag
+          key={key}
+          className={node.listType === 'check' ? 'list-none' : undefined}
+          style={blockStyle(node)}
+        >
           {children}
         </ListTag>
       )
@@ -120,7 +170,7 @@ const renderNode = (node: RichTextNode, locale: Locale, index: number): ReactNod
       return <li key={key}>{children}</li>
 
     case 'quote':
-      return <blockquote key={key}>{children}</blockquote>
+      return <blockquote key={key} style={blockStyle(node)}>{children}</blockquote>
 
     case 'horizontalrule':
       return <hr key={key} />

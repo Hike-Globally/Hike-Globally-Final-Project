@@ -373,6 +373,9 @@ export interface Trip {
    */
   summary: string;
   heroImage: number | Media;
+  /**
+   * The main body of the trip page. The toolbar across the top of the box has headings, bold, links, lists and images.
+   */
   description?: {
     root: {
       type: string;
@@ -395,9 +398,6 @@ export interface Trip {
    */
   durationDays: number;
   durationNights?: number | null;
-  /**
-   * Maximum group size.
-   */
   groupSizeMax?: number | null;
   /**
    * Highest point, in metres.
