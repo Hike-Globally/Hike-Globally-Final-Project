@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
 import { notFound } from 'next/navigation'
+import { Analytics } from '@vercel/analytics/next'
 
 import { Footer } from '@/components/layout/footer'
 import { Header } from '@/components/layout/header'
@@ -109,6 +110,8 @@ export default async function LocaleLayout({
 
         {/* Lenis smooth scrolling — ~6KB, disabled for reduced-motion users. */}
         <SmoothScroll />
+
+        <Analytics />
       </body>
     </html>
   )
