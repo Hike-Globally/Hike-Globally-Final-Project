@@ -1,51 +1,63 @@
 'use client'
 
-import { Link, toast, useAuth, useConfig, useTranslation } from '@payloadcms/ui'
+import { toast, useConfig, useTranslation } from '@payloadcms/ui'
 import React, { useCallback, useState } from 'react'
 
+import { RailIcon } from './rail-icons'
+
 /**
- * Sidebar account block: who you are signed in as, plus a sign-out button that actually works.
+ * Sign out — a button, not a link.
  *
- * Registered as `admin.components.logout.Button`, replacing Payload's icon-only logout anchor.
- * The default flow navigates to the logout *page*, whose `logOut()` helper swallows every
- * failure — so if the server rejects the request (see `src/middleware.ts` for the origin case)
- * the browser still lands on the login screen while the session cookie lives on, and the next
- * navigation drops the user straight back into the dashboard.
+ * Three things have to be true for a sign-out to be honest, and the built-in flow only guarantees
+ * the first one:
  *
- * This version posts to the logout endpoint itself, then *verifies* that the session is really
- * gone before leaving the page. If the session survives, we say so instead of pretending.
- * The final hop is a full document navigation, so no in-memory auth state can outlive sign-out.
+ *   1. the browser lands on the login screen,
+ *   2. the session cookie is actually gone, and
+ *   3. the admin cannot be reached again with the back button.
+ *
+ * Payload's default logout link navigates to the logout *page*, whose helper swallows every failure
+ * and redirects anyway — so a refused request looks exactly like a successful sign-out. This button
+ * instead posts the sign-out itself and then *checks* `/users/me` before leaving the page.
+ *
+ * The check matters because the server can legitimately refuse the request: Payload only accepts a
+ * cookie-authenticated call when the browser's `Origin` is in its CSRF allowlist, so a preview URL,
+ * a tunnel or a `www`/apex mismatch can produce a 400 that leaves the session alive. If that
+ * happens — or the response simply never arrives — the button falls back to `/api/logout`, a route
+ * that always expires the cookie server-side, and verifies again. Only if even that fails does it
+ * say so instead of pretending.
+ *
+ * The final hop is a full document navigation (`location.replace`, so the admin is not left in the
+ * back history) rather than a client-side push: sign-out has to discard every cached React tree and
+ * every scrap of in-memory auth state, not just move to another route.
  */
 
-type SidebarUser = {
-  email?: string
-  name?: string
-  roles?: string[]
-}
-
-const initialsOf = (user: SidebarUser): string => {
-  const name = typeof user.name === 'string' ? user.name.trim() : ''
-  if (name) {
-    const words = name.split(/\s+/).slice(0, 2)
-    return words.map((word) => word[0]?.toUpperCase() ?? '').join('')
-  }
-  return user.email?.[0]?.toUpperCase() ?? '?'
-}
-
 export default function NavSignOut() {
-  const { user } = useAuth()
   const { config } = useConfig()
   const { i18n, t } = useTranslation()
   const [signingOut, setSigningOut] = useState(false)
   const [failure, setFailure] = useState<string | null>(null)
 
-  const account = (user ?? null) as SidebarUser | null
-  const role = account?.roles?.[0]
   const apiRoute = config.routes.api
   const collection = config.admin.user
   const adminRoute = config.routes.admin
-  const accountHref = `${adminRoute}${config.admin.routes.account}`
   const loginHref = `${adminRoute}${config.admin.routes.login}`
+
+  const language = i18n.language
+
+  /** True once the server confirms there is no session left. */
+  const sessionIsGone = useCallback(async (): Promise<boolean> => {
+    try {
+      const response = await fetch(`${apiRoute}/${collection}/me`, {
+        credentials: 'include',
+        headers: { 'Accept-Language': language },
+      })
+      if (!response.ok) return false
+      const session = (await response.json()) as { user?: unknown }
+      return !session?.user
+    } catch {
+      return false
+    }
+  }, [apiRoute, collection, language])
 
   const signOut = useCallback(async () => {
     if (signingOut) return
@@ -53,72 +65,75 @@ export default function NavSignOut() {
     setSigningOut(true)
     setFailure(null)
 
+    /** Ask Payload to end the session the canonical way (runs any `afterLogout` hooks). */
+    const askPayload = async (): Promise<boolean> => {
+      try {
+        const response = await fetch(`${apiRoute}/${collection}/logout`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Accept-Language': language },
+        })
+        return response.ok
+      } catch {
+        return false
+      }
+    }
+
+    /** Last resort: expire the cookie on the server ourselves. Always answers. */
+    const clearServerSide = async (): Promise<boolean> => {
+      try {
+        const response = await fetch(`${apiRoute}/logout`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Accept-Language': language },
+        })
+        return response.ok
+      } catch {
+        return false
+      }
+    }
+
     try {
-      const response = await fetch(`${apiRoute}/${collection}/logout`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Accept-Language': i18n.language },
-      })
+      await askPayload()
+      let gone = await sessionIsGone()
 
-      // Confirm the cookie is gone rather than trusting the status code alone.
-      const me = await fetch(`${apiRoute}/${collection}/me`, {
-        credentials: 'include',
-        headers: { 'Accept-Language': i18n.language },
-      })
-      const session = me.ok ? ((await me.json()) as { user?: unknown }) : null
+      if (!gone) {
+        await clearServerSide()
+        gone = await sessionIsGone()
+      }
 
-      if (response.ok && !session?.user) {
-        toast.success(t('authentication:loggedOutSuccessfully'))
-        // Deliberately a full document navigation, not `router.push()`: sign-out must discard
-        // every cached React tree and in-memory auth state, not just move to another route.
-        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-        window.location.assign(loginHref)
+      if (!gone) {
+        setFailure(
+          'The server still sees an active session, so signing out has been cancelled. Please try again.',
+        )
+        setSigningOut(false)
         return
       }
 
-      setFailure(
-        'Sign out was refused by the server, so your session is still active. Please try again.',
-      )
-      setSigningOut(false)
+      toast.success(t('authentication:loggedOutSuccessfully'))
+      window.location.replace(loginHref)
     } catch {
       setFailure('Sign out could not reach the server. Check your connection and try again.')
       setSigningOut(false)
     }
-  }, [apiRoute, collection, i18n.language, loginHref, signingOut, t])
+  }, [apiRoute, collection, language, loginHref, sessionIsGone, signingOut, t])
 
   return (
-    <div className="hg-nav-account">
-      {account ? (
-        <Link className="hg-nav-account__identity" href={accountHref} prefetch={false}>
-          <span aria-hidden="true" className="hg-nav-account__avatar">
-            {initialsOf(account)}
-          </span>
-          <span className="hg-nav-account__copy">
-            <span className="hg-nav-account__name">{account.name || account.email}</span>
-            <span className="hg-nav-account__meta">
-              {account.email}
-              {role ? <span className="hg-nav-account__role">{role}</span> : null}
-            </span>
-          </span>
-        </Link>
-      ) : null}
-
+    <div className="hg-rail__signout-wrap">
       <button
-        className="hg-nav-account__sign-out"
+        className="hg-rail__signout"
         disabled={signingOut}
         onClick={signOut}
         type="button"
       >
-        <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
-          <path d="M14.5 4H18a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3.5" />
-          <path d="M10 16.5 5.5 12 10 7.5" />
-          <path d="M5.5 12h9" />
-        </svg>
-        {signingOut ? t('authentication:loggingOut') : t('authentication:logOut')}
+        <RailIcon name="sign-out" />
+        <span className="hg-rail__signout-label">
+          {signingOut ? t('authentication:loggingOut') : t('authentication:logOut')}
+        </span>
       </button>
 
       {failure ? (
-        <p className="hg-nav-account__failure" role="alert">
+        <p className="hg-rail__signout-failure" role="alert">
           {failure}
         </p>
       ) : null}
