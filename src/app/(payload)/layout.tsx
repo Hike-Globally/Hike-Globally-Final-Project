@@ -7,6 +7,9 @@ import type { ServerFunctionClient } from 'payload'
 import type React from 'react'
 
 import { importMap } from './admin/importMap'
+// Payload's own admin stylesheet — theme variables, layout grid, nav rail, form controls.
+// Must come before `custom.scss`, which overrides it.
+import '@payloadcms/next/css'
 import './custom.scss'
 
 /**
