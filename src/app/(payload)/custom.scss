@@ -904,24 +904,55 @@ body {
 
 .template-default {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   background: #f5f7f4;
   color: #17342e;
 }
 
+/* Sidebar/Navigation — fixed left column with proper height */
+.template-default .layout {
+  display: flex;
+  min-height: 100vh;
+}
+
 .template-default .nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 260px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
   border-right: 1px solid rgb(255 255 255 / 7%);
   background: #102d29;
   color: #f5f8f5;
+  box-shadow: 2px 0 20px rgb(0 0 0 / 6%);
+  z-index: 100;
 }
 
 .template-default .nav__scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
   background: transparent;
+  padding: 0;
 }
 
 .template-default .nav__brand {
-  padding-top: 21px;
-  padding-bottom: 21px;
+  padding-top: 24px;
+  padding-bottom: 24px;
   border-bottom: 1px solid rgb(255 255 255 / 9%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.template-default .nav__inner {
+  padding: 12px;
 }
 
 .template-default .nav__link,
@@ -932,23 +963,36 @@ body {
     background-color 160ms ease,
     color 160ms ease,
     transform 160ms ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  width: 100%;
 }
 
 .template-default .nav__link:hover,
 .template-default .nav-group__toggle:hover {
   background: rgb(255 255 255 / 7%);
   color: #ffffff;
+  transform: translateX(2px);
 }
 
 .template-default .nav__link--active,
 .template-default .nav__link.active {
   background: rgb(190 211 190 / 13%);
   color: #ffffff;
+  box-shadow: inset 3px 0 0 #6f9580;
 }
 
 .template-default .nav__link-indicator {
   border-radius: 999px;
   background: #bfd2b8;
+  width: 6px;
+  height: 6px;
+  margin-left: auto;
 }
 
 .template-default .nav-group__toggle {
@@ -957,6 +1001,17 @@ body {
   font-weight: 700;
   letter-spacing: 0.13em;
   text-transform: uppercase;
+  padding: 16px 14px 8px;
+  cursor: pointer;
+}
+
+.template-default .nav-group {
+  margin-top: 4px;
+}
+
+.template-default .nav-group__content {
+  padding-left: 8px;
+  margin-bottom: 8px;
 }
 
 .template-default .nav__brand .hg-admin-icon {
@@ -965,41 +1020,81 @@ body {
 
 .template-default .hg-admin-logo {
   color: #f3f7f3;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.template-default .hg-admin-logo__mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid rgb(255 255 255 / 15%);
 }
 
 .template-default .hg-admin-logo__name {
   color: #f3f7f3;
+  font-size: 15px;
+  font-weight: 650;
 }
 
 .template-default .hg-admin-logo__descriptor {
   color: #a9c0b3;
+  font-size: 9px;
+  letter-spacing: 0.12em;
 }
 
-.hg-admin-icon {
-  display: grid;
-  width: 40px;
-  height: 40px;
-  place-items: center;
-  border: 1px solid rgb(217 232 216 / 21%);
-  border-radius: 13px;
-  background: rgb(255 255 255 / 8%);
-  color: #d8e5d2;
-}
-
-.hg-admin-icon svg {
-  width: 27px;
-  height: 27px;
-  overflow: visible;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.7;
+/* Main content area — takes remaining space after sidebar */
+.template-default .main {
+  flex: 1;
+  margin-left: 260px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .template-default .app-header {
   border-bottom: 1px solid #e6ece7;
   background: rgb(250 251 249 / 94%);
   backdrop-filter: blur(16px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.template-default .app-header__inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.template-default .app-header__breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #598392;
+  font-size: 13px;
+}
+
+.template-default .app-header__breadcrumbs a {
+  color: #124559;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.template-default .app-header__breadcrumbs a:hover {
+  color: #103f36;
+}
+
+.template-default .app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .template-default .app-header .btn--style-primary,
@@ -1012,6 +1107,14 @@ body {
     transform 160ms ease,
     box-shadow 160ms ease,
     background-color 160ms ease;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .template-default .app-header .btn--style-primary:hover,
@@ -1023,69 +1126,28 @@ body {
 
 .template-default .btn--style-secondary {
   border-radius: 10px;
-}
-
-.template-default .field-type input:not([type='checkbox']):not([type='radio']):not([type='file']),
-.template-default .field-type textarea,
-.template-default .field-type select {
-  border-color: #dce6de;
-  border-radius: 9px;
-  background-color: #ffffff;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid #dde3e4;
+  background: #ffffff;
   color: #17342e;
-  transition:
-    border-color 150ms ease,
-    box-shadow 150ms ease;
+  cursor: pointer;
+  transition: all 150ms ease;
 }
 
-.template-default .field-type input:not([type='checkbox']):not([type='radio']):not([type='file']):focus,
-.template-default .field-type textarea:focus,
-.template-default .field-type select:focus {
-  border-color: #6e9b86;
-  box-shadow: 0 0 0 3px rgb(80 133 108 / 13%);
-  outline: none;
+.template-default .btn--style-secondary:hover {
+  background: #f8faf7;
+  border-color: #c2d3c6;
 }
 
-.template-default .field-label {
-  color: #29483e;
-  font-weight: 650;
-}
-
-.template-default .field-description {
-  color: #70827a;
-}
-
-.template-default .table thead th {
-  color: #718078;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.template-default .table tbody tr {
-  transition: background-color 130ms ease;
-}
-
-.template-default .table tbody tr:hover {
-  background: #f6f9f6;
-}
-
-.template-default .table td,
-.template-default .table th {
-  border-color: #e8eee9;
-}
-
-.template-default .pill,
-.template-default .badge {
-  border-radius: 999px;
-}
-
-/* Dashboard */
+/* Dashboard content container */
 .hg-dashboard {
   box-sizing: border-box;
-  width: min(100%, 1580px);
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 34px clamp(22px, 3vw, 50px) 68px;
+  padding: 34px 40px 68px;
   color: #17342e;
 }
 
@@ -1721,6 +1783,24 @@ body {
   background: #ffffff;
   color: #52675c;
   text-align: center;
+}
+
+/* Scrollbar styling for sidebar */
+.template-default .nav__scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.template-default .nav__scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.template-default .nav__scroll::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 15%);
+  border-radius: 4px;
+}
+
+.template-default .nav__scroll::-webkit-scrollbar-thumb:hover {
+  background: rgb(255 255 255 / 25%);
 }
 
 @media (max-width: 1180px) {
