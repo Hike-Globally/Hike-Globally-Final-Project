@@ -902,157 +902,685 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* Payload lays the admin out with its own CSS grid (`--nav-width` + content column), so the
+   surface rules here must not introduce a competing display mode. */
 .template-default {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
   background: #f5f7f4;
   color: #17342e;
 }
 
-/* Sidebar/Navigation — fixed left column with proper height */
-.template-default .layout {
-  display: flex;
-  min-height: 100vh;
+/* --------------------------------------------------------------------------
+   Sidebar — the workspace rail
+
+   Payload positions the rail with its own CSS grid (`--nav-width` + content),
+   so this block styles the surface and its internals only: a pinned brand
+   header, a scrolling list of collections and a pinned account footer. The
+   markup is Payload's own (`.nav__scroll` > `.nav__wrap` + `.nav__controls`)
+   plus the two components registered in `payload.config.ts`
+   (`nav-brand`, `nav-sign-out`). Icons are pure CSS masks keyed off the stable
+   `#nav-<slug>` ids Payload renders, so new collections are one line each.
+   -------------------------------------------------------------------------- */
+.template-default {
+  --hg-nav-bg: #0e2c27;
+  --hg-nav-text: rgb(224 239 228 / 66%);
+  --hg-nav-text-strong: #ffffff;
+  --hg-nav-accent: #9ed0ac;
+  --hg-nav-hairline: rgb(255 255 255 / 7%);
+  --hg-nav-font: 'Archivo Variable', 'Archivo', Arial, sans-serif;
 }
 
 .template-default .nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 260px;
-  flex-shrink: 0;
+  z-index: 1;
+  border-right: 1px solid var(--hg-nav-hairline);
+  background-color: var(--hg-nav-bg);
+  background-image: radial-gradient(120% 58% at 50% -8%, rgb(151 201 166 / 15%), transparent 62%);
+  box-shadow: 12px 0 34px rgb(3 20 17 / 10%);
+  color: var(--hg-nav-text);
+  font-family: var(--hg-nav-font);
+}
+
+/* The scrolling area is the rail itself; the list inside it does the scrolling. */
+.template-default .nav__scroll {
   display: flex;
   flex-direction: column;
-  border-right: 1px solid rgb(255 255 255 / 7%);
-  background: #102d29;
-  color: #f5f8f5;
-  box-shadow: 2px 0 20px rgb(0 0 0 / 6%);
-  z-index: 100;
-}
-
-.template-default .nav__scroll {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  background: transparent;
   padding: 0;
+  overflow: hidden;
 }
 
-.template-default .nav__brand {
-  padding-top: 24px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid rgb(255 255 255 / 9%);
+/* -- Brand ---------------------------------------------------------------- */
+.template-default .hg-nav-brand {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
-  justify-content: center;
-  padding-left: 20px;
-  padding-right: 20px;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 16px 14px 15px 16px;
+  border-bottom: 1px solid var(--hg-nav-hairline);
 }
 
-.template-default .nav__inner {
-  padding: 12px;
+.template-default .hg-nav-brand__identity {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 11px;
+  border-radius: 12px;
+  color: inherit;
+  text-decoration: none;
 }
 
-.template-default .nav__link,
-.template-default .nav-group__toggle {
-  border-radius: 10px;
-  color: rgb(242 248 243 / 70%);
+.template-default .hg-nav-brand__mark {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 11px;
+  background: linear-gradient(150deg, rgb(255 255 255 / 15%), rgb(255 255 255 / 3%));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 12%),
+    0 4px 12px rgb(2 16 13 / 28%);
+}
+
+.template-default .hg-nav-brand__mark svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: #cfe6d3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.9;
+}
+
+.template-default .hg-nav-brand__wordmark {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.template-default .hg-nav-brand__name {
+  overflow: hidden;
+  color: #f4f9f4;
+  font-family: 'Google Sans Flex Variable', 'Google Sans Flex', var(--hg-nav-font);
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.template-default .hg-nav-brand__descriptor {
+  color: rgb(214 233 219 / 45%);
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.145em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.template-default .hg-nav-brand__actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+}
+
+.template-default .hg-nav-brand__action {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 8px;
+  background: transparent;
+  color: rgb(224 239 228 / 55%);
+  cursor: pointer;
+  text-decoration: none;
   transition:
     background-color 160ms ease,
+    border-color 160ms ease,
     color 160ms ease,
     transform 160ms ease;
+}
+
+.template-default .hg-nav-brand__action svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.9;
+}
+
+.template-default .hg-nav-brand__action:hover {
+  transform: translateY(-1px);
+  border-color: rgb(255 255 255 / 20%);
+  background: rgb(255 255 255 / 8%);
+  color: #ffffff;
+}
+
+/* Payload's `.nav__header` is a full-width strip layered above the rail (it holds the mobile
+   close button and stretches across the content column). Only the close button should react to
+   pointer events, or it swallows clicks meant for the brand block underneath it. */
+.template-default .nav__header,
+.template-default .nav__header-content {
+  pointer-events: none;
+}
+
+.template-default .nav__mobile-close {
+  pointer-events: auto;
+}
+
+/* -- Link list ------------------------------------------------------------ */
+.template-default .nav__wrap {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
-  width: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  padding: 14px 12px 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-color: rgb(255 255 255 / 16%) transparent;
+  scrollbar-width: thin;
 }
 
-.template-default .nav__link:hover,
-.template-default .nav-group__toggle:hover {
-  background: rgb(255 255 255 / 7%);
-  color: #ffffff;
-  transform: translateX(2px);
-}
-
-.template-default .nav__link--active,
-.template-default .nav__link.active {
-  background: rgb(190 211 190 / 13%);
-  color: #ffffff;
-  box-shadow: inset 3px 0 0 #6f9580;
-}
-
-.template-default .nav__link-indicator {
-  border-radius: 999px;
-  background: #bfd2b8;
+.template-default .nav__wrap::-webkit-scrollbar {
   width: 6px;
-  height: 6px;
-  margin-left: auto;
 }
 
-.template-default .nav-group__toggle {
-  color: rgb(230 239 231 / 46%);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  padding: 16px 14px 8px;
-  cursor: pointer;
+.template-default .nav__wrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.template-default .nav__wrap::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgb(255 255 255 / 14%);
+}
+
+.template-default .nav__wrap::-webkit-scrollbar-thumb:hover {
+  background: rgb(255 255 255 / 24%);
 }
 
 .template-default .nav-group {
-  margin-top: 4px;
+  width: 100%;
+  margin: 0;
+}
+
+.template-default .nav-group + .nav-group {
+  margin-top: 13px;
+  padding-top: 13px;
+  border-top: 1px solid rgb(255 255 255 / 5%);
+}
+
+.template-default .nav-group__toggle {
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  margin: 0 0 5px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: rgb(214 233 219 / 40%);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.17em;
+  line-height: 1.4;
+  text-align: left;
+  text-transform: uppercase;
+  transition: color 160ms ease;
+}
+
+.template-default .nav-group__toggle:hover,
+.template-default .nav-group__toggle:focus-visible {
+  color: rgb(224 239 228 / 74%);
+}
+
+.template-default .nav-group__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.template-default .nav-group__indicator {
+  opacity: 0.45;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.template-default .nav-group__indicator svg {
+  width: 14px;
+  height: 14px;
+  margin-top: 0;
+}
+
+.template-default .nav-group__toggle:hover .nav-group__indicator {
+  opacity: 0.8;
 }
 
 .template-default .nav-group__content {
-  padding-left: 8px;
-  margin-bottom: 8px;
-}
-
-.template-default .nav__brand .hg-admin-icon {
-  margin: 0 auto;
-}
-
-.template-default .hg-admin-logo {
-  color: #f3f7f3;
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+}
+
+.template-default .nav__link {
+  position: relative;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 9px;
+  color: var(--hg-nav-text);
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: -0.004em;
+  text-decoration: none;
+  transition:
+    background-color 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease;
+}
+
+/* Payload's default active marker (a bar at the far left) is replaced by the
+   filled state below, which reads better against a padded, rounded link. */
+.template-default .nav__link-indicator {
+  display: none;
+}
+
+.template-default .nav__link::before {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  background-color: currentColor;
+  content: '';
+  opacity: 0.85;
+  -webkit-mask-image: var(--hg-nav-icon);
+  mask-image: var(--hg-nav-icon);
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 17px 17px;
+  mask-size: 17px 17px;
+  transition: opacity 160ms ease;
+}
+
+.template-default .nav__link-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.template-default .nav__link:hover,
+.template-default .nav__link:focus-visible {
+  background: rgb(255 255 255 / 6%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 5%);
+  color: var(--hg-nav-text-strong);
   text-decoration: none;
 }
 
-.template-default .hg-admin-logo__mark {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  border: 1px solid rgb(255 255 255 / 15%);
+.template-default .nav__link:hover::before,
+.template-default .nav__link:focus-visible::before {
+  opacity: 1;
 }
 
-.template-default .hg-admin-logo__name {
-  color: #f3f7f3;
-  font-size: 15px;
-  font-weight: 650;
+.template-default .nav__link.active,
+.template-default .nav__link:has(.nav__link-indicator) {
+  background: linear-gradient(
+    95deg,
+    rgb(158 208 172 / 20%) 0%,
+    rgb(158 208 172 / 8%) 55%,
+    rgb(158 208 172 / 2%) 100%
+  );
+  box-shadow:
+    inset 2px 0 0 var(--hg-nav-accent),
+    inset 0 0 0 1px rgb(158 208 172 / 12%);
+  color: var(--hg-nav-text-strong);
+  font-weight: 600;
+  padding-left: 10px;
 }
 
-.template-default .hg-admin-logo__descriptor {
-  color: #a9c0b3;
-  font-size: 9px;
-  letter-spacing: 0.12em;
+.template-default .nav__link.active::before,
+.template-default .nav__link:has(.nav__link-indicator)::before {
+  color: var(--hg-nav-accent);
+  opacity: 1;
 }
 
-/* Main content area — takes remaining space after sidebar */
-.template-default .main {
-  flex: 1;
-  margin-left: 260px;
+/* -- Per-collection icons (stable `#nav-<slug>` ids from Payload) --------- */
+.template-default .nav__link {
+  --hg-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='7.5'/%3E%3C/svg%3E");
+}
+
+.template-default #nav-trips {
+  --hg-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m8 3 4 8 5-5 5 15H2L8 3z'/%3E%3C/svg%3E");
+}
+
+.template-default #nav-destinations {
+  --hg-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3C/svg%3E");
+}
+
+.template-default #nav-blog {
+  --hg-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 7v14'/%3E%3Cpath d='M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z'/%3E%3C/svg%3E");
+}
+
+.template-default #nav-pages {
+  --hg-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='18' height='7' x='3' y='3' rx='1'/%3E%3Crect width='9' height='7' x='3' y='14' rx='1'/%3E%3Crect width='5' height='7' x='16' y='14' rx='1'/%3E%3C/svg%3E");
+}
+
+.template-default #nav-media {
+  --hg-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='18' height='18' x='3' y='3' rx='2'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Cpath d='m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21'/%3E%3C/svg%3E");
+}
+
+.template-default #nav-users {
+  --hg-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='9' cy='7' r='4'/%3E%3Cpath d='M22 21v-2a4 4 0 0 0-3-3.87'/%3E%3Cpath d='M16 3.13a4 4 0 0 1 0 7.75'/%3E%3C/svg%3E");
+}
+
+.template-default #nav-global-header {
+  --hg-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='18' height='18' x='3' y='3' rx='2'/%3E%3Cpath d='M3 9h18'/%3E%3C/svg%3E");
+}
+
+.template-default #nav-global-footer {
+  --hg-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='18' height='18' x='3' y='3' rx='2'/%3E%3Cpath d='M3 15h18'/%3E%3C/svg%3E");
+}
+
+.template-default #nav-global-settings {
+  --hg-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4'/%3E%3C/svg%3E");
+}
+
+/* -- Rail toggle ----------------------------------------------------------
+   Payload renders a floating collapse button over the top-left of the content
+   column. While the rail is open that lands on the brand block, so it steps
+   aside and the chevron in the brand header drives the same state. Once the
+   rail is collapsed this button is the only way back, so it keeps its place —
+   restyled to match the rail it reopens.
+   -------------------------------------------------------------------------- */
+/* `.template-default__nav-toggler-wrapper` is a sibling of the template (it is rendered before
+   it), so it is styled on its own — its open/closed state is read from the toggler it holds. */
+.template-default__nav-toggler-wrapper:has(.nav-toggler--is-open) {
+  display: none;
+}
+
+.template-default__nav-toggler-wrapper:not(:has(.nav-toggler--is-open)) {
+  display: flex;
+}
+
+.template-default__nav-toggler-wrapper .template-default__nav-toggler {
+  padding: 0;
+}
+
+.template-default__nav-toggler-wrapper .template-default__nav-toggler .hamburger {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid #d9e3db;
+  border-radius: 11px;
+  background: #ffffff;
+  box-shadow: 0 5px 14px rgb(11 40 34 / 9%);
+  color: #12453b;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.template-default__nav-toggler-wrapper .template-default__nav-toggler:hover .hamburger {
+  transform: translateY(-1px);
+  border-color: #bcd2c2;
+  box-shadow: 0 8px 18px rgb(11 40 34 / 13%);
+}
+
+.template-default__nav-toggler-wrapper .hamburger__close-icon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.template-default__nav-toggler-wrapper .hamburger__close-icon svg .stroke {
+  stroke: currentColor;
+  stroke-width: 1.6px;
+}
+
+/* -- Account footer ------------------------------------------------------- */
+.template-default .nav__controls {
+  position: sticky;
+  bottom: 0;
+  gap: 4px;
+  margin-top: auto;
+  padding: 14px 12px 14px;
+  border-top: 1px solid var(--hg-nav-hairline);
+  background-color: var(--hg-nav-bg);
+  background-image: linear-gradient(180deg, rgb(255 255 255 / 0%) 0%, rgb(255 255 255 / 2%) 100%);
+}
+
+.template-default .nav__controls > :first-child {
+  margin-top: 0;
+}
+
+.template-default .hg-nav-account {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  gap: 3px;
 }
+
+.template-default .hg-nav-account__identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px;
+  border-radius: 10px;
+  color: inherit;
+  text-decoration: none;
+  transition: background-color 160ms ease;
+}
+
+.template-default .hg-nav-account__identity:hover {
+  background: rgb(255 255 255 / 5%);
+}
+
+.template-default .hg-nav-account__avatar {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 50%;
+  background: linear-gradient(150deg, #2f7059 0%, #1b4a3c 100%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 14%);
+  color: #e2f1e6;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.template-default .hg-nav-account__copy {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.template-default .hg-nav-account__name {
+  overflow: hidden;
+  color: #f2f8f3;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.template-default .hg-nav-account__meta {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  color: rgb(214 233 219 / 48%);
+  font-size: 10px;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.template-default .hg-nav-account__role {
+  flex: 0 0 auto;
+  padding: 1.5px 6px;
+  border: 1px solid rgb(158 208 172 / 26%);
+  border-radius: 999px;
+  background: rgb(158 208 172 / 12%);
+  color: #bde0c7;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.template-default .hg-nav-account__sign-out {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 10px;
+  border: 1px solid rgb(255 255 255 / 7%);
+  border-radius: 10px;
+  background: rgb(255 255 255 / 4%);
+  color: rgb(232 243 235 / 78%);
+  cursor: pointer;
+  font-family: var(--hg-nav-font);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  text-align: left;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+.template-default .hg-nav-account__sign-out svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.template-default .hg-nav-account__sign-out:hover:not(:disabled) {
+  border-color: rgb(219 132 120 / 34%);
+  background: rgb(219 132 120 / 14%);
+  color: #f7dcd6;
+}
+
+.template-default .hg-nav-account__sign-out:disabled {
+  cursor: progress;
+  opacity: 0.62;
+}
+
+.template-default .hg-nav-account__failure {
+  margin: 5px 2px 0;
+  color: #f0c8c0;
+  font-size: 10.5px;
+  line-height: 1.45;
+}
+
+/* -- Focus + motion ------------------------------------------------------- */
+.template-default .nav__link:focus-visible,
+.template-default .nav-group__toggle:focus-visible,
+.template-default .hg-nav-brand__identity:focus-visible,
+.template-default .hg-nav-brand__action:focus-visible,
+.template-default .hg-nav-account__identity:focus-visible,
+.template-default .hg-nav-account__sign-out:focus-visible {
+  outline: 2px solid rgb(158 208 172 / 75%);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .template-default .nav__link,
+  .template-default .nav__link::before,
+  .template-default .nav-group__toggle,
+  .template-default .nav-group__indicator,
+  .template-default .hg-nav-brand__action,
+  .template-default .hg-nav-account__identity,
+  .template-default .hg-nav-account__sign-out {
+    transition: none;
+  }
+}
+
+/* -- Compact rail --------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .template-default .nav__wrap {
+    padding: 12px 10px 0;
+  }
+
+  .template-default .nav__controls {
+    padding: 12px 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Below this width Payload turns the rail into a full-screen drawer and opens it from the
+     hamburger in the app header. Its floating toggle must stay out of the way — the rules above
+     would otherwise re-show it next to that hamburger. */
+  .template-default__nav-toggler-wrapper .template-default__nav-toggler .hamburger {
+    display: none;
+  }
+
+  /* The close button floats above the brand block instead of sitting on the app-header row. */
+  .template-default .nav__header {
+    top: 12px;
+    right: 12px;
+    left: auto;
+    width: auto;
+    height: auto;
+  }
+
+  .template-default .nav__mobile-close {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    place-items: center;
+    border: 1px solid rgb(255 255 255 / 12%);
+    border-radius: 10px;
+    background: rgb(255 255 255 / 6%);
+    color: rgb(232 243 235 / 80%);
+  }
+
+  .template-default .nav__mobile-close svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .template-default .hg-nav-brand {
+    padding-right: 58px;
+  }
+
+  /* The rail is a full-screen drawer at this width, so collapsing it makes no sense. */
+  .template-default .hg-nav-brand__action--collapse {
+    display: none;
+  }
+
+  .template-default .nav__link {
+    font-size: 14px;
+    line-height: 1.4;
+    padding: 9px 11px;
+  }
+}
+
+/* Main content area — Payload owns the grid column that follows the rail. */
 
 .template-default .app-header {
   border-bottom: 1px solid #e6ece7;
@@ -1783,24 +2311,6 @@ body {
   background: #ffffff;
   color: #52675c;
   text-align: center;
-}
-
-/* Scrollbar styling for sidebar */
-.template-default .nav__scroll::-webkit-scrollbar {
-  width: 4px;
-}
-
-.template-default .nav__scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.template-default .nav__scroll::-webkit-scrollbar-thumb {
-  background: rgb(255 255 255 / 15%);
-  border-radius: 4px;
-}
-
-.template-default .nav__scroll::-webkit-scrollbar-thumb:hover {
-  background: rgb(255 255 255 / 25%);
 }
 
 @media (max-width: 1180px) {

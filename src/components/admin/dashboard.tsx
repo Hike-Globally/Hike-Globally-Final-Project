@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import type { AdminViewServerProps } from 'payload'
-import { DefaultTemplate } from '@payloadcms/next/templates'
 import {
   ArrowRight,
   ArrowUpRight,
@@ -31,31 +30,15 @@ const formatDate = (value: string) => {
   return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' }).format(date)
 }
 
-export default async function AdminDashboard({
-  initPageResult,
-  params,
-  searchParams,
-  user,
-}: AdminViewServerProps) {
+export default async function AdminDashboard({ initPageResult, user }: AdminViewServerProps) {
   const payload = initPageResult.req.payload
   const principal = initPageResult.req.user
 
   if (!principal) {
     return (
-      <DefaultTemplate
-        i18n={initPageResult.req.i18n}
-        locale={initPageResult.locale}
-        params={params}
-        payload={payload}
-        permissions={initPageResult.permissions}
-        searchParams={searchParams}
-        user={user}
-        visibleEntities={initPageResult.visibleEntities}
-      >
-        <main className="hg-dashboard">
-          <p className="hg-dashboard__empty">Please sign in to view the Hike Globally workspace.</p>
-        </main>
-      </DefaultTemplate>
+      <main className="hg-dashboard">
+        <p className="hg-dashboard__empty">Please sign in to view the Hike Globally workspace.</p>
+      </main>
     )
   }
 
@@ -205,17 +188,7 @@ export default async function AdminDashboard({
   ]
 
   return (
-    <DefaultTemplate
-      i18n={initPageResult.req.i18n}
-      locale={initPageResult.locale}
-      params={params}
-      payload={payload}
-      permissions={initPageResult.permissions}
-      searchParams={searchParams}
-      user={user}
-      visibleEntities={initPageResult.visibleEntities}
-    >
-      <main className="hg-dashboard">
+    <main className="hg-dashboard">
         <section className="hg-dashboard__hero" aria-labelledby="hg-dashboard-title">
           <div className="hg-dashboard__hero-topline">
             <span className="hg-dashboard__eyebrow">
@@ -363,9 +336,8 @@ export default async function AdminDashboard({
               <Images aria-hidden="true" size={15} strokeWidth={1.8} />
               <span>Images and video, together in your media library.</span>
             </div>
-          </aside>
-        </div>
-      </main>
-    </DefaultTemplate>
+        </aside>
+      </div>
+    </main>
   )
 }

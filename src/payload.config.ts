@@ -20,6 +20,7 @@ import { Settings } from './globals/Settings'
 import { defaultLocale, localeMeta, locales } from './i18n/config'
 import { migrations } from './migrations'
 import { resolveSiteUrl } from './lib/site-url'
+import { trustedOrigins } from './lib/trusted-origins'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -47,6 +48,12 @@ export default buildConfig({
     components: {
       beforeLogin: ['@/components/admin/login-gallery'],
       afterLogin: ['@/components/admin/login-footer'],
+      // The sidebar rail: a pinned brand header above the links, and a sign-out block that
+      // verifies the session is really gone before it leaves the page.
+      beforeNav: ['@/components/admin/nav-brand'],
+      logout: {
+        Button: '@/components/admin/nav-sign-out',
+      },
       graphics: {
         Logo: '@/components/admin/admin-logo',
         Icon: '@/components/admin/admin-icon',
@@ -119,8 +126,9 @@ export default buildConfig({
   sharp,
   telemetry: false,
 
-  cors: [siteUrl, 'http://localhost:3000'].filter(Boolean),
-  csrf: [siteUrl, 'http://localhost:3000'].filter(Boolean),
+  // Shared with the middleware, which defers to these origins instead of rewriting their headers.
+  cors: trustedOrigins(),
+  csrf: trustedOrigins(),
 
   upload: {
     // Leave headroom for multipart form fields and let temporary files handle large video uploads.
