@@ -4,7 +4,6 @@ import { fileURLToPath } from 'url'
 
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { FixedToolbarFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
-import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import { buildConfig } from 'payload'
 import sharp from 'sharp'
 
@@ -19,8 +18,11 @@ import { Header } from './globals/Header'
 import { Settings } from './globals/Settings'
 import { defaultLocale, localeMeta, locales } from './i18n/config'
 import { migrations } from './migrations'
+import { resolveMediaStorage } from './lib/media-storage'
+import { MEDIA_FILES_TABLE } from './lib/media-storage-schema'
 import { resolveSiteUrl } from './lib/site-url'
 import { trustedOrigins } from './lib/trusted-origins'
+import { mediaStoragePlugin } from './storage/plugin'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -40,6 +42,16 @@ const payloadSecret =
 
 // Allow high-resolution photos and long-form expedition footage without keeping uploads in RAM.
 const maxMediaUploadSize = 1024 * 1024 * 1024
+
+// Where uploaded files physically live: Vercel Blob when a token is configured, Postgres on a
+// serverless host that has no external storage, and the local disk everywhere else. The rules (and
+// the reasoning) are in src/lib/media-storage.ts.
+const mediaStorage = resolveMediaStorage()
+
+// Which storage the deployment actually uses, and why — logged once per process so an upload that
+// fails because of missing storage configuration is never a mystery again.
+const logMediaStorage = mediaStorage.mode === 'database' ? console.warn : console.log
+logMediaStorage(`[media] storage mode: ${mediaStorage.mode} — ${mediaStorage.reason}`)
 
 export default buildConfig({
   admin: {
@@ -117,6 +129,13 @@ export default buildConfig({
     // `push` is intentionally NOT used: production changes go through real migration files
     // (npm run migrate:create). Set PAYLOAD_PUSH=true only for throwaway local databases.
     // push: process.env.PAYLOAD_PUSH === 'true',
+
+    // Payload's dev-mode schema push only knows the tables it generates from the config. The
+    // media store's `media_files` table is owned by the migration / boot-time DDL, so without this
+    // filter drizzle offers to DROP it on every dev start — one stray `y` and every stored upload
+    // is gone. Excluding it from introspection keeps push for everything else. (tablesFilter only
+    // affects drizzle-kit push; `npm run migrate:create` is unaffected.)
+    tablesFilter: [`!${MEDIA_FILES_TABLE}`],
   }),
 
   collections: [Users, Media, Destinations, Trips, Blog, Pages],
@@ -155,20 +174,7 @@ export default buildConfig({
     },
   },
 
-  plugins: [
-    // Media lives on Vercel Blob in production (the filesystem is read-only there).
-    // With no token present the plugin is a no-op and uploads fall back to ./public/media.
-    vercelBlobStorage({
-      collections: { media: true },
-      // Temporary diagnostic: route uploads through the app server instead of the browser-to-Blob
-      // client flow. This is suitable for small test images (Vercel Functions have a ~4.5 MB limit).
-      // Re-enable client uploads once the direct Blob upload path is fixed.
-      clientUploads: false,
-      token: process.env.BLOB_READ_WRITE_TOKEN,
-      addRandomSuffix: false,
-      cacheControlMaxAge: 60 * 60 * 24 * 365,
-    }),
-  ],
+  plugins: [mediaStoragePlugin(mediaStorage.mode)],
 
   graphQL: {
     schemaOutputFile: path.resolve(dirname, '../generated-schema.graphql'),
