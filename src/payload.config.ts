@@ -48,9 +48,10 @@ export default buildConfig({
     components: {
       beforeLogin: ['@/components/admin/login-gallery'],
       afterLogin: ['@/components/admin/login-footer'],
-      // The sidebar rail: a pinned brand header above the links, and a sign-out block that
-      // verifies the session is really gone before it leaves the page.
-      beforeNav: ['@/components/admin/nav-brand'],
+      // The sidebar rail is a bespoke component (brand header, filterable sections, pinned
+      // account footer). `logout.Button` points at the same sign-out the rail renders, so
+      // Payload's own logout slot keeps working if the default nav is ever restored.
+      Nav: '@/components/admin/nav',
       logout: {
         Button: '@/components/admin/nav-sign-out',
       },
