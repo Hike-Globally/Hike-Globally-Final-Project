@@ -160,8 +160,10 @@ export default buildConfig({
     // With no token present the plugin is a no-op and uploads fall back to ./public/media.
     vercelBlobStorage({
       collections: { media: true },
-      // Upload directly from the browser to avoid Vercel Functions' 4.5 MB request limit.
-      clientUploads: true,
+      // Temporary diagnostic: route uploads through the app server instead of the browser-to-Blob
+      // client flow. This is suitable for small test images (Vercel Functions have a ~4.5 MB limit).
+      // Re-enable client uploads once the direct Blob upload path is fixed.
+      clientUploads: false,
       token: process.env.BLOB_READ_WRITE_TOKEN,
       addRandomSuffix: false,
       cacheControlMaxAge: 60 * 60 * 24 * 365,
