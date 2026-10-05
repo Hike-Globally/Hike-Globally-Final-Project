@@ -200,7 +200,12 @@ export const revalidatePageDelete = pageHooks.afterDelete
  */
 export const revalidateGlobal =
   (global: 'header' | 'footer' | 'settings'): GlobalAfterChangeHook =>
-  (doc) => {
+  // Payload calls an afterChange hook with ONE argument — the whole args object
+  // ({ doc, previousDoc, req, global, context, … }), and whatever the hook returns REPLACES the
+  // saved document. Destructuring here and returning only `doc` is therefore essential: returning
+  // `args` would hand Payload's internal `req`/`payload`/`db` objects back as the "global", and the
+  // REST handler would then fail to serialise them (circular structure) with a 500 on every save.
+  ({ doc }) => {
     const tag =
       global === 'header' ? CACHE_TAG.header : global === 'footer' ? CACHE_TAG.footer : CACHE_TAG.settings
 
