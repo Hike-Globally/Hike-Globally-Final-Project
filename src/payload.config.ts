@@ -3,7 +3,7 @@ import { tmpdir } from 'os'
 import { fileURLToPath } from 'url'
 
 import { postgresAdapter } from '@payloadcms/db-postgres'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { FixedToolbarFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import { buildConfig } from 'payload'
 import sharp from 'sharp'
@@ -82,7 +82,19 @@ export default buildConfig({
 
   // Lexical is Payload's default rich-text editor. It stores structured JSON (not HTML), which
   // lets the frontend render it with zero client-side JavaScript.
-  editor: lexicalEditor(),
+  //
+  // Out of the box Lexical only shows a floating popup toolbar once you select some text, so the
+  // available formatting is invisible until you know to look for it. Adding `FixedToolbarFeature`
+  // pins a full ribbon above the editor — headings, bold/italic/underline, lists, alignment,
+  // links, quotes, images — always on screen, the way MS Word and the WordPress editor behave.
+  // Every standard feature already registers its own fixed-toolbar group, so enabling this one
+  // feature surfaces the whole set; nothing is added to the stored document shape.
+  editor: lexicalEditor({
+    features: ({ defaultFeatures }) => [...defaultFeatures, FixedToolbarFeature()],
+    admin: {
+      placeholder: 'Start writing…',
+    },
+  }),
 
   db: postgresAdapter({
     pool: {

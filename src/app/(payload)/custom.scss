@@ -2474,3 +2474,107 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* --------------------------------------------------------------------------
+   Rich-text editor — a WordPress-style content box
+
+   Payload ships Lexical chromeless: the writing surface floats straight onto
+   the page with no box around it, and the formatting controls exist only as a
+   popup that appears *after* you select some text — so headings, bold and
+   linking are invisible until you already know they are there.
+
+   `FixedToolbarFeature` in `payload.config.ts` pins the ribbon above the
+   surface; these rules give the pair one card to live in, so the field reads as
+   a single document box the way the WordPress editor does — toolbar strip
+   across the top, generous writing area below — and picks up the same border,
+   hover and focus treatment as every other input in the form.
+
+   Two deliberate details:
+   • Selectors start at `.field-type.rich-text-lexical`, one class deeper than
+     Payload's own. The Lexical field imports its stylesheet from the client
+     bundle, which can land after this file in the cascade, so the result must
+     not depend on load order.
+   • Every card rule is scoped `:not(.error)`, leaving Payload's validation
+     styling (red border and wash) completely untouched.
+   -------------------------------------------------------------------------- */
+
+/* The card. No `overflow: hidden` here on purpose: Payload makes the toolbar
+   `position: sticky` so it stays reachable while scrolling a long document, and
+   an `overflow` ancestor would quietly switch that off. The corners are rounded
+   on the card and on the toolbar separately instead. Nothing is clipped by the
+   missing `overflow` either — the ribbon's dropdown menus are portalled to
+   <body>. */
+.field-type.rich-text-lexical:not(.error) .rich-text-lexical__wrap {
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--style-radius-s);
+  background: var(--theme-input-bg);
+  box-shadow: 0 2px 2px -1px rgb(0 0 0 / 10%);
+  transition:
+    border-color 100ms cubic-bezier(0, 0.2, 0.2, 1),
+    box-shadow 100ms cubic-bezier(0, 0.2, 0.2, 1);
+}
+
+.field-type.rich-text-lexical:not(.error):hover .rich-text-lexical__wrap {
+  border-color: var(--theme-elevation-250);
+}
+
+/* Typing anywhere inside the card lights up its whole outline, like a focused
+   text input. */
+.field-type.rich-text-lexical:not(.error):focus-within .rich-text-lexical__wrap {
+  border-color: var(--theme-elevation-400);
+}
+
+/* The ribbon. Payload's rule draws a border all the way round the toolbar and
+   nudges it down 1px so it overlaps the surface below; inside a card it only
+   needs a baseline separating it from the text, plus the card's top corners. */
+.field-type.rich-text-lexical .fixed-toolbar {
+  min-height: 44px;
+  padding: 5px 7px;
+  border: 0;
+  border-bottom: 1px solid var(--theme-elevation-150);
+  border-radius: calc(var(--style-radius-s) - 1px) calc(var(--style-radius-s) - 1px) 0 0;
+  background: var(--theme-elevation-50);
+  transform: none;
+}
+
+/* Group separators need a little more weight to read against the tinted ribbon. */
+.field-type.rich-text-lexical .fixed-toolbar__group .divider {
+  height: 18px;
+  background-color: var(--theme-elevation-200);
+}
+
+/* A tall-enough writing surface: an empty Overview should still read as a
+   document area waiting to be filled, not a single collapsed line. */
+.field-type.rich-text-lexical .editor-scroller {
+  min-height: 240px;
+}
+
+/* Payload only ever pads the surface on the left (via the gutter) and the top,
+   so text would run into the card's right-hand border. */
+.field-type.rich-text-lexical .editor-scroller .editor .ContentEditable__root {
+  padding-right: 14px;
+}
+
+/* On narrow viewports Payload drops the gutter entirely, which would leave the
+   text flush against the left border too. The placeholder is absolutely
+   positioned, so it needs the matching inset or it drifts out of line with the
+   copy. Both selectors mirror Payload's own chain — plus the leading
+   `.field-type` — to out-rank it. */
+.field-type.rich-text-lexical:not(.rich-text-lexical--show-gutter)
+  > .rich-text-lexical__wrap
+  > .editor-container
+  > .editor-scroller
+  > .editor
+  > .ContentEditable__root {
+  padding-left: 14px;
+}
+
+.field-type.rich-text-lexical:not(.rich-text-lexical--show-gutter)
+  > .rich-text-lexical__wrap
+  > .editor-container
+  > .editor-scroller
+  > .editor
+  > div
+  > .LexicalEditorTheme__placeholder {
+  left: 14px;
+}
