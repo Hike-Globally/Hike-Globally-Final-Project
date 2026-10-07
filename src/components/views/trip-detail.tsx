@@ -9,6 +9,12 @@ import { Reveal } from '@/components/motion/reveal'
 import { InquiryForm } from '@/components/forms/inquiry-form'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
 import { PayloadImageFill, PayloadImage } from '@/components/ui/payload-image'
 import { getDictionary } from '@/i18n/dictionaries'
 import { localizedPath, type Locale } from '@/i18n/config'
@@ -250,39 +256,50 @@ export function TripDetail({
           <div className="container-content">
             <h2 className="heading-lg mb-10">{dict.trip.itinerary}</h2>
 
-            <ol className="relative space-y-4 border-l border-sage/60 pl-0">
+            <Accordion type="multiple" className="space-y-3">
               {trip.itinerary.map((day, index) => (
-                <Reveal key={day.id ?? index} delay={Math.min(index * 40, 240)}>
-                  <li className="relative pl-8">
-                    <span className="absolute top-6 -left-[0.9rem] grid size-7 place-items-center rounded-full border border-sage bg-mist font-heading text-[0.75rem] font-semibold text-deep">
-                      {day.day}
-                    </span>
-                    <div className="rounded-2xl border border-black/[0.06] bg-card p-6">
-                      <div className="flex flex-wrap items-baseline justify-between gap-3">
-                        <h3 className="font-heading text-lg font-semibold text-ink">{day.title}</h3>
-                        <div className="flex items-center gap-4 text-[0.8125rem] text-slate">
+                <AccordionItem
+                  key={day.id ?? index}
+                  value={`day-${day.id ?? index}`}
+                  className="overflow-hidden rounded-2xl border border-black/[0.06] bg-card px-5 shadow-[0_1px_2px_rgba(1,22,30,0.04)] last:border-b last:border-black/[0.06] md:px-7"
+                >
+                  <AccordionTrigger className="items-center py-5 hover:no-underline md:py-6">
+                    <span className="flex min-w-0 items-center gap-4">
+                      <span
+                        aria-hidden="true"
+                        className="grid size-10 shrink-0 place-items-center rounded-full border border-sage bg-mist font-heading text-sm font-semibold text-deep"
+                      >
+                        {day.day}
+                      </span>
+                      <span className="min-w-0 text-left">
+                        <span className="block font-heading text-base font-semibold text-ink md:text-lg">
+                          {day.title}
+                        </span>
+                        <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.75rem] text-slate md:text-[0.8125rem]">
+                          <span className="tracking-[0.12em] uppercase">
+                            {dict.trip.day} {day.day}
+                          </span>
                           {day.altitude ? (
                             <span className="flex items-center gap-1.5">
                               <Mountain className="size-3.5" aria-hidden />
                               {formatNumber(day.altitude, locale)} m
                             </span>
                           ) : null}
-                          <span className="tracking-[0.12em] uppercase">
-                            {dict.trip.day} {day.day}
-                          </span>
-                        </div>
-                      </div>
-                      <p className="mt-3 leading-relaxed text-ink-70">{day.description}</p>
-                      {day.accommodation ? (
-                        <p className="mt-3 text-[0.8125rem] text-slate">
-                          {dict.trip.accommodation}: {day.accommodation}
-                        </p>
-                      ) : null}
-                    </div>
-                  </li>
-                </Reveal>
+                        </span>
+                      </span>
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="pl-14 md:pl-[3.5rem]">
+                    <p className="leading-relaxed text-ink-70">{day.description}</p>
+                    {day.accommodation ? (
+                      <p className="mt-3 text-[0.8125rem] text-slate">
+                        {dict.trip.accommodation}: {day.accommodation}
+                      </p>
+                    ) : null}
+                  </AccordionContent>
+                </AccordionItem>
               ))}
-            </ol>
+            </Accordion>
           </div>
         </section>
       ) : null}
