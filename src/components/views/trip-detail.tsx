@@ -290,9 +290,11 @@ export function TripDetail({
       {/* ---------------- Additional headed content ---------------- */}
       {trip.contentSections?.map((contentSection, index) => (
         <section key={contentSection.id ?? index} className="py-16 md:py-24">
-          <div className="container-prose">
-            <h2 className="heading-lg mb-6">{contentSection.heading}</h2>
-            <RichText content={contentSection.content} locale={locale} />
+          <div className="container-content">
+            <div className="rounded-2xl border border-black/[0.06] bg-card p-6 shadow-[0_1px_2px_rgba(1,22,30,0.04)] md:p-8">
+              <h2 className="heading-lg mb-6">{contentSection.heading}</h2>
+              <RichText content={contentSection.content} locale={locale} />
+            </div>
           </div>
         </section>
       ))}
