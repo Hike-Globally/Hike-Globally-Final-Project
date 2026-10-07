@@ -33,8 +33,10 @@ export const Media: CollectionConfig = {
   upload: {
     // Lets editors choose what part of a photo survives cropping (a summit, not the sky).
     focalPoint: true,
-    // Local disk fallback for development. In production, @payloadcms/storage-vercel-blob
-    // takes over as soon as BLOB_READ_WRITE_TOKEN is present (see payload.config.ts).
+    // Where files land is decided at startup (see src/lib/media-storage.ts): Vercel Blob when
+    // BLOB_READ_WRITE_TOKEN is set, the `media_files` table in Postgres on a serverless host
+    // without external storage, and this directory everywhere else — which is what makes uploads
+    // survive a read-only filesystem with no extra configuration.
     staticDir: path.join(dirname, '../../public/media'),
     adminThumbnail: 'card',
     // Keep images and video in one library so editors can use either in the CMS.
@@ -43,8 +45,19 @@ export const Media: CollectionConfig = {
       { name: 'thumbnail', width: 400, height: 300, position: 'centre' },
       { name: 'card', width: 800, height: 600, position: 'centre' },
       { name: 'tablet', width: 1280, formatOptions: { format: 'webp', options: { quality: 82 } } },
-      { name: 'hero', width: 1920, height: 1080, formatOptions: { format: 'webp', options: { quality: 80 } } },
-      { name: 'og', width: 1200, height: 630, position: 'centre', formatOptions: { format: 'webp', options: { quality: 82 } } },
+      {
+        name: 'hero',
+        width: 1920,
+        height: 1080,
+        formatOptions: { format: 'webp', options: { quality: 80 } },
+      },
+      {
+        name: 'og',
+        width: 1200,
+        height: 630,
+        position: 'centre',
+        formatOptions: { format: 'webp', options: { quality: 82 } },
+      },
     ],
   },
   fields: [
