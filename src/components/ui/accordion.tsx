@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import * as AccordionPrimitive from '@radix-ui/react-accordion'
-import { PlusIcon } from 'lucide-react'
+import { ChevronDownIcon, PlusIcon } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 
@@ -26,8 +26,15 @@ function AccordionItem({
 function AccordionTrigger({
   className,
   children,
+  indicator = 'plus',
   ...props
-}: React.ComponentProps<typeof AccordionPrimitive.Trigger>) {
+}: React.ComponentProps<typeof AccordionPrimitive.Trigger> & {
+  /**
+   * Right-hand control. `plus` is the site-wide badge (rotates to an × when open);
+   * `chevron` is the circular chevron button used by the trip-page section cards.
+   */
+  indicator?: 'plus' | 'chevron'
+}) {
   return (
     <AccordionPrimitive.Header className="flex">
       <AccordionPrimitive.Trigger
@@ -39,9 +46,15 @@ function AccordionTrigger({
         {...props}
       >
         {children}
-        <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full border border-ink/10 text-deep transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] [&>svg]:size-3.5 [[data-state=open]>span>&]:rotate-45">
-          <PlusIcon className="transition-transform duration-300" />
-        </span>
+        {indicator === 'chevron' ? (
+          <span className="grid size-10 shrink-0 place-items-center rounded-full border border-slate-200 bg-white text-slate transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] [&>svg]:size-4 [[data-state=open]>span>&]:rotate-180">
+            <ChevronDownIcon aria-hidden />
+          </span>
+        ) : (
+          <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full border border-ink/10 text-deep transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] [&>svg]:size-3.5 [[data-state=open]>span>&]:rotate-45">
+            <PlusIcon className="transition-transform duration-300" aria-hidden />
+          </span>
+        )}
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
   )
