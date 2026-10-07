@@ -307,22 +307,24 @@ export function TripDetail({
       {/* ---------------- Additional headed content ---------------- */}
       {trip.contentSections?.length ? (
         <div className="bg-mist py-16 md:py-24">
-          {/* Match the itinerary container; every card occupies its own full-width row. */}
-          <div className="container-content grid grid-cols-1 gap-6 md:gap-8">
+          {/* Match the itinerary container. Each heading sits above its own full-width content box. */}
+          <div className="container-content space-y-12 md:space-y-16">
             {trip.contentSections.map((contentSection, index) => (
               <section
                 key={contentSection.id ?? index}
                 aria-labelledby={`trip-content-heading-${index}`}
-                className="min-w-0 w-full rounded-2xl border border-black/[0.06] bg-card p-6 shadow-[0_1px_2px_rgba(1,22,30,0.04)] md:p-8"
+                className="min-w-0 w-full"
               >
-                <h2 id={`trip-content-heading-${index}`} className="heading-lg mb-6">
+                <h2 id={`trip-content-heading-${index}`} className="heading-lg mb-8 md:mb-10">
                   {contentSection.heading}
                 </h2>
-                <RichText
-                  content={contentSection.content}
-                  locale={locale}
-                  className="w-full min-w-0 break-words"
-                />
+                <div className="rounded-2xl border border-black/[0.06] bg-card p-6 shadow-[0_1px_2px_rgba(1,22,30,0.04)] md:p-8">
+                  <RichText
+                    content={contentSection.content}
+                    locale={locale}
+                    className="w-full min-w-0 break-words"
+                  />
+                </div>
               </section>
             ))}
           </div>
