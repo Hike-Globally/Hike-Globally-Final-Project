@@ -15,6 +15,7 @@ import { adminOrEditor, publishedOrSignedIn } from '../access'
 import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
 import { revalidatePage, revalidatePageDelete } from '../hooks/revalidate'
+import { siteLivePreviewURL } from '../lib/live-preview-url'
 
 /**
  * Flexible pages.
@@ -35,12 +36,12 @@ export const Pages: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'updatedAt'],
     group: 'Content',
-    livePreview: {
-      url: ({ data, locale }) => {
-        const slug = (data?.slug as string | undefined) ?? ''
-        return slug === 'home' ? `/${locale ?? 'en'}` : `/${locale ?? 'en'}/${slug}`
+    components: {
+      edit: {
+        beforeDocumentControls: ['@/components/admin/live-preview-toggle'],
       },
     },
+    livePreview: { url: siteLivePreviewURL },
   },
   versions: {
     drafts: { autosave: { interval: 250 } },

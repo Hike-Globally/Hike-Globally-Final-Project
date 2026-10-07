@@ -3,10 +3,19 @@ import type { GlobalConfig } from 'payload'
 import { adminOrEditor, anyone } from '../access'
 import { linkField } from '../fields/link'
 import { revalidateGlobal } from '../hooks/revalidate'
+import { siteLivePreviewURL } from '../lib/live-preview-url'
 
 export const Footer: GlobalConfig = {
   slug: 'footer',
   label: 'Footer',
+  admin: {
+    components: {
+      elements: {
+        beforeDocumentControls: ['@/components/admin/live-preview-toggle'],
+      },
+    },
+    livePreview: { url: siteLivePreviewURL },
+  },
   access: {
     read: anyone,
     update: adminOrEditor,

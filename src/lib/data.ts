@@ -1,5 +1,5 @@
 import { unstable_cache } from 'next/cache'
-import type { TypedLocale } from 'payload'
+import type { TypedLocale, Where } from 'payload'
 
 import { CACHE_TAG, REVALIDATE_SECONDS } from '@/lib/cache-tags'
 import type { Locale } from '@/i18n/config'
@@ -64,6 +64,33 @@ async function safeQuery<T>(query: () => Promise<T>, fallback: T): Promise<T> {
     }
     return fallback
   }
+}
+
+type PreviewableCollection = 'blog' | 'destinations' | 'pages' | 'trips'
+
+/** Uncached Local API lookup used only after the authenticated preview route enables Draft Mode. */
+async function findDocumentBySlug<T>(
+  collection: PreviewableCollection,
+  locale: Locale,
+  slug: string,
+  depth: number,
+  includeDraft: boolean,
+): Promise<T | null> {
+  const payload = await getPayloadClient()
+  const where: Where = includeDraft
+    ? { slug: { equals: slug } }
+    : { and: [{ _status: { equals: 'published' } }, { slug: { equals: slug } }] }
+
+  const result = await payload.find({
+    collection,
+    locale: toTypedLocale(locale),
+    depth,
+    limit: 1,
+    where,
+    ...(includeDraft ? { draft: true, overrideAccess: true } : {}),
+  })
+
+  return (result.docs[0] as T | undefined) ?? null
 }
 
 const defaultHeader: Header = {
@@ -204,23 +231,15 @@ export const getFeaturedTrips = (locale: Locale, limit = 3): Promise<TripCard[]>
     [],
   )
 
-export const getTrip = (locale: Locale, slug: string): Promise<Trip | null> =>
+export const getTrip = (locale: Locale, slug: string, includeDraft = false): Promise<Trip | null> =>
   safeQuery(
-    unstable_cache(
-      async () => {
-        const payload = await getPayloadClient()
-        const result = await payload.find({
-          collection: 'trips',
-          locale: toTypedLocale(locale),
-          depth: 2,
-          limit: 1,
-          where: { and: [{ _status: { equals: 'published' } }, { slug: { equals: slug } }] },
-        })
-        return (result.docs[0] as Trip | undefined) ?? null
-      },
-      ['trip', locale, slug],
-      { tags: [CACHE_TAG.trips, CACHE_TAG.trip(slug)], revalidate: REVALIDATE_SECONDS },
-    ),
+    includeDraft
+      ? () => findDocumentBySlug<Trip>('trips', locale, slug, 2, true)
+      : unstable_cache(
+          () => findDocumentBySlug<Trip>('trips', locale, slug, 2, false),
+          ['trip', locale, slug],
+          { tags: [CACHE_TAG.trips, CACHE_TAG.trip(slug)], revalidate: REVALIDATE_SECONDS },
+        ),
     null,
   )
 
@@ -386,29 +405,48 @@ export const getFeaturedDestinations = (locale: Locale, limit = 3): Promise<Dest
     [],
   )
 
-export const getDestination = (locale: Locale, slug: string): Promise<Destination | null> =>
+export const getDestination = (
+  locale: Locale,
+  slug: string,
+  includeDraft = false,
+): Promise<Destination | null> =>
   safeQuery(
-    unstable_cache(
-      async () => {
-        const payload = await getPayloadClient()
-        const result = await payload.find({
-          collection: 'destinations',
-          locale: toTypedLocale(locale),
-          depth: 1,
-          limit: 1,
-          // `joins` resolves the `trips` join field in the same round trip as the document,
-          // so the destination page needs exactly ONE database query.
-          joins: { trips: { limit: 50, sort: '-featured' } },
-          where: { and: [{ _status: { equals: 'published' } }, { slug: { equals: slug } }] },
-        })
-        return (result.docs[0] as Destination | undefined) ?? null
-      },
-      ['destination', locale, slug],
-      {
-        tags: [CACHE_TAG.destinations, CACHE_TAG.destination(slug), CACHE_TAG.trips],
-        revalidate: REVALIDATE_SECONDS,
-      },
-    ),
+    includeDraft
+      ? async () => {
+          const payload = await getPayloadClient()
+          const result = await payload.find({
+            collection: 'destinations',
+            locale: toTypedLocale(locale),
+            depth: 1,
+            limit: 1,
+            draft: true,
+            overrideAccess: true,
+            joins: { trips: { limit: 50, sort: '-featured' } },
+            where: { slug: { equals: slug } },
+          })
+          return (result.docs[0] as Destination | undefined) ?? null
+        }
+      : unstable_cache(
+          async () => {
+            const payload = await getPayloadClient()
+            const result = await payload.find({
+              collection: 'destinations',
+              locale: toTypedLocale(locale),
+              depth: 1,
+              limit: 1,
+              // `joins` resolves the `trips` join field in the same round trip as the document,
+              // so the destination page needs exactly ONE database query.
+              joins: { trips: { limit: 50, sort: '-featured' } },
+              where: { and: [{ _status: { equals: 'published' } }, { slug: { equals: slug } }] },
+            })
+            return (result.docs[0] as Destination | undefined) ?? null
+          },
+          ['destination', locale, slug],
+          {
+            tags: [CACHE_TAG.destinations, CACHE_TAG.destination(slug), CACHE_TAG.trips],
+            revalidate: REVALIDATE_SECONDS,
+          },
+        ),
     null,
   )
 
@@ -500,23 +538,15 @@ export const getFeaturedPosts = (locale: Locale, limit = 3): Promise<PostCard[]>
     [],
   )
 
-export const getPost = (locale: Locale, slug: string): Promise<Blog | null> =>
+export const getPost = (locale: Locale, slug: string, includeDraft = false): Promise<Blog | null> =>
   safeQuery(
-    unstable_cache(
-      async () => {
-        const payload = await getPayloadClient()
-        const result = await payload.find({
-          collection: 'blog',
-          locale: toTypedLocale(locale),
-          depth: 2,
-          limit: 1,
-          where: { and: [{ _status: { equals: 'published' } }, { slug: { equals: slug } }] },
-        })
-        return (result.docs[0] as Blog | undefined) ?? null
-      },
-      ['post', locale, slug],
-      { tags: [CACHE_TAG.posts, CACHE_TAG.post(slug)], revalidate: REVALIDATE_SECONDS },
-    ),
+    includeDraft
+      ? () => findDocumentBySlug<Blog>('blog', locale, slug, 2, true)
+      : unstable_cache(
+          () => findDocumentBySlug<Blog>('blog', locale, slug, 2, false),
+          ['post', locale, slug],
+          { tags: [CACHE_TAG.posts, CACHE_TAG.post(slug)], revalidate: REVALIDATE_SECONDS },
+        ),
     null,
   )
 
@@ -598,23 +628,15 @@ export const getAllPostSlugs = (): Promise<{ id: number; locale: Locale; slug: s
 /* Flexible pages                                                              */
 /* -------------------------------------------------------------------------- */
 
-export const getPage = (locale: Locale, slug: string): Promise<Page | null> =>
+export const getPage = (locale: Locale, slug: string, includeDraft = false): Promise<Page | null> =>
   safeQuery(
-    unstable_cache(
-      async () => {
-        const payload = await getPayloadClient()
-        const result = await payload.find({
-          collection: 'pages',
-          locale: toTypedLocale(locale),
-          depth: 2,
-          limit: 1,
-          where: { and: [{ _status: { equals: 'published' } }, { slug: { equals: slug } }] },
-        })
-        return (result.docs[0] as Page | undefined) ?? null
-      },
-      ['page', locale, slug],
-      { tags: [CACHE_TAG.pages, CACHE_TAG.page(slug)], revalidate: REVALIDATE_SECONDS },
-    ),
+    includeDraft
+      ? () => findDocumentBySlug<Page>('pages', locale, slug, 2, true)
+      : unstable_cache(
+          () => findDocumentBySlug<Page>('pages', locale, slug, 2, false),
+          ['page', locale, slug],
+          { tags: [CACHE_TAG.pages, CACHE_TAG.page(slug)], revalidate: REVALIDATE_SECONDS },
+        ),
     null,
   )
 

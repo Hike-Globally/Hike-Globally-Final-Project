@@ -4,6 +4,7 @@ import { adminOrEditor, publishedOrSignedIn } from '../access'
 import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
 import { populatePublishedAt, revalidatePost, revalidatePostDelete } from '../hooks/revalidate'
+import { siteLivePreviewURL } from '../lib/live-preview-url'
 
 export const Blog: CollectionConfig = {
   slug: 'blog',
@@ -11,9 +12,12 @@ export const Blog: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'author', 'publishedAt', 'featured', 'updatedAt'],
     group: 'Content',
-    livePreview: {
-      url: ({ data, locale }) => `/${locale ?? 'en'}/blog/${data?.slug ?? ''}`,
+    components: {
+      edit: {
+        beforeDocumentControls: ['@/components/admin/live-preview-toggle'],
+      },
     },
+    livePreview: { url: siteLivePreviewURL },
   },
   versions: {
     drafts: { autosave: { interval: 250 } },
