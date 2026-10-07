@@ -287,6 +287,16 @@ export function TripDetail({
         </section>
       ) : null}
 
+      {/* ---------------- Additional headed content ---------------- */}
+      {trip.contentSections?.map((contentSection, index) => (
+        <section key={contentSection.id ?? index} className="py-16 md:py-24">
+          <div className="container-prose">
+            <h2 className="heading-lg mb-6">{contentSection.heading}</h2>
+            <RichText content={contentSection.content} locale={locale} />
+          </div>
+        </section>
+      ))}
+
       {/* ---------------- Included / not included ---------------- */}
       {(trip.included?.length || trip.notIncluded?.length) ? (
         <section className="py-16 md:py-24">

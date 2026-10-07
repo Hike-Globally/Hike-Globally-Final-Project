@@ -445,6 +445,36 @@ export interface Trip {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Add extra headed sections to the trip page. These appear after the itinerary.
+   */
+  contentSections?:
+    | {
+        /**
+         * Displayed above this section’s content.
+         */
+        heading: string;
+        /**
+         * Write the section content using the same rich-text editor and formatting options as the Overview.
+         */
+        content: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
   included?:
     | {
         item: string;
@@ -1290,6 +1320,13 @@ export interface TripsSelect<T extends boolean = true> {
         altitude?: T;
         description?: T;
         accommodation?: T;
+        id?: T;
+      };
+  contentSections?:
+    | T
+    | {
+        heading?: T;
+        content?: T;
         id?: T;
       };
   included?:
