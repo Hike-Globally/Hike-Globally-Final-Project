@@ -274,6 +274,34 @@ export const Trips: CollectionConfig = {
             },
           ],
         },
+        {
+          name: 'contentSections',
+          type: 'array',
+          localized: true,
+          labels: { singular: 'Content section', plural: 'Content sections' },
+          admin: {
+            description:
+              'Add extra headed sections to the trip page. These appear after the itinerary.',
+            initCollapsed: true,
+          },
+          fields: [
+            {
+              name: 'heading',
+              type: 'text',
+              required: true,
+              admin: { description: 'Displayed above this section’s content.' },
+            },
+            {
+              name: 'content',
+              type: 'richText',
+              required: true,
+              admin: {
+                description:
+                  'Write the section content using the same rich-text editor and formatting options as the Overview.',
+              },
+            },
+          ],
+        },
       ],
     },
 
