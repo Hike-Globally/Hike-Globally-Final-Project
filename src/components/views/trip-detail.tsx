@@ -264,32 +264,24 @@ export function TripDetail({
                   className="overflow-hidden rounded-2xl border border-black/[0.06] bg-card px-5 shadow-[0_1px_2px_rgba(1,22,30,0.04)] last:border-b last:border-black/[0.06] md:px-7"
                 >
                   <AccordionTrigger className="items-center py-5 hover:no-underline md:py-6">
-                    <span className="flex min-w-0 items-center gap-4">
-                      <span
-                        aria-hidden="true"
-                        className="grid size-10 shrink-0 place-items-center rounded-full border border-sage bg-mist font-heading text-sm font-semibold text-deep"
-                      >
-                        {day.day}
+                    <span className="min-w-0 text-left">
+                      <span className="block font-heading text-base font-semibold text-ink md:text-lg">
+                        {day.title}
                       </span>
-                      <span className="min-w-0 text-left">
-                        <span className="block font-heading text-base font-semibold text-ink md:text-lg">
-                          {day.title}
+                      <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.75rem] text-slate md:text-[0.8125rem]">
+                        <span className="tracking-[0.12em] uppercase">
+                          {dict.trip.day} {day.day}
                         </span>
-                        <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.75rem] text-slate md:text-[0.8125rem]">
-                          <span className="tracking-[0.12em] uppercase">
-                            {dict.trip.day} {day.day}
+                        {day.altitude ? (
+                          <span className="flex items-center gap-1.5">
+                            <Mountain className="size-3.5" aria-hidden />
+                            {formatNumber(day.altitude, locale)} m
                           </span>
-                          {day.altitude ? (
-                            <span className="flex items-center gap-1.5">
-                              <Mountain className="size-3.5" aria-hidden />
-                              {formatNumber(day.altitude, locale)} m
-                            </span>
-                          ) : null}
-                        </span>
+                        ) : null}
                       </span>
                     </span>
                   </AccordionTrigger>
-                  <AccordionContent className="pl-14 md:pl-[3.5rem]">
+                  <AccordionContent>
                     <p className="leading-relaxed text-ink-70">{day.description}</p>
                     {day.accommodation ? (
                       <p className="mt-3 text-[0.8125rem] text-slate">
