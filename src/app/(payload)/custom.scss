@@ -2759,3 +2759,41 @@ body {
   > .LexicalEditorTheme__placeholder {
   left: 14px;
 }
+
+/* A labelled companion to Payload's eye toggle: the live-preview split pane can be collapsed and
+   reopened without leaving the document editor. */
+.hg-live-preview-toggle {
+  display: inline-flex;
+  min-height: calc(var(--base) * 1.8);
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--base) * 0.35);
+  padding: 0 calc(var(--base) * 0.65);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--style-radius-s);
+  background: var(--theme-elevation-0);
+  color: var(--theme-elevation-800);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color 100ms cubic-bezier(0, 0.2, 0.2, 1),
+    background-color 100ms cubic-bezier(0, 0.2, 0.2, 1);
+}
+
+.hg-live-preview-toggle:hover {
+  border-color: var(--theme-elevation-300);
+  background: var(--theme-elevation-100);
+}
+
+.hg-live-preview-toggle:focus-visible {
+  outline: 2px solid var(--theme-info-500);
+  outline-offset: 2px;
+}
+
+.hg-live-preview-toggle svg {
+  flex: 0 0 auto;
+}

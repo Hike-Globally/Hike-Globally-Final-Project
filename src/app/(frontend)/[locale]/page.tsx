@@ -5,8 +5,8 @@ import { BlockRenderer } from '@/components/blocks/block-renderer'
 import { JsonLd } from '@/components/seo/json-ld'
 import { HomeFallback } from '@/components/views/home-fallback'
 import { isLocale, type Locale } from '@/i18n/config'
-import { getSettings } from '@/lib/data'
-import { getPage } from '@/lib/data'
+import { getPage, getSettings } from '@/lib/data'
+import { isLivePreviewRequest } from '@/lib/live-preview-access'
 import { buildMetadata, organizationJsonLd, seoFromDoc, siteUrl, websiteJsonLd } from '@/lib/seo'
 
 /**
@@ -26,7 +26,11 @@ export async function generateMetadata({
   const { locale } = await params
   if (!isLocale(locale)) return {}
 
-  const [page, settings] = await Promise.all([getPage(locale, 'home'), getSettings(locale)])
+  const includeDraft = await isLivePreviewRequest()
+  const [page, settings] = await Promise.all([
+    getPage(locale, 'home', includeDraft),
+    getSettings(locale),
+  ])
   const seo = page ? seoFromDoc(page, { title: settings.siteName, description: settings.tagline }) : null
 
   return buildMetadata({
@@ -45,7 +49,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   if (!isLocale(localeParam)) notFound()
 
   const locale = localeParam as Locale
-  const [page, settings] = await Promise.all([getPage(locale, 'home'), getSettings(locale)])
+  const includeDraft = await isLivePreviewRequest()
+  const [page, settings] = await Promise.all([
+    getPage(locale, 'home', includeDraft),
+    getSettings(locale),
+  ])
 
   return (
     <>

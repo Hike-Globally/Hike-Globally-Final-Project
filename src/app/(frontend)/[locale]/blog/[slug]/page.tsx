@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { PostDetail } from '@/components/views/post-detail'
 import { isLocale, localizedPath, type Locale } from '@/i18n/config'
 import { getAllPostSlugs, getPost, getRelatedPosts, getSettings } from '@/lib/data'
+import { isLivePreviewRequest } from '@/lib/live-preview-access'
 import { buildMetadata, seoFromDoc } from '@/lib/seo'
 
 export const revalidate = 3600
@@ -21,7 +22,8 @@ export async function generateMetadata({
   const { locale, slug } = await params
   if (!isLocale(locale)) return {}
 
-  const post = await getPost(locale, slug)
+  const includeDraft = await isLivePreviewRequest()
+  const post = await getPost(locale, slug, includeDraft)
   if (!post) return {}
 
   const seo = seoFromDoc(post, {
@@ -55,7 +57,8 @@ export default async function BlogPostPage({
   if (!isLocale(localeParam)) notFound()
 
   const locale = localeParam as Locale
-  const post = await getPost(locale, slug)
+  const includeDraft = await isLivePreviewRequest()
+  const post = await getPost(locale, slug, includeDraft)
 
   if (!post) notFound()
 

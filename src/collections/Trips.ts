@@ -5,6 +5,7 @@ import { linkField } from '../fields/link'
 import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
 import { revalidateTrip, revalidateTripDelete } from '../hooks/revalidate'
+import { siteLivePreviewURL } from '../lib/live-preview-url'
 
 /**
  * Trips — the longest form in the CMS.
@@ -26,9 +27,12 @@ export const Trips: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'destination', 'durationDays', 'priceFrom', 'featured', 'updatedAt'],
     group: 'Content',
-    livePreview: {
-      url: ({ data, locale }) => `/${locale ?? 'en'}/trips/${data?.slug ?? ''}`,
+    components: {
+      edit: {
+        beforeDocumentControls: ['@/components/admin/live-preview-toggle'],
+      },
     },
+    livePreview: { url: siteLivePreviewURL },
   },
   versions: {
     drafts: { autosave: { interval: 250 } },

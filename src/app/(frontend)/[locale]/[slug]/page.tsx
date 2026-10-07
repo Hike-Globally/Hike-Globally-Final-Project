@@ -5,6 +5,7 @@ import { BlockRenderer } from '@/components/blocks/block-renderer'
 import { JsonLd } from '@/components/seo/json-ld'
 import { isLocale, localizedPath, type Locale } from '@/i18n/config'
 import { getAllPageSlugs, getPage } from '@/lib/data'
+import { isLivePreviewRequest } from '@/lib/live-preview-access'
 import { breadcrumbJsonLd, buildMetadata, seoFromDoc } from '@/lib/seo'
 
 export const revalidate = 3600
@@ -28,7 +29,8 @@ export async function generateMetadata({
   const { locale, slug } = await params
   if (!isLocale(locale) || RESERVED.has(slug)) return {}
 
-  const page = await getPage(locale, slug)
+  const includeDraft = await isLivePreviewRequest()
+  const page = await getPage(locale, slug, includeDraft)
   if (!page) return {}
 
   const seo = seoFromDoc(page, { title: page.title })
@@ -58,7 +60,8 @@ export default async function FlexiblePage({
   if (!isLocale(localeParam) || RESERVED.has(slug)) notFound()
 
   const locale = localeParam as Locale
-  const page = await getPage(locale, slug)
+  const includeDraft = await isLivePreviewRequest()
+  const page = await getPage(locale, slug, includeDraft)
 
   if (!page) notFound()
 

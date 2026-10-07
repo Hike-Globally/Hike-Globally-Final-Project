@@ -5,6 +5,7 @@ import { Analytics } from '@vercel/analytics/next'
 
 import { Footer } from '@/components/layout/footer'
 import { Header } from '@/components/layout/header'
+import { LivePreviewRefresh } from '@/components/live-preview-refresh'
 import { SmoothScroll } from '@/components/providers/smooth-scroll'
 import { getDictionary } from '@/i18n/dictionaries'
 import { isLocale, localeMeta, locales, type Locale } from '@/i18n/config'
@@ -93,6 +94,7 @@ export default async function LocaleLayout({
   return (
     <html lang={localeMeta[locale].htmlLang} className={`${headingFont.variable} ${bodyFont.variable}`}>
       <body className="flex min-h-screen flex-col bg-background text-foreground">
+        <LivePreviewRefresh />
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-full focus:bg-deep focus:px-5 focus:py-3 focus:text-mist"

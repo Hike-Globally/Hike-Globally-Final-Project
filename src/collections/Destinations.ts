@@ -4,6 +4,7 @@ import { adminOrEditor, publishedOrSignedIn } from '../access'
 import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
 import { revalidateDestination, revalidateDestinationDelete } from '../hooks/revalidate'
+import { siteLivePreviewURL } from '../lib/live-preview-url'
 
 export const Destinations: CollectionConfig = {
   slug: 'destinations',
@@ -11,9 +12,12 @@ export const Destinations: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['name', 'country', 'region', 'featured', 'updatedAt'],
     group: 'Content',
-    livePreview: {
-      url: ({ data, locale }) => `/${locale ?? 'en'}/destinations/${data?.slug ?? ''}`,
+    components: {
+      edit: {
+        beforeDocumentControls: ['@/components/admin/live-preview-toggle'],
+      },
     },
+    livePreview: { url: siteLivePreviewURL },
   },
   versions: {
     drafts: { autosave: { interval: 250 } },

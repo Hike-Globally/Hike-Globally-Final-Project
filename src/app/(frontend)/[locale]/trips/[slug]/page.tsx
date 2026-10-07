@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { TripDetail } from '@/components/views/trip-detail'
 import { isLocale, localizedPath, type Locale } from '@/i18n/config'
 import { getAllTripSlugs, getRelatedTrips, getSettings, getTrip, getTripOptions } from '@/lib/data'
+import { isLivePreviewRequest } from '@/lib/live-preview-access'
 import { buildMetadata, seoFromDoc } from '@/lib/seo'
 
 export const revalidate = 3600
@@ -26,7 +27,8 @@ export async function generateMetadata({
   const { locale, slug } = await params
   if (!isLocale(locale)) return {}
 
-  const trip = await getTrip(locale, slug)
+  const includeDraft = await isLivePreviewRequest()
+  const trip = await getTrip(locale, slug, includeDraft)
   if (!trip) return {}
 
   const seo = seoFromDoc(trip, {
@@ -54,7 +56,8 @@ export default async function TripPage({
   if (!isLocale(localeParam)) notFound()
 
   const locale = localeParam as Locale
-  const trip = await getTrip(locale, slug)
+  const includeDraft = await isLivePreviewRequest()
+  const trip = await getTrip(locale, slug, includeDraft)
 
   if (!trip) notFound()
 
