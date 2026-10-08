@@ -82,6 +82,7 @@ export function TripDetail({
     ) ?? []
 
   const bookingLink = resolveLink(trip.bookingLink?.link, locale)
+  const faqs = (trip.faqs ?? []).filter((faq) => faq.question?.trim())
 
   return (
     <>
@@ -366,6 +367,34 @@ export function TripDetail({
         </section>
       ) : null}
 
+      {/* ---------------- FAQs ---------------- */}
+      {faqs.length ? (
+        <section id="faqs" className="scroll-mt-24 py-16 md:py-24">
+          <div className="container-content">
+            <h2 className="heading-lg mb-10">{dict.trip.faqs}</h2>
+
+            <Accordion type="multiple" className="space-y-3">
+              {faqs.map((faq, index) => (
+                <AccordionItem
+                  key={faq.id ?? index}
+                  value={`faq-${faq.id ?? index}`}
+                  className="overflow-hidden rounded-2xl border border-black/[0.06] bg-card px-5 shadow-[0_1px_2px_rgba(1,22,30,0.04)] last:border-b last:border-black/[0.06] md:px-7"
+                >
+                  <AccordionTrigger className="items-center py-5 hover:no-underline md:py-6">
+                    <span className="min-w-0 text-left font-heading text-base font-semibold text-ink md:text-lg">
+                      {faq.question}
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <p className="whitespace-pre-line leading-relaxed text-ink-70">{faq.answer}</p>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </section>
+      ) : null}
+
       {/* ---------------- Gallery ---------------- */}
       {trip.gallery?.length ? (
         <section className="bg-mist py-16 md:py-24">
@@ -433,12 +462,8 @@ export function TripDetail({
             destinationName: destination?.name,
             siteName: 'Hike Globally',
           }),
-          ...(trip.faqs?.length
-            ? [
-                faqJsonLd(
-                  trip.faqs.map((faq) => ({ question: faq.question ?? '', answer: faq.answer ?? '' })),
-                ),
-              ]
+          ...(faqs.length
+            ? [faqJsonLd(faqs.map((faq) => ({ question: faq.question, answer: faq.answer ?? '' })))]
             : []),
         ]}
       />
