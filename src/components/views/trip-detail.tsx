@@ -1,20 +1,5 @@
 import Link from 'next/link'
-import {
-  Backpack,
-  BedDouble,
-  CalendarDays,
-  Check,
-  Clock,
-  Map,
-  MapPin,
-  Mountain,
-  Sun,
-  Tent,
-  Users,
-  UtensilsCrossed,
-  X,
-} from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
+import { CalendarDays, Check, Clock, MapPin, Mountain, Users, X } from 'lucide-react'
 
 import { RichText } from '@/components/content/rich-text'
 import { JsonLd } from '@/components/seo/json-ld'
@@ -37,7 +22,6 @@ import type { TripCard as TripCardData } from '@/lib/data'
 import { formatNumber, formatPrice } from '@/lib/format'
 import { resolveLink } from '@/lib/links'
 import { breadcrumbJsonLd, faqJsonLd, touristTripJsonLd } from '@/lib/seo'
-import { cn } from '@/lib/utils'
 import type { Trip } from '@/payload-types'
 
 const difficultyVariant: Record<string, 'sage' | 'light' | 'outline' | 'default' | 'muted'> = {
@@ -46,35 +30,6 @@ const difficultyVariant: Record<string, 'sage' | 'light' | 'outline' | 'default'
   challenging: 'outline',
   strenuous: 'outline',
   extreme: 'default',
-}
-
-type SectionTone = 'green' | 'blue'
-
-const sectionToneClasses: Record<SectionTone, string> = {
-  green: 'bg-green-50 text-green-600',
-  blue: 'bg-blue-50 text-blue-600',
-}
-
-/**
- * The content-section cards pair each heading with a small tinted icon chip (green
- * for on-trek logistics, blue for planning topics — see accordion.png). Editors
- * only write a heading, so the icon is picked from its keywords and falls back to
- * a brand mountain.
- */
-const sectionVisual = (heading: string): { icon: LucideIcon; tone: SectionTone } => {
-  const h = heading.toLowerCase()
-  if (/(accommodat|lodg|hotel|teahouse|guesthouse|stay|sleep|bed|room|night)/.test(h))
-    return { icon: BedDouble, tone: 'green' }
-  if (/(food|meal|dining|cuisine|eat|drink|snack)/.test(h))
-    return { icon: UtensilsCrossed, tone: 'green' }
-  if (/(best time|season|weather|when|month)/.test(h)) return { icon: Sun, tone: 'green' }
-  if (/(typical day|daily|day-to-day|day by day|schedule|routine)/.test(h))
-    return { icon: Tent, tone: 'blue' }
-  if (/(permit|visa|licen[cs]e|document|paper|registration)/.test(h))
-    return { icon: Map, tone: 'blue' }
-  if (/(cost|price|budget|pack|gear|equipment|include|bring)/.test(h))
-    return { icon: Backpack, tone: 'blue' }
-  return { icon: Mountain, tone: 'green' }
 }
 
 /**
@@ -341,51 +296,39 @@ export function TripDetail({
         </section>
       ) : null}
 
-      {/* ------- Additional headed content — icon-chip card accordion (accordion.png) ------- */}
+      {/* ------- Essential information — plain card accordion, no icon chips ------- */}
       {trip.contentSections?.length ? (
-        <div className="bg-mist py-16 md:py-24">
+        <section id="essential-information" className="scroll-mt-24 bg-mist py-16 md:py-24">
           <div className="container-content">
-            <Accordion type="multiple" className="space-y-4">
-              {trip.contentSections.map((contentSection, index) => {
-                const { icon: SectionIcon, tone } = sectionVisual(contentSection.heading)
-                return (
-                  <AccordionItem
-                    key={contentSection.id ?? index}
-                    value={`section-${contentSection.id ?? index}`}
-                    className="overflow-hidden rounded-2xl border border-black/[0.06] bg-card shadow-[0_1px_2px_rgba(1,22,30,0.05)] last:border-b last:border-black/[0.06]"
+            <h2 className="heading-lg mb-10">{dict.trip.essentialInformation}</h2>
+
+            <Accordion type="multiple" className="space-y-3">
+              {trip.contentSections.map((contentSection, index) => (
+                <AccordionItem
+                  key={contentSection.id ?? index}
+                  value={`section-${contentSection.id ?? index}`}
+                  className="overflow-hidden rounded-2xl border border-black/[0.06] bg-card px-5 shadow-[0_1px_2px_rgba(1,22,30,0.04)] last:border-b last:border-black/[0.06] md:px-7"
+                >
+                  <AccordionTrigger
+                    indicator="chevron"
+                    className="items-center py-5 hover:no-underline md:py-6"
                   >
-                    <AccordionTrigger
-                      indicator="chevron"
-                      className="items-center gap-4 px-5 py-4 text-lg font-bold hover:no-underline md:px-6 md:py-5 md:text-xl"
-                    >
-                      <span className="flex min-w-0 flex-1 items-center gap-4 text-left">
-                        <span
-                          className={cn(
-                            'relative grid size-12 shrink-0 place-items-center rounded-xl md:size-14',
-                            sectionToneClasses[tone],
-                          )}
-                        >
-                          <SectionIcon className="size-6" aria-hidden />
-                          <span className="absolute -right-1 -bottom-1 grid size-5 place-items-center rounded-full bg-green-500 text-white ring-2 ring-card">
-                            <Check className="size-3" strokeWidth={3} aria-hidden />
-                          </span>
-                        </span>
-                        <span className="min-w-0">{contentSection.heading}</span>
-                      </span>
-                    </AccordionTrigger>
-                    <AccordionContent className="px-5 pb-6 md:px-6 md:pb-8 md:pl-24">
-                      <RichText
-                        content={contentSection.content}
-                        locale={locale}
-                        className="w-full min-w-0 break-words"
-                      />
-                    </AccordionContent>
-                  </AccordionItem>
-                )
-              })}
+                    <span className="min-w-0 text-left font-heading text-base font-semibold text-ink md:text-lg">
+                      {contentSection.heading}
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <RichText
+                      content={contentSection.content}
+                      locale={locale}
+                      className="w-full min-w-0 break-words"
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
             </Accordion>
           </div>
-        </div>
+        </section>
       ) : null}
 
       {/* ---------------- Included / not included ---------------- */}
