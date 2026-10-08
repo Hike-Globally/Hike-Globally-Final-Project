@@ -78,7 +78,6 @@ const resolveLabel = (label: unknown, i18n: ServerProps['i18n']): string => {
 
 export default function AdminNav({
   i18n,
-  locale,
   payload,
   permissions,
   user,
@@ -104,7 +103,8 @@ export default function AdminNav({
     team: [],
   }
 
-  const collectionSlugs = visibleEntities?.collections ?? payload.config.collections.map((c) => c.slug)
+  const collectionSlugs =
+    visibleEntities?.collections ?? payload.config.collections.map((c) => c.slug)
   const globalSlugs = visibleEntities?.globals ?? payload.config.globals.map((g) => g.slug)
 
   for (const slug of collectionSlugs) {
@@ -173,14 +173,13 @@ export default function AdminNav({
       }
     : null
 
-  const siteLocale = locale?.code && locale.code.length > 0 ? locale.code : 'en'
-
+  // The public site is English-only and lives at the root — no locale prefix to build.
   return (
     <AdminNavRail
       account={account}
       accountHref={formatAdminURL({ adminRoute, path: admin.routes.account })}
       dashboardHref={adminRoute}
-      liveSiteHref={`/${siteLocale}`}
+      liveSiteHref="/"
       sections={sections}
     />
   )

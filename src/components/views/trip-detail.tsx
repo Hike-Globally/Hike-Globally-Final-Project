@@ -16,8 +16,8 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { PayloadImageFill, PayloadImage } from '@/components/ui/payload-image'
-import { getDictionary } from '@/i18n/dictionaries'
-import { localizedPath, type Locale } from '@/i18n/config'
+import { dictionary, type Dictionary } from '@/i18n/dictionaries'
+import { sitePath } from '@/i18n/config'
 import type { TripCard as TripCardData } from '@/lib/data'
 import { formatNumber, formatPrice } from '@/lib/format'
 import { resolveLink } from '@/lib/links'
@@ -34,14 +34,12 @@ const difficultyVariant: Record<string, 'sage' | 'light' | 'outline' | 'default'
 
 function TripBookingCard({
   trip,
-  locale,
   dict,
   seasons,
   bookingLink,
 }: {
   trip: Trip
-  locale: Locale
-  dict: ReturnType<typeof getDictionary>
+  dict: Dictionary
   seasons: string[]
   bookingLink: ReturnType<typeof resolveLink>
 }) {
@@ -49,7 +47,7 @@ function TripBookingCard({
     <div className="rounded-2xl border border-black/[0.06] bg-card p-7 shadow-[0_1px_2px_rgba(1,22,30,0.04)]">
       <p className="eyebrow mb-3 text-slate">{dict.common.from}</p>
       <p className="font-heading text-4xl font-semibold tracking-tight text-ink">
-        {formatPrice(trip.priceFrom, trip.priceCurrency, locale)}
+        {formatPrice(trip.priceFrom, trip.priceCurrency)}
       </p>
       <p className="mt-1 text-[0.8125rem] text-slate">
         {trip.priceUnit === 'per-group' ? dict.common.perGroup : dict.common.perPerson}
@@ -120,18 +118,16 @@ function TripBookingCard({
  */
 export function TripDetail({
   trip,
-  locale,
   related,
   tripOptions,
   formEmail,
 }: {
   trip: Trip
-  locale: Locale
   related: TripCardData[]
   tripOptions: { id: number; title: string; slug: string }[]
   formEmail: string
 }) {
-  const dict = getDictionary(locale)
+  const dict = dictionary
 
   const destination =
     trip.destination && typeof trip.destination !== 'number' ? trip.destination : null
@@ -145,7 +141,7 @@ export function TripDetail({
       ? {
           icon: Mountain,
           label: dict.trip.maxAltitude,
-          value: `${formatNumber(trip.maxAltitude, locale)} m`,
+          value: `${formatNumber(trip.maxAltitude)} m`,
         }
       : null,
     {
@@ -163,7 +159,7 @@ export function TripDetail({
         ] ?? season,
     ) ?? []
 
-  const bookingLink = resolveLink(trip.bookingLink?.link, locale)
+  const bookingLink = resolveLink(trip.bookingLink?.link)
   const faqs = (trip.faqs ?? []).filter((faq) => faq.question?.trim())
 
   return (
@@ -185,8 +181,8 @@ export function TripDetail({
           <Breadcrumbs
             className="mb-6"
             items={[
-              { label: dict.nav.home, href: localizedPath(locale, '/') },
-              { label: dict.nav.trips, href: localizedPath(locale, '/trips') },
+              { label: dict.nav.home, href: sitePath('/') },
+              { label: dict.nav.trips, href: sitePath('/trips') },
               { label: trip.title },
             ]}
           />
@@ -194,7 +190,7 @@ export function TripDetail({
           <div className="flex flex-wrap items-center gap-3">
             {destination ? (
               <Link
-                href={localizedPath(locale, `/destinations/${destination.slug}`)}
+                href={sitePath(`/destinations/${destination.slug}`)}
                 className="rounded-full bg-white/10 px-3 py-1 text-[0.75rem] tracking-[0.14em] text-sage uppercase backdrop-blur transition-colors hover:bg-white/20"
               >
                 {destination.name}
@@ -246,7 +242,7 @@ export function TripDetail({
             <div>
               <h2 className="heading-lg">{dict.trip.overview}</h2>
               <div className="mt-6">
-                <RichText content={trip.description} locale={locale} />
+                <RichText content={trip.description} />
               </div>
 
               {trip.highlights?.length ? (
@@ -271,13 +267,7 @@ export function TripDetail({
 
           {/* Keep the booking card near the trip summary on small screens. */}
           <div className="mb-12 lg:hidden">
-            <TripBookingCard
-              trip={trip}
-              locale={locale}
-              dict={dict}
-              seasons={seasons}
-              bookingLink={bookingLink}
-            />
+            <TripBookingCard trip={trip} dict={dict} seasons={seasons} bookingLink={bookingLink} />
           </div>
 
           {/* ---------------- Itinerary ---------------- */}
@@ -304,7 +294,7 @@ export function TripDetail({
                           {day.altitude ? (
                             <span className="flex items-center gap-1.5">
                               <Mountain className="size-3.5" aria-hidden />
-                              {formatNumber(day.altitude, locale)} m
+                              {formatNumber(day.altitude)} m
                             </span>
                           ) : null}
                         </span>
@@ -347,7 +337,6 @@ export function TripDetail({
                     <AccordionContent>
                       <RichText
                         content={contentSection.content}
-                        locale={locale}
                         className="w-full min-w-0 break-words"
                       />
                     </AccordionContent>
@@ -461,12 +450,7 @@ export function TripDetail({
                 <h2 className="heading-lg">{dict.inquiry.title}</h2>
                 <p className="lead mt-5">{dict.inquiry.subtitle}</p>
               </div>
-              <InquiryForm
-                locale={locale}
-                trips={tripOptions}
-                email={formEmail}
-                defaultTripSlug={trip.slug}
-              />
+              <InquiryForm trips={tripOptions} email={formEmail} defaultTripSlug={trip.slug} />
             </div>
           </section>
 
@@ -477,7 +461,7 @@ export function TripDetail({
               <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
                 {related.map((item, index) => (
                   <Reveal key={item.id} delay={index * 70}>
-                    <TripCard trip={item} locale={locale} />
+                    <TripCard trip={item} />
                   </Reveal>
                 ))}
               </div>
@@ -487,27 +471,20 @@ export function TripDetail({
 
         {/* The card stays in this shared layout so it can stick beside the full trip content. */}
         <aside className="hidden lg:sticky lg:top-28 lg:mt-16 lg:block lg:self-start">
-          <TripBookingCard
-            trip={trip}
-            locale={locale}
-            dict={dict}
-            seasons={seasons}
-            bookingLink={bookingLink}
-          />
+          <TripBookingCard trip={trip} dict={dict} seasons={seasons} bookingLink={bookingLink} />
         </aside>
       </div>
 
       <JsonLd
         data={[
           breadcrumbJsonLd([
-            { name: dict.nav.home, url: localizedPath(locale, '/') },
-            { name: dict.nav.trips, url: localizedPath(locale, '/trips') },
-            { name: trip.title, url: localizedPath(locale, `/trips/${trip.slug}`) },
+            { name: dict.nav.home, url: sitePath('/') },
+            { name: dict.nav.trips, url: sitePath('/trips') },
+            { name: trip.title, url: sitePath(`/trips/${trip.slug}`) },
           ]),
           touristTripJsonLd({
             trip,
-            url: localizedPath(locale, `/trips/${trip.slug}`),
-            locale,
+            url: sitePath(`/trips/${trip.slug}`),
             image:
               typeof trip.heroImage === 'object' && trip.heroImage?.url
                 ? trip.heroImage.url

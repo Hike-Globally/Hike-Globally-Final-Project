@@ -1,60 +1,44 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
 import { Mail, MessageCircle, Phone } from 'lucide-react'
 
 import { InquiryForm } from '@/components/forms/inquiry-form'
 import { PageHeader } from '@/components/sections/page-header'
-import { getDictionary } from '@/i18n/dictionaries'
-import { isLocale, localizedPath, type Locale } from '@/i18n/config'
+import { dictionary } from '@/i18n/dictionaries'
+import { sitePath } from '@/i18n/config'
 import { getSettings, getTripOptions } from '@/lib/data'
 import { buildMetadata } from '@/lib/seo'
 
 export const revalidate = 3600
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>
-}): Promise<Metadata> {
-  const { locale } = await params
-  if (!isLocale(locale)) return {}
-
-  const dict = getDictionary(locale)
+export async function generateMetadata(): Promise<Metadata> {
+  const dict = dictionary
 
   return buildMetadata({
     title: dict.inquiry.title,
     description: dict.inquiry.subtitle,
-    path: localizedPath(locale, '/inquiry'),
-    locale,
+    path: sitePath('/inquiry'),
   })
 }
 
 /**
- * INQUIRY PAGE — `/[locale]/inquiry`
+ * INQUIRY PAGE — `/inquiry`
  * The form posts directly to Formsubmit.co; no Payload form collection, no API route.
  */
-export default async function InquiryPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale: localeParam } = await params
-  if (!isLocale(localeParam)) notFound()
+export default async function InquiryPage() {
+  const dict = dictionary
+  const [settings, trips] = await Promise.all([getSettings(), getTripOptions()])
 
-  const locale = localeParam as Locale
-  const dict = getDictionary(locale)
-  const [settings, trips] = await Promise.all([getSettings(locale), getTripOptions(locale)])
-
-  const email = settings.formsubmitEmail || process.env.NEXT_PUBLIC_FORMSUBMIT_EMAIL || settings.email
+  const email =
+    settings.formsubmitEmail || process.env.NEXT_PUBLIC_FORMSUBMIT_EMAIL || settings.email
 
   return (
     <>
       <PageHeader
-        locale={locale}
         eyebrow={dict.nav.contact}
         title={dict.inquiry.title}
         lead={dict.inquiry.subtitle}
-        breadcrumbs={[
-          { label: dict.nav.home, href: localizedPath(locale, '/') },
-          { label: dict.nav.inquiry },
-        ]}
+        breadcrumbs={[{ label: dict.nav.home, href: sitePath('/') }, { label: dict.nav.inquiry }]}
       />
 
       <section className="py-14 md:py-20">
@@ -105,13 +89,15 @@ export default async function InquiryPage({ params }: { params: Promise<{ locale
             {settings.address ? (
               <div className="rounded-2xl border border-black/[0.06] p-7">
                 <h2 className="heading-md mb-4">{dict.structuredData.organization}</h2>
-                <p className="text-[0.9375rem] whitespace-pre-line text-ink-70">{settings.address}</p>
+                <p className="text-[0.9375rem] whitespace-pre-line text-ink-70">
+                  {settings.address}
+                </p>
               </div>
             ) : null}
           </aside>
 
           <div>
-            <InquiryForm locale={locale} trips={trips} email={email} />
+            <InquiryForm trips={trips} email={email} />
           </div>
         </div>
       </section>

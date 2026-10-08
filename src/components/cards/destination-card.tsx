@@ -1,25 +1,22 @@
 import Link from 'next/link'
 
 import { PayloadImageFill } from '@/components/ui/payload-image'
-import type { Locale } from '@/i18n/config'
-import { localizedPath } from '@/i18n/config'
+import { sitePath } from '@/i18n/config'
 import type { DestinationCard } from '@/lib/data'
 import { cn } from '@/lib/utils'
 
 export function DestinationCard({
   destination,
-  locale,
   size = 'default',
   priority = false,
   className,
 }: {
   destination: DestinationCard
-  locale: Locale
   size?: 'default' | 'large'
   priority?: boolean
   className?: string
 }) {
-  const href = localizedPath(locale, `/destinations/${destination.slug}`)
+  const href = sitePath(`/destinations/${destination.slug}`)
 
   return (
     <article

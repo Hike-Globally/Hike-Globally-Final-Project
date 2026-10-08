@@ -1,18 +1,17 @@
 import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
-import { notFound } from 'next/navigation'
 import { Analytics } from '@vercel/analytics/next'
 
 import { Footer } from '@/components/layout/footer'
 import { Header } from '@/components/layout/header'
 import { LivePreviewRefresh } from '@/components/live-preview-refresh'
 import { SmoothScroll } from '@/components/providers/smooth-scroll'
-import { getDictionary } from '@/i18n/dictionaries'
-import { isLocale, localeMeta, locales, type Locale } from '@/i18n/config'
+import { dictionary } from '@/i18n/dictionaries'
+import { htmlLang } from '@/i18n/config'
 import { getSettings } from '@/lib/data'
 import { absoluteUrl } from '@/lib/seo'
 import { resolveSiteUrlObject } from '@/lib/site-url'
-import '../globals.css'
+import './globals.css'
 
 /**
  * Fonts are self-hosted from node_modules (@fontsource) instead of fetched from
@@ -21,7 +20,7 @@ import '../globals.css'
  * critical path and eliminates the flash of unstyled text.
  */
 const headingFont = localFont({
-  src: '../../../../node_modules/@fontsource-variable/google-sans-flex/files/google-sans-flex-latin-wght-normal.woff2',
+  src: '../../../node_modules/@fontsource-variable/google-sans-flex/files/google-sans-flex-latin-wght-normal.woff2',
   variable: '--font-google-sans-flex',
   display: 'swap',
   preload: true,
@@ -29,27 +28,15 @@ const headingFont = localFont({
 })
 
 const bodyFont = localFont({
-  src: '../../../../node_modules/@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2',
+  src: '../../../node_modules/@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2',
   variable: '--font-archivo',
   display: 'swap',
   preload: true,
   fallback: ['system-ui', 'sans-serif'],
 })
 
-/** Prerenders one shell per language; unknown languages 404 instead of silently rendering. */
-export function generateStaticParams() {
-  return locales.map((locale) => ({ locale }))
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>
-}): Promise<Metadata> {
-  const { locale } = await params
-  if (!isLocale(locale)) return {}
-
-  const settings = await getSettings(locale)
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings()
 
   return {
     // `undefined` rather than a thrown `TypeError` if the configured URL is unusable — a bad env
@@ -66,7 +53,7 @@ export async function generateMetadata({
       'theme-color': '#01161e',
     },
     alternates: {
-      canonical: absoluteUrl(`/${locale}`),
+      canonical: absoluteUrl('/'),
     },
   }
 }
@@ -78,21 +65,11 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
-export default async function LocaleLayout({
-  children,
-  params,
-}: {
-  children: React.ReactNode
-  params: Promise<{ locale: string }>
-}) {
-  const { locale: localeParam } = await params
-  if (!isLocale(localeParam)) notFound()
-
-  const locale = localeParam as Locale
-  const dict = getDictionary(locale)
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const dict = dictionary
 
   return (
-    <html lang={localeMeta[locale].htmlLang} className={`${headingFont.variable} ${bodyFont.variable}`}>
+    <html lang={htmlLang} className={`${headingFont.variable} ${bodyFont.variable}`}>
       <body className="flex min-h-screen flex-col bg-background text-foreground">
         <LivePreviewRefresh />
         <a
@@ -102,13 +79,13 @@ export default async function LocaleLayout({
           {dict.common.skipToContent}
         </a>
 
-        <Header locale={locale} />
+        <Header />
 
         <main id="main" className="flex-1">
           {children}
         </main>
 
-        <Footer locale={locale} />
+        <Footer />
 
         {/* Lenis smooth scrolling — ~6KB, disabled for reduced-motion users. */}
         <SmoothScroll />

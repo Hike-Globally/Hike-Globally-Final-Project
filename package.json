@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Hike Globally — premium multilingual trekking & expedition website. Next.js App Router + Payload CMS 3 + PostgreSQL.",
+  "description": "Hike Globally — trekking & expedition website. Next.js App Router + Payload CMS 3 + PostgreSQL.",
   "license": "ISC",
   "scripts": {
     "dev": "next dev",

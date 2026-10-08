@@ -1,7 +1,6 @@
 import { PayloadImageFill } from '@/components/ui/payload-image'
 import { Reveal } from '@/components/motion/reveal'
 import { SectionHeading } from '@/components/sections/section-heading'
-import type { Locale } from '@/i18n/config'
 import type { GalleryBlock } from '@/payload-types'
 import { cn } from '@/lib/utils'
 
@@ -17,7 +16,7 @@ const aspectClass: Record<string, string> = {
   '3/4': 'aspect-[3/4]',
 }
 
-export function Gallery({ block }: { block: GalleryBlock; locale: Locale }) {
+export function Gallery({ block }: { block: GalleryBlock }) {
   const images = (block.images ?? []).filter((item) => Boolean(item?.image))
 
   if (images.length === 0) return null
@@ -29,7 +28,12 @@ export function Gallery({ block }: { block: GalleryBlock; locale: Locale }) {
           <SectionHeading title={block.heading ?? ''} description={block.subheading} />
         ) : null}
 
-        <div className={cn('grid gap-4 md:gap-6', columnsClass[block.columns ?? '3'] ?? columnsClass['3'])}>
+        <div
+          className={cn(
+            'grid gap-4 md:gap-6',
+            columnsClass[block.columns ?? '3'] ?? columnsClass['3'],
+          )}
+        >
           {images.map((item, index) => (
             <Reveal key={item.id ?? index} delay={index * 60}>
               <figure className="group">
@@ -47,7 +51,9 @@ export function Gallery({ block }: { block: GalleryBlock; locale: Locale }) {
                   />
                 </div>
                 {item.caption ? (
-                  <figcaption className="mt-3 text-[0.8125rem] text-slate">{item.caption}</figcaption>
+                  <figcaption className="mt-3 text-[0.8125rem] text-slate">
+                    {item.caption}
+                  </figcaption>
                 ) : null}
               </figure>
             </Reveal>

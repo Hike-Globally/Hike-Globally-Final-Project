@@ -8,8 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { resolveSiteUrl } from '@/lib/site-url'
-import type { Locale } from '@/i18n/config'
-import { getDictionary, type Dictionary } from '@/i18n/dictionaries'
+import { dictionary, type Dictionary } from '@/i18n/dictionaries'
 
 export type TripOption = { id: number; title: string; slug: string }
 
@@ -23,21 +22,19 @@ export type TripOption = { id: number; title: string; slug: string }
  * the "thank you" page (and its analytics) on our own domain instead of on formsubmit.co.
  */
 export function InquiryForm({
-  locale,
   trips,
   email,
   defaultTripSlug,
   compact = false,
   variant = 'light',
 }: {
-  locale: Locale
   trips: TripOption[]
   email: string
   defaultTripSlug?: string | null
   compact?: boolean
   variant?: 'light' | 'dark'
 }) {
-  const dict: Dictionary = getDictionary(locale)
+  const dict: Dictionary = dictionary
   const formRef = useRef<HTMLFormElement>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -46,7 +43,7 @@ export function InquiryForm({
   // Normalized so a schemeless NEXT_PUBLIC_SITE_URL still produces a usable absolute return URL.
   // Unset means "no absolute URL": Formsubmit then redirects to a relative path on our own domain.
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() ? resolveSiteUrl() : ''
-  const nextUrl = siteUrl ? `${siteUrl}/${locale}${successPath}` : `/${locale}${successPath}`
+  const nextUrl = siteUrl ? `${siteUrl}${successPath}` : successPath
 
   const onSubmit = () => {
     setSubmitting(true)
@@ -77,7 +74,7 @@ export function InquiryForm({
       <input type="hidden" name="_captcha" value="false" />
       <input type="hidden" name="_template" value="table" />
       <input type="text" name="_honey" className="hidden" tabIndex={-1} autoComplete="off" />
-      <input type="hidden" name="_language" value={locale} />
+      <input type="hidden" name="_language" value="en" />
 
       <div className={compact ? '' : 'md:col-span-1'}>
         <Label htmlFor="name" className={`mb-2 ${labelClass}`}>
@@ -113,14 +110,26 @@ export function InquiryForm({
         <Label htmlFor="phone" className={`mb-2 ${labelClass}`}>
           {dict.inquiry.phone}
         </Label>
-        <Input id="phone" name="phone" autoComplete="tel" placeholder="+49 170 0000000" className={ghostClass} />
+        <Input
+          id="phone"
+          name="phone"
+          autoComplete="tel"
+          placeholder="+49 170 0000000"
+          className={ghostClass}
+        />
       </div>
 
       <div className={compact ? '' : 'md:col-span-1'}>
         <Label htmlFor="country" className={`mb-2 ${labelClass}`}>
           {dict.inquiry.country}
         </Label>
-        <Input id="country" name="country" autoComplete="country-name" placeholder="Germany" className={ghostClass} />
+        <Input
+          id="country"
+          name="country"
+          autoComplete="country-name"
+          placeholder="Germany"
+          className={ghostClass}
+        />
       </div>
 
       <div className={compact ? '' : 'md:col-span-2'}>
@@ -184,8 +193,17 @@ export function InquiryForm({
         />
       </div>
 
-      <div className={compact ? 'space-y-3' : 'md:col-span-2 md:flex md:items-center md:justify-between'}>
-        <Button type="submit" size="lg" variant={variant === 'dark' ? 'sage' : 'default'} disabled={submitting}>
+      <div
+        className={
+          compact ? 'space-y-3' : 'md:col-span-2 md:flex md:items-center md:justify-between'
+        }
+      >
+        <Button
+          type="submit"
+          size="lg"
+          variant={variant === 'dark' ? 'sage' : 'default'}
+          disabled={submitting}
+        >
           {submitting ? dict.inquiry.submitting : dict.inquiry.submit}
         </Button>
         <p className={`mt-3 text-xs md:mt-0 ${variant === 'dark' ? 'text-mist/60' : 'text-slate'}`}>

@@ -21,7 +21,7 @@ import { siteLivePreviewURL } from '../lib/live-preview-url'
  * Flexible pages.
  *
  * Every page is built from blocks, so an editor can assemble a landing page without a developer.
- * The page with the slug `home` is rendered by the homepage route (`/[locale]`), which is what
+ * The page with the slug `home` is rendered by the homepage route (`/`), which is what
  * makes the homepage editable from the CMS instead of being hard-coded.
  *
  * LOCALIZATION NOTE: the `blocks` field itself is localized, which localizes both the block

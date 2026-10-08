@@ -3,9 +3,8 @@ import { ArrowUpRight, Clock, Mountain, Users } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { PayloadImageFill } from '@/components/ui/payload-image'
-import { getDictionary } from '@/i18n/dictionaries'
-import type { Locale } from '@/i18n/config'
-import { localizedPath } from '@/i18n/config'
+import { dictionary } from '@/i18n/dictionaries'
+import { sitePath } from '@/i18n/config'
 import type { TripCard } from '@/lib/data'
 import { formatNumber, formatPrice } from '@/lib/format'
 import { cn } from '@/lib/utils'
@@ -20,17 +19,15 @@ const difficultyVariant: Record<string, 'sage' | 'light' | 'outline' | 'default'
 
 export function TripCard({
   trip,
-  locale,
   priority = false,
   className,
 }: {
   trip: TripCard
-  locale: Locale
   priority?: boolean
   className?: string
 }) {
-  const dict = getDictionary(locale)
-  const href = localizedPath(locale, `/trips/${trip.slug}`)
+  const dict = dictionary
+  const href = sitePath(`/trips/${trip.slug}`)
 
   const destinationName =
     trip.destination && typeof trip.destination !== 'number' ? trip.destination.name : null
@@ -62,8 +59,9 @@ export function TripCard({
             variant={difficultyVariant[trip.difficulty] ?? 'light'}
             className="bg-white/90 backdrop-blur"
           >
-            {dict.trips[`difficulty${trip.difficulty.charAt(0).toUpperCase()}${trip.difficulty.slice(1)}` as keyof typeof dict.trips] ??
-              trip.difficulty}
+            {dict.trips[
+              `difficulty${trip.difficulty.charAt(0).toUpperCase()}${trip.difficulty.slice(1)}` as keyof typeof dict.trips
+            ] ?? trip.difficulty}
           </Badge>
         </div>
         {destinationName ? (
@@ -80,7 +78,9 @@ export function TripCard({
           </Link>
         </h3>
 
-        <p className="mt-2 line-clamp-2 text-[0.9375rem] leading-relaxed text-ink-60">{trip.summary}</p>
+        <p className="mt-2 line-clamp-2 text-[0.9375rem] leading-relaxed text-ink-60">
+          {trip.summary}
+        </p>
 
         <dl className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.8125rem] text-slate">
           <div className="flex items-center gap-1.5">
@@ -94,7 +94,7 @@ export function TripCard({
             <div className="flex items-center gap-1.5">
               <Mountain className="size-4" aria-hidden />
               <dt className="sr-only">{dict.trip.maxAltitude}</dt>
-              <dd>{formatNumber(trip.maxAltitude, locale)} m</dd>
+              <dd>{formatNumber(trip.maxAltitude)} m</dd>
             </div>
           ) : null}
           {trip.groupSizeMax ? (
@@ -110,7 +110,7 @@ export function TripCard({
           <p className="text-[0.8125rem] text-slate">
             {dict.common.from}{' '}
             <span className="font-heading text-lg font-semibold text-ink">
-              {formatPrice(trip.priceFrom, trip.priceCurrency, locale)}
+              {formatPrice(trip.priceFrom, trip.priceCurrency)}
             </span>
             <span className="ml-1 text-slate">
               {trip.priceUnit === 'per-group' ? dict.common.perGroup : dict.common.perPerson}

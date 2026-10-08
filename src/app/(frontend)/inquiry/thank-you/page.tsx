@@ -1,38 +1,25 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Check } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { getDictionary } from '@/i18n/dictionaries'
-import { isLocale, localizedPath, type Locale } from '@/i18n/config'
+import { dictionary } from '@/i18n/dictionaries'
+import { sitePath } from '@/i18n/config'
 import { buildMetadata } from '@/lib/seo'
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>
-}): Promise<Metadata> {
-  const { locale } = await params
-  if (!isLocale(locale)) return {}
-
-  const dict = getDictionary(locale)
+export async function generateMetadata(): Promise<Metadata> {
+  const dict = dictionary
 
   return buildMetadata({
     title: dict.inquiry.successTitle,
-    path: localizedPath(locale, '/inquiry/thank-you'),
-    locale,
+    path: sitePath('/inquiry/thank-you'),
     noIndex: true,
   })
 }
 
 /** Where Formsubmit.co redirects after a successful enquiry (the `_next` hidden field). */
-export default async function ThankYouPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale: localeParam } = await params
-  if (!isLocale(localeParam)) notFound()
-
-  const locale = localeParam as Locale
-  const dict = getDictionary(locale)
+export default async function ThankYouPage() {
+  const dict = dictionary
 
   return (
     <section className="py-24 md:py-32">
@@ -45,10 +32,10 @@ export default async function ThankYouPage({ params }: { params: Promise<{ local
 
         <div className="mt-10 flex flex-wrap justify-center gap-3">
           <Button asChild size="lg">
-            <Link href={localizedPath(locale, '/trips')}>{dict.inquiry.successBrowseTrips}</Link>
+            <Link href={sitePath('/trips')}>{dict.inquiry.successBrowseTrips}</Link>
           </Button>
           <Button asChild size="lg" variant="outline">
-            <Link href={localizedPath(locale, '/')}>{dict.inquiry.successBackHome}</Link>
+            <Link href={sitePath('/')}>{dict.inquiry.successBackHome}</Link>
           </Button>
         </div>
       </div>

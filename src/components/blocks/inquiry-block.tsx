@@ -3,7 +3,6 @@ import { Mail, MessageCircle, Phone } from 'lucide-react'
 
 import { InquiryForm } from '@/components/forms/inquiry-form'
 import { SectionHeading } from '@/components/sections/section-heading'
-import type { Locale } from '@/i18n/config'
 import { getSettings, getTripOptions } from '@/lib/data'
 import type { InquiryBlock } from '@/payload-types'
 import { cn } from '@/lib/utils'
@@ -17,10 +16,11 @@ const platformLabels: Record<string, string> = {
   x: 'X',
 }
 
-export async function InquirySection({ block, locale }: { block: InquiryBlock; locale: Locale }) {
-  const [settings, trips] = await Promise.all([getSettings(locale), getTripOptions(locale)])
+export async function InquirySection({ block }: { block: InquiryBlock }) {
+  const [settings, trips] = await Promise.all([getSettings(), getTripOptions()])
 
-  const email = settings.formsubmitEmail || process.env.NEXT_PUBLIC_FORMSUBMIT_EMAIL || settings.email
+  const email =
+    settings.formsubmitEmail || process.env.NEXT_PUBLIC_FORMSUBMIT_EMAIL || settings.email
 
   // When the block sits on a trip page, pre-select that trip in the form.
   const defaultTrip = block.trip && typeof block.trip !== 'number' ? block.trip : null
@@ -28,7 +28,10 @@ export async function InquirySection({ block, locale }: { block: InquiryBlock; l
   const dark = block.variant === 'dark'
 
   return (
-    <section id="inquiry" className={cn('py-16 md:py-24', dark ? 'bg-ink text-mist' : 'bg-sage-20 text-ink')}>
+    <section
+      id="inquiry"
+      className={cn('py-16 md:py-24', dark ? 'bg-ink text-mist' : 'bg-sage-20 text-ink')}
+    >
       <div className="container-content">
         <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
           <div>
@@ -78,7 +81,12 @@ export async function InquirySection({ block, locale }: { block: InquiryBlock; l
             ) : null}
 
             {settings.socials?.length ? (
-              <p className={cn('mt-6 text-xs tracking-[0.14em] uppercase', dark ? 'text-mist/50' : 'text-slate')}>
+              <p
+                className={cn(
+                  'mt-6 text-xs tracking-[0.14em] uppercase',
+                  dark ? 'text-mist/50' : 'text-slate',
+                )}
+              >
                 {settings.socials
                   .map((social) => platformLabels[social.platform] ?? social.platform)
                   .join(' · ')}
@@ -88,7 +96,6 @@ export async function InquirySection({ block, locale }: { block: InquiryBlock; l
 
           <div>
             <InquiryForm
-              locale={locale}
               trips={trips}
               email={email}
               defaultTripSlug={defaultTrip?.slug ?? null}

@@ -1,9 +1,8 @@
 import { Reveal } from '@/components/motion/reveal'
-import type { Locale } from '@/i18n/config'
 import type { StatsBlock } from '@/payload-types'
 import { cn } from '@/lib/utils'
 
-export function Stats({ block }: { block: StatsBlock; locale: Locale }) {
+export function Stats({ block }: { block: StatsBlock }) {
   const items = block.items ?? []
   if (items.length === 0) return null
 
@@ -13,7 +12,9 @@ export function Stats({ block }: { block: StatsBlock; locale: Locale }) {
     <section className={cn('py-14 md:py-16', dark ? 'bg-ink text-mist' : 'bg-sage-20 text-ink')}>
       <div className="container-content">
         {block.heading ? (
-          <p className={cn('eyebrow mb-8 text-center', dark ? 'text-sage' : 'text-deep')}>{block.heading}</p>
+          <p className={cn('eyebrow mb-8 text-center', dark ? 'text-sage' : 'text-deep')}>
+            {block.heading}
+          </p>
         ) : null}
 
         <dl

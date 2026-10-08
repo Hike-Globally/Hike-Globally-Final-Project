@@ -10,29 +10,27 @@ import { Breadcrumbs } from '@/components/sections/breadcrumbs'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { PayloadImage, PayloadImageFill } from '@/components/ui/payload-image'
-import { getDictionary, plural } from '@/i18n/dictionaries'
-import { localizedPath, type Locale } from '@/i18n/config'
+import { dictionary, plural, type Dictionary } from '@/i18n/dictionaries'
+import { sitePath } from '@/i18n/config'
 import type { DestinationCard as DestinationCardData, TripCard as TripCardData } from '@/lib/data'
 import { breadcrumbJsonLd, touristDestinationJsonLd } from '@/lib/seo'
 import type { Destination } from '@/payload-types'
 
-const regionLabel = (region: string, dict: ReturnType<typeof getDictionary>): string =>
+const regionLabel = (region: string, dict: Dictionary): string =>
   dict.destinations[
     `region${region.charAt(0).toUpperCase()}${region.slice(1)}` as keyof typeof dict.destinations
   ] ?? region
 
 export function DestinationDetail({
   destination,
-  locale,
   trips,
   otherDestinations,
 }: {
   destination: Destination
-  locale: Locale
   trips: TripCardData[]
   otherDestinations: DestinationCardData[]
 }) {
-  const dict = getDictionary(locale)
+  const dict = dictionary
 
   const seasons = (destination.bestSeasons ?? []).map(
     (season) =>
@@ -64,8 +62,8 @@ export function DestinationDetail({
           <Breadcrumbs
             className="mb-6"
             items={[
-              { label: dict.nav.home, href: localizedPath(locale, '/') },
-              { label: dict.nav.destinations, href: localizedPath(locale, '/destinations') },
+              { label: dict.nav.home, href: sitePath('/') },
+              { label: dict.nav.destinations, href: sitePath('/destinations') },
               { label: destination.name },
             ]}
           />
@@ -107,16 +105,18 @@ export function DestinationDetail({
       <section className="py-16 md:py-24">
         <div className="container-content grid gap-12 lg:grid-cols-[1.6fr_1fr] lg:gap-16">
           <div>
-            <h2 className="heading-lg">{dict.destinations.about} {destination.name}</h2>
+            <h2 className="heading-lg">
+              {dict.destinations.about} {destination.name}
+            </h2>
             <div className="mt-6">
-              <RichText content={destination.description} locale={locale} />
+              <RichText content={destination.description} />
             </div>
 
             {destination.gettingThere ? (
               <div className="mt-12">
                 <h3 className="heading-md">{dict.destinations.gettingThere}</h3>
                 <div className="mt-5">
-                  <RichText content={destination.gettingThere} locale={locale} />
+                  <RichText content={destination.gettingThere} />
                 </div>
               </div>
             ) : null}
@@ -170,7 +170,7 @@ export function DestinationDetail({
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {trips.map((trip, index) => (
                 <Reveal key={trip.id} delay={index * 70}>
-                  <TripCard trip={trip} locale={locale} priority={index < 3} />
+                  <TripCard trip={trip} priority={index < 3} />
                 </Reveal>
               ))}
             </div>
@@ -185,7 +185,7 @@ export function DestinationDetail({
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {otherDestinations.map((destinationItem, index) => (
                 <Reveal key={destinationItem.id} delay={index * 70}>
-                  <DestinationCard destination={destinationItem} locale={locale} />
+                  <DestinationCard destination={destinationItem} />
                 </Reveal>
               ))}
             </div>
@@ -196,14 +196,13 @@ export function DestinationDetail({
       <JsonLd
         data={[
           breadcrumbJsonLd([
-            { name: dict.nav.home, url: localizedPath(locale, '/') },
-            { name: dict.nav.destinations, url: localizedPath(locale, '/destinations') },
-            { name: destination.name, url: localizedPath(locale, `/destinations/${destination.slug}`) },
+            { name: dict.nav.home, url: sitePath('/') },
+            { name: dict.nav.destinations, url: sitePath('/destinations') },
+            { name: destination.name, url: sitePath(`/destinations/${destination.slug}`) },
           ]),
           touristDestinationJsonLd({
             destination,
-            url: localizedPath(locale, `/destinations/${destination.slug}`),
-            locale,
+            url: sitePath(`/destinations/${destination.slug}`),
             image:
               typeof destination.heroImage === 'object' && destination.heroImage?.url
                 ? destination.heroImage.url

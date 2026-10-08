@@ -1,12 +1,10 @@
-import type { Locale } from '@/i18n/config'
-import { localizedPath } from '@/i18n/config'
+import { sitePath } from '@/i18n/config'
 import type { Page, Trip, Destination, Blog } from '@/payload-types'
 
 /**
  * Payload's reusable `link` field stores either an internal relationship
- * (`reference`) or a raw URL (`custom`). This resolves it to an href that always
- * carries the current language prefix — so internal links never drop the visitor
- * into the wrong language.
+ * (`reference`) or a raw URL (`custom`). This resolves it to an href on this site —
+ * so a link stored in the CMS can never point at a route that does not exist.
  */
 export type LinkValue = {
   label?: string | null
@@ -50,7 +48,7 @@ const isPopulated = (
  * Returns `null` when the link can't be resolved (empty, or pointing at an unpublished
  * document that was deleted), so callers can simply skip rendering it.
  */
-export const resolveLink = (link: LinkValue | null | undefined, locale: Locale): ResolvedLink | null => {
+export const resolveLink = (link: LinkValue | null | undefined): ResolvedLink | null => {
   if (!link) return null
 
   const label = link.label ?? ''
@@ -69,28 +67,28 @@ export const resolveLink = (link: LinkValue | null | undefined, locale: Locale):
     case 'pages':
       if (!isPopulated(doc) || !doc.slug) return null
       return {
-        href: doc.slug === 'home' ? localizedPath(locale, '/') : localizedPath(locale, `/${doc.slug}`),
+        href: doc.slug === 'home' ? sitePath('/') : sitePath(`/${doc.slug}`),
         label: label || doc.title || '',
         newTab: Boolean(link.newTab),
       }
     case 'trips':
       if (!isPopulated(doc) || !doc.slug) return null
       return {
-        href: localizedPath(locale, `/trips/${doc.slug}`),
+        href: sitePath(`/trips/${doc.slug}`),
         label: label || doc.title || '',
         newTab: Boolean(link.newTab),
       }
     case 'destinations':
       if (!isPopulated(doc) || !doc.slug) return null
       return {
-        href: localizedPath(locale, `/destinations/${doc.slug}`),
+        href: sitePath(`/destinations/${doc.slug}`),
         label: label || doc.name || '',
         newTab: Boolean(link.newTab),
       }
     case 'blog':
       if (!isPopulated(doc) || !doc.slug) return null
       return {
-        href: localizedPath(locale, `/blog/${doc.slug}`),
+        href: sitePath(`/blog/${doc.slug}`),
         label: label || doc.title || '',
         newTab: Boolean(link.newTab),
       }
@@ -99,4 +97,5 @@ export const resolveLink = (link: LinkValue | null | undefined, locale: Locale):
   }
 }
 
-export const isExternal = (href: string): boolean => /^https?:\/\//.test(href) || href.startsWith('mailto:') || href.startsWith('tel:')
+export const isExternal = (href: string): boolean =>
+  /^https?:\/\//.test(href) || href.startsWith('mailto:') || href.startsWith('tel:')

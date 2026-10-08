@@ -1,8 +1,6 @@
 import { revalidatePath, revalidateTag } from 'next/cache'
 import type { NextRequest } from 'next/server'
 
-import { locales } from '@/i18n/config'
-
 /**
  * On-demand revalidation webhook.
  *
@@ -13,7 +11,7 @@ import { locales } from '@/i18n/config'
  *   curl -X POST https://your-site.com/api/revalidate \
  *        -H "Authorization: Bearer $REVALIDATE_SECRET" \
  *        -H "Content-Type: application/json" \
- *        -d '{"tags":["trips"],"paths":["/en/trips"]}'
+ *        -d '{"tags":["trips"],"paths":["/trips"]}'
  */
 export async function POST(request: NextRequest) {
   const secret = process.env.REVALIDATE_SECRET
@@ -29,7 +27,7 @@ export async function POST(request: NextRequest) {
     return Response.json({ message: 'Invalid secret' }, { status: 401 })
   }
 
-  let body: { tags?: string[]; paths?: string[]; locale?: string } = {}
+  let body: { tags?: string[]; paths?: string[] } = {}
 
   try {
     body = (await request.json()) as typeof body
@@ -38,7 +36,7 @@ export async function POST(request: NextRequest) {
   }
 
   const tags = body.tags?.length ? body.tags : ['trips', 'destinations', 'posts', 'pages']
-  const paths = body.paths?.length ? body.paths : locales.map((locale) => `/${locale}`)
+  const paths = body.paths?.length ? body.paths : ['/']
 
   for (const tag of tags) revalidateTag(tag, { expire: 0 })
   for (const path of paths) revalidatePath(path)

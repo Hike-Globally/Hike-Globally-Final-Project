@@ -8,9 +8,8 @@ import { Reveal } from '@/components/motion/reveal'
 import { SectionHeading } from '@/components/sections/section-heading'
 import { Button } from '@/components/ui/button'
 import { PayloadImageFill } from '@/components/ui/payload-image'
-import { getDictionary } from '@/i18n/dictionaries'
-import type { Locale } from '@/i18n/config'
-import { localizedPath } from '@/i18n/config'
+import { dictionary } from '@/i18n/dictionaries'
+import { sitePath } from '@/i18n/config'
 import { getFeaturedDestinations, getFeaturedTrips, getPosts, getSettings } from '@/lib/data'
 
 /**
@@ -18,13 +17,13 @@ import { getFeaturedDestinations, getFeaturedTrips, getPosts, getSettings } from
  * It still shows real CMS content, so a fresh database produces a presentable site
  * rather than an empty shell.
  */
-export async function HomeFallback({ locale }: { locale: Locale }) {
-  const dict = getDictionary(locale)
+export async function HomeFallback() {
+  const dict = dictionary
   const [settings, trips, destinations, posts] = await Promise.all([
-    getSettings(locale),
-    getFeaturedTrips(locale, 3),
-    getFeaturedDestinations(locale, 3),
-    getPosts(locale, 3),
+    getSettings(),
+    getFeaturedTrips(3),
+    getFeaturedDestinations(3),
+    getPosts(3),
   ])
 
   const heroImage = settings.defaultOgImage
@@ -54,19 +53,17 @@ export async function HomeFallback({ locale }: { locale: Locale }) {
         <div className="container-content py-24 md:py-28">
           <div className="max-w-3xl">
             <p className="eyebrow mb-5 text-sage">{settings.tagline ?? dict.nav.home}</p>
-            <h1 className="heading-display text-white">
-              Walk where the map runs out of names.
-            </h1>
+            <h1 className="heading-display text-white">Walk where the map runs out of names.</h1>
             <p className="lead mt-6 max-w-2xl text-mist/85">
               Small-group treks and expeditions across Nepal, led by guides who grew up on these
               trails. Tell us what you are dreaming of — we will build the itinerary around it.
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
               <Button asChild size="lg" variant="sage">
-                <Link href={localizedPath(locale, '/trips')}>{dict.nav.trips}</Link>
+                <Link href={sitePath('/trips')}>{dict.nav.trips}</Link>
               </Button>
               <Button asChild size="lg" variant="outline-light">
-                <Link href={localizedPath(locale, '/inquiry')}>{dict.nav.inquiry}</Link>
+                <Link href={sitePath('/inquiry')}>{dict.nav.inquiry}</Link>
               </Button>
             </div>
           </div>
@@ -79,12 +76,12 @@ export async function HomeFallback({ locale }: { locale: Locale }) {
             <SectionHeading
               title={dict.nav.trips}
               description={dict.trips.listingSubtitle}
-              action={{ href: localizedPath(locale, '/trips'), label: dict.common.viewAll }}
+              action={{ href: sitePath('/trips'), label: dict.common.viewAll }}
             />
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {trips.map((trip, index) => (
                 <Reveal key={trip.id} delay={index * 80}>
-                  <TripCard trip={trip} locale={locale} priority={index === 0} />
+                  <TripCard trip={trip} priority={index === 0} />
                 </Reveal>
               ))}
             </div>
@@ -98,12 +95,12 @@ export async function HomeFallback({ locale }: { locale: Locale }) {
             <SectionHeading
               title={dict.nav.destinations}
               description={dict.destinations.listingSubtitle}
-              action={{ href: localizedPath(locale, '/destinations'), label: dict.common.viewAll }}
+              action={{ href: sitePath('/destinations'), label: dict.common.viewAll }}
             />
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {destinations.map((destination, index) => (
                 <Reveal key={destination.id} delay={index * 80}>
-                  <DestinationCard destination={destination} locale={locale} />
+                  <DestinationCard destination={destination} />
                 </Reveal>
               ))}
             </div>
@@ -117,12 +114,12 @@ export async function HomeFallback({ locale }: { locale: Locale }) {
             <SectionHeading
               title={dict.blog.latest}
               description={dict.blog.listingSubtitle}
-              action={{ href: localizedPath(locale, '/blog'), label: dict.common.viewAll }}
+              action={{ href: sitePath('/blog'), label: dict.common.viewAll }}
             />
             <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
               {posts.map((post, index) => (
                 <Reveal key={post.id} delay={index * 80}>
-                  <PostCard post={post} locale={locale} />
+                  <PostCard post={post} />
                 </Reveal>
               ))}
             </div>
@@ -137,7 +134,7 @@ export async function HomeFallback({ locale }: { locale: Locale }) {
               <h2 className="heading-lg text-ink">{dict.inquiry.title}</h2>
               <p className="lead mt-5 text-ink-70">{dict.inquiry.subtitle}</p>
               <Button asChild size="lg" className="mt-9">
-                <Link href={localizedPath(locale, '/inquiry')}>
+                <Link href={sitePath('/inquiry')}>
                   {dict.inquiry.submit}
                   <ArrowRight className="size-4" />
                 </Link>

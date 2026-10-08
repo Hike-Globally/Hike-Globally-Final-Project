@@ -3,32 +3,30 @@ import test from 'node:test'
 
 import { buildLivePreviewURL, resolveLivePreviewPath, siteLivePreviewURL } from './live-preview-url'
 
-test('resolveLivePreviewPath builds localized URLs for supported content collections', () => {
-  const locale = { code: 'de' }
-
+test('resolveLivePreviewPath builds URLs for supported content collections', () => {
   assert.equal(
     resolveLivePreviewPath({
       collectionConfig: { slug: 'blog' },
       data: { slug: 'everest-guide' },
-      locale,
+      locale: { code: 'en' },
     }),
-    '/de/blog/everest-guide',
+    '/blog/everest-guide',
   )
   assert.equal(
     resolveLivePreviewPath({
       collectionConfig: { slug: 'trips' },
       data: { slug: 'everest-base-camp' },
-      locale,
+      locale: { code: 'en' },
     }),
-    '/de/trips/everest-base-camp',
+    '/trips/everest-base-camp',
   )
   assert.equal(
     resolveLivePreviewPath({
       collectionConfig: { slug: 'destinations' },
       data: { slug: 'khumbu' },
-      locale,
+      locale: { code: 'en' },
     }),
-    '/de/destinations/khumbu',
+    '/destinations/khumbu',
   )
 })
 
@@ -37,9 +35,9 @@ test('resolveLivePreviewPath handles homepage, new records, and globals', () => 
     resolveLivePreviewPath({
       collectionConfig: { slug: 'pages' },
       data: { slug: 'home' },
-      locale: { code: 'fr' },
+      locale: { code: 'en' },
     }),
-    '/fr',
+    '/',
   )
   assert.equal(
     resolveLivePreviewPath({
@@ -47,15 +45,15 @@ test('resolveLivePreviewPath handles homepage, new records, and globals', () => 
       data: {},
       locale: { code: 'en' },
     }),
-    '/en/blog',
+    '/blog',
   )
   assert.equal(
     resolveLivePreviewPath({
       globalConfig: { slug: 'header' },
       data: {},
-      locale: { code: 'fr' },
+      locale: { code: 'en' },
     }),
-    '/fr',
+    '/',
   )
 })
 
@@ -66,7 +64,7 @@ test('siteLivePreviewURL wraps a storefront path in the authenticated preview ro
       data: { slug: 'everest-base-camp' },
       locale: { code: 'en' },
     }),
-    '/api/live-preview?path=%2Fen%2Ftrips%2Feverest-base-camp',
+    '/api/live-preview?path=%2Ftrips%2Feverest-base-camp',
   )
-  assert.equal(buildLivePreviewURL('/en/trips/a b'), '/api/live-preview?path=%2Fen%2Ftrips%2Fa%20b')
+  assert.equal(buildLivePreviewURL('/trips/a b'), '/api/live-preview?path=%2Ftrips%2Fa%20b')
 })
