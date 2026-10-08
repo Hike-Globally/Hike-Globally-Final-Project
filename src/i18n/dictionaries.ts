@@ -84,6 +84,7 @@ const en = {
   trip: {
     overview: 'Trip overview',
     itinerary: 'Day-by-day itinerary',
+    essentialInformation: 'Essential Information You Must Know',
     included: "What's included",
     notIncluded: "What's not included",
     gallery: 'Gallery',
@@ -282,6 +283,7 @@ const de: Dictionary = {
   trip: {
     overview: 'Reiseüberblick',
     itinerary: 'Reiseverlauf Tag für Tag',
+    essentialInformation: 'Wichtige Informationen, die Sie kennen sollten',
     included: 'Im Preis enthalten',
     notIncluded: 'Nicht enthalten',
     gallery: 'Galerie',
@@ -473,6 +475,7 @@ const fr: Dictionary = {
   trip: {
     overview: 'Aperçu du voyage',
     itinerary: 'Itinéraire jour par jour',
+    essentialInformation: 'Informations essentielles à connaître',
     included: 'Ce qui est inclus',
     notIncluded: 'Ce qui n’est pas inclus',
     gallery: 'Galerie',
