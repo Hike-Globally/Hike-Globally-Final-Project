@@ -54,16 +54,16 @@ capped at ~4.5 MB — larger originals need Blob plus `BLOB_CLIENT_UPLOADS=true`
 
 ## Scripts
 
-| Script                                                           | Description                                                        |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------ |
-| `dev` / `build` / `start`                                        | Next.js                                                            |
-| `typecheck`                                                      | `tsc --noEmit`                                                     |
-| `test`                                                           | Node's built-in runner — unit tests for the site-URL normalization |
-| `lint`                                                           | ESLint                                                             |
-| `migrate` / `migrate:create` / `migrate:status` / `migrate:down` | Payload migrations                                                 |
-| `generate:types`                                                 | Regenerate `src/payload-types.ts` after a schema change            |
-| `generate:importmap`                                             | Regenerate the admin import map (also runs on `postinstall`)       |
-| `seed`                                                           | Load the demo content                                              |
+| Script                                                           | Description                                                                                                                 |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `dev` / `build` / `start`                                        | Next.js                                                                                                                     |
+| `typecheck`                                                      | `tsc --noEmit`                                                                                                              |
+| `test`                                                           | Node's built-in runner — URL/canonical helpers, media storage, and a route audit that every page declares its own canonical |
+| `lint`                                                           | ESLint                                                                                                                      |
+| `migrate` / `migrate:create` / `migrate:status` / `migrate:down` | Payload migrations                                                                                                          |
+| `generate:types`                                                 | Regenerate `src/payload-types.ts` after a schema change                                                                     |
+| `generate:importmap`                                             | Regenerate the admin import map (also runs on `postinstall`)                                                                |
+| `seed`                                                           | Load the demo content                                                                                                       |
 
 ## Design tokens
 
@@ -76,6 +76,35 @@ Headings **Google Sans Flex 600**, body **Archivo 300** (self-hosted variable fo
 | `slate` | `#598392` |
 | `sage`  | `#aec3b0` |
 | `mist`  | `#f8f9fa` |
+
+## SEO
+
+**One page, one URL.** Every page renders `<link rel="canonical">` pointing at its own exact URL —
+`https://hikeglobally.com/trips/everest-base-camp`, never the homepage and never a filtered or
+slash-variant spelling of itself. Two layers guarantee that, including for pages that do not exist
+yet:
+
+| Layer              | Where                                                         | What it does                                                                                                                                                                               |
+| ------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Per page           | `generateMetadata` → `buildMetadata({ path })`                | The canonical is built from the route's own path (`sitePath(`/trips/${slug}`)`), so it stays exact for content published after the last deploy. Also feeds `og:url` and the JSON-LD `url`. |
+| Site-wide fallback | `(frontend)/layout.tsx` → `canonical: resolveSiteUrlObject()` | Next resolves a `URL` _instance_ against the request pathname, so a route that exports no metadata at all still canonicalizes to its own URL instead of inheriting the homepage's.         |
+
+`canonicalUrl()` in `src/lib/seo.ts` is the single formatter behind the canonical tag, `og:url`,
+`sitemap.xml` and JSON-LD: it drops query strings and hashes (`/trips?page=2` → `/trips`), collapses
+duplicate and trailing slashes, percent-encodes segments, and renders the homepage as the bare
+origin. Because the sitemap is written with the same helper, an entry and the canonical of the page
+it points at are always the identical string.
+
+The 404 page is the deliberate exception — it emits no canonical (the URL it is served at does not
+exist) and is `noindex`.
+
+**Adding a page:** export `generateMetadata` and return
+`buildMetadata({ …, path: sitePath('/your/path') })`. `npm test` fails if a page under
+`src/app/(frontend)` does not: `src/lib/canonical-coverage.test.ts` audits the route tree, so the
+rule holds for pages written later, not just the ones written today.
+
+Every URL is built from `NEXT_PUBLIC_SITE_URL`, so point it at the production origin before
+deploying.
 
 ## Deployment
 

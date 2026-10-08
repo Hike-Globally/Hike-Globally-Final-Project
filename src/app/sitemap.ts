@@ -7,7 +7,7 @@ import {
   getAllPostSlugs,
   getAllTripSlugs,
 } from '@/lib/data'
-import { absoluteUrl } from '@/lib/seo'
+import { canonicalUrl } from '@/lib/seo'
 
 export const revalidate = 3600
 
@@ -18,6 +18,10 @@ export const revalidate = 3600
  * page, and each published trip, destination, post and CMS page. There are no `alternates`
  * blocks — with a single language there is nothing to translate between, and the canonical URL
  * on each page is all a crawler needs.
+ *
+ * URLs come from the same `canonicalUrl()` helper that renders each page's
+ * `<link rel="canonical">`, so a sitemap entry and the canonical of the page it points at are
+ * always the identical string.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [trips, destinations, posts, pages] = await Promise.all([
@@ -34,7 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: number,
     changeFrequency: 'daily' | 'weekly',
   ): MetadataRoute.Sitemap[number] => ({
-    url: absoluteUrl(path),
+    url: canonicalUrl(path),
     lastModified,
     changeFrequency,
     priority,

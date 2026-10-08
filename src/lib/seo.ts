@@ -9,8 +9,89 @@ import { resolveSiteUrl } from './site-url'
 // build. See src/lib/site-url.ts.
 export const siteUrl = resolveSiteUrl()
 
+/**
+ * Prefixes the site origin onto any URL — media and API paths, which are served as-is and are not
+ * subject to canonicalization. Page URLs go through `canonicalUrl()` below instead.
+ */
 export const absoluteUrl = (path: string): string =>
   path.startsWith('http') ? path : `${siteUrl}${path.startsWith('/') ? path : `/${path}`}`
+
+/* ==========================================================================
+   Canonical URLs
+   ==========================================================================
+   One page = one URL. `canonicalPath()` normalizes a route into the exact
+   pathname the site serves it at, and `canonicalUrl()` turns that into the
+   absolute URL used by `<link rel="canonical">`, `og:url`, the sitemap and
+   JSON-LD — so all four always agree, byte for byte.
+   ========================================================================== */
+
+/**
+ * Percent-encodes one path segment.
+ *
+ * Route params arrive already decoded (`/blog/caf%C3%A9` → `café`), so encoding once here is what
+ * puts the URL back into its wire form. A stray `%` that is not a valid escape is literal text:
+ * `decodeURIComponent` throws on it, and `encodeURIComponent` then correctly writes it as `%25`.
+ */
+const encodeSegment = (segment: string): string => {
+  let decoded = segment
+  try {
+    decoded = decodeURIComponent(segment)
+  } catch {
+    // Leave as-is — it will still be encoded below.
+  }
+  return encodeURIComponent(decoded)
+}
+
+/**
+ * Normalizes any site path into the single pathname a page is served at:
+ *
+ * ```
+ * 'trips'                → '/trips'          (leading slash added)
+ * '/trips/'              → '/trips'          (trailing slash dropped)
+ * '/trips//everest/'     → '/trips/everest'  (duplicate slashes collapsed)
+ * '/trips?page=2&x=1'    → '/trips'          (query dropped — filters are not pages)
+ * '/trips/everest#day-3' → '/trips/everest'  (hash dropped)
+ * '/blog/café'           → '/blog/caf%C3%A9' (encoded)
+ * ''  |  '/'             → '/'
+ * ```
+ *
+ * An absolute URL is reduced to its path: the canonical of a page on this site can only ever live
+ * on this site's origin.
+ */
+export const canonicalPath = (path?: string | null): string => {
+  const raw = String(path ?? '').trim()
+  if (!raw) return '/'
+
+  let pathname = raw
+  if (/^https?:\/\//i.test(raw)) {
+    try {
+      pathname = new URL(raw).pathname
+    } catch {
+      return '/'
+    }
+  }
+
+  const segments = pathname
+    .split(/[?#]/, 1)[0]
+    .split('/')
+    // `filter(Boolean)` drops the leading, trailing and duplicated empty segments at once.
+    .filter(Boolean)
+    .map(encodeSegment)
+
+  return segments.length === 0 ? '/' : `/${segments.join('/')}`
+}
+
+/**
+ * The absolute canonical URL of a page path — what crawlers must see in `<link rel="canonical">`.
+ *
+ * The homepage resolves to the bare origin (`https://hikeglobally.com`, no trailing slash) because
+ * that is exactly what Next.js emits for it, so a page's canonical, its sitemap entry and its
+ * `og:url` are never three spellings of the same URL.
+ */
+export const canonicalUrl = (path?: string | null): string => {
+  const url = new URL(`${siteUrl}${canonicalPath(path)}`)
+  return url.pathname === '/' ? url.origin : url.href
+}
 
 type MetaGroup = {
   title?: string | null
@@ -41,7 +122,14 @@ type BuildMetadataArgs = {
   title: string
   description?: string | null
   image?: number | Media | null
-  /** Path of THIS page, e.g. '/trips/everest-base-camp'. */
+  /**
+   * Path of THIS page, e.g. '/trips/everest-base-camp'.
+   *
+   * It becomes the canonical URL (and `og:url`), so it must be the exact path the page is served
+   * at — build it from the route params (`sitePath(`/trips/${slug}`)`), never from CMS content.
+   * Anything that is not part of the URL (query strings, trailing slashes, duplicate slashes) is
+   * normalized away by `canonicalPath()`.
+   */
   path: string
   type?: 'website' | 'article'
   noIndex?: boolean
@@ -55,6 +143,10 @@ type BuildMetadataArgs = {
  * Builds complete Next.js Metadata for a page: canonical URL, Open Graph, Twitter card,
  * robots. The site is English-only, so there are no hreflang alternates to emit — the
  * canonical URL is the single source of truth for search engines.
+ *
+ * Every page on the site goes through this, which is what guarantees each one self-references its
+ * own exact URL. `src/lib/canonical-coverage.test.ts` fails the test run if a page under
+ * `src/app/(frontend)` ever stops doing so.
  */
 export const buildMetadata = ({
   title,
@@ -69,7 +161,7 @@ export const buildMetadata = ({
   siteName = 'Hike Globally',
 }: BuildMetadataArgs): Metadata => {
   const cleanDescription = description ? truncate(description, 160) : undefined
-  const url = absoluteUrl(path)
+  const url = canonicalUrl(path)
   const ogImage = imageUrl(image)
   const dimensions = imageDimensions(image)
 
@@ -186,7 +278,7 @@ export const breadcrumbJsonLd = (items: { name: string; url: string }[]): JsonLd
     '@type': 'ListItem',
     position: index + 1,
     name: item.name,
-    item: absoluteUrl(item.url),
+    item: canonicalUrl(item.url),
   })),
 })
 
@@ -207,8 +299,8 @@ export const blogPostingJsonLd = ({
   '@type': 'BlogPosting',
   headline: post.meta?.title || post.title,
   description: post.meta?.description || post.excerpt,
-  url: absoluteUrl(url),
-  mainEntityOfPage: { '@type': 'WebPage', '@id': absoluteUrl(url) },
+  url: canonicalUrl(url),
+  mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl(url) },
   image: image ? [image] : undefined,
   datePublished: post.publishedAt ?? post.createdAt,
   dateModified: post.updatedAt,
@@ -239,7 +331,7 @@ export const touristTripJsonLd = ({
   '@type': 'TouristTrip',
   name: trip.meta?.title || trip.title,
   description: trip.meta?.description || trip.summary,
-  url: absoluteUrl(url),
+  url: canonicalUrl(url),
   image: image ? [image] : undefined,
   inLanguage: htmlLang,
   touristType: trip.difficulty,
@@ -260,7 +352,7 @@ export const touristTripJsonLd = ({
     price: trip.priceFrom,
     priceCurrency: trip.priceCurrency,
     availability: 'https://schema.org/InStock',
-    url: absoluteUrl(url),
+    url: canonicalUrl(url),
   },
   ...(destinationName
     ? {
@@ -285,7 +377,7 @@ export const touristDestinationJsonLd = ({
   '@type': 'TouristDestination',
   name: destination.meta?.title || destination.name,
   description: destination.meta?.description || destination.tagline,
-  url: absoluteUrl(url),
+  url: canonicalUrl(url),
   image: image ? [image] : undefined,
   inLanguage: htmlLang,
   address: {

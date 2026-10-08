@@ -81,6 +81,9 @@ export function middleware(request: NextRequest) {
   if (pathname === '/admin' || pathname.startsWith('/admin/')) return trustSameOrigin(request)
 
   // Retire the old language prefixes: /de/trips → /trips (search params are preserved).
+  //
+  // Trailing slashes need no handling here: Next's router 308s `/trips/` → `/trips` before the
+  // proxy runs, so the URL a crawler lands on is already the same string as the page's canonical.
   const stripped = stripLocalePrefix(pathname)
   if (stripped !== null) {
     const url = request.nextUrl.clone()

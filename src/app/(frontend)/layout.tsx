@@ -9,7 +9,6 @@ import { SmoothScroll } from '@/components/providers/smooth-scroll'
 import { dictionary } from '@/i18n/dictionaries'
 import { htmlLang } from '@/i18n/config'
 import { getSettings } from '@/lib/data'
-import { absoluteUrl } from '@/lib/seo'
 import { resolveSiteUrlObject } from '@/lib/site-url'
 import './globals.css'
 
@@ -38,10 +37,12 @@ const bodyFont = localFont({
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings()
 
+  // `undefined` rather than a thrown `TypeError` if the configured origin is unusable — a bad env
+  // var must degrade the metadata, not fail the build.
+  const siteUrlObject = resolveSiteUrlObject()
+
   return {
-    // `undefined` rather than a thrown `TypeError` if the configured URL is unusable — a bad env
-    // var must degrade the metadata, not fail the build.
-    metadataBase: resolveSiteUrlObject(),
+    metadataBase: siteUrlObject,
     title: {
       default: `${settings.siteName} — ${settings.tagline ?? 'Trekking & expeditions in Nepal'}`,
       template: `%s · ${settings.siteName}`,
@@ -53,7 +54,20 @@ export async function generateMetadata(): Promise<Metadata> {
       'theme-color': '#01161e',
     },
     alternates: {
-      canonical: absoluteUrl('/'),
+      /**
+       * Site-wide canonical fallback: the exact URL of whatever page is being rendered.
+       *
+       * Passing a `URL` *instance* (not a string) is Next.js' own mechanism for this — Next
+       * resolves it against the request's pathname, so `/trips/everest-base-camp` canonicalizes to
+       * `https://hikeglobally.com/trips/everest-base-camp` with no code in that route. A page's own
+       * `buildMetadata({ path })` overrides it with the identical value; this net exists so a route
+       * added later that forgets `generateMetadata` still self-canonicalizes correctly instead of
+       * silently inheriting a homepage canonical (which would tell Google it is a duplicate of `/`).
+       *
+       * With an unusable origin this is `undefined` and no canonical is emitted at all — better
+       * than a wrong one.
+       */
+      canonical: siteUrlObject,
     },
   }
 }
