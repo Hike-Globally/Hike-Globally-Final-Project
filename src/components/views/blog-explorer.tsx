@@ -3,8 +3,7 @@
 import { useMemo, useState } from 'react'
 
 import { PostCard } from '@/components/cards/post-card'
-import { getDictionary } from '@/i18n/dictionaries'
-import type { Locale } from '@/i18n/config'
+import { dictionary } from '@/i18n/dictionaries'
 import type { PostCard as PostCardData } from '@/lib/data'
 import { cn } from '@/lib/utils'
 
@@ -12,8 +11,8 @@ import { cn } from '@/lib/utils'
  * Category filter for the journal. Filtering is client-side so /blog stays a static page —
  * see the note in `trips-explorer.tsx` for the trade-off.
  */
-export function BlogExplorer({ posts, locale }: { posts: PostCardData[]; locale: Locale }) {
-  const dict = getDictionary(locale)
+export function BlogExplorer({ posts }: { posts: PostCardData[] }) {
+  const dict = dictionary
   const [category, setCategory] = useState<string>('all')
 
   const categories = useMemo(() => {
@@ -25,7 +24,10 @@ export function BlogExplorer({ posts, locale }: { posts: PostCardData[]; locale:
   }, [posts])
 
   const filtered = useMemo(
-    () => (category === 'all' ? posts : posts.filter((post) => post.categories?.includes(category as never))),
+    () =>
+      category === 'all'
+        ? posts
+        : posts.filter((post) => post.categories?.includes(category as never)),
     [posts, category],
   )
 
@@ -43,7 +45,7 @@ export function BlogExplorer({ posts, locale }: { posts: PostCardData[]; locale:
     return (
       <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
         {filtered.map((post, index) => (
-          <PostCard key={post.id} post={post} locale={locale} priority={index < 3} />
+          <PostCard key={post.id} post={post} priority={index < 3} />
         ))}
       </div>
     )
@@ -83,13 +85,13 @@ export function BlogExplorer({ posts, locale }: { posts: PostCardData[]; locale:
 
       {lead ? (
         <div className="mb-16">
-          <PostCard post={lead} locale={locale} featured priority />
+          <PostCard post={lead} featured priority />
         </div>
       ) : null}
 
       <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
         {rest.map((post, index) => (
-          <PostCard key={post.id} post={post} locale={locale} priority={index < 2} />
+          <PostCard key={post.id} post={post} priority={index < 2} />
         ))}
       </div>
     </div>

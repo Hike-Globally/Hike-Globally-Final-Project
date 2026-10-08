@@ -1,4 +1,3 @@
-import type { Locale } from '@/i18n/config'
 import type { Page } from '@/payload-types'
 
 import { Cta } from './cta'
@@ -22,13 +21,7 @@ type Block = NonNullable<Page['blocks']>[number]
  * block to the CMS produces a TypeScript error here until it has a component — new blocks can
  * never silently render as nothing.
  */
-export async function BlockRenderer({
-  blocks,
-  locale,
-}: {
-  blocks: Block[] | null | undefined
-  locale: Locale
-}) {
+export async function BlockRenderer({ blocks }: { blocks: Block[] | null | undefined }) {
   if (!blocks?.length) return null
 
   return (
@@ -38,27 +31,27 @@ export async function BlockRenderer({
 
         switch (block.blockType) {
           case 'hero':
-            return <Hero key={key} block={block} locale={locale} />
+            return <Hero key={key} block={block} />
           case 'richText':
-            return <RichTextSection key={key} block={block} locale={locale} />
+            return <RichTextSection key={key} block={block} />
           case 'featuredTrips':
-            return <FeaturedTrips key={key} block={block} locale={locale} />
+            return <FeaturedTrips key={key} block={block} />
           case 'featuredDestinations':
-            return <FeaturedDestinations key={key} block={block} locale={locale} />
+            return <FeaturedDestinations key={key} block={block} />
           case 'latestPosts':
-            return <LatestPosts key={key} block={block} locale={locale} />
+            return <LatestPosts key={key} block={block} />
           case 'stats':
-            return <Stats key={key} block={block} locale={locale} />
+            return <Stats key={key} block={block} />
           case 'gallery':
-            return <Gallery key={key} block={block} locale={locale} />
+            return <Gallery key={key} block={block} />
           case 'testimonials':
-            return <Testimonials key={key} block={block} locale={locale} />
+            return <Testimonials key={key} block={block} />
           case 'faq':
-            return <Faq key={key} block={block} locale={locale} />
+            return <Faq key={key} block={block} />
           case 'inquiry':
-            return <InquirySection key={key} block={block} locale={locale} />
+            return <InquirySection key={key} block={block} />
           case 'cta':
-            return <Cta key={key} block={block} locale={locale} />
+            return <Cta key={key} block={block} />
           default:
             return null
         }

@@ -8,7 +8,6 @@ import type {
 } from 'payload'
 
 import { CACHE_TAG, revalidationDisabled } from '../lib/cache-tags'
-import { locales, type Locale } from '../i18n/config'
 
 /**
  * ============================================================================
@@ -54,33 +53,11 @@ const documentTag = (collection: RevalidateConfig['collection'], slug: string): 
         ? CACHE_TAG.post(slug)
         : CACHE_TAG.page(slug)
 
-/**
- * Reads the slug of every language for a document.
- *
- * A hook only sees the locale it was saved from, but a German editor saving a German trip must
- * also invalidate the English and French caches — otherwise /en/trips/x can keep serving stale
- * content even though the underlying document changed.
- */
-const slugsByLocale = (doc: unknown): Partial<Record<Locale, string>> => {
-  const result: Partial<Record<Locale, string>> = {}
-  if (!doc || typeof doc !== 'object') return result
-
-  const record = doc as Record<string, unknown>
-  const currentSlug = typeof record.slug === 'string' ? record.slug : undefined
-
-  for (const locale of locales) {
-    const localized = record[locale]
-    if (localized && typeof localized === 'object') {
-      const slug = (localized as { slug?: unknown }).slug
-      if (typeof slug === 'string' && slug.length > 0) {
-        result[locale] = slug
-        continue
-      }
-    }
-    if (currentSlug) result[locale] = currentSlug
-  }
-
-  return result
+/** The slug of a document, from either the hook payload or a fresh read of it. */
+const slugOf = (doc: unknown): string | undefined => {
+  if (!doc || typeof doc !== 'object') return undefined
+  const slug = (doc as { slug?: unknown }).slug
+  return typeof slug === 'string' && slug.length > 0 ? slug : undefined
 }
 
 const revalidateDocument = async ({
@@ -98,13 +75,12 @@ const revalidateDocument = async ({
   const tags: string[] = [collectionTag(collection), ...extraTags]
   const paths: string[] = []
 
-  // Load every language so the right per-locale URLs get rebuilt.
+  // Read the document back so the slug is present even on a partial update.
   let fullDoc: unknown = doc
   try {
     fullDoc = await req.payload.findByID({
       id: doc.id,
       collection,
-      locale: 'all',
       depth: 0,
       draft: true,
       overrideAccess: true,
@@ -114,27 +90,21 @@ const revalidateDocument = async ({
     fullDoc = doc
   }
 
-  const slugs = slugsByLocale(fullDoc)
-  const previousSlugs = slugsByLocale(previousDoc)
+  const slug = slugOf(fullDoc)
+  const previousSlug = slugOf(previousDoc)
 
-  for (const locale of locales) {
-    // Pages have no listing route — their "index" is the homepage.
-    paths.push(collection === 'pages' ? `/${locale}` : `/${locale}/${segment}`)
+  // Pages have no listing route — their "index" is the homepage.
+  paths.push(collection === 'pages' ? '/' : `/${segment}`)
 
-    const slug = slugs[locale]
-    if (slug) {
-      paths.push(
-        collection === 'pages' && slug === 'home' ? `/${locale}` : `/${locale}/${segment}/${slug}`,
-      )
-      tags.push(documentTag(collection, slug))
-    }
+  if (slug) {
+    paths.push(collection === 'pages' && slug === 'home' ? '/' : `/${segment}/${slug}`)
+    tags.push(documentTag(collection, slug))
+  }
 
-    // A renamed slug must purge the old URL too, or it keeps serving stale HTML.
-    const previousSlug = previousSlugs[locale]
-    if (previousSlug && previousSlug !== slug) {
-      paths.push(`/${locale}/${segment}/${previousSlug}`)
-      tags.push(documentTag(collection, previousSlug))
-    }
+  // A renamed slug must purge the old URL too, or it keeps serving stale HTML.
+  if (previousSlug && previousSlug !== slug) {
+    paths.push(`/${[segment, previousSlug].filter(Boolean).join('/')}`)
+    tags.push(documentTag(collection, previousSlug))
   }
 
   if (revalidationDisabled()) return
@@ -195,8 +165,8 @@ export const revalidatePage = pageHooks.afterChange
 export const revalidatePageDelete = pageHooks.afterDelete
 
 /**
- * Header / footer / settings appear on every page, so a change invalidates the whole
- * locale layout (`revalidatePath('/en', 'layout')`) instead of guessing which pages are touched.
+ * Header / footer / settings appear on every page, so a change invalidates the whole root
+ * layout (`revalidatePath('/', 'layout')`) instead of guessing which pages are touched.
  */
 export const revalidateGlobal =
   (global: 'header' | 'footer' | 'settings'): GlobalAfterChangeHook =>
@@ -207,11 +177,15 @@ export const revalidateGlobal =
   // REST handler would then fail to serialise them (circular structure) with a 500 on every save.
   ({ doc }) => {
     const tag =
-      global === 'header' ? CACHE_TAG.header : global === 'footer' ? CACHE_TAG.footer : CACHE_TAG.settings
+      global === 'header'
+        ? CACHE_TAG.header
+        : global === 'footer'
+          ? CACHE_TAG.footer
+          : CACHE_TAG.settings
 
     if (!revalidationDisabled()) {
       try {
-        for (const locale of locales) revalidatePath(`/${locale}`, 'layout')
+        revalidatePath('/', 'layout')
         revalidateTag(tag, { expire: 0 })
       } catch (error) {
         console.warn(`[revalidate] skipped — ${(error as Error).message}`)
@@ -225,7 +199,8 @@ export const revalidateGlobal =
 export const populatePublishedAt: CollectionBeforeChangeHook = ({ data, operation, req }) => {
   const incoming = req.data as { _status?: string } | undefined
   const isPublished =
-    incoming?._status === 'published' || (data as { _status?: string } | undefined)?._status === 'published'
+    incoming?._status === 'published' ||
+    (data as { _status?: string } | undefined)?._status === 'published'
 
   if ((operation === 'create' || operation === 'update') && isPublished) {
     const existing = (data as { publishedAt?: string | null } | undefined)?.publishedAt

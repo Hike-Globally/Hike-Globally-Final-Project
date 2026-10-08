@@ -1,8 +1,7 @@
 import { TripCard } from '@/components/cards/trip-card'
 import { Reveal } from '@/components/motion/reveal'
 import { SectionHeading } from '@/components/sections/section-heading'
-import type { Locale } from '@/i18n/config'
-import { localizedPath } from '@/i18n/config'
+import { sitePath } from '@/i18n/config'
 import { getFeaturedTrips } from '@/lib/data'
 import type { FeaturedTripsBlock, Trip } from '@/payload-types'
 import type { TripCard as TripCardData } from '@/lib/data'
@@ -15,7 +14,7 @@ const columnClass: Record<string, string> = {
   '4': 'sm:grid-cols-2 lg:grid-cols-4',
 }
 
-export async function FeaturedTrips({ block, locale }: { block: FeaturedTripsBlock; locale: Locale }) {
+export async function FeaturedTrips({ block }: { block: FeaturedTripsBlock }) {
   let trips: TripCardData[] = []
 
   if (block.source === 'manual' && Array.isArray(block.trips) && block.trips.length > 0) {
@@ -26,13 +25,13 @@ export async function FeaturedTrips({ block, locale }: { block: FeaturedTripsBlo
   }
 
   if (trips.length === 0) {
-    trips = await getFeaturedTrips(locale, block.limit ?? 3)
+    trips = await getFeaturedTrips(block.limit ?? 3)
   }
 
   if (trips.length === 0) return null
 
-  const viewAll = resolveLink(block.viewAllLink, locale) ?? {
-    href: localizedPath(locale, '/trips'),
+  const viewAll = resolveLink(block.viewAllLink) ?? {
+    href: sitePath('/trips'),
     label: 'View all trips',
     newTab: false,
   }
@@ -45,7 +44,7 @@ export async function FeaturedTrips({ block, locale }: { block: FeaturedTripsBlo
         <div className={cn('grid gap-6', columnClass[block.columns ?? '3'] ?? columnClass['3'])}>
           {trips.slice(0, (block.limit ?? 3) * 2).map((trip, index) => (
             <Reveal key={trip.id} delay={index * 80}>
-              <TripCard trip={trip} locale={locale} priority={index === 0} />
+              <TripCard trip={trip} priority={index === 0} />
             </Reveal>
           ))}
         </div>

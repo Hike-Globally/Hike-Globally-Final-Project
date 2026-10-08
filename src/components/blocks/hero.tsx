@@ -2,7 +2,6 @@ import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
 import { PayloadImageFill } from '@/components/ui/payload-image'
-import type { Locale } from '@/i18n/config'
 import type { HeroBlock } from '@/payload-types'
 import { resolveLink } from '@/lib/links'
 import { cn } from '@/lib/utils'
@@ -19,9 +18,9 @@ const overlays: Record<string, string> = {
   none: 'bg-transparent',
 }
 
-export function Hero({ block, locale }: { block: HeroBlock; locale: Locale }) {
-  const primary = resolveLink(block.primaryLink, locale)
-  const secondary = resolveLink(block.secondaryLink, locale)
+export function Hero({ block }: { block: HeroBlock }) {
+  const primary = resolveLink(block.primaryLink)
+  const secondary = resolveLink(block.secondaryLink)
   const hasImage = Boolean(block.backgroundImage)
   const height = heights[block.height ?? 'tall'] ?? heights.tall!
   const overlay = overlays[block.overlay ?? 'medium'] ?? overlays.medium!
@@ -57,7 +56,9 @@ export function Hero({ block, locale }: { block: HeroBlock; locale: Locale }) {
       <div className="container-content py-24 md:py-28">
         <div className="max-w-3xl">
           {block.eyebrow ? (
-            <p className={cn('eyebrow mb-5', hasImage ? 'text-sage' : 'text-slate')}>{block.eyebrow}</p>
+            <p className={cn('eyebrow mb-5', hasImage ? 'text-sage' : 'text-slate')}>
+              {block.eyebrow}
+            </p>
           ) : null}
 
           <h1 className={cn('heading-display', hasImage ? 'text-white' : 'text-ink')}>

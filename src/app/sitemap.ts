@@ -1,92 +1,57 @@
 import type { MetadataRoute } from 'next'
 
-import { locales, localizedPath } from '@/i18n/config'
+import { sitePath } from '@/i18n/config'
 import {
   getAllDestinationSlugs,
   getAllPageSlugs,
   getAllPostSlugs,
   getAllTripSlugs,
-  getSettings,
 } from '@/lib/data'
 import { absoluteUrl } from '@/lib/seo'
 
 export const revalidate = 3600
 
-type SlugEntry = { id: number; locale: string; slug: string }
-
-const groupById = (entries: SlugEntry[]) => {
-  const groups = new Map<number, Record<string, string>>()
-  for (const entry of entries) {
-    const group = groups.get(entry.id) ?? {}
-    group[entry.locale] = entry.slug
-    groups.set(entry.id, group)
-  }
-  return Array.from(groups.values())
-}
-
 /**
- * Multilingual sitemap with hreflang alternates.
+ * Sitemap for the English-only site.
  *
- * Each document appears once per language, and every entry lists its translations via
- * `alternates.languages` — that is how Google serves the German URL to German users instead
- * of deciding your English page is a duplicate.
+ * Every public URL appears exactly once: the homepage, the three listing pages, the inquiry
+ * page, and each published trip, destination, post and CMS page. There are no `alternates`
+ * blocks — with a single language there is nothing to translate between, and the canonical URL
+ * on each page is all a crawler needs.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [trips, destinations, posts, pages, settings] = await Promise.all([
+  const [trips, destinations, posts, pages] = await Promise.all([
     getAllTripSlugs(),
     getAllDestinationSlugs(),
     getAllPostSlugs(),
     getAllPageSlugs(),
-    getSettings('en'),
   ])
 
   const lastModified = new Date()
 
-  const staticPaths = ['', '/trips', '/destinations', '/blog', '/inquiry']
-
-  const staticEntries: MetadataRoute.Sitemap = staticPaths.flatMap((path) =>
-    locales.map((locale) => ({
-      url: absoluteUrl(localizedPath(locale, path)),
-      lastModified,
-      changeFrequency: (path === '' ? 'weekly' : 'daily') as 'weekly' | 'daily',
-      priority: path === '' ? 1 : 0.8,
-      alternates: {
-        languages: Object.fromEntries(
-          locales.map((code) => [code, absoluteUrl(localizedPath(code, path))]),
-        ),
-      },
-    })),
-  )
-
-  const build = (
-    entries: SlugEntry[],
-    segment: string,
+  const entry = (
+    path: string,
     priority: number,
-  ): MetadataRoute.Sitemap =>
-    groupById(entries).flatMap((group) =>
-      Object.entries(group).map(([locale, slug]) => ({
-        url: absoluteUrl(localizedPath(locale as (typeof locales)[number], `/${segment}/${slug}`)),
-        lastModified,
-        changeFrequency: 'weekly' as const,
-        priority,
-        alternates: {
-          languages: Object.fromEntries(
-            Object.entries(group).map(([code, value]) => [
-              code,
-              absoluteUrl(localizedPath(code as (typeof locales)[number], `/${segment}/${value}`)),
-            ]),
-          ),
-        },
-      })),
-    )
+    changeFrequency: 'daily' | 'weekly',
+  ): MetadataRoute.Sitemap[number] => ({
+    url: absoluteUrl(path),
+    lastModified,
+    changeFrequency,
+    priority,
+  })
+
+  const staticPaths = ['/', '/trips', '/destinations', '/blog', '/inquiry']
 
   return [
-    ...staticEntries,
-    ...build(trips, 'trips', 0.9),
-    ...build(destinations, 'destinations', 0.8),
-    ...build(posts, 'blog', 0.7),
-    ...build(pages, '', 0.6),
-    // The site name is not needed here; it is referenced to keep the settings read meaningful.
-    ...(settings.siteName ? [] : []),
+    ...staticPaths.map((path) =>
+      entry(path, path === '/' ? 1 : 0.8, path === '/' ? 'weekly' : 'daily'),
+    ),
+    ...trips.map((slug) => entry(sitePath(`/trips/${slug}`), 0.9, 'weekly')),
+    ...destinations.map((slug) => entry(sitePath(`/destinations/${slug}`), 0.8, 'weekly')),
+    ...posts.map((slug) => entry(sitePath(`/blog/${slug}`), 0.7, 'weekly')),
+    // A CMS page with the reserved `home` slug is the homepage, which is already listed above.
+    ...pages
+      .filter((slug) => slug !== 'home')
+      .map((slug) => entry(sitePath(`/${slug}`), 0.6, 'weekly')),
   ]
 }

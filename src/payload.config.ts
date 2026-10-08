@@ -144,15 +144,17 @@ export default buildConfig({
   collections: [Users, Media, Destinations, Trips, Blog, Pages],
   globals: [Header, Footer, Settings],
 
+  // The site is English-only, so Payload is configured with a single locale: the admin shows no
+  // language selector, and localized fields fall back to that one locale. Keeping the layer in
+  // place means adding a language back is a one-line change in src/i18n/config.ts, and existing
+  // content tables (`_locales` columns) stay valid.
   localization: {
     defaultLocale,
     locales: locales.map((code) => ({
       code,
-      label: localeMeta[code].adminLabel,
+      label: localeMeta[code].label,
       rtl: false,
     })),
-    // Fallback: a missing German translation transparently serves the English text instead of
-    // an empty string, so a partially translated site never shows blank sections.
     fallback: true,
   },
 

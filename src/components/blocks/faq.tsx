@@ -7,7 +7,6 @@ import {
 import { JsonLd } from '@/components/seo/json-ld'
 import { SectionHeading } from '@/components/sections/section-heading'
 import { faqJsonLd } from '@/lib/seo'
-import type { Locale } from '@/i18n/config'
 import type { FaqBlock } from '@/payload-types'
 
 /**
@@ -15,7 +14,7 @@ import type { FaqBlock } from '@/payload-types'
  * It also emits FAQPage structured data, which is what makes the questions eligible to
  * appear directly under your result in Google.
  */
-export function Faq({ block }: { block: FaqBlock; locale: Locale }) {
+export function Faq({ block }: { block: FaqBlock }) {
   const items = (block.items ?? []).filter((item) => Boolean(item?.question))
 
   if (items.length === 0) return null

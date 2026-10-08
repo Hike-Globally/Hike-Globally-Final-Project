@@ -3,12 +3,11 @@ import { Quote, Star } from 'lucide-react'
 import { PayloadImage } from '@/components/ui/payload-image'
 import { Reveal } from '@/components/motion/reveal'
 import { SectionHeading } from '@/components/sections/section-heading'
-import type { Locale } from '@/i18n/config'
-import { localizedPath } from '@/i18n/config'
+import { sitePath } from '@/i18n/config'
 import type { TestimonialsBlock } from '@/payload-types'
 import { cn } from '@/lib/utils'
 
-export function Testimonials({ block, locale }: { block: TestimonialsBlock; locale: Locale }) {
+export function Testimonials({ block }: { block: TestimonialsBlock }) {
   const items = block.items ?? []
   if (items.length === 0) return null
 
@@ -27,7 +26,9 @@ export function Testimonials({ block, locale }: { block: TestimonialsBlock; loca
           {items.map((item, index) => {
             const rating = Number(item.rating ?? 5)
             const tripSlug =
-              item.trip && typeof item.trip !== 'number' && 'slug' in item.trip ? item.trip.slug : null
+              item.trip && typeof item.trip !== 'number' && 'slug' in item.trip
+                ? item.trip.slug
+                : null
 
             return (
               <Reveal key={item.id ?? index} delay={index * 80}>
@@ -37,10 +38,7 @@ export function Testimonials({ block, locale }: { block: TestimonialsBlock; loca
                     dark ? 'border-white/10 bg-white/[0.04]' : 'border-black/[0.06] bg-card',
                   )}
                 >
-                  <Quote
-                    className={cn('size-7', dark ? 'text-sage' : 'text-sage')}
-                    aria-hidden
-                  />
+                  <Quote className={cn('size-7', dark ? 'text-sage' : 'text-sage')} aria-hidden />
 
                   <div className="mt-5 flex gap-0.5" aria-label={`${rating} out of 5`}>
                     {Array.from({ length: 5 }).map((_, star) => (
@@ -99,7 +97,7 @@ export function Testimonials({ block, locale }: { block: TestimonialsBlock; loca
 
                   {tripSlug ? (
                     <a
-                      href={localizedPath(locale, `/trips/${tripSlug}`)}
+                      href={sitePath(`/trips/${tripSlug}`)}
                       className={cn(
                         'mt-5 inline-flex text-[0.8125rem] underline underline-offset-4',
                         dark ? 'text-sage hover:text-white' : 'text-deep hover:text-ink',

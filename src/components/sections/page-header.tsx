@@ -1,6 +1,5 @@
 import { PayloadImageFill } from '@/components/ui/payload-image'
 import { Breadcrumbs } from './breadcrumbs'
-import type { Locale } from '@/i18n/config'
 import type { Media } from '@/payload-types'
 import { cn } from '@/lib/utils'
 
@@ -12,7 +11,6 @@ import { cn } from '@/lib/utils'
  * consistent rhythm without every page looking identical.
  */
 export function PageHeader({
-  locale: _locale,
   eyebrow,
   title,
   lead,
@@ -21,7 +19,6 @@ export function PageHeader({
   align = 'left',
   children,
 }: {
-  locale: Locale
   eyebrow?: string | null
   title: string
   lead?: string | null
@@ -68,17 +65,18 @@ export function PageHeader({
         ) : null}
 
         {eyebrow ? (
-          <p
-            className={cn(
-              'eyebrow mb-4',
-              hasBackground ? 'text-sage' : 'text-slate',
-            )}
-          >
+          <p className={cn('eyebrow mb-4', hasBackground ? 'text-sage' : 'text-slate')}>
             {eyebrow}
           </p>
         ) : null}
 
-        <h1 className={cn('heading-xl max-w-4xl', hasBackground ? 'text-white' : 'text-ink', align === 'center' ? 'mx-auto' : '')}>
+        <h1
+          className={cn(
+            'heading-xl max-w-4xl',
+            hasBackground ? 'text-white' : 'text-ink',
+            align === 'center' ? 'mx-auto' : '',
+          )}
+        >
           {title}
         </h1>
 

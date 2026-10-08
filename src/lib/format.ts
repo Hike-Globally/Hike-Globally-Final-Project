@@ -1,10 +1,10 @@
-import type { Locale } from '@/i18n/config'
-
-const localeTag: Record<Locale, string> = {
-  en: 'en-US',
-  de: 'de-DE',
-  fr: 'fr-FR',
-}
+/**
+ * Number, currency and date formatting.
+ *
+ * Everything is formatted with the site's single locale (en-US), so a price reads
+ * "$1,850" and a date reads "14 April 2026" for every visitor.
+ */
+const LOCALE_TAG = 'en-US'
 
 const currencySymbols: Record<string, string> = {
   USD: '$',
@@ -12,47 +12,47 @@ const currencySymbols: Record<string, string> = {
   NPR: 'रू',
 }
 
-/** 1,850 → "$1,850" / "1.850 €" / "रू1,850" — formatted with the visitor's own conventions. */
-export const formatPrice = (amount: number, currency: string, locale: Locale): string => {
+/** 1,850 USD → "$1,850". */
+export const formatPrice = (amount: number, currency: string): string => {
   try {
-    return new Intl.NumberFormat(localeTag[locale], {
+    return new Intl.NumberFormat(LOCALE_TAG, {
       style: 'currency',
       currency,
       maximumFractionDigits: 0,
     }).format(amount)
   } catch {
-    return `${currencySymbols[currency] ?? ''}${amount.toLocaleString(localeTag[locale])}`
+    return `${currencySymbols[currency] ?? ''}${amount.toLocaleString(LOCALE_TAG)}`
   }
 }
 
-export const formatNumber = (value: number, locale: Locale): string =>
-  new Intl.NumberFormat(localeTag[locale]).format(value)
+export const formatNumber = (value: number): string =>
+  new Intl.NumberFormat(LOCALE_TAG).format(value)
 
-export const formatDate = (value: string | Date | null | undefined, locale: Locale): string => {
+export const formatDate = (value: string | Date | null | undefined): string => {
   if (!value) return ''
   const date = typeof value === 'string' ? new Date(value) : value
   if (Number.isNaN(date.getTime())) return ''
-  return new Intl.DateTimeFormat(localeTag[locale], {
+  return new Intl.DateTimeFormat(LOCALE_TAG, {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   }).format(date)
 }
 
-export const formatDateShort = (value: string | Date | null | undefined, locale: Locale): string => {
+export const formatDateShort = (value: string | Date | null | undefined): string => {
   if (!value) return ''
   const date = typeof value === 'string' ? new Date(value) : value
   if (Number.isNaN(date.getTime())) return ''
-  return new Intl.DateTimeFormat(localeTag[locale], {
+  return new Intl.DateTimeFormat(LOCALE_TAG, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
   }).format(date)
 }
 
-/** Altitude in metres, localised (3,440 m). */
-export const formatMetres = (value: number | null | undefined, locale: Locale): string =>
-  value ? `${formatNumber(value, locale)} m` : ''
+/** Altitude in metres (3,440 m). */
+export const formatMetres = (value: number | null | undefined): string =>
+  value ? `${formatNumber(value)} m` : ''
 
 /**
  * Reading time from Payload's Lexical JSON.

@@ -2,7 +2,7 @@
  * Regression tests for site URL normalization.
  *
  * The bug this guards: `NEXT_PUBLIC_SITE_URL=hikeglobally.com` (no scheme) reached `new URL()` in
- * `src/app/(frontend)/[locale]/layout.tsx` and threw `TypeError: Invalid URL`, failing `next build`
+ * `src/app/(frontend)/layout.tsx` and threw `TypeError: Invalid URL`, failing `next build`
  * during prerender. Every site-URL consumer is expected to go through this module from now on.
  *
  * Run with: npm test
@@ -10,7 +10,12 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { DEFAULT_SITE_URL, normalizeSiteUrl, resolveSiteUrl, resolveSiteUrlObject } from './site-url'
+import {
+  DEFAULT_SITE_URL,
+  normalizeSiteUrl,
+  resolveSiteUrl,
+  resolveSiteUrlObject,
+} from './site-url'
 
 const cases: Array<[string, string]> = [
   // The production bug: a bare host must be repaired, not thrown on.

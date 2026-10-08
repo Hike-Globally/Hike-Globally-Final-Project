@@ -6,8 +6,8 @@ import { PostCard } from '@/components/cards/post-card'
 import { JsonLd } from '@/components/seo/json-ld'
 import { Breadcrumbs } from '@/components/sections/breadcrumbs'
 import { PayloadImage } from '@/components/ui/payload-image'
-import { getDictionary } from '@/i18n/dictionaries'
-import { localizedPath, type Locale } from '@/i18n/config'
+import { dictionary } from '@/i18n/dictionaries'
+import { sitePath } from '@/i18n/config'
 import type { PostCard as PostCardData } from '@/lib/data'
 import { formatDate, readingTimeMinutes } from '@/lib/format'
 import { blogPostingJsonLd, breadcrumbJsonLd } from '@/lib/seo'
@@ -15,16 +15,14 @@ import type { Blog, Media } from '@/payload-types'
 
 export function PostDetail({
   post,
-  locale,
   related,
   siteName,
 }: {
   post: Blog
-  locale: Locale
   related: PostCardData[]
   siteName: string
 }) {
-  const dict = getDictionary(locale)
+  const dict = dictionary
 
   const author = post.author && typeof post.author !== 'number' ? post.author : null
   const authorName = author?.name ?? null
@@ -33,12 +31,12 @@ export function PostDetail({
 
   const category = post.categories?.[0]
   const categoryLabel = category
-    ? dict.blog[
+    ? (dict.blog[
         `category${category
           .split('-')
           .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
           .join('')}` as keyof typeof dict.blog
-      ] ?? category
+      ] ?? category)
     : null
 
   return (
@@ -49,8 +47,8 @@ export function PostDetail({
             <Breadcrumbs
               className="[&_a]:text-slate [&_span]:text-ink [&_svg]:text-ink/30 mb-8"
               items={[
-                { label: dict.nav.home, href: localizedPath(locale, '/') },
-                { label: dict.nav.blog, href: localizedPath(locale, '/blog') },
+                { label: dict.nav.home, href: sitePath('/') },
+                { label: dict.nav.blog, href: sitePath('/blog') },
                 { label: post.title },
               ]}
             />
@@ -58,7 +56,7 @@ export function PostDetail({
             <div className="flex flex-wrap items-center gap-3 text-[0.75rem] tracking-[0.12em] text-slate uppercase">
               {categoryLabel ? <span className="text-deep">{categoryLabel}</span> : null}
               {categoryLabel ? <span aria-hidden>·</span> : null}
-              <time dateTime={publishedAt}>{formatDate(publishedAt, locale)}</time>
+              <time dateTime={publishedAt}>{formatDate(publishedAt)}</time>
               <span aria-hidden>·</span>
               <span>{dict.blog.readTime.replace('{minutes}', String(minutes))}</span>
             </div>
@@ -81,7 +79,7 @@ export function PostDetail({
         </div>
 
         <div className="container-prose py-14 md:py-20">
-          <RichText content={post.content} locale={locale} />
+          <RichText content={post.content} />
 
           {authorName ? (
             <div className="mt-14 flex items-center gap-4 rounded-2xl bg-mist p-6">
@@ -98,7 +96,9 @@ export function PostDetail({
                 </span>
               )}
               <div>
-                <p className="text-[0.75rem] tracking-[0.14em] text-slate uppercase">{dict.blog.by}</p>
+                <p className="text-[0.75rem] tracking-[0.14em] text-slate uppercase">
+                  {dict.blog.by}
+                </p>
                 <p className="font-heading text-lg font-semibold text-ink">{authorName}</p>
                 {author?.bio ? (
                   <p className="mt-1 text-[0.9375rem] text-ink-60">{author.bio}</p>
@@ -109,7 +109,7 @@ export function PostDetail({
 
           <div className="mt-10">
             <Link
-              href={localizedPath(locale, '/blog')}
+              href={sitePath('/blog')}
               className="inline-flex items-center gap-2 text-[0.9375rem] text-deep transition-colors hover:text-ink"
             >
               <ArrowLeft className="size-4" />
@@ -125,7 +125,7 @@ export function PostDetail({
             <h2 className="heading-lg mb-10">{dict.blog.related}</h2>
             <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
               {related.map((item) => (
-                <PostCard key={item.id} post={item} locale={locale} />
+                <PostCard key={item.id} post={item} />
               ))}
             </div>
           </div>
@@ -135,14 +135,13 @@ export function PostDetail({
       <JsonLd
         data={[
           breadcrumbJsonLd([
-            { name: dict.nav.home, url: localizedPath(locale, '/') },
-            { name: dict.nav.blog, url: localizedPath(locale, '/blog') },
-            { name: post.title, url: localizedPath(locale, `/blog/${post.slug}`) },
+            { name: dict.nav.home, url: sitePath('/') },
+            { name: dict.nav.blog, url: sitePath('/blog') },
+            { name: post.title, url: sitePath(`/blog/${post.slug}`) },
           ]),
           blogPostingJsonLd({
             post,
-            url: localizedPath(locale, `/blog/${post.slug}`),
-            locale,
+            url: sitePath(`/blog/${post.slug}`),
             authorName,
             image:
               typeof post.featuredImage === 'object' && post.featuredImage?.url

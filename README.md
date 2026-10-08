@@ -1,10 +1,11 @@
 # Hike Globally
 
-Premium, multilingual website for a Himalayan trekking operator — **Next.js 16 App Router +
+Website for a Himalayan trekking operator — **Next.js 16 App Router +
 Payload CMS 3 + PostgreSQL**, in a single deployable application.
 
-- Public site: `/`, `/trips`, `/destinations`, `/blog` and their detail pages, in **English,
-  German and French** (localized slugs, `/de` and `/fr` prefixes).
+- Public site in **English**, at plain URLs: `/`, `/trips`, `/destinations`, `/blog` and their
+  detail pages. No locale prefixes. (The site used to serve `/en`, `/de` and `/fr`; those URLs
+  now 308-redirect to the same page without the prefix.)
 - CMS: Payload admin at `/admin`, drafts + versions + role-based access control.
 - Content saved in the CMS appears on the site immediately (tag-based on-demand revalidation).
 

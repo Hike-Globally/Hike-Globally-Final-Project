@@ -2,7 +2,6 @@ import Link from 'next/link'
 import type { CSSProperties, ReactNode } from 'react'
 
 import { PayloadImage } from '@/components/ui/payload-image'
-import type { Locale } from '@/i18n/config'
 import type { Media } from '@/payload-types'
 import { cn } from '@/lib/utils'
 
@@ -101,8 +100,7 @@ const blockStyle = (node: RichTextNode): CSSProperties | undefined => {
     typeof node.format === 'string' && ALIGNMENTS.has(node.format)
       ? (node.format as CSSProperties['textAlign'])
       : undefined
-  const indent =
-    typeof node.indent === 'number' && node.indent > 0 ? node.indent * 40 : undefined
+  const indent = typeof node.indent === 'number' && node.indent > 0 ? node.indent * 40 : undefined
 
   if (!align && !indent) return undefined
   return { textAlign: align, paddingInlineStart: indent }
@@ -110,24 +108,24 @@ const blockStyle = (node: RichTextNode): CSSProperties | undefined => {
 
 type MediaValue = (Media & { slug?: string }) | number | null | undefined
 
-const docHref = (relationTo: string | undefined, value: unknown, locale: Locale): string | null => {
+const docHref = (relationTo: string | undefined, value: unknown): string | null => {
   if (!value || typeof value !== 'object') return null
   const slug = (value as { slug?: string | null }).slug
   if (!slug) return null
-  if (relationTo === 'trips') return `/${locale}/trips/${slug}`
-  if (relationTo === 'destinations') return `/${locale}/destinations/${slug}`
-  if (relationTo === 'blog') return `/${locale}/blog/${slug}`
-  if (relationTo === 'pages') return slug === 'home' ? `/${locale}` : `/${locale}/${slug}`
+  if (relationTo === 'trips') return `/trips/${slug}`
+  if (relationTo === 'destinations') return `/destinations/${slug}`
+  if (relationTo === 'blog') return `/blog/${slug}`
+  if (relationTo === 'pages') return slug === 'home' ? '/' : `/${slug}`
   return null
 }
 
-const renderNodes = (nodes: RichTextNode[] | undefined, locale: Locale): ReactNode =>
-  (nodes ?? []).map((node, index) => renderNode(node, locale, index))
+const renderNodes = (nodes: RichTextNode[] | undefined): ReactNode =>
+  (nodes ?? []).map((node, index) => renderNode(node, index))
 
-const renderNode = (node: RichTextNode, locale: Locale, index: number): ReactNode => {
+const renderNode = (node: RichTextNode, index: number): ReactNode => {
   if (!node) return null
   const key = `${node.type ?? 'node'}-${index}`
-  const children = renderNodes(node.children, locale)
+  const children = renderNodes(node.children)
 
   switch (node.type) {
     case 'text':
@@ -170,15 +168,20 @@ const renderNode = (node: RichTextNode, locale: Locale, index: number): ReactNod
       return <li key={key}>{children}</li>
 
     case 'quote':
-      return <blockquote key={key} style={blockStyle(node)}>{children}</blockquote>
+      return (
+        <blockquote key={key} style={blockStyle(node)}>
+          {children}
+        </blockquote>
+      )
 
     case 'horizontalrule':
       return <hr key={key} />
 
     case 'link': {
-      const internal = node.linkType === 'internal' ? docHref(node.relationTo, node.doc, locale) : null
+      const internal = node.linkType === 'internal' ? docHref(node.relationTo, node.doc) : null
       const href = internal ?? node.url ?? '#'
-      const external = href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('tel:')
+      const external =
+        href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('tel:')
 
       if (external) {
         return (
@@ -215,7 +218,7 @@ const renderNode = (node: RichTextNode, locale: Locale, index: number): ReactNod
     }
 
     case 'relationship': {
-      const href = docHref(node.relationTo, node.value, locale)
+      const href = docHref(node.relationTo, node.value)
       const label =
         (node.value && typeof node.value === 'object'
           ? ((node.value as { title?: string; name?: string }).title ??
@@ -259,19 +262,9 @@ const renderNode = (node: RichTextNode, locale: Locale, index: number): ReactNod
   }
 }
 
-export function RichText({
-  content,
-  locale,
-  className,
-}: {
-  content: unknown
-  locale: Locale
-  className?: string
-}) {
+export function RichText({ content, className }: { content: unknown; className?: string }) {
   const root = (content as { root?: RichTextNode } | null | undefined)?.root
   if (!root?.children?.length) return null
 
-  return (
-    <div className={cn('prose-hg', className)}>{renderNodes(root.children, locale)}</div>
-  )
+  return <div className={cn('prose-hg', className)}>{renderNodes(root.children)}</div>
 }

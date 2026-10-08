@@ -3,9 +3,9 @@ import type { FieldHook, TextField } from 'payload'
 /**
  * Turns a human title into a URL-safe slug.
  *
- * Diacritics are transliterated so German/French titles produce clean URLs:
- *   "Zermatt & surroundings" -> "zermatt-surroundings"
- *   "Circuit du Mont-Blanc"   -> "circuit-du-mont-blanc"
+ * Diacritics are transliterated so accented titles still produce clean URLs:
+ *   "Annapurna & surroundings" -> "annapurna-surroundings"
+ *   "Everest — Base Camp"      -> "everest-base-camp"
  */
 export const formatSlug = (value: string): string =>
   value
@@ -48,10 +48,11 @@ type SlugOverrides = Partial<
 >
 
 /**
- * Localized slug field.
+ * Slug field.
  *
- * `localized: true` is the key detail: each language gets its own slug, so the German version
- * of a trip lives at /de/trips/<german-slug> while English stays at /en/trips/<english-slug>.
+ * `localized: true` keeps the field in the same `_locales` storage shape the collection already
+ * uses, so re-introducing a second language later needs no database change. The slug is unique
+ * per document either way and stays stable once the page has been published.
  */
 export const slugField = (fallbackField = 'title', overrides: SlugOverrides = {}): TextField => ({
   name: 'slug',
@@ -62,7 +63,7 @@ export const slugField = (fallbackField = 'title', overrides: SlugOverrides = {}
   admin: {
     position: 'sidebar',
     description:
-      'Auto-generated from the title. Each language has its own slug — edit carefully, changing it changes the live URL.',
+      'Auto-generated from the title. Edit carefully — changing it changes the live URL.',
   },
   hooks: {
     beforeValidate: [formatSlugHook(fallbackField)],

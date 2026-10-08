@@ -2,7 +2,7 @@ import { unstable_cache } from 'next/cache'
 import type { TypedLocale, Where } from 'payload'
 
 import { CACHE_TAG, REVALIDATE_SECONDS } from '@/lib/cache-tags'
-import type { Locale } from '@/i18n/config'
+import { defaultLocale } from '@/i18n/config'
 import type {
   Blog,
   Destination,
@@ -38,7 +38,8 @@ import { getPayloadClient, isDatabaseConfigured } from './payload'
  * statically renderable (the single biggest Core Web Vitals win available).
  */
 
-const toTypedLocale = (locale: Locale): TypedLocale => locale as TypedLocale
+/** The site's single locale, as Payload's Local API expects it. */
+const SITE_LOCALE = defaultLocale as TypedLocale
 
 let hasLoggedFallbackWarning = false
 
@@ -71,7 +72,6 @@ type PreviewableCollection = 'blog' | 'destinations' | 'pages' | 'trips'
 /** Uncached Local API lookup used only after the authenticated preview route enables Draft Mode. */
 async function findDocumentBySlug<T>(
   collection: PreviewableCollection,
-  locale: Locale,
   slug: string,
   depth: number,
   includeDraft: boolean,
@@ -83,7 +83,7 @@ async function findDocumentBySlug<T>(
 
   const result = await payload.find({
     collection,
-    locale: toTypedLocale(locale),
+    locale: SITE_LOCALE,
     depth,
     limit: 1,
     where,
@@ -187,14 +187,14 @@ const tripCardSelect = {
   destination: true,
 } as const
 
-export const getTrips = (locale: Locale, limit = 100): Promise<TripCard[]> =>
+export const getTrips = (limit = 100): Promise<TripCard[]> =>
   safeQuery(
     unstable_cache(
       async () => {
         const payload = await getPayloadClient()
         const result = await payload.find({
           collection: 'trips',
-          locale: toTypedLocale(locale),
+          locale: SITE_LOCALE,
           depth: 1,
           limit,
           sort: '-featured',
@@ -203,20 +203,20 @@ export const getTrips = (locale: Locale, limit = 100): Promise<TripCard[]> =>
         })
         return result.docs as unknown as TripCard[]
       },
-      ['trips', locale, String(limit)],
+      ['trips', String(limit)],
       { tags: [CACHE_TAG.trips], revalidate: REVALIDATE_SECONDS },
     ),
     [],
   )
 
-export const getFeaturedTrips = (locale: Locale, limit = 3): Promise<TripCard[]> =>
+export const getFeaturedTrips = (limit = 3): Promise<TripCard[]> =>
   safeQuery(
     unstable_cache(
       async () => {
         const payload = await getPayloadClient()
         const result = await payload.find({
           collection: 'trips',
-          locale: toTypedLocale(locale),
+          locale: SITE_LOCALE,
           depth: 1,
           limit,
           sort: '-featured',
@@ -225,26 +225,25 @@ export const getFeaturedTrips = (locale: Locale, limit = 3): Promise<TripCard[]>
         })
         return result.docs as unknown as TripCard[]
       },
-      ['trips', 'featured', locale, String(limit)],
+      ['trips', 'featured', String(limit)],
       { tags: [CACHE_TAG.trips], revalidate: REVALIDATE_SECONDS },
     ),
     [],
   )
 
-export const getTrip = (locale: Locale, slug: string, includeDraft = false): Promise<Trip | null> =>
+export const getTrip = (slug: string, includeDraft = false): Promise<Trip | null> =>
   safeQuery(
     includeDraft
-      ? () => findDocumentBySlug<Trip>('trips', locale, slug, 2, true)
-      : unstable_cache(
-          () => findDocumentBySlug<Trip>('trips', locale, slug, 2, false),
-          ['trip', locale, slug],
-          { tags: [CACHE_TAG.trips, CACHE_TAG.trip(slug)], revalidate: REVALIDATE_SECONDS },
-        ),
+      ? () => findDocumentBySlug<Trip>('trips', slug, 2, true)
+      : unstable_cache(() => findDocumentBySlug<Trip>('trips', slug, 2, false), ['trip', slug], {
+          tags: [CACHE_TAG.trips, CACHE_TAG.trip(slug)],
+          revalidate: REVALIDATE_SECONDS,
+        }),
     null,
   )
 
 /** Related trips: explicit picks first, otherwise other trips in the same destination. */
-export const getRelatedTrips = (locale: Locale, trip: Trip, limit = 3): Promise<TripCard[]> =>
+export const getRelatedTrips = (trip: Trip, limit = 3): Promise<TripCard[]> =>
   safeQuery(
     unstable_cache(
       async () => {
@@ -257,7 +256,7 @@ export const getRelatedTrips = (locale: Locale, trip: Trip, limit = 3): Promise<
         if (manualIds.length > 0) {
           const result = await payload.find({
             collection: 'trips',
-            locale: toTypedLocale(locale),
+            locale: SITE_LOCALE,
             depth: 1,
             limit,
             where: {
@@ -273,7 +272,7 @@ export const getRelatedTrips = (locale: Locale, trip: Trip, limit = 3): Promise<
 
         const result = await payload.find({
           collection: 'trips',
-          locale: toTypedLocale(locale),
+          locale: SITE_LOCALE,
           depth: 1,
           limit,
           where: {
@@ -287,34 +286,31 @@ export const getRelatedTrips = (locale: Locale, trip: Trip, limit = 3): Promise<
         })
         return result.docs as unknown as TripCard[]
       },
-      ['trips', 'related', locale, String(trip.id)],
+      ['trips', 'related', String(trip.id)],
       { tags: [CACHE_TAG.trips], revalidate: REVALIDATE_SECONDS },
     ),
     [],
   )
 
-/** Every published slug, per language — feeds generateStaticParams(). */
-export const getAllTripSlugs = (): Promise<{ id: number; locale: Locale; slug: string }[]> =>
+/** Every published slug — feeds generateStaticParams(). */
+/** Every published trip slug — feeds generateStaticParams(). */
+export const getAllTripSlugs = (): Promise<string[]> =>
   safeQuery(
     unstable_cache(
       async () => {
         const payload = await getPayloadClient()
-        const result: { id: number; locale: Locale; slug: string }[] = []
-        for (const locale of ['en', 'de', 'fr'] as Locale[]) {
-          const response = await payload.find({
-            collection: 'trips',
-            locale: toTypedLocale(locale),
-            depth: 0,
-            limit: 1000,
-            select: { slug: true },
-            where: { _status: { equals: 'published' } },
-          })
-          for (const doc of response.docs) {
-            const slug = (doc as { slug?: string | null }).slug
-            if (slug) result.push({ id: doc.id, locale, slug })
-          }
-        }
-        return result
+        const response = await payload.find({
+          collection: 'trips',
+          locale: SITE_LOCALE,
+          depth: 0,
+          limit: 1000,
+          select: { slug: true },
+          where: { _status: { equals: 'published' } },
+        })
+
+        return response.docs
+          .map((doc) => (doc as { slug?: string | null }).slug)
+          .filter((slug): slug is string => Boolean(slug))
       },
       ['trip-slugs'],
       { tags: [CACHE_TAG.trips], revalidate: REVALIDATE_SECONDS },
@@ -323,16 +319,14 @@ export const getAllTripSlugs = (): Promise<{ id: number; locale: Locale; slug: s
   )
 
 /** Lightweight list used to populate the inquiry form's "trip of interest" dropdown. */
-export const getTripOptions = (
-  locale: Locale,
-): Promise<{ id: number; title: string; slug: string }[]> =>
+export const getTripOptions = (): Promise<{ id: number; title: string; slug: string }[]> =>
   safeQuery(
     unstable_cache(
       async () => {
         const payload = await getPayloadClient()
         const result = await payload.find({
           collection: 'trips',
-          locale: toTypedLocale(locale),
+          locale: SITE_LOCALE,
           depth: 0,
           limit: 200,
           sort: 'title',
@@ -341,7 +335,7 @@ export const getTripOptions = (
         })
         return result.docs as unknown as { id: number; title: string; slug: string }[]
       },
-      ['trip-options', locale],
+      ['trip-options'],
       { tags: [CACHE_TAG.trips], revalidate: REVALIDATE_SECONDS },
     ),
     [],
@@ -361,14 +355,14 @@ const destinationCardSelect = {
   featured: true,
 } as const
 
-export const getDestinations = (locale: Locale, limit = 100): Promise<DestinationCard[]> =>
+export const getDestinations = (limit = 100): Promise<DestinationCard[]> =>
   safeQuery(
     unstable_cache(
       async () => {
         const payload = await getPayloadClient()
         const result = await payload.find({
           collection: 'destinations',
-          locale: toTypedLocale(locale),
+          locale: SITE_LOCALE,
           depth: 1,
           limit,
           sort: '-featured',
@@ -377,20 +371,20 @@ export const getDestinations = (locale: Locale, limit = 100): Promise<Destinatio
         })
         return result.docs as unknown as DestinationCard[]
       },
-      ['destinations', locale],
+      ['destinations'],
       { tags: [CACHE_TAG.destinations], revalidate: REVALIDATE_SECONDS },
     ),
     [],
   )
 
-export const getFeaturedDestinations = (locale: Locale, limit = 3): Promise<DestinationCard[]> =>
+export const getFeaturedDestinations = (limit = 3): Promise<DestinationCard[]> =>
   safeQuery(
     unstable_cache(
       async () => {
         const payload = await getPayloadClient()
         const result = await payload.find({
           collection: 'destinations',
-          locale: toTypedLocale(locale),
+          locale: SITE_LOCALE,
           depth: 1,
           limit,
           sort: '-featured',
@@ -399,24 +393,20 @@ export const getFeaturedDestinations = (locale: Locale, limit = 3): Promise<Dest
         })
         return result.docs as unknown as DestinationCard[]
       },
-      ['destinations', 'featured', locale, String(limit)],
+      ['destinations', 'featured', String(limit)],
       { tags: [CACHE_TAG.destinations], revalidate: REVALIDATE_SECONDS },
     ),
     [],
   )
 
-export const getDestination = (
-  locale: Locale,
-  slug: string,
-  includeDraft = false,
-): Promise<Destination | null> =>
+export const getDestination = (slug: string, includeDraft = false): Promise<Destination | null> =>
   safeQuery(
     includeDraft
       ? async () => {
           const payload = await getPayloadClient()
           const result = await payload.find({
             collection: 'destinations',
-            locale: toTypedLocale(locale),
+            locale: SITE_LOCALE,
             depth: 1,
             limit: 1,
             draft: true,
@@ -431,7 +421,7 @@ export const getDestination = (
             const payload = await getPayloadClient()
             const result = await payload.find({
               collection: 'destinations',
-              locale: toTypedLocale(locale),
+              locale: SITE_LOCALE,
               depth: 1,
               limit: 1,
               // `joins` resolves the `trips` join field in the same round trip as the document,
@@ -441,7 +431,7 @@ export const getDestination = (
             })
             return (result.docs[0] as Destination | undefined) ?? null
           },
-          ['destination', locale, slug],
+          ['destination', slug],
           {
             tags: [CACHE_TAG.destinations, CACHE_TAG.destination(slug), CACHE_TAG.trips],
             revalidate: REVALIDATE_SECONDS,
@@ -450,27 +440,24 @@ export const getDestination = (
     null,
   )
 
-export const getAllDestinationSlugs = (): Promise<{ id: number; locale: Locale; slug: string }[]> =>
+/** Every published destination slug — feeds generateStaticParams(). */
+export const getAllDestinationSlugs = (): Promise<string[]> =>
   safeQuery(
     unstable_cache(
       async () => {
         const payload = await getPayloadClient()
-        const result: { id: number; locale: Locale; slug: string }[] = []
-        for (const locale of ['en', 'de', 'fr'] as Locale[]) {
-          const response = await payload.find({
-            collection: 'destinations',
-            locale: toTypedLocale(locale),
-            depth: 0,
-            limit: 1000,
-            select: { slug: true },
-            where: { _status: { equals: 'published' } },
-          })
-          for (const doc of response.docs) {
-            const slug = (doc as { slug?: string | null }).slug
-            if (slug) result.push({ id: doc.id, locale, slug })
-          }
-        }
-        return result
+        const response = await payload.find({
+          collection: 'destinations',
+          locale: SITE_LOCALE,
+          depth: 0,
+          limit: 1000,
+          select: { slug: true },
+          where: { _status: { equals: 'published' } },
+        })
+
+        return response.docs
+          .map((doc) => (doc as { slug?: string | null }).slug)
+          .filter((slug): slug is string => Boolean(slug))
       },
       ['destination-slugs'],
       { tags: [CACHE_TAG.destinations], revalidate: REVALIDATE_SECONDS },
@@ -494,14 +481,14 @@ const postCardSelect = {
   author: true,
 } as const
 
-export const getPosts = (locale: Locale, limit = 100): Promise<PostCard[]> =>
+export const getPosts = (limit = 100): Promise<PostCard[]> =>
   safeQuery(
     unstable_cache(
       async () => {
         const payload = await getPayloadClient()
         const result = await payload.find({
           collection: 'blog',
-          locale: toTypedLocale(locale),
+          locale: SITE_LOCALE,
           depth: 1,
           limit,
           sort: '-publishedAt',
@@ -510,20 +497,20 @@ export const getPosts = (locale: Locale, limit = 100): Promise<PostCard[]> =>
         })
         return result.docs as unknown as PostCard[]
       },
-      ['posts', locale],
+      ['posts'],
       { tags: [CACHE_TAG.posts], revalidate: REVALIDATE_SECONDS },
     ),
     [],
   )
 
-export const getFeaturedPosts = (locale: Locale, limit = 3): Promise<PostCard[]> =>
+export const getFeaturedPosts = (limit = 3): Promise<PostCard[]> =>
   safeQuery(
     unstable_cache(
       async () => {
         const payload = await getPayloadClient()
         const result = await payload.find({
           collection: 'blog',
-          locale: toTypedLocale(locale),
+          locale: SITE_LOCALE,
           depth: 1,
           limit,
           sort: '-publishedAt',
@@ -532,25 +519,24 @@ export const getFeaturedPosts = (locale: Locale, limit = 3): Promise<PostCard[]>
         })
         return result.docs as unknown as PostCard[]
       },
-      ['posts', 'featured', locale, String(limit)],
+      ['posts', 'featured', String(limit)],
       { tags: [CACHE_TAG.posts], revalidate: REVALIDATE_SECONDS },
     ),
     [],
   )
 
-export const getPost = (locale: Locale, slug: string, includeDraft = false): Promise<Blog | null> =>
+export const getPost = (slug: string, includeDraft = false): Promise<Blog | null> =>
   safeQuery(
     includeDraft
-      ? () => findDocumentBySlug<Blog>('blog', locale, slug, 2, true)
-      : unstable_cache(
-          () => findDocumentBySlug<Blog>('blog', locale, slug, 2, false),
-          ['post', locale, slug],
-          { tags: [CACHE_TAG.posts, CACHE_TAG.post(slug)], revalidate: REVALIDATE_SECONDS },
-        ),
+      ? () => findDocumentBySlug<Blog>('blog', slug, 2, true)
+      : unstable_cache(() => findDocumentBySlug<Blog>('blog', slug, 2, false), ['post', slug], {
+          tags: [CACHE_TAG.posts, CACHE_TAG.post(slug)],
+          revalidate: REVALIDATE_SECONDS,
+        }),
     null,
   )
 
-export const getRelatedPosts = (locale: Locale, post: Blog, limit = 3): Promise<PostCard[]> =>
+export const getRelatedPosts = (post: Blog, limit = 3): Promise<PostCard[]> =>
   safeQuery(
     unstable_cache(
       async () => {
@@ -563,7 +549,7 @@ export const getRelatedPosts = (locale: Locale, post: Blog, limit = 3): Promise<
         if (manualIds.length > 0) {
           const result = await payload.find({
             collection: 'blog',
-            locale: toTypedLocale(locale),
+            locale: SITE_LOCALE,
             depth: 1,
             limit,
             sort: '-publishedAt',
@@ -575,7 +561,7 @@ export const getRelatedPosts = (locale: Locale, post: Blog, limit = 3): Promise<
 
         const result = await payload.find({
           collection: 'blog',
-          locale: toTypedLocale(locale),
+          locale: SITE_LOCALE,
           depth: 1,
           limit,
           sort: '-publishedAt',
@@ -590,33 +576,30 @@ export const getRelatedPosts = (locale: Locale, post: Blog, limit = 3): Promise<
         })
         return result.docs as unknown as PostCard[]
       },
-      ['posts', 'related', locale, String(post.id)],
+      ['posts', 'related', String(post.id)],
       { tags: [CACHE_TAG.posts], revalidate: REVALIDATE_SECONDS },
     ),
     [],
   )
 
-export const getAllPostSlugs = (): Promise<{ id: number; locale: Locale; slug: string }[]> =>
+/** Every published post slug — feeds generateStaticParams(). */
+export const getAllPostSlugs = (): Promise<string[]> =>
   safeQuery(
     unstable_cache(
       async () => {
         const payload = await getPayloadClient()
-        const result: { id: number; locale: Locale; slug: string }[] = []
-        for (const locale of ['en', 'de', 'fr'] as Locale[]) {
-          const response = await payload.find({
-            collection: 'blog',
-            locale: toTypedLocale(locale),
-            depth: 0,
-            limit: 1000,
-            select: { slug: true },
-            where: { _status: { equals: 'published' } },
-          })
-          for (const doc of response.docs) {
-            const slug = (doc as { slug?: string | null }).slug
-            if (slug) result.push({ id: doc.id, locale, slug })
-          }
-        }
-        return result
+        const response = await payload.find({
+          collection: 'blog',
+          locale: SITE_LOCALE,
+          depth: 0,
+          limit: 1000,
+          select: { slug: true },
+          where: { _status: { equals: 'published' } },
+        })
+
+        return response.docs
+          .map((doc) => (doc as { slug?: string | null }).slug)
+          .filter((slug): slug is string => Boolean(slug))
       },
       ['post-slugs'],
       { tags: [CACHE_TAG.posts], revalidate: REVALIDATE_SECONDS },
@@ -628,40 +611,37 @@ export const getAllPostSlugs = (): Promise<{ id: number; locale: Locale; slug: s
 /* Flexible pages                                                              */
 /* -------------------------------------------------------------------------- */
 
-export const getPage = (locale: Locale, slug: string, includeDraft = false): Promise<Page | null> =>
+export const getPage = (slug: string, includeDraft = false): Promise<Page | null> =>
   safeQuery(
     includeDraft
-      ? () => findDocumentBySlug<Page>('pages', locale, slug, 2, true)
-      : unstable_cache(
-          () => findDocumentBySlug<Page>('pages', locale, slug, 2, false),
-          ['page', locale, slug],
-          { tags: [CACHE_TAG.pages, CACHE_TAG.page(slug)], revalidate: REVALIDATE_SECONDS },
-        ),
+      ? () => findDocumentBySlug<Page>('pages', slug, 2, true)
+      : unstable_cache(() => findDocumentBySlug<Page>('pages', slug, 2, false), ['page', slug], {
+          tags: [CACHE_TAG.pages, CACHE_TAG.page(slug)],
+          revalidate: REVALIDATE_SECONDS,
+        }),
     null,
   )
 
-/** Slugs of every published page except the homepage (which lives at /{locale}). */
-export const getAllPageSlugs = (): Promise<{ id: number; locale: Locale; slug: string }[]> =>
+/** Slugs of every published page except the homepage (which lives at /). */
+/** Slugs of every published page except the homepage (which lives at /). */
+export const getAllPageSlugs = (): Promise<string[]> =>
   safeQuery(
     unstable_cache(
       async () => {
         const payload = await getPayloadClient()
-        const result: { id: number; locale: Locale; slug: string }[] = []
-        for (const locale of ['en', 'de', 'fr'] as Locale[]) {
-          const response = await payload.find({
-            collection: 'pages',
-            locale: toTypedLocale(locale),
-            depth: 0,
-            limit: 1000,
-            select: { slug: true },
-            where: { _status: { equals: 'published' } },
-          })
-          for (const doc of response.docs) {
-            const slug = (doc as { slug?: string | null }).slug
-            if (slug && slug !== 'home') result.push({ id: doc.id, locale, slug })
-          }
-        }
-        return result
+        const response = await payload.find({
+          collection: 'pages',
+          locale: SITE_LOCALE,
+          depth: 0,
+          limit: 1000,
+          select: { slug: true },
+          where: { _status: { equals: 'published' } },
+        })
+
+        return response.docs
+          .map((doc) => (doc as { slug?: string | null }).slug)
+          .filter((slug): slug is string => Boolean(slug))
+          .filter((slug): slug is string => slug !== 'home')
       },
       ['page-slugs'],
       { tags: [CACHE_TAG.pages], revalidate: REVALIDATE_SECONDS },
@@ -673,40 +653,40 @@ export const getAllPageSlugs = (): Promise<{ id: number; locale: Locale; slug: s
 /* Globals                                                                     */
 /* -------------------------------------------------------------------------- */
 
-export const getHeader = (locale: Locale): Promise<Header> =>
+export const getHeader = (): Promise<Header> =>
   safeQuery(
     unstable_cache(
       async () => {
         const payload = await getPayloadClient()
-        return payload.findGlobal({ slug: 'header', locale: toTypedLocale(locale), depth: 2 })
+        return payload.findGlobal({ slug: 'header', locale: SITE_LOCALE, depth: 2 })
       },
-      ['global-header', locale],
+      ['global-header'],
       { tags: [CACHE_TAG.header], revalidate: REVALIDATE_SECONDS },
     ),
     defaultHeader,
   )
 
-export const getFooter = (locale: Locale): Promise<Footer> =>
+export const getFooter = (): Promise<Footer> =>
   safeQuery(
     unstable_cache(
       async () => {
         const payload = await getPayloadClient()
-        return payload.findGlobal({ slug: 'footer', locale: toTypedLocale(locale), depth: 2 })
+        return payload.findGlobal({ slug: 'footer', locale: SITE_LOCALE, depth: 2 })
       },
-      ['global-footer', locale],
+      ['global-footer'],
       { tags: [CACHE_TAG.footer], revalidate: REVALIDATE_SECONDS },
     ),
     defaultFooter,
   )
 
-export const getSettings = async (locale: Locale): Promise<Setting> => {
+export const getSettings = async (): Promise<Setting> => {
   const settings = await safeQuery(
     unstable_cache(
       async () => {
         const payload = await getPayloadClient()
-        return payload.findGlobal({ slug: 'settings', locale: toTypedLocale(locale), depth: 1 })
+        return payload.findGlobal({ slug: 'settings', locale: SITE_LOCALE, depth: 1 })
       },
-      ['global-settings', locale],
+      ['global-settings'],
       { tags: [CACHE_TAG.settings], revalidate: REVALIDATE_SECONDS },
     ),
     defaultSettings,

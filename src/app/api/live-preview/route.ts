@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation'
 import type { NextRequest } from 'next/server'
 
 import { isAdminOrEditor } from '@/access'
-import { isLocale } from '@/i18n/config'
 import { getPayloadClient } from '@/lib/payload'
 
 export const dynamic = 'force-dynamic'
@@ -22,7 +21,7 @@ export async function GET(request: NextRequest) {
     requestedPath.startsWith('//') ||
     requestedPath.includes('\\')
   ) {
-    return new Response('A valid localized preview path is required.', { status: 400 })
+    return new Response('A valid preview path is required.', { status: 400 })
   }
 
   let target: URL
@@ -32,16 +31,14 @@ export async function GET(request: NextRequest) {
     return new Response('The preview path is invalid.', { status: 400 })
   }
 
-  const locale = target.pathname.split('/')[1]
   if (
     target.origin !== requestURL.origin ||
-    !isLocale(locale) ||
     target.pathname === '/admin' ||
     target.pathname.startsWith('/admin/') ||
     target.pathname === '/api' ||
     target.pathname.startsWith('/api/')
   ) {
-    return new Response('Only localized site pages can be previewed.', { status: 400 })
+    return new Response('Only public site pages can be previewed.', { status: 400 })
   }
 
   let payload

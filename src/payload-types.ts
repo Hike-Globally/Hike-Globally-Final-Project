@@ -98,7 +98,7 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('en' | 'de' | 'fr') | ('en' | 'de' | 'fr')[];
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | 'en' | 'en'[];
   globals: {
     header: Header;
     footer: Footer;
@@ -109,7 +109,7 @@ export interface Config {
     footer: FooterSelect<false> | FooterSelect<true>;
     settings: SettingsSelect<false> | SettingsSelect<true>;
   };
-  locale: 'en' | 'de' | 'fr';
+  locale: 'en';
   widgets: {
     collections: CollectionsWidget;
   };
@@ -255,7 +255,7 @@ export interface Destination {
   id: number;
   name: string;
   /**
-   * Auto-generated from the title. Each language has its own slug — edit carefully, changing it changes the live URL.
+   * Auto-generated from the title. Edit carefully — changing it changes the live URL.
    */
   slug?: string | null;
   /**
@@ -367,7 +367,7 @@ export interface Trip {
   id: number;
   title: string;
   /**
-   * Auto-generated from the title. Each language has its own slug — edit carefully, changing it changes the live URL.
+   * Auto-generated from the title. Edit carefully — changing it changes the live URL.
    */
   slug?: string | null;
   /**
@@ -690,7 +690,7 @@ export interface Blog {
   id: number;
   title: string;
   /**
-   * Auto-generated from the title. Each language has its own slug — edit carefully, changing it changes the live URL.
+   * Auto-generated from the title. Edit carefully — changing it changes the live URL.
    */
   slug?: string | null;
   /**

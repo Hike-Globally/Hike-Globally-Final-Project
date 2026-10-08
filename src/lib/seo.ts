@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { localeMeta, locales, localizedPath, type Locale } from '@/i18n/config'
+import { htmlLang, ogLocale } from '@/i18n/config'
 import type { Blog, Destination, Media, Trip } from '@/payload-types'
 import { lexicalToPlainText, truncate } from './format'
 import { resolveSiteUrl } from './site-url'
@@ -41,9 +41,8 @@ type BuildMetadataArgs = {
   title: string
   description?: string | null
   image?: number | Media | null
-  /** Locale-prefixed path of THIS page, e.g. '/de/trips/ebc'. */
+  /** Path of THIS page, e.g. '/trips/everest-base-camp'. */
   path: string
-  locale: Locale
   type?: 'website' | 'article'
   noIndex?: boolean
   publishedTime?: string | null
@@ -53,18 +52,15 @@ type BuildMetadataArgs = {
 }
 
 /**
- * Builds complete Next.js Metadata for a localized page:
- * canonical + hreflang alternates, Open Graph, Twitter card, robots.
- *
- * hreflang is what stops Google treating /en, /de and /fr versions as duplicate content —
- * it is the single most important multilingual SEO detail and the easiest one to forget.
+ * Builds complete Next.js Metadata for a page: canonical URL, Open Graph, Twitter card,
+ * robots. The site is English-only, so there are no hreflang alternates to emit — the
+ * canonical URL is the single source of truth for search engines.
  */
 export const buildMetadata = ({
   title,
   description,
   image,
   path,
-  locale,
   type = 'website',
   noIndex = false,
   publishedTime,
@@ -77,12 +73,6 @@ export const buildMetadata = ({
   const ogImage = imageUrl(image)
   const dimensions = imageDimensions(image)
 
-  const languages: Record<string, string> = {}
-  for (const code of locales) {
-    languages[localeMeta[code].hreflang] = absoluteUrl(localizedPath(code, path.replace(/^\/[a-z]{2}(\/|$)/, '$1')))
-  }
-  languages['x-default'] = absoluteUrl(path.replace(/^\/[a-z]{2}(\/|$)/, '/$1'))
-
   return {
     title,
     description: cleanDescription,
@@ -90,19 +80,21 @@ export const buildMetadata = ({
     authors: authorName ? [{ name: authorName }] : undefined,
     alternates: {
       canonical: url,
-      languages,
     },
     robots: noIndex
       ? { index: false, follow: false }
-      : { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
+      : {
+          index: true,
+          follow: true,
+          googleBot: { index: true, follow: true, 'max-image-preview': 'large' },
+        },
     openGraph: {
       type,
       url,
       title,
       description: cleanDescription,
       siteName,
-      locale: localeMeta[locale].ogLocale,
-      alternateLocale: locales.filter((code) => code !== locale).map((code) => localeMeta[code].ogLocale),
+      locale: ogLocale,
       publishedTime: type === 'article' ? (publishedTime ?? undefined) : undefined,
       modifiedTime: type === 'article' ? (modifiedTime ?? undefined) : undefined,
       images: ogImage
@@ -201,14 +193,12 @@ export const breadcrumbJsonLd = (items: { name: string; url: string }[]): JsonLd
 export const blogPostingJsonLd = ({
   post,
   url,
-  locale,
   authorName,
   image,
   siteName,
 }: {
   post: Blog
   url: string
-  locale: Locale
   authorName?: string | null
   image?: string
   siteName: string
@@ -222,7 +212,7 @@ export const blogPostingJsonLd = ({
   image: image ? [image] : undefined,
   datePublished: post.publishedAt ?? post.createdAt,
   dateModified: post.updatedAt,
-  inLanguage: localeMeta[locale].htmlLang,
+  inLanguage: htmlLang,
   author: authorName ? { '@type': 'Person', name: authorName } : undefined,
   publisher: {
     '@type': 'Organization',
@@ -235,14 +225,12 @@ export const blogPostingJsonLd = ({
 export const touristTripJsonLd = ({
   trip,
   url,
-  locale,
   image,
   destinationName,
   siteName,
 }: {
   trip: Trip
   url: string
-  locale: Locale
   image?: string
   destinationName?: string
   siteName: string
@@ -253,7 +241,7 @@ export const touristTripJsonLd = ({
   description: trip.meta?.description || trip.summary,
   url: absoluteUrl(url),
   image: image ? [image] : undefined,
-  inLanguage: localeMeta[locale].htmlLang,
+  inLanguage: htmlLang,
   touristType: trip.difficulty,
   itinerary: Array.isArray(trip.itinerary)
     ? {
@@ -287,12 +275,10 @@ export const touristTripJsonLd = ({
 export const touristDestinationJsonLd = ({
   destination,
   url,
-  locale,
   image,
 }: {
   destination: Destination
   url: string
-  locale: Locale
   image?: string
 }): JsonLdInput => ({
   '@context': 'https://schema.org',
@@ -301,7 +287,7 @@ export const touristDestinationJsonLd = ({
   description: destination.meta?.description || destination.tagline,
   url: absoluteUrl(url),
   image: image ? [image] : undefined,
-  inLanguage: localeMeta[locale].htmlLang,
+  inLanguage: htmlLang,
   address: {
     '@type': 'PostalAddress',
     addressCountry: destination.country,

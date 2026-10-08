@@ -5,9 +5,14 @@ import { useMemo, useState } from 'react'
 import { TripCard } from '@/components/cards/trip-card'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { getDictionary, plural } from '@/i18n/dictionaries'
-import type { Locale } from '@/i18n/config'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { dictionary, plural } from '@/i18n/dictionaries'
 import type { TripCard as TripCardData } from '@/lib/data'
 
 type Sort = 'featured' | 'price-asc' | 'price-desc' | 'duration-asc' | 'duration-desc'
@@ -22,14 +27,12 @@ type Sort = 'featured' | 'price-asc' | 'price-desc' | 'duration-asc' | 'duration
  */
 export function TripsExplorer({
   trips,
-  locale,
   destinations,
 }: {
   trips: TripCardData[]
-  locale: Locale
   destinations: { slug: string; name: string }[]
 }) {
-  const dict = getDictionary(locale)
+  const dict = dictionary
 
   const [difficulty, setDifficulty] = useState<string>('all')
   const [destination, setDestination] = useState<string>('all')
@@ -189,7 +192,7 @@ export function TripsExplorer({
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((trip, index) => (
-              <TripCard key={trip.id} trip={trip} locale={locale} priority={index < 3} />
+              <TripCard key={trip.id} trip={trip} priority={index < 3} />
             ))}
           </div>
         )}

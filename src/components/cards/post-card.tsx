@@ -1,38 +1,34 @@
 import Link from 'next/link'
 
 import { PayloadImageFill } from '@/components/ui/payload-image'
-import { getDictionary } from '@/i18n/dictionaries'
-import type { Locale } from '@/i18n/config'
-import { localizedPath } from '@/i18n/config'
+import { dictionary } from '@/i18n/dictionaries'
+import { sitePath } from '@/i18n/config'
 import type { PostCard } from '@/lib/data'
 import { formatDate, readingTimeMinutes } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
 export function PostCard({
   post,
-  locale,
   priority = false,
   featured = false,
   className,
 }: {
   post: PostCard
-  locale: Locale
   priority?: boolean
   featured?: boolean
   className?: string
 }) {
-  const dict = getDictionary(locale)
-  const href = localizedPath(locale, `/blog/${post.slug}`)
-  const authorName =
-    post.author && typeof post.author !== 'number' ? post.author.name : null
+  const dict = dictionary
+  const href = sitePath(`/blog/${post.slug}`)
+  const authorName = post.author && typeof post.author !== 'number' ? post.author.name : null
   const category = post.categories?.[0]
   const categoryLabel = category
-    ? dict.blog[
+    ? (dict.blog[
         `category${category
           .split('-')
           .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
           .join('')}` as keyof typeof dict.blog
-      ] ?? category
+      ] ?? category)
     : null
 
   return (
@@ -69,7 +65,7 @@ export function PostCard({
           {categoryLabel ? <span className="text-deep">{categoryLabel}</span> : null}
           {categoryLabel ? <span aria-hidden>·</span> : null}
           <time dateTime={(post.publishedAt ?? post.createdAt) as string}>
-            {formatDate(post.publishedAt ?? post.createdAt, locale)}
+            {formatDate(post.publishedAt ?? post.createdAt)}
           </time>
         </div>
 

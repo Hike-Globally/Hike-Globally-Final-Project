@@ -5,22 +5,24 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Menu } from 'lucide-react'
 
-import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
-import { LanguageSwitcher } from './language-switcher'
-import type { Locale } from '@/i18n/config'
 import type { ResolvedLink } from '@/lib/links'
 import { cn } from '@/lib/utils'
 
 export type NavLink = ResolvedLink
 
 export function MobileNav({
-  locale,
   links,
   actions,
   label,
 }: {
-  locale: Locale
   links: NavLink[]
   actions: NavLink[]
   label: string
@@ -67,9 +69,6 @@ export function MobileNav({
               </Link>
             </Button>
           ))}
-          <div className="pt-2">
-            <LanguageSwitcher current={locale} />
-          </div>
         </div>
       </SheetContent>
     </Sheet>
