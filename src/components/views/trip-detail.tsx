@@ -235,7 +235,9 @@ export function TripDetail({
       </section>
 
       {/* ---------------- Trip content + sticky booking sidebar ---------------- */}
-      <div className="container-content grid items-start gap-12 pb-16 md:pb-24 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-12">
+      {/* A sticky element can only travel as far as its grid area, so ending this grid right
+          before the full-width "Request a quote" section is what releases the booking card. */}
+      <div className="container-content grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-12">
         <div className="min-w-0">
           {/* ---------------- Overview + highlights ---------------- */}
           <section className="py-16 md:py-24">
@@ -441,39 +443,43 @@ export function TripDetail({
               </div>
             </section>
           ) : null}
-
-          {/* ---------------- Inquiry ---------------- */}
-          <section id="inquiry" className="scroll-mt-24 py-16 md:py-24">
-            <div className="grid gap-8 xl:grid-cols-[0.85fr_1.15fr] xl:gap-12">
-              <div>
-                <p className="eyebrow mb-3 text-slate">{dict.inquiry.formTitle}</p>
-                <h2 className="heading-lg">{dict.inquiry.title}</h2>
-                <p className="lead mt-5">{dict.inquiry.subtitle}</p>
-              </div>
-              <InquiryForm trips={tripOptions} email={formEmail} defaultTripSlug={trip.slug} />
-            </div>
-          </section>
-
-          {/* ---------------- Related ---------------- */}
-          {related.length ? (
-            <section className="bg-mist py-16 md:py-24">
-              <h2 className="heading-lg mb-10">{dict.trip.related}</h2>
-              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                {related.map((item, index) => (
-                  <Reveal key={item.id} delay={index * 70}>
-                    <TripCard trip={item} />
-                  </Reveal>
-                ))}
-              </div>
-            </section>
-          ) : null}
         </div>
 
-        {/* The card stays in this shared layout so it can stick beside the full trip content. */}
+        {/* The card stays in this grid so it can stick beside the trip content. */}
         <aside className="hidden lg:sticky lg:top-28 lg:mt-16 lg:block lg:self-start">
           <TripBookingCard trip={trip} dict={dict} seasons={seasons} bookingLink={bookingLink} />
         </aside>
       </div>
+
+      {/* ---------------- Inquiry — full width, no sidebar beside it ---------------- */}
+      <section id="inquiry" className="scroll-mt-24 py-16 md:py-24">
+        <div className="container-content">
+          <div className="grid gap-8 xl:grid-cols-[0.85fr_1.15fr] xl:gap-12">
+            <div>
+              <p className="eyebrow mb-3 text-slate">{dict.inquiry.formTitle}</p>
+              <h2 className="heading-lg">{dict.inquiry.title}</h2>
+              <p className="lead mt-5">{dict.inquiry.subtitle}</p>
+            </div>
+            <InquiryForm trips={tripOptions} email={formEmail} defaultTripSlug={trip.slug} />
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------- Related ---------------- */}
+      {related.length ? (
+        <section className="bg-mist py-16 md:py-24">
+          <div className="container-content">
+            <h2 className="heading-lg mb-10">{dict.trip.related}</h2>
+            <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              {related.map((item, index) => (
+                <Reveal key={item.id} delay={index * 70}>
+                  <TripCard trip={item} />
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <JsonLd
         data={[
