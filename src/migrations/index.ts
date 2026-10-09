@@ -3,6 +3,7 @@ import * as migration_20261003_081622_localize_arrays from './20261003_081622_lo
 import * as migration_20261003_084733_localize_blocks from './20261003_084733_localize_blocks';
 import * as migration_20261005_162110_media_storage from './20261005_162110_media_storage';
 import * as migration_20261007_163309_trip_content_sections from './20261007_163309_trip_content_sections';
+import * as migration_20261009_124959_trip_itinerary_food from './20261009_124959_trip_itinerary_food';
 
 export const migrations = [
   {
@@ -28,6 +29,11 @@ export const migrations = [
   {
     up: migration_20261007_163309_trip_content_sections.up,
     down: migration_20261007_163309_trip_content_sections.down,
-    name: '20261007_163309_trip_content_sections'
+    name: '20261007_163309_trip_content_sections',
+  },
+  {
+    up: migration_20261009_124959_trip_itinerary_food.up,
+    down: migration_20261009_124959_trip_itinerary_food.down,
+    name: '20261009_124959_trip_itinerary_food'
   },
 ];

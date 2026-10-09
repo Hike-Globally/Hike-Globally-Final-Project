@@ -1,5 +1,17 @@
 import Link from 'next/link'
-import { CalendarDays, Check, Clock, MapPin, Mountain, Users, X } from 'lucide-react'
+import {
+  ArrowRight,
+  BedDouble,
+  Check,
+  Clock,
+  Gauge,
+  MapPin,
+  Mountain,
+  Users,
+  Utensils,
+  X,
+  type LucideIcon,
+} from 'lucide-react'
 
 import { RichText } from '@/components/content/rich-text'
 import { JsonLd } from '@/components/seo/json-ld'
@@ -21,96 +33,189 @@ import { sitePath } from '@/i18n/config'
 import type { TripCard as TripCardData } from '@/lib/data'
 import { formatNumber, formatPrice } from '@/lib/format'
 import { resolveLink } from '@/lib/links'
+import { cn } from '@/lib/utils'
 import { breadcrumbJsonLd, faqJsonLd, touristTripJsonLd } from '@/lib/seo'
 import type { Trip } from '@/payload-types'
 
-const difficultyVariant: Record<string, 'sage' | 'light' | 'outline' | 'default' | 'muted'> = {
-  easy: 'sage',
-  moderate: 'light',
-  challenging: 'outline',
-  strenuous: 'outline',
-  extreme: 'default',
+type Food = 'included' | 'not-included'
+type FoodSummary = Food | 'partial' | null
+
+/* ----------------------------------------------------------------------------
+   Shared styling
+   ---------------------------------------------------------------------------- */
+
+/** The one card surface used across the page: white, hairline border, soft layered shadow. */
+const surface =
+  'rounded-3xl border border-black/[0.06] bg-white shadow-[0_1px_2px_rgba(1,22,30,0.04),0_18px_40px_-24px_rgba(1,22,30,0.18)]'
+
+/** Eyebrow for dark backgrounds (the shared `.eyebrow` utility is tuned for light ones). */
+const eyebrowOnDark =
+  'font-heading text-[0.75rem] font-semibold tracking-[0.18em] text-sage uppercase'
+
+function SectionTitle({ title, className }: { title: string; className?: string }) {
+  return (
+    <div className={cn('mb-10 flex items-center gap-5', className)}>
+      <span aria-hidden className="h-px w-12 shrink-0 bg-sage md:w-16" />
+      <h2 className="heading-lg">{title}</h2>
+    </div>
+  )
 }
+
+/* ----------------------------------------------------------------------------
+   Helpers
+   ---------------------------------------------------------------------------- */
+
+const capitalise = (value: string) => `${value.charAt(0).toUpperCase()}${value.slice(1)}`
+
+function difficultyLabel(difficulty: string, dict: Dictionary): string {
+  return dict.trips[`difficulty${capitalise(difficulty)}` as keyof typeof dict.trips] ?? difficulty
+}
+
+/**
+ * One food answer for the whole trip, from the per-day values:
+ * every day included → included, none → not included, a mix → partly. No answers → null.
+ */
+function summariseFood(itinerary: Trip['itinerary']): FoodSummary {
+  const answers = (itinerary ?? [])
+    .map((day) => day.food)
+    .filter((food): food is Food => food === 'included' || food === 'not-included')
+
+  if (!answers.length) return null
+  if (answers.every((food) => food === 'included')) return 'included'
+  if (answers.every((food) => food === 'not-included')) return 'not-included'
+  return 'partial'
+}
+
+const foodText = (food: FoodSummary, dict: Dictionary): string => {
+  if (food === 'included') return dict.trip.foodIncluded
+  if (food === 'not-included') return dict.trip.foodNotIncluded
+  if (food === 'partial') return dict.trip.foodPartial
+  return '—'
+}
+
+/* ----------------------------------------------------------------------------
+   Sticky booking card — price, difficulty, duration and the booking CTA
+   ---------------------------------------------------------------------------- */
 
 function TripBookingCard({
   trip,
   dict,
-  seasons,
-  bookingLink,
+  bookingHref,
+  className,
 }: {
   trip: Trip
   dict: Dictionary
-  seasons: string[]
-  bookingLink: ReturnType<typeof resolveLink>
+  bookingHref: string
+  className?: string
 }) {
-  return (
-    <div className="rounded-2xl border border-black/[0.06] bg-card p-7 shadow-[0_1px_2px_rgba(1,22,30,0.04)]">
-      <p className="eyebrow mb-3 text-slate">{dict.common.from}</p>
-      <p className="font-heading text-4xl font-semibold tracking-tight text-ink">
-        {formatPrice(trip.priceFrom, trip.priceCurrency)}
-      </p>
-      <p className="mt-1 text-[0.8125rem] text-slate">
-        {trip.priceUnit === 'per-group' ? dict.common.perGroup : dict.common.perPerson}
-      </p>
-      {trip.priceNote ? (
-        <p className="mt-2 text-[0.8125rem] text-ink-60">{trip.priceNote}</p>
-      ) : null}
+  const perGroup = trip.priceUnit === 'per-group'
 
-      <dl className="mt-7 space-y-4 border-t border-black/[0.06] pt-6 text-[0.9375rem]">
-        <div className="flex items-center justify-between gap-4">
-          <dt className="text-slate">{dict.trip.difficulty}</dt>
-          <dd>
-            <Badge variant={difficultyVariant[trip.difficulty] ?? 'light'}>
-              {dict.trips[
-                `difficulty${trip.difficulty.charAt(0).toUpperCase()}${trip.difficulty.slice(1)}` as keyof typeof dict.trips
-              ] ?? trip.difficulty}
-            </Badge>
-          </dd>
+  return (
+    <div
+      className={cn(
+        'relative overflow-hidden rounded-[1.75rem] bg-ink p-7 text-mist ring-1 ring-white/10 shadow-[0_40px_80px_-30px_rgba(1,22,30,0.6)]',
+        className,
+      )}
+    >
+      {/* Soft brand glows behind the content — purely decorative. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-24 -right-24 size-64 rounded-full bg-sage/20 blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-28 -left-20 size-64 rounded-full bg-deep blur-3xl"
+      />
+
+      <div className="relative">
+        <p className={eyebrowOnDark}>
+          {perGroup ? dict.trip.pricePerGroup : dict.trip.pricePerPerson}
+        </p>
+
+        <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-4">
+          <p className="font-heading text-4xl leading-none font-semibold tracking-tight text-white">
+            {formatPrice(trip.priceFrom, trip.priceCurrency)}
+          </p>
         </div>
-        {seasons.length ? (
-          <div className="flex items-center justify-between gap-4">
-            <dt className="text-slate">{dict.trip.bestSeason}</dt>
-            <dd className="text-right text-ink">{seasons.join(' · ')}</dd>
-          </div>
-        ) : null}
-        <div className="flex items-center justify-between gap-4">
-          <dt className="text-slate">{dict.trip.duration}</dt>
-          <dd className="text-ink">
-            {trip.durationDays} {dict.common.days}
-            {trip.durationNights ? ` / ${trip.durationNights} ${dict.common.nights}` : ''}
-          </dd>
-        </div>
-        {trip.tripType ? (
-          <div className="flex items-center justify-between gap-4">
-            <dt className="text-slate">{dict.trips.typeTrekking}</dt>
-            <dd className="text-ink">
-              {dict.trips[
-                `type${trip.tripType
-                  .split('-')
-                  .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-                  .join('')}` as keyof typeof dict.trips
-              ] ?? trip.tripType}
+
+        <dl className="mt-7 divide-y divide-white/10 border-t border-white/10">
+          <div className="flex items-center justify-between gap-4 py-4">
+            <dt className="flex items-center gap-2.5 text-[0.9375rem] text-mist/65">
+              <Gauge className="size-4 text-sage" aria-hidden />
+              {dict.trip.difficultyLevel}
+            </dt>
+            <dd>
+              <span className="rounded-full bg-sage/15 px-3 py-1 text-[0.8125rem] font-medium text-sage">
+                {difficultyLabel(trip.difficulty, dict)}
+              </span>
             </dd>
           </div>
-        ) : null}
-      </dl>
+          <div className="flex items-center justify-between gap-4 py-4">
+            <dt className="flex items-center gap-2.5 text-[0.9375rem] text-mist/65">
+              <Clock className="size-4 text-sage" aria-hidden />
+              {dict.trip.duration}
+            </dt>
+            <dd className="text-right font-heading text-[0.9375rem] font-semibold text-white">
+              {trip.durationDays} {dict.common.days}
+              {trip.durationNights ? ` / ${trip.durationNights} ${dict.common.nights}` : ''}
+            </dd>
+          </div>
+        </dl>
 
-      <Button asChild size="lg" className="mt-7 w-full">
-        <Link href="#inquiry">{dict.trip.enquire}</Link>
-      </Button>
-      {bookingLink ? (
-        <Button asChild size="lg" variant="outline" className="mt-3 w-full">
-          <Link href={bookingLink.href}>{bookingLink.label}</Link>
+        <Button asChild size="lg" variant="sage" className="mt-6 h-13 w-full text-[0.9375rem]">
+          <Link href={bookingHref}>
+            {dict.trip.bookThisTrek}
+            <ArrowRight aria-hidden />
+          </Link>
         </Button>
-      ) : null}
-
-      <p className="mt-5 flex items-center gap-2 text-[0.8125rem] text-slate">
-        <CalendarDays className="size-4" aria-hidden />
-        {dict.inquiry.flexible}
-      </p>
+      </div>
     </div>
   )
 }
+
+/* ----------------------------------------------------------------------------
+   Itinerary day meta chip (accommodation / altitude / food)
+   ---------------------------------------------------------------------------- */
+
+function DayChip({
+  icon: Icon,
+  label,
+  value,
+  tone = 'default',
+}: {
+  icon: LucideIcon
+  label: string
+  value: string
+  tone?: 'default' | 'positive' | 'muted'
+}) {
+  return (
+    <div className="flex min-w-0 items-center gap-3 rounded-2xl bg-mist px-4 py-3">
+      <span
+        className={cn(
+          'grid size-9 shrink-0 place-items-center rounded-full',
+          tone === 'positive' ? 'bg-sage text-ink' : 'bg-white text-deep shadow-sm',
+        )}
+      >
+        <Icon className="size-4" aria-hidden />
+      </span>
+      <div className="min-w-0">
+        <p className="text-[0.6875rem] tracking-[0.14em] text-slate uppercase">{label}</p>
+        <p
+          className={cn(
+            'truncate font-heading text-[0.9375rem] font-semibold',
+            tone === 'muted' ? 'text-ink-60' : 'text-ink',
+          )}
+        >
+          {value}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+/* ----------------------------------------------------------------------------
+   Page
+   ---------------------------------------------------------------------------- */
 
 /**
  * Trip detail view — shared by the public route (statically rendered) and the
@@ -132,7 +237,10 @@ export function TripDetail({
   const destination =
     trip.destination && typeof trip.destination !== 'number' ? trip.destination : null
 
-  const facts = [
+  const foodSummary = summariseFood(trip.itinerary)
+
+  /* "Trip at a glance" dashboard — shown inside the hero. */
+  const facts: { icon: LucideIcon; label: string; value: string }[] = [
     { icon: Clock, label: dict.trip.duration, value: `${trip.durationDays} ${dict.common.days}` },
     trip.groupSizeMax
       ? { icon: Users, label: dict.trip.groupSize, value: `max ${trip.groupSizeMax}` }
@@ -144,28 +252,18 @@ export function TripDetail({
           value: `${formatNumber(trip.maxAltitude)} m`,
         }
       : null,
-    {
-      icon: MapPin,
-      label: dict.trip.destination,
-      value: destination?.name ?? '—',
-    },
-  ].filter(Boolean) as { icon: typeof Clock; label: string; value: string }[]
-
-  const seasons =
-    trip.bestSeasons?.map(
-      (season) =>
-        dict.destinations[
-          `season${season.charAt(0).toUpperCase()}${season.slice(1)}` as keyof typeof dict.destinations
-        ] ?? season,
-    ) ?? []
+    { icon: Utensils, label: dict.trip.food, value: foodText(foodSummary, dict) },
+    { icon: MapPin, label: dict.trip.destination, value: destination?.name ?? '—' },
+  ].filter((fact): fact is NonNullable<typeof fact> => fact !== null)
 
   const bookingLink = resolveLink(trip.bookingLink?.link)
+  const bookingHref = bookingLink?.href ?? '#inquiry'
   const faqs = (trip.faqs ?? []).filter((faq) => faq.question?.trim())
 
   return (
     <>
-      {/* ---------------- Hero ---------------- */}
-      <section className="relative isolate min-h-[70svh] overflow-hidden bg-ink text-mist">
+      {/* ---------------- Hero + trip dashboard ---------------- */}
+      <section className="relative isolate overflow-hidden bg-ink text-mist">
         <PayloadImageFill
           media={trip.heroImage}
           size="hero"
@@ -174,12 +272,12 @@ export function TripDetail({
           className="-z-10"
           imageClassName="object-cover"
         />
-        <div className="absolute inset-0 -z-10 bg-ink/60" />
-        <div className="absolute inset-x-0 bottom-0 -z-10 h-1/2 bg-gradient-to-t from-ink/85 to-transparent" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-ink/95 via-ink/70 to-ink/25" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/30 to-ink/40" />
 
-        <div className="container-content pt-28 pb-16 md:pt-36 md:pb-20">
+        <div className="container-content pt-28 pb-14 md:pt-36 md:pb-16">
           <Breadcrumbs
-            className="mb-6"
+            className="mb-8"
             items={[
               { label: dict.nav.home, href: sitePath('/') },
               { label: dict.nav.trips, href: sitePath('/trips') },
@@ -191,7 +289,7 @@ export function TripDetail({
             {destination ? (
               <Link
                 href={sitePath(`/destinations/${destination.slug}`)}
-                className="rounded-full bg-white/10 px-3 py-1 text-[0.75rem] tracking-[0.14em] text-sage uppercase backdrop-blur transition-colors hover:bg-white/20"
+                className="rounded-full bg-white/10 px-3.5 py-1.5 text-[0.75rem] tracking-[0.14em] text-sage uppercase ring-1 ring-white/15 backdrop-blur transition-colors hover:bg-white/20"
               >
                 {destination.name}
               </Link>
@@ -199,8 +297,8 @@ export function TripDetail({
             <Badge variant="sage">{dict.trip.factsTitle}</Badge>
           </div>
 
-          <h1 className="heading-xl mt-5 max-w-4xl text-white">{trip.title}</h1>
-          <p className="lead mt-5 max-w-2xl text-mist/85">{trip.summary}</p>
+          <h1 className="heading-xl mt-6 max-w-4xl text-white">{trip.title}</h1>
+          <p className="lead mt-6 max-w-2xl text-mist/80">{trip.summary}</p>
 
           <div className="mt-9 flex flex-wrap items-center gap-3">
             <Button asChild size="lg" variant="sage">
@@ -212,157 +310,207 @@ export function TripDetail({
               </Button>
             ) : null}
           </div>
-        </div>
-      </section>
 
-      {/* ---------------- Facts bar ---------------- */}
-      <section className="border-b border-black/[0.06] bg-mist">
-        <div className="container-content grid gap-6 py-8 sm:grid-cols-2 lg:grid-cols-4">
-          {facts.map((fact) => (
-            <div key={fact.label} className="flex items-center gap-3">
-              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-sage-20 text-deep">
-                <fact.icon className="size-4" aria-hidden />
-              </span>
-              <div>
-                <p className="text-[0.6875rem] tracking-[0.14em] text-slate uppercase">
-                  {fact.label}
-                </p>
-                <p className="font-heading text-[0.9375rem] font-semibold text-ink">{fact.value}</p>
+          {/* Glass dashboard. A 1px gap over a tinted background draws the grid lines. */}
+          <dl className="mt-14 grid grid-cols-2 gap-px overflow-hidden rounded-3xl bg-white/10 ring-1 ring-white/10 backdrop-blur-xl md:grid-cols-5">
+            {facts.map((fact) => (
+              <div
+                key={fact.label}
+                className="flex items-center gap-4 bg-ink/60 p-5 backdrop-blur md:p-6"
+              >
+                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-sage/15 text-sage">
+                  <fact.icon className="size-4" aria-hidden />
+                </span>
+                <div className="min-w-0">
+                  <dt className="text-[0.6875rem] tracking-[0.14em] text-mist/55 uppercase">
+                    {fact.label}
+                  </dt>
+                  <dd className="mt-1 truncate font-heading text-[0.9375rem] font-semibold text-white">
+                    {fact.value}
+                  </dd>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </dl>
         </div>
       </section>
 
-      {/* ---------------- Trip content + sticky booking sidebar ---------------- */}
+      {/* ---------------- Trip content + sticky booking card ---------------- */}
       {/* A sticky element can only travel as far as its grid area, so ending this grid right
-          before the full-width "Request a quote" section is what releases the booking card. */}
-      <div className="container-content grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-12">
+          before the full-width inquiry panel is what releases the booking card. */}
+      <div className="container-content grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14">
         <div className="min-w-0">
           {/* ---------------- Overview + highlights ---------------- */}
-          <section className="py-16 md:py-24">
-            <div>
-              <h2 className="heading-lg">{dict.trip.overview}</h2>
-              <div className="mt-6">
-                <RichText content={trip.description} />
-              </div>
-
-              {trip.highlights?.length ? (
-                <div className="mt-12">
-                  <h3 className="heading-md">{dict.trip.highlights}</h3>
-                  <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-                    {trip.highlights.map((highlight) => (
-                      <li key={highlight.id ?? highlight.text} className="flex items-start gap-3">
-                        <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-sage/60 text-ink">
-                          <Check className="size-3" strokeWidth={3} aria-hidden />
-                        </span>
-                        <span className="text-[0.9375rem] leading-relaxed text-ink-80">
-                          {highlight.text}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
+          <Reveal as="section" className="py-16 md:py-24">
+            <SectionTitle title={dict.trip.overview} />
+            <div className="prose-hg max-w-none text-[1.0625rem] leading-[1.8]">
+              <RichText content={trip.description} />
             </div>
-          </section>
+
+            {trip.highlights?.length ? (
+              <div className="mt-14">
+                <h3 className="heading-md mb-6">{dict.trip.highlights}</h3>
+                <ul className="grid gap-3 sm:grid-cols-2">
+                  {trip.highlights.map((highlight) => (
+                    <li
+                      key={highlight.id ?? highlight.text}
+                      className={cn(surface, 'flex items-start gap-4 p-5')}
+                    >
+                      <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-sage text-ink">
+                        <Check className="size-3.5" strokeWidth={3} aria-hidden />
+                      </span>
+                      <span className="text-[0.9375rem] leading-relaxed text-ink-80">
+                        {highlight.text}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </Reveal>
 
           {/* Keep the booking card near the trip summary on small screens. */}
-          <div className="mb-12 lg:hidden">
-            <TripBookingCard trip={trip} dict={dict} seasons={seasons} bookingLink={bookingLink} />
+          <div className="mb-16 lg:hidden">
+            <TripBookingCard trip={trip} dict={dict} bookingHref={bookingHref} />
           </div>
 
-          {/* ---------------- Itinerary ---------------- */}
+          {/* ---------------- Itinerary (timeline) ---------------- */}
           {trip.itinerary?.length ? (
-            <section id="itinerary" className="scroll-mt-24 bg-mist py-16 md:py-24">
-              <h2 className="heading-lg mb-10">{dict.trip.itinerary}</h2>
+            <section id="itinerary" className="scroll-mt-24 py-16 md:py-24">
+              <Reveal>
+                <SectionTitle title={dict.trip.itinerary} />
 
-              <Accordion type="multiple" className="space-y-3">
-                {trip.itinerary.map((day, index) => (
-                  <AccordionItem
-                    key={day.id ?? index}
-                    value={`day-${day.id ?? index}`}
-                    className="overflow-hidden rounded-2xl border border-black/[0.06] bg-card px-5 shadow-[0_1px_2px_rgba(1,22,30,0.04)] last:border-b last:border-black/[0.06] md:px-7"
-                  >
-                    <AccordionTrigger className="items-center py-5 hover:no-underline md:py-6">
-                      <span className="min-w-0 text-left">
-                        <span className="block font-heading text-base font-semibold text-ink md:text-lg">
-                          {day.title}
-                        </span>
-                        <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.75rem] text-slate md:text-[0.8125rem]">
-                          <span className="tracking-[0.12em] uppercase">
-                            {dict.trip.day} {day.day}
+                <div className="relative">
+                  {/* Vertical timeline rail, behind the day nodes. */}
+                  <span
+                    aria-hidden
+                    className="absolute top-6 bottom-6 left-[1.1rem] w-px bg-gradient-to-b from-sage via-slate-20 to-transparent md:left-[1.35rem]"
+                  />
+
+                  <Accordion type="multiple" className="space-y-4">
+                    {trip.itinerary.map((day, index) => {
+                      const food =
+                        day.food === 'included' || day.food === 'not-included' ? day.food : null
+
+                      return (
+                        <AccordionItem
+                          key={day.id ?? index}
+                          value={`day-${day.id ?? index}`}
+                          className="relative border-b-0 pl-12 md:pl-16"
+                        >
+                          {/* Timeline node */}
+                          <span
+                            aria-hidden
+                            className="absolute top-7 left-0 grid size-9 place-items-center rounded-full border border-sage/70 bg-white shadow-sm md:size-11"
+                          >
+                            <span className="size-2.5 rounded-full bg-deep" />
                           </span>
-                          {day.altitude ? (
-                            <span className="flex items-center gap-1.5">
-                              <Mountain className="size-3.5" aria-hidden />
-                              {formatNumber(day.altitude)} m
-                            </span>
-                          ) : null}
-                        </span>
-                      </span>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <p className="leading-relaxed text-ink-70">{day.description}</p>
-                      {day.accommodation ? (
-                        <p className="mt-3 text-[0.8125rem] text-slate">
-                          {dict.trip.accommodation}: {day.accommodation}
-                        </p>
-                      ) : null}
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
+
+                          <div
+                            className={cn(
+                              surface,
+                              'overflow-hidden px-6 transition-shadow duration-300 data-[state=open]:shadow-[0_1px_2px_rgba(1,22,30,0.04),0_28px_56px_-28px_rgba(1,22,30,0.28)] md:px-8',
+                            )}
+                          >
+                            <AccordionTrigger className="items-center py-6 hover:no-underline md:py-7">
+                              <span className="min-w-0 text-left font-heading text-base font-semibold text-ink md:text-lg">
+                                {day.title}
+                              </span>
+                            </AccordionTrigger>
+
+                            <AccordionContent>
+                              <p className="max-w-3xl leading-relaxed text-ink-70">
+                                {day.description}
+                              </p>
+
+                              {day.accommodation || typeof day.altitude === 'number' || food ? (
+                                <div className="mt-6 grid gap-3 border-t border-black/[0.06] pt-6 sm:grid-cols-2 xl:grid-cols-3">
+                                  {day.accommodation ? (
+                                    <DayChip
+                                      icon={BedDouble}
+                                      label={dict.trip.accommodation}
+                                      value={day.accommodation}
+                                    />
+                                  ) : null}
+                                  {typeof day.altitude === 'number' ? (
+                                    <DayChip
+                                      icon={Mountain}
+                                      label={dict.trip.altitude}
+                                      value={`${formatNumber(day.altitude)} m`}
+                                    />
+                                  ) : null}
+                                  {food ? (
+                                    <DayChip
+                                      icon={Utensils}
+                                      label={dict.trip.food}
+                                      value={
+                                        food === 'included'
+                                          ? dict.trip.foodIncluded
+                                          : dict.trip.foodNotIncluded
+                                      }
+                                      tone={food === 'included' ? 'positive' : 'muted'}
+                                    />
+                                  ) : null}
+                                </div>
+                              ) : null}
+                            </AccordionContent>
+                          </div>
+                        </AccordionItem>
+                      )
+                    })}
+                  </Accordion>
+                </div>
+              </Reveal>
             </section>
           ) : null}
 
-          {/* ------- Essential information — plain card accordion, no icon chips ------- */}
+          {/* ------- Essential information ------- */}
           {trip.contentSections?.length ? (
-            <section id="essential-information" className="scroll-mt-24 bg-mist py-16 md:py-24">
-              <h2 className="heading-lg mb-10">{dict.trip.essentialInformation}</h2>
+            <section id="essential-information" className="scroll-mt-24 py-16 md:py-24">
+              <Reveal>
+                <SectionTitle title={dict.trip.essentialInformation} />
 
-              <Accordion type="multiple" className="space-y-3">
-                {trip.contentSections.map((contentSection, index) => (
-                  <AccordionItem
-                    key={contentSection.id ?? index}
-                    value={`section-${contentSection.id ?? index}`}
-                    className="overflow-hidden rounded-2xl border border-black/[0.06] bg-card px-5 shadow-[0_1px_2px_rgba(1,22,30,0.04)] last:border-b last:border-black/[0.06] md:px-7"
-                  >
-                    <AccordionTrigger
-                      indicator="chevron"
-                      className="items-center py-5 hover:no-underline md:py-6"
+                <Accordion type="multiple" className="space-y-4">
+                  {trip.contentSections.map((contentSection, index) => (
+                    <AccordionItem
+                      key={contentSection.id ?? index}
+                      value={`section-${contentSection.id ?? index}`}
+                      className={cn(surface, 'overflow-hidden px-6 md:px-8')}
                     >
-                      <span className="min-w-0 text-left font-heading text-base font-semibold text-ink md:text-lg">
-                        {contentSection.heading}
-                      </span>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <RichText
-                        content={contentSection.content}
-                        className="w-full min-w-0 break-words"
-                      />
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
+                      <AccordionTrigger
+                        indicator="chevron"
+                        className="items-center py-6 hover:no-underline md:py-7"
+                      >
+                        <span className="min-w-0 text-left font-heading text-base font-semibold text-ink md:text-lg">
+                          {contentSection.heading}
+                        </span>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <RichText
+                          content={contentSection.content}
+                          className="w-full min-w-0 break-words"
+                        />
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </Reveal>
             </section>
           ) : null}
 
           {/* ---------------- Included / not included ---------------- */}
           {trip.included?.length || trip.notIncluded?.length ? (
-            <section className="py-16 md:py-24">
-              <div className="grid gap-10 md:grid-cols-2">
+            <Reveal as="section" className="py-16 md:py-24">
+              <div className="grid gap-6 md:grid-cols-2">
                 {trip.included?.length ? (
-                  <div className="rounded-2xl bg-sage-20 p-8">
-                    <h2 className="heading-md mb-6">{dict.trip.included}</h2>
-                    <ul className="space-y-3">
+                  <div className="rounded-3xl bg-sage-20 p-8 ring-1 ring-sage/30 md:p-10">
+                    <h2 className="heading-md mb-7">{dict.trip.included}</h2>
+                    <ul className="space-y-4">
                       {trip.included.map((item) => (
-                        <li key={item.id ?? item.item} className="flex items-start gap-3">
-                          <Check
-                            className="mt-0.5 size-4 shrink-0 text-deep"
-                            strokeWidth={3}
-                            aria-hidden
-                          />
+                        <li key={item.id ?? item.item} className="flex items-start gap-3.5">
+                          <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-deep text-mist">
+                            <Check className="size-3.5" strokeWidth={3} aria-hidden />
+                          </span>
                           <span className="text-[0.9375rem] leading-relaxed text-ink-80">
                             {item.item}
                           </span>
@@ -373,16 +521,14 @@ export function TripDetail({
                 ) : null}
 
                 {trip.notIncluded?.length ? (
-                  <div className="rounded-2xl border border-black/[0.06] p-8">
-                    <h2 className="heading-md mb-6">{dict.trip.notIncluded}</h2>
-                    <ul className="space-y-3">
+                  <div className={cn(surface, 'p-8 md:p-10')}>
+                    <h2 className="heading-md mb-7">{dict.trip.notIncluded}</h2>
+                    <ul className="space-y-4">
                       {trip.notIncluded.map((item) => (
-                        <li key={item.id ?? item.item} className="flex items-start gap-3">
-                          <X
-                            className="mt-0.5 size-4 shrink-0 text-slate"
-                            strokeWidth={3}
-                            aria-hidden
-                          />
+                        <li key={item.id ?? item.item} className="flex items-start gap-3.5">
+                          <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-mist-60 text-slate">
+                            <X className="size-3.5" strokeWidth={3} aria-hidden />
+                          </span>
                           <span className="text-[0.9375rem] leading-relaxed text-ink-60">
                             {item.item}
                           </span>
@@ -392,84 +538,102 @@ export function TripDetail({
                   </div>
                 ) : null}
               </div>
-            </section>
+            </Reveal>
           ) : null}
 
           {/* ---------------- FAQs ---------------- */}
           {faqs.length ? (
             <section id="faqs" className="scroll-mt-24 py-16 md:py-24">
-              <h2 className="heading-lg mb-10">{dict.trip.faqs}</h2>
+              <Reveal>
+                <SectionTitle title={dict.trip.faqs} />
 
-              <Accordion type="multiple" className="space-y-3">
-                {faqs.map((faq, index) => (
-                  <AccordionItem
-                    key={faq.id ?? index}
-                    value={`faq-${faq.id ?? index}`}
-                    className="overflow-hidden rounded-2xl border border-black/[0.06] bg-card px-5 shadow-[0_1px_2px_rgba(1,22,30,0.04)] last:border-b last:border-black/[0.06] md:px-7"
-                  >
-                    <AccordionTrigger className="items-center py-5 hover:no-underline md:py-6">
-                      <span className="min-w-0 text-left font-heading text-base font-semibold text-ink md:text-lg">
-                        {faq.question}
-                      </span>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <p className="whitespace-pre-line leading-relaxed text-ink-70">
-                        {faq.answer}
-                      </p>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
+                <Accordion type="multiple" className="space-y-4">
+                  {faqs.map((faq, index) => (
+                    <AccordionItem
+                      key={faq.id ?? index}
+                      value={`faq-${faq.id ?? index}`}
+                      className={cn(surface, 'overflow-hidden px-6 md:px-8')}
+                    >
+                      <AccordionTrigger className="items-center py-6 hover:no-underline md:py-7">
+                        <span className="min-w-0 text-left font-heading text-base font-semibold text-ink md:text-lg">
+                          {faq.question}
+                        </span>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <p className="max-w-3xl leading-relaxed whitespace-pre-line text-ink-70">
+                          {faq.answer}
+                        </p>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </Reveal>
             </section>
           ) : null}
 
           {/* ---------------- Gallery ---------------- */}
           {trip.gallery?.length ? (
-            <section className="bg-mist py-16 md:py-24">
-              <h2 className="heading-lg mb-10">{dict.trip.gallery}</h2>
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <Reveal as="section" className="py-16 md:py-24">
+              <SectionTitle title={dict.trip.gallery} />
+              <div className="grid gap-5 sm:grid-cols-2">
                 {trip.gallery.map((item, index) => (
                   <Reveal key={item.id ?? index} delay={index * 60}>
-                    <div className="overflow-hidden rounded-2xl bg-mist-60">
+                    <div className="group overflow-hidden rounded-3xl bg-mist-60 ring-1 ring-black/5">
                       <PayloadImage
                         media={item.image}
                         size="tablet"
-                        sizes="(min-width: 1280px) 21vw, (min-width: 640px) 35vw, 92vw"
-                        className="aspect-[4/3] w-full"
+                        sizes="(min-width: 1280px) 30vw, (min-width: 640px) 45vw, 92vw"
+                        className="aspect-[4/3] w-full transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
                       />
                     </div>
                   </Reveal>
                 ))}
               </div>
-            </section>
+            </Reveal>
           ) : null}
         </div>
 
         {/* The card stays in this grid so it can stick beside the trip content. */}
         <aside className="hidden lg:sticky lg:top-28 lg:mt-16 lg:block lg:self-start">
-          <TripBookingCard trip={trip} dict={dict} seasons={seasons} bookingLink={bookingLink} />
+          <TripBookingCard trip={trip} dict={dict} bookingHref={bookingHref} />
         </aside>
       </div>
 
-      {/* ---------------- Inquiry — full width, no sidebar beside it ---------------- */}
+      {/* ---------------- Inquiry — full width, dark panel ---------------- */}
       <section id="inquiry" className="scroll-mt-24 py-16 md:py-24">
         <div className="container-content">
-          <div className="grid gap-8 xl:grid-cols-[0.85fr_1.15fr] xl:gap-12">
-            <div>
-              <p className="eyebrow mb-3 text-slate">{dict.inquiry.formTitle}</p>
-              <h2 className="heading-lg">{dict.inquiry.title}</h2>
-              <p className="lead mt-5">{dict.inquiry.subtitle}</p>
+          <div className="relative isolate overflow-hidden rounded-[2rem] bg-ink p-8 text-mist ring-1 ring-white/10 md:p-14">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -top-40 -right-32 -z-10 size-[28rem] rounded-full bg-sage/15 blur-3xl"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -bottom-40 -left-32 -z-10 size-[24rem] rounded-full bg-deep blur-3xl"
+            />
+
+            <div className="grid gap-10 xl:grid-cols-[0.85fr_1.15fr] xl:gap-16">
+              <div>
+                <p className={eyebrowOnDark}>{dict.inquiry.formTitle}</p>
+                <h2 className="heading-lg mt-3 text-white">{dict.inquiry.title}</h2>
+                <p className="lead mt-5 text-mist/70">{dict.inquiry.subtitle}</p>
+              </div>
+              <InquiryForm
+                trips={tripOptions}
+                email={formEmail}
+                defaultTripSlug={trip.slug}
+                variant="dark"
+              />
             </div>
-            <InquiryForm trips={tripOptions} email={formEmail} defaultTripSlug={trip.slug} />
           </div>
         </div>
       </section>
 
       {/* ---------------- Related ---------------- */}
       {related.length ? (
-        <section className="bg-mist py-16 md:py-24">
+        <section className="py-16 md:py-24">
           <div className="container-content">
-            <h2 className="heading-lg mb-10">{dict.trip.related}</h2>
+            <SectionTitle title={dict.trip.related} />
             <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {related.map((item, index) => (
                 <Reveal key={item.id} delay={index * 70}>

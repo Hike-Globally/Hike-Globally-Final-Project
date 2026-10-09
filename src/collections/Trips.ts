@@ -61,7 +61,10 @@ export const Trips: CollectionConfig = {
       localized: true,
       required: true,
       maxLength: 220,
-      admin: { description: '2–3 sentences. Used on cards, in search results and as the meta description fallback.' },
+      admin: {
+        description:
+          '2–3 sentences. Used on cards, in search results and as the meta description fallback.',
+      },
     },
     {
       name: 'heroImage',
@@ -198,7 +201,10 @@ export const Trips: CollectionConfig = {
               type: 'number',
               required: true,
               min: 0,
-              admin: { width: '33%', description: 'Lowest per-person price, no thousands separators.' },
+              admin: {
+                width: '33%',
+                description: 'Lowest per-person price, no thousands separators.',
+              },
             },
             {
               name: 'priceCurrency',
@@ -262,8 +268,7 @@ export const Trips: CollectionConfig = {
               type: 'row',
               fields: [
                 { name: 'day', type: 'number', required: true, min: 1, admin: { width: '20%' } },
-                { name: 'title', type: 'text', required: true, admin: { width: '55%' } },
-                { name: 'altitude', type: 'number', min: 0, admin: { width: '25%', description: 'Metres' } },
+                { name: 'title', type: 'text', required: true, admin: { width: '80%' } },
               ],
             },
             {
@@ -272,9 +277,35 @@ export const Trips: CollectionConfig = {
               required: true,
             },
             {
-              name: 'accommodation',
-              type: 'text',
-              admin: { description: 'e.g. Teahouse in Namche Bazaar (3,440 m)' },
+              type: 'row',
+              fields: [
+                {
+                  name: 'accommodation',
+                  type: 'text',
+                  admin: {
+                    width: '50%',
+                    description: 'e.g. Teahouse in Namche Bazaar',
+                  },
+                },
+                {
+                  name: 'altitude',
+                  type: 'number',
+                  min: 0,
+                  admin: { width: '25%', description: 'Metres' },
+                },
+                {
+                  name: 'food',
+                  type: 'select',
+                  options: [
+                    { label: 'Included', value: 'included' },
+                    { label: 'Not included', value: 'not-included' },
+                  ],
+                  admin: {
+                    width: '25%',
+                    description: 'Are this day’s meals covered by the price?',
+                  },
+                },
+              ],
             },
           ],
         },
@@ -368,7 +399,10 @@ export const Trips: CollectionConfig = {
           relationTo: 'trips',
           hasMany: true,
           filterOptions: ({ id }) => (id ? { id: { not_equals: id } } : true),
-          admin: { description: 'Shown in the "You may also like" rail. Leave empty to auto-fill from the same destination.' },
+          admin: {
+            description:
+              'Shown in the "You may also like" rail. Leave empty to auto-fill from the same destination.',
+          },
         },
       ],
     },
@@ -381,14 +415,19 @@ export const Trips: CollectionConfig = {
           name: 'bookingLink',
           type: 'group',
           label: 'Booking CTA',
-          admin: { description: 'Optional external booking button (e.g. your booking engine). Leave empty to use the built-in inquiry form.' },
+          admin: {
+            description:
+              'Optional external booking button (e.g. your booking engine). Leave empty to use the built-in inquiry form.',
+          },
           fields: [linkField({ name: 'link', label: 'Booking link', newTab: false })],
         },
         {
           name: 'featured',
           type: 'checkbox',
           defaultValue: false,
-          admin: { description: 'Featured trips surface on the homepage and are pinned first on /trips.' },
+          admin: {
+            description: 'Featured trips surface on the homepage and are pinned first on /trips.',
+          },
         },
       ],
     },
