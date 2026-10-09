@@ -433,15 +433,19 @@ export interface Trip {
     | {
         day: number;
         title: string;
+        description: string;
+        /**
+         * e.g. Teahouse in Namche Bazaar
+         */
+        accommodation?: string | null;
         /**
          * Metres
          */
         altitude?: number | null;
-        description: string;
         /**
-         * e.g. Teahouse in Namche Bazaar (3,440 m)
+         * Are this day’s meals covered by the price?
          */
-        accommodation?: string | null;
+        food?: ('included' | 'not-included') | null;
         id?: string | null;
       }[]
     | null;
@@ -1317,9 +1321,10 @@ export interface TripsSelect<T extends boolean = true> {
     | {
         day?: T;
         title?: T;
-        altitude?: T;
         description?: T;
         accommodation?: T;
+        altitude?: T;
+        food?: T;
         id?: T;
       };
   contentSections?:
