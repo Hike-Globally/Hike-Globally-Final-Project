@@ -8,15 +8,14 @@ import { SectionHeading } from '@/components/sections/section-heading'
 import type { DestinationCard as DestinationCardData } from '@/lib/data'
 import { cn } from '@/lib/utils'
 
-/** Matches `gap-6` on the track — turns "one card" into a scroll distance. */
-const GAP = 24
-
 /**
  * Destination slider.
  *
- * Three cards are visible at a time on desktop (two on tablet, one on a phone) and the
- * remaining cards sit off to the right. The left/right buttons in the section heading
- * slide the track by exactly one card, so the row always lands on a card edge.
+ * The track slides exactly like the difficulty-level slider: it spans the full viewport
+ * but carries `container-gutter` inline padding, so the first card starts on the same
+ * left line as the heading while the remaining cards still slide in from — and out to —
+ * the right-hand edge of the screen. `scroll-padding` repeats that gutter, so a card also
+ * comes to rest on that line after a swipe instead of snapping to the viewport edge.
  *
  * Implementation notes:
  * - It is a native horizontally scrollable flex row, so touch/trackpad swiping, keyboard
@@ -79,18 +78,19 @@ export function DestinationCarousel({
     const track = trackRef.current
     if (!track) return
 
-    const card = track.firstElementChild as HTMLElement | null
-    const step = card ? card.getBoundingClientRect().width + GAP : track.clientWidth
+    const firstCard = track.firstElementChild as HTMLElement | null
+    const gap = Number.parseFloat(getComputedStyle(track).columnGap) || 20
+    const distance = firstCard ? firstCard.getBoundingClientRect().width + gap : track.clientWidth
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
     track.scrollBy({
-      left: step * direction,
+      left: distance * direction,
       behavior: prefersReducedMotion ? 'auto' : 'smooth',
     })
   }
 
   return (
-    <section className={cn('py-16 md:py-24', className)}>
+    <section className={cn('overflow-hidden py-16 md:py-24', className)}>
       <div className="container-content">
         <SectionHeading
           title={title}
@@ -107,26 +107,23 @@ export function DestinationCarousel({
             </div>
           }
         />
+      </div>
 
-        <div
-          ref={trackRef}
-          role="group"
-          aria-label={title}
-          className="no-scrollbar flex snap-x snap-mandatory gap-6 overflow-x-auto overscroll-x-contain pb-1"
-        >
-          {destinations.map((destination, index) => (
-            <div
-              key={destination.id}
-              className="w-full shrink-0 snap-start sm:w-[calc((100%_-_1.5rem)/2)] lg:w-[calc((100%_-_3rem)/3)]"
-            >
-              <DestinationCard
-                destination={destination}
-                priority={index === 0}
-                className="h-full"
-              />
-            </div>
-          ))}
-        </div>
+      <div
+        ref={trackRef}
+        role="region"
+        aria-label={title}
+        tabIndex={0}
+        className="container-gutter no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-2 focus-visible:outline-offset-4 [scroll-padding-inline:var(--container-gutter-offset)] sm:gap-5"
+      >
+        {destinations.map((destination, index) => (
+          <div
+            key={destination.id}
+            className="w-full shrink-0 snap-start sm:w-[calc((100%_-_1.25rem)/2)] lg:w-[calc((100%_-_2.5rem)/3)]"
+          >
+            <DestinationCard destination={destination} priority={index === 0} className="h-full" />
+          </div>
+        ))}
       </div>
     </section>
   )
