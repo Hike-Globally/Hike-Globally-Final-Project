@@ -5,6 +5,7 @@ import { linkField } from '../fields/link'
 import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
 import { revalidateTrip, revalidateTripDelete } from '../hooks/revalidate'
+import { difficultySelectOptions } from '../lib/difficulty'
 import { siteLivePreviewURL } from '../lib/live-preview-url'
 
 /**
@@ -160,14 +161,12 @@ export const Trips: CollectionConfig = {
               type: 'select',
               required: true,
               defaultValue: 'moderate',
-              options: [
-                { label: 'Easy', value: 'easy' },
-                { label: 'Moderate', value: 'moderate' },
-                { label: 'Challenging', value: 'challenging' },
-                { label: 'Strenuous', value: 'strenuous' },
-                { label: 'Extreme', value: 'extreme' },
-              ],
-              admin: { width: '50%' },
+              options: difficultySelectOptions,
+              admin: {
+                width: '50%',
+                description:
+                  'Nine rungs, from Easy to Extreme. The homepage slider after the hero groups published trips by this value.',
+              },
             },
             {
               name: 'bestSeasons',

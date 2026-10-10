@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useSyncExternalStore } from 'react'
 
 import { TripCard } from '@/components/cards/trip-card'
 import { Button } from '@/components/ui/button'
@@ -14,16 +14,48 @@ import {
 } from '@/components/ui/select'
 import { dictionary, plural } from '@/i18n/dictionaries'
 import type { TripCard as TripCardData } from '@/lib/data'
+import {
+  DIFFICULTY_VALUES,
+  difficultyLabel,
+  isDifficulty,
+  readDifficultyFromSearch,
+  writeDifficultySearch,
+} from '@/lib/difficulty'
 
 type Sort = 'featured' | 'price-asc' | 'price-desc' | 'duration-asc' | 'duration-desc'
+
+const difficultyListeners = new Set<() => void>()
+
+const subscribeDifficulty = (onStoreChange: () => void) => {
+  difficultyListeners.add(onStoreChange)
+  window.addEventListener('popstate', onStoreChange)
+  return () => {
+    difficultyListeners.delete(onStoreChange)
+    window.removeEventListener('popstate', onStoreChange)
+  }
+}
+
+const getDifficultySnapshot = () => readDifficultyFromSearch(window.location.search)
+
+const getDifficultyServerSnapshot = (): 'all' => 'all'
+
+const setDifficultySearch = (value: string) => {
+  const next = writeDifficultySearch(window.location.search, isDifficulty(value) ? value : 'all')
+  window.history.replaceState(null, '', `${window.location.pathname}${next}${window.location.hash}`)
+  difficultyListeners.forEach((listener) => listener())
+}
 
 /**
  * Client-side trip explorer.
  *
- * TRADE-OFF: filtering happens in the browser, not via `searchParams`. That keeps /trips
+ * TRADE-OFF: filtering happens in the browser, not via Next `searchParams`. That keeps /trips
  * statically rendered (instant, CDN-cacheable) instead of turning every filter click into a
  * server round trip. It is the right call up to a few hundred trips; beyond that, move the
  * filtering into the server component with `searchParams` + `<Suspense>`.
+ *
+ * The difficulty filter is the exception that *is* mirrored onto the URL (`?difficulty=`), so
+ * the homepage slider can deep-link a rung and land on the matching trips. The write uses
+ * `history.replaceState` rather than the App Router, so the page stays static.
  */
 export function TripsExplorer({
   trips,
@@ -34,7 +66,11 @@ export function TripsExplorer({
 }) {
   const dict = dictionary
 
-  const [difficulty, setDifficulty] = useState<string>('all')
+  const difficulty = useSyncExternalStore(
+    subscribeDifficulty,
+    getDifficultySnapshot,
+    getDifficultyServerSnapshot,
+  )
   const [destination, setDestination] = useState<string>('all')
   const [season, setSeason] = useState<string>('all')
   const [sort, setSort] = useState<Sort>('featured')
@@ -74,7 +110,7 @@ export function TripsExplorer({
   }, [trips, difficulty, destination, season, sort])
 
   const reset = () => {
-    setDifficulty('all')
+    setDifficultySearch('all')
     setDestination('all')
     setSeason('all')
     setSort('featured')
@@ -91,17 +127,15 @@ export function TripsExplorer({
               <Label className="mb-2 text-xs tracking-[0.12em] text-slate uppercase">
                 {dict.trips.difficulty}
               </Label>
-              <Select value={difficulty} onValueChange={setDifficulty}>
+              <Select value={difficulty} onValueChange={setDifficultySearch}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{dict.trips.any}</SelectItem>
-                  {['easy', 'moderate', 'challenging', 'strenuous', 'extreme'].map((value) => (
+                  {DIFFICULTY_VALUES.map((value) => (
                     <SelectItem key={value} value={value}>
-                      {dict.trips[
-                        `difficulty${value.charAt(0).toUpperCase()}${value.slice(1)}` as keyof typeof dict.trips
-                      ] ?? value}
+                      {difficultyLabel(value)}
                     </SelectItem>
                   ))}
                 </SelectContent>

@@ -31,6 +31,7 @@ import { PayloadImageFill, PayloadImage } from '@/components/ui/payload-image'
 import { dictionary, type Dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
 import type { TripCard as TripCardData } from '@/lib/data'
+import { difficultyLabel } from '@/lib/difficulty'
 import { formatNumber, formatPrice } from '@/lib/format'
 import { resolveLink } from '@/lib/links'
 import { cn } from '@/lib/utils'
@@ -55,16 +56,6 @@ function SectionTitle({ title, className }: { title: string; className?: string 
       <h2 className="heading-lg">{title}</h2>
     </div>
   )
-}
-
-/* ----------------------------------------------------------------------------
-   Helpers
-   ---------------------------------------------------------------------------- */
-
-const capitalise = (value: string) => `${value.charAt(0).toUpperCase()}${value.slice(1)}`
-
-function difficultyLabel(difficulty: string, dict: Dictionary): string {
-  return dict.trips[`difficulty${capitalise(difficulty)}` as keyof typeof dict.trips] ?? difficulty
 }
 
 /* ----------------------------------------------------------------------------
@@ -120,7 +111,7 @@ function TripBookingCard({
             </dt>
             <dd>
               <span className="bg-sage/15 px-3 py-1 text-[0.8125rem] font-medium text-sage">
-                {difficultyLabel(trip.difficulty, dict)}
+                {difficultyLabel(trip.difficulty)}
               </span>
             </dd>
           </div>

@@ -405,7 +405,16 @@ export interface Trip {
    * Highest point, in metres.
    */
   maxAltitude?: number | null;
-  difficulty: 'easy' | 'moderate' | 'challenging' | 'strenuous' | 'extreme';
+  difficulty:
+    | 'easy'
+    | 'easy-moderate'
+    | 'moderate'
+    | 'moderate-challenging'
+    | 'challenging'
+    | 'challenging-strenuous'
+    | 'strenuous'
+    | 'strenuous-extreme'
+    | 'extreme';
   bestSeasons?: ('spring' | 'summer' | 'autumn' | 'winter')[] | null;
   /**
    * Lowest per-person price, no thousands separators.
