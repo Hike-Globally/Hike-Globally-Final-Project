@@ -101,11 +101,14 @@ export function HeroScrollCover({
   const handleWidth = useTransform(smoothProgress, [0, 0.5, 1], [36, 52, 44])
   const handleOpacity = useTransform(smoothProgress, [0, 0.3, 0.8, 1], [0.5, 0.9, 0.6, 0.35])
 
-  // Sticky hero depth effects (receding while sitting static and sticky)
-  const heroOverlayOpacity = useTransform(smoothProgress, [0, 0.7, 1], [0, 0.28, 0.42])
-  const heroContentY = useTransform(smoothProgress, [0, 1], [0, -32])
-  const heroContentOpacity = useTransform(smoothProgress, [0, 0.65, 1], [1, 0.6, 0.25])
-  const heroScale = useTransform(smoothProgress, [0, 1], [1, 0.98])
+  // Sticky hero depth effects (hero itself stays pinned full-screen; only a very subtle
+  // darkening veil is applied as the next section glides over it. The hero content does
+  // not scale, translate, or fade — it stays exactly as it was so the section always
+  // looks full-screen and alive while scrolling.)
+  const heroOverlayOpacity = useTransform(smoothProgress, [0, 0.7, 1], [0, 0.12, 0.22])
+  const heroContentY = useTransform(smoothProgress, [0, 1], [0, 0])
+  const heroContentOpacity = useTransform(smoothProgress, [0, 1], [1, 1])
+  const heroScale = useTransform(smoothProgress, [0, 1], [1, 1])
 
   const enableMotion = isMounted && !prefersReducedMotion
 
