@@ -311,6 +311,24 @@
   }
 }
 
+/* Inline gutter for a full-bleed element — an edge-to-edge scroller, say — that puts its
+   content on the exact left line `container-content` uses: the centring offset the
+   max-width container produces, plus that container's own inline padding. The element still
+   spans the viewport, so cards slide out from under the right-hand edge.
+   `100%` (not `100vw`) is deliberate: percentages resolve against the element's containing
+   block, so a vertical scrollbar can't push the content a few pixels off the column.
+   The offset is also published as `--container-gutter-offset` because a scroll container
+   needs it a second time as `scroll-padding-inline`: scroll snapping measures from the
+   scrollport (the padding box), so without it the cards would come to rest on the viewport
+   edge instead of on the column line. */
+@utility container-gutter {
+  --container-gutter-offset: calc(max(0px, (100% - var(--container-content)) / 2) + 1.5rem);
+  padding-inline: var(--container-gutter-offset);
+  @media (width >= 768px) {
+    --container-gutter-offset: calc(max(0px, (100% - var(--container-content)) / 2) + 2rem);
+  }
+}
+
 /* Eyebrow / kicker label above headings. */
 @utility eyebrow {
   font-family: var(--font-heading);
