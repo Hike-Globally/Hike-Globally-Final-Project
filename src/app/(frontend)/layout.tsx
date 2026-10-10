@@ -13,14 +13,11 @@ import { resolveSiteUrlObject } from '@/lib/site-url'
 import './globals.css'
 
 /* Section typefaces, self-hosted from node_modules — the exact families the
-   ported Framer designs specify: Inter (Latest Stories tiles), Switzer (pill
-   nav), Lato (shader footer). */
+   ported designs specify: Inter (Latest Stories tiles) and Switzer (pill nav). */
 import '@fontsource-variable/inter'
 import '@carrot-kpi/switzer-font/400.css'
 import '@carrot-kpi/switzer-font/500.css'
 import '@carrot-kpi/switzer-font/700.css'
-import '@fontsource/lato/400.css'
-import '@fontsource/lato/700.css'
 
 /**
  * Fonts are self-hosted from node_modules (@fontsource) instead of fetched from
