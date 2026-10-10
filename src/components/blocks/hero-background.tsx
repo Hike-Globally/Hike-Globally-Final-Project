@@ -12,7 +12,8 @@ export function HomepageHeroBackground() {
         fill
         priority
         sizes="100vw"
-        className="-z-10 scale-105 object-cover blur-sm"
+        className="-z-10 scale-[1.02] object-cover blur-[1px]"
+        style={{ filter: 'blur(1px)' }}
       />
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-black/50" />
     </>
