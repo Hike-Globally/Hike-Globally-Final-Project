@@ -119,13 +119,22 @@ const docHref = (relationTo: string | undefined, value: unknown): string | null 
   return null
 }
 
-const renderNodes = (nodes: RichTextNode[] | undefined): ReactNode =>
-  (nodes ?? []).map((node, index) => renderNode(node, index))
+type RenderContext = {
+  headingIds?: readonly string[]
+  headingIndex: number
+}
 
-const renderNode = (node: RichTextNode, index: number): ReactNode => {
+const renderNodes = (nodes: RichTextNode[] | undefined, context: RenderContext): ReactNode =>
+  (nodes ?? []).map((node, index) => renderNode(node, index, context))
+
+const renderNode = (node: RichTextNode, index: number, context: RenderContext): ReactNode => {
   if (!node) return null
   const key = `${node.type ?? 'node'}-${index}`
-  const children = renderNodes(node.children)
+  const headingTag = node.tag ?? 'h2'
+  const isOutlineHeading = node.type === 'heading' && (headingTag === 'h2' || headingTag === 'h3')
+  const headingId = isOutlineHeading ? context.headingIds?.[context.headingIndex] : undefined
+  if (isOutlineHeading) context.headingIndex += 1
+  const children = renderNodes(node.children, context)
 
   switch (node.type) {
     case 'text':
@@ -145,7 +154,12 @@ const renderNode = (node: RichTextNode, index: number): ReactNode => {
       const tag = node.tag ?? 'h2'
       const Tag = (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tag) ? tag : 'h2') as 'h2'
       return (
-        <Tag key={key} style={blockStyle(node)}>
+        <Tag
+          key={key}
+          id={headingId}
+          className={headingId ? 'scroll-mt-32' : undefined}
+          style={blockStyle(node)}
+        >
           {children}
         </Tag>
       )
@@ -262,9 +276,19 @@ const renderNode = (node: RichTextNode, index: number): ReactNode => {
   }
 }
 
-export function RichText({ content, className }: { content: unknown; className?: string }) {
+export function RichText({
+  content,
+  className,
+  headingIds,
+}: {
+  content: unknown
+  className?: string
+  /** Adds matching anchor IDs to h2/h3 nodes when a page renders a table of contents. */
+  headingIds?: readonly string[]
+}) {
   const root = (content as { root?: RichTextNode } | null | undefined)?.root
   if (!root?.children?.length) return null
 
-  return <div className={cn('prose-hg', className)}>{renderNodes(root.children)}</div>
+  const context: RenderContext = { headingIds, headingIndex: 0 }
+  return <div className={cn('prose-hg', className)}>{renderNodes(root.children, context)}</div>
 }
