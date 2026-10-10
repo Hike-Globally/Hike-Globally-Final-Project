@@ -1,6 +1,22 @@
 import { revalidatePath, revalidateTag } from 'next/cache'
 import type { NextRequest } from 'next/server'
 
+import { CACHE_TAG } from '@/lib/cache-tags'
+
+/**
+ * Every shared cache tag the frontend reads with (see `src/lib/data.ts`). Per-document tags such
+ * as `trip:<slug>` don't need listing: each of those entries also carries its collection tag.
+ */
+const ALL_TAGS: string[] = [
+  CACHE_TAG.trips,
+  CACHE_TAG.destinations,
+  CACHE_TAG.posts,
+  CACHE_TAG.pages,
+  CACHE_TAG.header,
+  CACHE_TAG.footer,
+  CACHE_TAG.settings,
+]
+
 /**
  * On-demand revalidation webhook.
  *
@@ -12,6 +28,9 @@ import type { NextRequest } from 'next/server'
  *        -H "Authorization: Bearer $REVALIDATE_SECRET" \
  *        -H "Content-Type: application/json" \
  *        -d '{"tags":["trips"],"paths":["/trips"]}'
+ *
+ * Send no body (or `{}`) to purge the whole site: every data-cache tag, including the header,
+ * footer and settings globals, plus the rendered HTML of every route under the root layout.
  */
 export async function POST(request: NextRequest) {
   const secret = process.env.REVALIDATE_SECRET
@@ -35,11 +54,14 @@ export async function POST(request: NextRequest) {
     // An empty body is valid: it means "revalidate everything".
   }
 
-  const tags = body.tags?.length ? body.tags : ['trips', 'destinations', 'posts', 'pages']
+  const purgeEverything = !body.tags?.length && !body.paths?.length
+  const tags = body.tags?.length ? body.tags : ALL_TAGS
   const paths = body.paths?.length ? body.paths : ['/']
 
   for (const tag of tags) revalidateTag(tag, { expire: 0 })
-  for (const path of paths) revalidatePath(path)
+  // `'layout'` on `/` purges every page that shares the root layout, i.e. the whole site.
+  if (purgeEverything) revalidatePath('/', 'layout')
+  else for (const path of paths) revalidatePath(path)
 
   return Response.json({ revalidated: true, tags, paths, now: Date.now() })
 }
