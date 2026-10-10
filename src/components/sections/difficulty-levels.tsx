@@ -71,7 +71,7 @@ export function DifficultyLevels() {
       className="overflow-hidden bg-white py-16 md:py-20"
       aria-labelledby="difficulty-heading"
     >
-      <div className="container-content">
+      <div className="container-content flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-10">
         <div className="max-w-3xl">
           <p className="eyebrow mb-3">Find your level</p>
           <h2
@@ -98,6 +98,15 @@ export function DifficultyLevels() {
               />
             </Link>
           </div>
+        </div>
+
+        <div
+          className="flex shrink-0 items-center gap-3"
+          role="group"
+          aria-label="Browse difficulty levels"
+        >
+          <CarouselArrow direction="left" disabled={atStart} onClick={() => scroll(-1)} />
+          <CarouselArrow direction="right" disabled={atEnd} onClick={() => scroll(1)} />
         </div>
       </div>
 
@@ -177,11 +186,6 @@ export function DifficultyLevels() {
             </Link>
           ))}
         </div>
-
-        <div className="pointer-events-none absolute inset-y-0 left-0 right-0 z-10 flex items-center justify-between px-2 sm:px-3">
-          <CarouselArrow direction="left" disabled={atStart} onClick={() => scroll(-1)} />
-          <CarouselArrow direction="right" disabled={atEnd} onClick={() => scroll(1)} />
-        </div>
       </div>
     </section>
   )
@@ -204,7 +208,7 @@ function CarouselArrow({
       onClick={onClick}
       disabled={disabled}
       aria-label={direction === 'left' ? 'Previous difficulty levels' : 'Next difficulty levels'}
-      className="pointer-events-auto inline-flex size-10 items-center justify-center rounded-full border border-white/25 bg-ink/80 text-white shadow-lg backdrop-blur-sm transition duration-300 hover:bg-deep disabled:pointer-events-none disabled:opacity-0"
+      className="inline-flex size-11 items-center justify-center rounded-full border border-ink/20 bg-white text-ink transition duration-300 hover:border-deep hover:bg-deep hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-deep disabled:cursor-not-allowed disabled:border-ink/10 disabled:text-ink/30 disabled:hover:border-ink/10 disabled:hover:bg-white disabled:hover:text-ink/30"
     >
       <Icon className="size-4" aria-hidden="true" />
     </button>
