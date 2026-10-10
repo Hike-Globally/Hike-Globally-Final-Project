@@ -539,7 +539,7 @@ export interface Trip {
     };
   };
   /**
-   * Featured trips surface on the homepage and are pinned first on /trips.
+   * Pinned first on /trips and picked by the homepage "Featured trips" section. With none ticked, the homepage falls back to the newest published trips rather than hiding the section.
    */
   featured?: boolean | null;
   /**
@@ -798,6 +798,9 @@ export interface RichTextBlock {
 export interface FeaturedTripsBlock {
   heading: string;
   subheading?: string | null;
+  /**
+   * Automatically means trips ticked “Featured” on their trip; if none are ticked yet, the newest published trips are shown instead.
+   */
   source?: ('featured' | 'manual') | null;
   trips?: (number | Trip)[] | null;
   limit?: number | null;
@@ -841,6 +844,9 @@ export interface FeaturedDestinationsBlock {
   subheading?: string | null;
   source?: ('featured' | 'manual') | null;
   destinations?: (number | Destination)[] | null;
+  /**
+   * How many destinations the slider holds. Three are visible at a time — the rest are reached with the arrows. Every published destination can appear; the featured ones come first.
+   */
   limit?: number | null;
   layout?: ('grid' | 'editorial') | null;
   viewAllLink?: {
@@ -1742,6 +1748,39 @@ export interface Header {
               } | null);
           url?: string | null;
         };
+        /**
+         * Optional. When present, the tab shows a dropdown panel with these links.
+         */
+        children?:
+          | {
+              link?: {
+                /**
+                 * Visible text of the link. Empty = use the linked document’s title.
+                 */
+                label?: string | null;
+                type?: ('reference' | 'custom') | null;
+                reference?:
+                  | ({
+                      relationTo: 'pages';
+                      value: number | Page;
+                    } | null)
+                  | ({
+                      relationTo: 'trips';
+                      value: number | Trip;
+                    } | null)
+                  | ({
+                      relationTo: 'destinations';
+                      value: number | Destination;
+                    } | null)
+                  | ({
+                      relationTo: 'blog';
+                      value: number | Blog;
+                    } | null);
+                url?: string | null;
+              };
+              id?: string | null;
+            }[]
+          | null;
         id?: string | null;
       }[]
     | null;
@@ -1919,6 +1958,19 @@ export interface HeaderSelect<T extends boolean = true> {
               type?: T;
               reference?: T;
               url?: T;
+            };
+        children?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    label?: T;
+                    type?: T;
+                    reference?: T;
+                    url?: T;
+                  };
+              id?: T;
             };
         id?: T;
       };
