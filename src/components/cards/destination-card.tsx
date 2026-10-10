@@ -22,7 +22,8 @@ export function DestinationCard({
     <article
       className={cn(
         'group relative isolate overflow-hidden bg-ink',
-        size === 'large' ? 'min-h-[26rem] lg:min-h-[32rem]' : 'min-h-[20rem]',
+        // Heights are the previous values ×1.5 (26rem → 39rem, 32rem → 48rem, 20rem → 30rem).
+        size === 'large' ? 'min-h-[39rem] lg:min-h-[48rem]' : 'min-h-[30rem]',
         className,
       )}
     >
@@ -38,9 +39,12 @@ export function DestinationCard({
         priority={priority}
         imageClassName="scale-100 transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/25 to-transparent" />
+      {/* Flat black wash over the whole photo, then the bottom-up gradient on top of it,
+          so the caption text stays legible no matter how bright the image is. */}
+      <div className="absolute inset-0 bg-black/35" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
 
-      <div className="relative flex h-full flex-col justify-end p-6">
+      <div className="relative flex h-full flex-col items-start justify-end p-4 text-left">
         <p className="text-[0.75rem] font-medium tracking-[0.16em] text-sage uppercase">
           {destination.country}
         </p>

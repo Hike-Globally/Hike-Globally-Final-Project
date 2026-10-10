@@ -237,6 +237,38 @@ export const defaultFeaturedDestinations: DestinationCard[] = [
     region: 'langtang',
     featured: true,
   },
+  {
+    id: 4,
+    name: 'Mustang',
+    slug: 'mustang',
+    country: 'Nepal',
+    tagline: 'A Tibetan kingdom behind the rain shadow — ochre cliffs and cave monasteries.',
+    heroImage: {
+      id: 204,
+      url: '/images/admin/himalaya-01.jpg',
+      alt: 'Mustang desert cliffs above the Kali Gandaki',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      createdAt: '2026-01-01T00:00:00.000Z',
+    } as Media,
+    region: 'mustang',
+    featured: true,
+  },
+  {
+    id: 5,
+    name: 'Manaslu',
+    slug: 'manaslu',
+    country: 'Nepal',
+    tagline: 'The quiet circuit — 8,163 m of mountain and a trail that still feels remote.',
+    heroImage: {
+      id: 205,
+      url: '/images/admin/himalaya-02.jpg',
+      alt: 'Manaslu massif above the Budhi Gandaki valley',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      createdAt: '2026-01-01T00:00:00.000Z',
+    } as Media,
+    region: 'manaslu',
+    featured: true,
+  },
 ]
 
 export const defaultPosts: PostCard[] = [
@@ -555,6 +587,35 @@ export const getDestinations = (limit = 100): Promise<DestinationCard[]> =>
         return result.docs as unknown as DestinationCard[]
       },
       ['destinations'],
+      { tags: [CACHE_TAG.destinations], revalidate: REVALIDATE_SECONDS },
+    ),
+    defaultFeaturedDestinations.slice(0, limit),
+  )
+
+/**
+ * Destinations for the homepage slider.
+ *
+ * Every published destination goes in, featured ones first and then alphabetically — so the
+ * slider always has something to slide to, even when only a couple of regions are flagged as
+ * featured. `limit` caps the size of the track; three cards are visible at a time.
+ */
+export const getDestinationSlider = (limit = 6): Promise<DestinationCard[]> =>
+  safeQuery(
+    unstable_cache(
+      async () => {
+        const payload = await getPayloadClient()
+        const result = await payload.find({
+          collection: 'destinations',
+          locale: SITE_LOCALE,
+          depth: 1,
+          limit,
+          sort: ['-featured', 'name'],
+          where: { _status: { equals: 'published' } },
+          select: destinationCardSelect,
+        })
+        return result.docs as unknown as DestinationCard[]
+      },
+      ['destinations', 'slider', String(limit)],
       { tags: [CACHE_TAG.destinations], revalidate: REVALIDATE_SECONDS },
     ),
     defaultFeaturedDestinations.slice(0, limit),

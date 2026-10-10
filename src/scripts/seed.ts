@@ -1575,7 +1575,7 @@ const run = async () => {
         heading: copy.destinations,
         subheading: copy.destinationsSub,
         source: 'featured',
-        limit: 4,
+        limit: 6,
         layout: 'editorial',
         viewAllLink: { label: copy.viewDestinations, type: 'custom', url: '/destinations' },
       },

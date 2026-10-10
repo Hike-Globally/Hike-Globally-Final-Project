@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react'
 
 import { HomepageHeroBackground } from '@/components/blocks/hero-background'
 import { DestinationCard } from '@/components/cards/destination-card'
+import { DestinationCarousel } from '@/components/cards/destination-carousel'
 import { PostCard } from '@/components/cards/post-card'
 import { TripCard } from '@/components/cards/trip-card'
 import { HeroScrollCover } from '@/components/motion/hero-scroll-cover'
@@ -11,7 +12,7 @@ import { SectionHeading } from '@/components/sections/section-heading'
 import { Button } from '@/components/ui/button'
 import { dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
-import { getFeaturedDestinations, getFeaturedTrips, getPosts, getSettings } from '@/lib/data'
+import { getDestinationSlider, getFeaturedTrips, getPosts, getSettings } from '@/lib/data'
 
 /**
  * Rendered when no page with the slug `home` exists in Payload yet.
@@ -23,7 +24,8 @@ export async function HomeFallback() {
   const [settings, trips, destinations, posts] = await Promise.all([
     getSettings(),
     getFeaturedTrips(3),
-    getFeaturedDestinations(3),
+    // Three destination cards are visible at a time; the rest are reached with the arrows.
+    getDestinationSlider(6),
     getPosts(3),
   ])
 
@@ -72,7 +74,14 @@ export async function HomeFallback() {
   )
 
   const destinationsSection =
-    destinations.length > 0 ? (
+    destinations.length === 0 ? null : destinations.length > 3 ? (
+      <DestinationCarousel
+        destinations={destinations}
+        title={dict.nav.destinations}
+        description={dict.destinations.listingSubtitle}
+        action={{ href: sitePath('/destinations'), label: dict.common.viewAll }}
+      />
+    ) : (
       <section className="py-16 md:py-24">
         <div className="container-content">
           <SectionHeading
@@ -89,7 +98,7 @@ export async function HomeFallback() {
           </div>
         </div>
       </section>
-    ) : null
+    )
 
   const postsSection =
     posts.length > 0 ? (

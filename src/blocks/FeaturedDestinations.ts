@@ -14,7 +14,7 @@ export const FeaturedDestinations: Block = {
       type: 'radio',
       defaultValue: 'featured',
       options: [
-        { label: 'Show featured destinations automatically', value: 'featured' },
+        { label: 'Show destinations automatically (featured first)', value: 'featured' },
         { label: 'Pick specific destinations', value: 'manual' },
       ],
       admin: { layout: 'vertical' },
@@ -32,12 +32,14 @@ export const FeaturedDestinations: Block = {
     {
       name: 'limit',
       type: 'number',
-      defaultValue: 3,
+      defaultValue: 6,
       min: 1,
       max: 12,
       admin: {
         position: 'sidebar',
         condition: (_data, siblings) => (siblings as { source?: string })?.source === 'featured',
+        description:
+          'How many destinations the slider holds. Three are visible at a time — the rest are reached with the arrows. Every published destination can appear; the featured ones come first.',
       },
     },
     {

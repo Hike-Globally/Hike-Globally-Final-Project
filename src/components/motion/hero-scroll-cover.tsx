@@ -136,8 +136,9 @@ export function HeroScrollCover({
         />
       </div>
 
-      {/* Covering surface: slides smoothly up and covers the Hero section */}
-      <div className="relative z-10 -mt-6 rounded-t-[2.5rem] border-t border-black/[0.06] bg-background shadow-[0_-25px_60px_-15px_rgba(0,0,0,0.25)] transition-shadow md:rounded-t-[3.5rem]">
+      {/* Covering surface: slides smoothly up and covers the Hero section.
+          Square top corners — no radius on either the left or the right side. */}
+      <div className="relative z-10 -mt-6 border-t border-black/[0.06] bg-background shadow-[0_-25px_60px_-15px_rgba(0,0,0,0.25)] transition-shadow">
         {/* Subtle grab indicator bar */}
         <div className="flex justify-center pt-3 pb-1" aria-hidden="true">
           <motion.div
