@@ -6,16 +6,9 @@ import { PayloadImageFill } from '@/components/ui/payload-image'
 import { dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
 import type { TripCard } from '@/lib/data'
+import { difficultyBadgeVariant, difficultyLabel } from '@/lib/difficulty'
 import { formatNumber, formatPrice } from '@/lib/format'
 import { cn } from '@/lib/utils'
-
-const difficultyVariant: Record<string, 'sage' | 'light' | 'outline' | 'default'> = {
-  easy: 'sage',
-  moderate: 'light',
-  challenging: 'outline',
-  strenuous: 'outline',
-  extreme: 'default',
-}
 
 export function TripCard({
   trip,
@@ -56,12 +49,10 @@ export function TripCard({
             <span />
           )}
           <Badge
-            variant={difficultyVariant[trip.difficulty] ?? 'light'}
-            className="bg-white/90 backdrop-blur"
+            variant={difficultyBadgeVariant(trip.difficulty)}
+            className="max-w-[10.5rem] bg-white/90 text-center leading-snug whitespace-normal backdrop-blur"
           >
-            {dict.trips[
-              `difficulty${trip.difficulty.charAt(0).toUpperCase()}${trip.difficulty.slice(1)}` as keyof typeof dict.trips
-            ] ?? trip.difficulty}
+            {difficultyLabel(trip.difficulty)}
           </Badge>
         </div>
         {destinationName ? (
