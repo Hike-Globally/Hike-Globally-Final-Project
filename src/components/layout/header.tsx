@@ -1,3 +1,4 @@
+import { HeaderFrame } from './header-frame'
 import { PillNav, type PillNavLink } from './pill-nav'
 import { sitePath } from '@/i18n/config'
 import { dictionary } from '@/i18n/dictionaries'
@@ -47,7 +48,7 @@ export async function Header() {
     actions[0] ?? { href: sitePath('/inquiry'), label: dict.nav.inquiry, newTab: false }
 
   return (
-    <header className="hg-header">
+    <HeaderFrame>
       {header.announcement ? (
         <div
           style={{
@@ -66,6 +67,6 @@ export async function Header() {
         links={fallbackLinks}
         cta={cta}
       />
-    </header>
+    </HeaderFrame>
   )
 }

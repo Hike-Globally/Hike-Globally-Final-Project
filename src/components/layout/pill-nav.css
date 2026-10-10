@@ -25,6 +25,11 @@
   pointer-events: none;
 }
 
+/* Homepage: the header takes no vertical space and floats over the full-viewport hero. */
+.hg-header--overlay {
+  height: 0;
+}
+
 .pn-viewport {
   display: flex;
   flex-direction: column;

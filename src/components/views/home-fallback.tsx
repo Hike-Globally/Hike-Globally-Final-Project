@@ -32,7 +32,7 @@ export async function HomeFallback() {
   ])
 
   const heroSection = (
-    <section className="relative isolate flex h-full min-h-[calc(100svh-4.5rem)] items-center overflow-hidden bg-ink text-mist">
+    <section className="relative isolate flex h-full min-h-[100svh] items-center overflow-hidden bg-ink text-mist">
       <HomepageHeroBackground />
 
       <div className="container-content py-16 md:py-20">
