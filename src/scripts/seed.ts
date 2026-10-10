@@ -1772,8 +1772,22 @@ const run = async () => {
     data: {
       announcement: 'Spring 2026 departures are open — early-bird pricing until 31 December.',
       navItems: [
-        { link: { label: 'Trips', type: 'custom', url: '/trips' } },
-        { link: { label: 'Destinations', type: 'custom', url: '/destinations' } },
+        {
+          link: { label: 'Trips', type: 'custom', url: '/trips' },
+          children: [
+            { link: { label: 'All trips', type: 'custom', url: '/trips' } },
+            { link: { label: 'Everest region', type: 'custom', url: '/trips?region=khumbu-everest' } },
+            { link: { label: 'Annapurna region', type: 'custom', url: '/trips?region=annapurna' } },
+          ],
+        },
+        {
+          link: { label: 'Destinations', type: 'custom', url: '/destinations' },
+          children: [
+            { link: { label: 'All destinations', type: 'custom', url: '/destinations' } },
+            { link: { label: 'Langtang', type: 'custom', url: '/destinations/langtang' } },
+            { link: { label: 'Mustang', type: 'custom', url: '/destinations/mustang' } },
+          ],
+        },
         { link: { label: 'Journal', type: 'custom', url: '/blog' } },
         { link: { label: 'About', type: 'custom', url: '/about' } },
       ],

@@ -36,7 +36,19 @@ export const Header: GlobalConfig = {
       localized: true,
       maxRows: 8,
       labels: { singular: 'Nav item', plural: 'Navigation' },
-      fields: [linkField({ name: 'link', label: 'Link', newTab: false })],
+      fields: [
+        linkField({ name: 'link', label: 'Link', newTab: false }),
+        {
+          name: 'children',
+          type: 'array',
+          labels: { singular: 'Dropdown link', plural: 'Dropdown links' },
+          admin: {
+            description:
+              'Optional. When present, the tab shows a dropdown panel with these links.',
+          },
+          fields: [linkField({ name: 'link', label: 'Link', newTab: false })],
+        },
+      ],
     },
     {
       name: 'actions',

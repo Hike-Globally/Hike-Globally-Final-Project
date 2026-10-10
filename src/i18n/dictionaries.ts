@@ -149,6 +149,7 @@ const en = {
     featured: 'Featured story',
     latest: 'Latest stories',
     readTime: '{minutes} min read',
+    readStory: 'Read story',
     by: 'By',
     publishedOn: 'Published',
     related: 'Keep reading',
@@ -207,6 +208,8 @@ const en = {
   },
   footer: {
     contact: 'Contact',
+    contactUs: 'Contact us',
+    about: 'About',
     follow: 'Follow',
     rights: 'All rights reserved',
   },

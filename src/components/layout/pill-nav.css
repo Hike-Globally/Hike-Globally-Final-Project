@@ -1,0 +1,336 @@
+/* ============================================================================
+   Pill dropdown nav — ported 1:1 from Header-Sample.html
+   (pill-dropdown-nav.framer.website).
+
+   Geometry / colour / type values are copied from the sample's Framer CSS:
+     track   .framer-1m6zlyx  padding 8px 12px, radius 24px,
+             bg rgba(17,17,17,0.94), blur 14px, 1px rgba(255,255,255,0.08)
+             border, shadow rgba(0,0,0,0.45) 0 18px 40px -14px
+     links   .framer-1uf7nog  row, gap 2px, height 37px
+     pill    .framer-1biwgs4  height 37px, radius 12px, absolute in links row
+     tab     .framer-v0rh89   padding 11px 18px, radius 12px
+     label   Switzer 500 15px, -0.01em, 1em, rgba(255,255,255,0.56)
+     panel   .framer-1fmh8ov/.framer-rygpvy  top 45px, min-width 220px,
+             padding 10px, items 200px wide, padding 10px 6px
+     mobile  .framer-v-izx6qx collapsed 56×56 track, 40×40 burger,
+             bars 18×2 at top 16/22 left 11 · .framer-v-w3tplo expanded 316px
+   ========================================================================== */
+
+/* Sticky, in-flow wrapper: reserves its height so content never hides under
+   the floating pill, and keeps the pill pinned while scrolling. */
+.hg-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.pn-viewport {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  height: 92px;
+  padding: 16px 20px 0;
+  pointer-events: none;
+}
+
+.pn-announcement {
+  pointer-events: auto;
+  max-width: 100%;
+  padding: 7px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background-color: rgba(17, 17, 17, 0.94);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  color: rgba(255, 255, 255, 0.72);
+  font-family: var(--pn-font);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1em;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --- track ------------------------------------------------------------- */
+.pn-track {
+  pointer-events: auto;
+  position: relative;
+  display: flex;
+  flex-flow: row;
+  place-content: center;
+  align-items: center;
+  gap: 12px;
+  width: min-content;
+  max-width: 100%;
+  height: min-content;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  background-color: rgba(17, 17, 17, 0.94);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: rgba(0, 0, 0, 0.45) 0px 18px 40px -14px;
+}
+
+.pn-logo {
+  flex: none;
+  padding: 11px 6px;
+  border-radius: 12px;
+  color: #fff;
+  font-family: var(--pn-font);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1em;
+  text-decoration: none;
+  white-space: pre;
+}
+
+.pn-links {
+  position: relative;
+  display: flex;
+  flex-flow: row;
+  place-content: center;
+  align-items: center;
+  gap: 2px;
+  height: 37px;
+  overflow: visible;
+}
+
+/* sliding highlight pill */
+.pn-pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 37px;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.pn-tab {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-flow: row;
+  place-content: center flex-start;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 18px;
+  border-radius: 12px;
+  background-color: rgba(0, 0, 0, 0);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.pn-label {
+  -webkit-user-select: none;
+  user-select: none;
+  white-space: pre;
+  color: rgba(255, 255, 255, 0.56);
+  font-family: var(--pn-font);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1em;
+  transition: color 0.2s ease;
+}
+
+.pn-tab:hover .pn-label,
+.pn-tab:focus-visible .pn-label,
+.pn-tab[data-active='true'] .pn-label {
+  color: #fff;
+}
+
+.pn-caret {
+  flex: none;
+  transition: transform 0.25s cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.pn-tab[aria-expanded='true'] .pn-caret {
+  transform: rotate(180deg);
+}
+
+/* --- dropdown panel ----------------------------------------------------- */
+.pn-panel {
+  position: absolute;
+  top: 45px;
+  z-index: 9;
+  display: flex;
+  flex-flow: column;
+  place-content: flex-start;
+  align-items: flex-start;
+  min-width: 220px;
+  height: min-content;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  background-color: rgba(35, 35, 35, 0.98);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: rgba(0, 0, 0, 0.45) 0px 18px 40px -14px;
+  transform-origin: top left;
+}
+
+.pn-panel-item {
+  display: flex;
+  flex-flow: column;
+  place-content: flex-start;
+  align-items: flex-start;
+  width: 200px;
+  padding: 10px 6px;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.pn-panel-item .pn-label {
+  white-space: normal;
+}
+
+/* --- CTA slot ----------------------------------------------------------- */
+.pn-cta {
+  flex: none;
+  display: flex;
+  align-items: center;
+  padding: 11px 18px;
+  border-radius: 12px;
+  background-color: #fff;
+  color: rgb(17, 17, 17);
+  font-family: var(--pn-font);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1em;
+  text-decoration: none;
+  white-space: pre;
+  transition: background-color 0.2s ease;
+}
+
+.pn-cta:hover {
+  background-color: rgba(255, 255, 255, 0.82);
+}
+
+/* --- mobile burger ------------------------------------------------------ */
+.pn-burger {
+  display: none;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.pn-burger-bar {
+  position: absolute;
+  left: 11px;
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background-color: #fff;
+}
+
+.pn-burger-bar:first-child {
+  top: 16px;
+}
+
+.pn-burger-bar:last-child {
+  top: 22px;
+}
+
+/* --- mobile: collapsed 56×56 track, expanded 316px column --------------- */
+@media (max-width: 809.98px) {
+  .pn-viewport {
+    height: 88px;
+    align-items: flex-end;
+    padding: 16px 16px 0;
+  }
+
+  .pn-track {
+    flex-direction: column;
+    place-content: flex-start;
+    align-items: flex-start;
+    gap: 8px;
+    width: 56px;
+    height: 56px;
+    padding: 8px;
+    overflow: hidden;
+  }
+
+  .pn-track[data-open='true'] {
+    width: 316px;
+    max-width: calc(100vw - 32px);
+    height: auto;
+    overflow: visible;
+  }
+
+  .pn-burger {
+    display: block;
+    flex: none;
+  }
+
+  .pn-logo,
+  .pn-cta-desktop {
+    display: none;
+  }
+
+  .pn-links {
+    display: none;
+    flex-direction: column;
+    place-content: flex-start;
+    align-items: flex-start;
+    width: 100%;
+    height: auto;
+  }
+
+  .pn-track[data-open='true'] .pn-links {
+    display: flex;
+  }
+
+  .pn-pill {
+    display: none;
+  }
+
+  .pn-tab {
+    width: 100%;
+    padding: 11px 18px 11px 7px;
+  }
+
+  .pn-panel {
+    position: static;
+    min-width: 0;
+    width: 100%;
+    padding: 0 0 8px 7px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+  }
+
+  .pn-panel-item {
+    width: 100%;
+    padding: 10px 6px;
+  }
+
+  .pn-cta {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pn-label,
+  .pn-caret,
+  .pn-cta {
+    transition: none !important;
+  }
+}

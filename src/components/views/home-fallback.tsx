@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react'
 import { HomepageHeroBackground } from '@/components/blocks/hero-background'
 import { DestinationCard } from '@/components/cards/destination-card'
 import { DestinationCarousel } from '@/components/cards/destination-carousel'
-import { PostCard } from '@/components/cards/post-card'
+import { StoryTiles } from '@/components/blocks/story-tiles'
 import { TripCard } from '@/components/cards/trip-card'
 import { HeroScrollCover } from '@/components/motion/hero-scroll-cover'
 import { Reveal } from '@/components/motion/reveal'
@@ -102,25 +102,7 @@ export async function HomeFallback() {
       </section>
     )
 
-  const postsSection =
-    posts.length > 0 ? (
-      <section className="py-16 md:py-24">
-        <div className="container-content">
-          <SectionHeading
-            title={dict.blog.latest}
-            description={dict.blog.listingSubtitle}
-            action={{ href: sitePath('/blog'), label: dict.common.viewAll }}
-          />
-          <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
-            {posts.map((post, index) => (
-              <Reveal key={post.id} delay={index * 80}>
-                <PostCard post={post} />
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-    ) : null
+  const postsSection = posts.length > 0 ? <StoryTiles posts={posts} /> : null
 
   const inquirySection = (
     <section className="py-16 md:py-24">

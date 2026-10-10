@@ -4,6 +4,7 @@ import * as migration_20261003_084733_localize_blocks from './20261003_084733_lo
 import * as migration_20261005_162110_media_storage from './20261005_162110_media_storage';
 import * as migration_20261007_163309_trip_content_sections from './20261007_163309_trip_content_sections';
 import * as migration_20261009_124959_trip_itinerary_food from './20261009_124959_trip_itinerary_food';
+import * as migration_20261010_124847_nav_item_children from './20261010_124847_nav_item_children';
 
 export const migrations = [
   {
@@ -34,6 +35,11 @@ export const migrations = [
   {
     up: migration_20261009_124959_trip_itinerary_food.up,
     down: migration_20261009_124959_trip_itinerary_food.down,
-    name: '20261009_124959_trip_itinerary_food'
+    name: '20261009_124959_trip_itinerary_food',
+  },
+  {
+    up: migration_20261010_124847_nav_item_children.up,
+    down: migration_20261010_124847_nav_item_children.down,
+    name: '20261010_124847_nav_item_children'
   },
 ];
