@@ -53,7 +53,7 @@ function getCoverDistanceServerSnapshot() {
 /**
  * Sticky hero section with smooth scroll covering animation.
  *
- * - The Hero sits static and sticky at `top-[4.5rem]` directly under the header.
+ * - The Hero is full-screen and sticky at the top of the viewport; the header floats above it.
  * - The section after Hero (and subsequent content) rises from below and covers the Hero section.
  * - While scrolling, the Hero subtly recedes with depth dimming and gentle parallax.
  * - The section immediately after Hero performs a silky spring-driven entrance animation (translate, scale, opacity).
@@ -111,8 +111,8 @@ export function HeroScrollCover({
 
   return (
     <div className={cn('relative w-full', className)}>
-      {/* Sticky Hero section: stays static and pinned at top-[4.5rem] */}
-      <div className="sticky top-[4.5rem] z-0 h-[calc(100svh-4.5rem)] min-h-[580px] w-full overflow-hidden">
+      {/* Sticky Hero section: full-screen, pinned to the top of the viewport (z-0, under the header) */}
+      <div className="sticky top-0 z-0 h-[100svh] min-h-[580px] w-full overflow-hidden">
         <motion.div
           style={
             enableMotion

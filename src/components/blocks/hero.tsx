@@ -25,7 +25,7 @@ export function Hero({ block, homepage = false }: { block: HeroBlock; homepage?:
   const secondary = resolveLink(block.secondaryLink)
   const hasImage = homepage || Boolean(block.backgroundImage)
   const height = homepage
-    ? 'h-full min-h-[calc(100svh-4.5rem)]'
+    ? 'h-full min-h-[100svh]'
     : (heights[block.height ?? 'tall'] ?? heights.tall!)
   const overlay = overlays[block.overlay ?? 'medium'] ?? overlays.medium!
 
