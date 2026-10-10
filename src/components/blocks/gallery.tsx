@@ -39,7 +39,7 @@ export function Gallery({ block }: { block: GalleryBlock }) {
               <figure className="group">
                 <div
                   className={cn(
-                    'relative overflow-hidden rounded-2xl bg-mist-60',
+                    'relative overflow-hidden bg-mist-60',
                     aspectClass[block.aspectRatio ?? '4/3'] ?? aspectClass['4/3'],
                   )}
                 >

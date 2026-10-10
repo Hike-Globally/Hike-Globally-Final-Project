@@ -43,7 +43,7 @@ import type { Trip } from '@/payload-types'
 
 /** The one card surface used across the page: white, hairline border, soft layered shadow. */
 const surface =
-  'rounded-3xl border border-black/[0.06] bg-white shadow-[0_1px_2px_rgba(1,22,30,0.04),0_18px_40px_-24px_rgba(1,22,30,0.18)]'
+  'border border-black/[0.06] bg-white shadow-[0_1px_2px_rgba(1,22,30,0.04),0_18px_40px_-24px_rgba(1,22,30,0.18)]'
 
 /** Eyebrow for dark backgrounds (the shared `.eyebrow` utility is tuned for light ones). */
 const eyebrowOnDark =
@@ -87,7 +87,7 @@ function TripBookingCard({
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-[1.75rem] bg-ink p-7 text-mist ring-1 ring-white/10 shadow-[0_40px_80px_-30px_rgba(1,22,30,0.6)]',
+        'relative overflow-hidden bg-ink p-7 text-mist ring-1 ring-white/10 shadow-[0_40px_80px_-30px_rgba(1,22,30,0.6)]',
         className,
       )}
     >
@@ -106,7 +106,7 @@ function TripBookingCard({
           {perGroup ? dict.trip.pricePerGroup : dict.trip.pricePerPerson}
         </p>
 
-        <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-4">
+        <div className="mt-4 border border-white/10 bg-white/[0.05] px-5 py-4">
           <p className="font-heading text-4xl leading-none font-semibold tracking-tight text-white">
             {formatPrice(trip.priceFrom, trip.priceCurrency)}
           </p>
@@ -119,7 +119,7 @@ function TripBookingCard({
               {dict.trip.difficultyLevel}
             </dt>
             <dd>
-              <span className="rounded-full bg-sage/15 px-3 py-1 text-[0.8125rem] font-medium text-sage">
+              <span className="bg-sage/15 px-3 py-1 text-[0.8125rem] font-medium text-sage">
                 {difficultyLabel(trip.difficulty, dict)}
               </span>
             </dd>
@@ -163,7 +163,7 @@ function DayChip({
   tone?: 'default' | 'positive' | 'muted'
 }) {
   return (
-    <div className="flex min-w-0 items-center gap-3 rounded-2xl bg-mist px-4 py-3">
+    <div className="flex min-w-0 items-center gap-3 bg-mist px-4 py-3">
       <span
         className={cn(
           'grid size-9 shrink-0 place-items-center rounded-full',
@@ -260,7 +260,7 @@ export function TripDetail({
             {destination ? (
               <Link
                 href={sitePath(`/destinations/${destination.slug}`)}
-                className="rounded-full bg-white/10 px-3.5 py-1.5 text-[0.75rem] tracking-[0.14em] text-sage uppercase ring-1 ring-white/15 backdrop-blur transition-colors hover:bg-white/20"
+                className="bg-white/10 px-3.5 py-1.5 text-[0.75rem] tracking-[0.14em] text-sage uppercase ring-1 ring-white/15 backdrop-blur transition-colors hover:bg-white/20"
               >
                 {destination.name}
               </Link>
@@ -283,7 +283,7 @@ export function TripDetail({
           </div>
 
           {/* Glass dashboard. A 1px gap over a tinted background draws the grid lines. */}
-          <dl className="mt-14 grid grid-cols-2 gap-px overflow-hidden rounded-3xl bg-white/10 ring-1 ring-white/10 backdrop-blur-xl md:grid-cols-4">
+          <dl className="mt-14 grid grid-cols-2 gap-px overflow-hidden bg-white/10 ring-1 ring-white/10 backdrop-blur-xl md:grid-cols-4">
             {facts.map((fact) => (
               <div
                 key={fact.label}
@@ -460,7 +460,7 @@ export function TripDetail({
             <Reveal as="section" className="py-16 md:py-24">
               <div className="grid gap-6 md:grid-cols-2">
                 {trip.included?.length ? (
-                  <div className="rounded-3xl bg-sage-20 p-8 ring-1 ring-sage/30 md:p-10">
+                  <div className="bg-sage-20 p-8 ring-1 ring-sage/30 md:p-10">
                     <h2 className="heading-md mb-7">{dict.trip.included}</h2>
                     <ul className="space-y-4">
                       {trip.included.map((item) => (
@@ -535,7 +535,7 @@ export function TripDetail({
               <div className="grid gap-5 sm:grid-cols-2">
                 {trip.gallery.map((item, index) => (
                   <Reveal key={item.id ?? index} delay={index * 60}>
-                    <div className="group overflow-hidden rounded-3xl bg-mist-60 ring-1 ring-black/5">
+                    <div className="group overflow-hidden bg-mist-60 ring-1 ring-black/5">
                       <PayloadImage
                         media={item.image}
                         size="tablet"
@@ -559,7 +559,7 @@ export function TripDetail({
       {/* ---------------- Inquiry — full width, dark panel ---------------- */}
       <section id="inquiry" className="scroll-mt-24 py-16 md:py-24">
         <div className="container-content">
-          <div className="relative isolate overflow-hidden rounded-[2rem] bg-ink p-8 text-mist ring-1 ring-white/10 md:p-14">
+          <div className="relative isolate overflow-hidden bg-ink p-8 text-mist ring-1 ring-white/10 md:p-14">
             <div
               aria-hidden
               className="pointer-events-none absolute -top-40 -right-32 -z-10 size-[28rem] rounded-full bg-sage/15 blur-3xl"

@@ -67,7 +67,7 @@ export function PostDetail({
         </header>
 
         <div className="container-content">
-          <div className="overflow-hidden rounded-3xl bg-mist-60">
+          <div className="overflow-hidden bg-mist-60">
             <PayloadImage
               media={post.featuredImage as Media}
               size="hero"
@@ -82,7 +82,7 @@ export function PostDetail({
           <RichText content={post.content} />
 
           {authorName ? (
-            <div className="mt-14 flex items-center gap-4 rounded-2xl bg-mist p-6">
+            <div className="mt-14 flex items-center gap-4 bg-mist p-6">
               {author?.avatar && typeof author.avatar !== 'number' ? (
                 <PayloadImage
                   media={author.avatar}

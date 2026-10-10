@@ -85,7 +85,7 @@ export function TripsExplorer({
   return (
     <div>
       <div className="container-content">
-        <div className="rounded-2xl border border-black/[0.06] bg-card p-5 shadow-[0_1px_2px_rgba(1,22,30,0.04)] md:p-6">
+        <div className="border border-black/[0.06] bg-card p-5 shadow-[0_1px_2px_rgba(1,22,30,0.04)] md:p-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div>
               <Label className="mb-2 text-xs tracking-[0.12em] text-slate uppercase">
@@ -182,7 +182,7 @@ export function TripsExplorer({
 
       <div className="container-content mt-12">
         {filtered.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-black/10 bg-mist p-12 text-center">
+          <div className="border border-dashed border-black/10 bg-mist p-12 text-center">
             <h2 className="heading-md">{dict.common.noResultsTitle}</h2>
             <p className="lead mx-auto mt-3 max-w-lg">{dict.common.noResultsText}</p>
             <Button variant="outline" className="mt-6" onClick={reset}>

@@ -58,7 +58,7 @@ export function BlogExplorer({ posts }: { posts: PostCardData[] }) {
           type="button"
           onClick={() => setCategory('all')}
           className={cn(
-            'rounded-full border px-4 py-2 text-[0.8125rem] transition-colors',
+            'border px-4 py-2 text-[0.8125rem] transition-colors',
             category === 'all'
               ? 'border-deep bg-deep text-mist'
               : 'border-ink/12 text-ink-70 hover:border-deep/40 hover:text-ink',
@@ -72,7 +72,7 @@ export function BlogExplorer({ posts }: { posts: PostCardData[] }) {
             type="button"
             onClick={() => setCategory(value)}
             className={cn(
-              'rounded-full border px-4 py-2 text-[0.8125rem] transition-colors',
+              'border px-4 py-2 text-[0.8125rem] transition-colors',
               category === value
                 ? 'border-deep bg-deep text-mist'
                 : 'border-ink/12 text-ink-70 hover:border-deep/40 hover:text-ink',

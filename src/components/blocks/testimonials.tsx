@@ -34,7 +34,7 @@ export function Testimonials({ block }: { block: TestimonialsBlock }) {
               <Reveal key={item.id ?? index} delay={index * 80}>
                 <figure
                   className={cn(
-                    'flex h-full flex-col rounded-2xl border p-7',
+                    'flex h-full flex-col border p-7',
                     dark ? 'border-white/10 bg-white/[0.04]' : 'border-black/[0.06] bg-card',
                   )}
                 >

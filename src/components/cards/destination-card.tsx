@@ -21,7 +21,7 @@ export function DestinationCard({
   return (
     <article
       className={cn(
-        'group relative isolate overflow-hidden rounded-2xl bg-ink',
+        'group relative isolate overflow-hidden bg-ink',
         size === 'large' ? 'min-h-[26rem] lg:min-h-[32rem]' : 'min-h-[20rem]',
         className,
       )}

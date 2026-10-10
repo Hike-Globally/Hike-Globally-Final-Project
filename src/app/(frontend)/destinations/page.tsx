@@ -42,7 +42,7 @@ export default async function DestinationsPage() {
       <section className="py-14 md:py-20">
         <div className="container-content">
           {destinations.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-black/10 bg-mist p-12 text-center">
+            <div className="border border-dashed border-black/10 bg-mist p-12 text-center">
               <h2 className="heading-md">{dict.common.noResultsTitle}</h2>
               <p className="lead mx-auto mt-3 max-w-lg">{dict.common.noResultsText}</p>
             </div>

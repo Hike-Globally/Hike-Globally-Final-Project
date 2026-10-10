@@ -67,7 +67,7 @@ const withFormat = (
   if (format & FORMAT.strikethrough) node = <s key={`s-${key}`}>{node}</s>
   if (format & FORMAT.code)
     node = (
-      <code key={`c-${key}`} className="rounded bg-mist-60 px-1.5 py-0.5 text-[0.9em]">
+      <code key={`c-${key}`} className="bg-mist-60 px-1.5 py-0.5 text-[0.9em]">
         {node}
       </code>
     )
@@ -242,7 +242,7 @@ const renderNode = (node: RichTextNode, index: number): ReactNode => {
 
       return (
         <figure key={key} className="-mx-0">
-          <div className="overflow-hidden rounded-2xl bg-mist-60">
+          <div className="overflow-hidden bg-mist-60">
             <PayloadImage
               media={media}
               size="tablet"
