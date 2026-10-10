@@ -50,11 +50,15 @@ export function InquiryForm({
     // The browser performs the actual POST to Formsubmit — this is only the pending state.
   }
 
-  const labelClass = variant === 'dark' ? 'text-mist/80' : 'text-ink'
-  const ghostClass =
-    variant === 'dark'
-      ? 'border-white/15 bg-white/[0.06] text-mist placeholder:text-mist/40 focus-visible:border-sage'
-      : ''
+  const isDark = variant === 'dark'
+
+  const labelClass = isDark ? 'text-mist/80' : 'text-ink'
+  // `color-scheme: dark` is what keeps the native widgets legible on the ink panel: without it the
+  // date-picker icon and the <select> arrow stay black-on-dark, and the pickers pop open light.
+  const ghostClass = isDark
+    ? '[color-scheme:dark] border-white/15 bg-white/[0.06] text-mist placeholder:text-mist/40 focus-visible:border-sage'
+    : ''
+  const requiredMarkClass = isDark ? 'text-sage' : 'text-slate'
 
   return (
     <form
@@ -65,7 +69,16 @@ export function InquiryForm({
       className={
         compact
           ? 'space-y-4'
-          : 'grid gap-5 rounded-2xl border border-black/[0.06] bg-card p-6 shadow-[0_1px_2px_rgba(1,22,30,0.04)] sm:p-8 md:grid-cols-2'
+          : cn(
+              // The panel surface follows the section it sits in: a white card on light backgrounds,
+              // a translucent white film on the dark ink panels (same treatment as the testimonial
+              // cards). Hardcoding `bg-card` here made the dark-variant form a solid white block
+              // with near-white labels and inputs on top of it — i.e. unreadable.
+              'grid gap-5 border p-6 sm:p-8 md:grid-cols-2',
+              isDark
+                ? 'border-white/10 bg-white/[0.04]'
+                : 'border-black/[0.06] bg-card shadow-[0_1px_2px_rgba(1,22,30,0.04)]',
+            )
       }
     >
       {/* Formsubmit controls */}
@@ -78,7 +91,7 @@ export function InquiryForm({
 
       <div className={compact ? '' : 'md:col-span-1'}>
         <Label htmlFor="name" className={`mb-2 ${labelClass}`}>
-          {dict.inquiry.name} <span className="text-slate">*</span>
+          {dict.inquiry.name} <span className={requiredMarkClass}>*</span>
         </Label>
         <Input
           id="name"
@@ -93,7 +106,7 @@ export function InquiryForm({
 
       <div className={compact ? '' : 'md:col-span-1'}>
         <Label htmlFor="email" className={`mb-2 ${labelClass}`}>
-          {dict.inquiry.email} <span className="text-slate">*</span>
+          {dict.inquiry.email} <span className={requiredMarkClass}>*</span>
         </Label>
         <Input
           id="email"
@@ -143,8 +156,9 @@ export function InquiryForm({
           name="tripTitle"
           defaultValue={trips.find((trip) => trip.slug === defaultTripSlug)?.title ?? ''}
           className={cn(
-            'h-11 w-full rounded-xl border border-input bg-white px-4 text-sm text-ink shadow-[0_1px_2px_rgba(1,22,30,0.03)] outline-none transition-[color,box-shadow,border-color] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/25',
-            ghostClass,
+            'h-11 w-full border px-4 text-sm shadow-[0_1px_2px_rgba(1,22,30,0.03)] outline-none transition-[color,box-shadow,border-color] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/25',
+            // A raw <select> has no shadcn primitive to inherit a surface from, so spell it out.
+            isDark ? ghostClass : 'border-input bg-white text-ink',
           )}
         >
           <option value="">{dict.inquiry.noTrip}</option>
