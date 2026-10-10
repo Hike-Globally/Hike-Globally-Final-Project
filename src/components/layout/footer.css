@@ -611,22 +611,19 @@
   color: #f8f9fa;
 }
 
-.hg-brand-mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 3rem;
-  height: 3rem;
-  border: 1px solid var(--hg-border-strong);
-  background-color: rgba(18, 69, 89, 0.32);
-  transition:
-    border-color 0.3s var(--ease-brand),
-    background-color 0.3s var(--ease-brand);
+/* The circular "H" mark ships as solid black — invert it for the dark footer. */
+.hg-brand-logo {
+  height: 3.25rem;
+  width: auto;
+  flex-shrink: 0;
+  object-fit: contain;
+  filter: invert(1);
+  opacity: 0.92;
+  transition: opacity 0.3s var(--ease-brand);
 }
 
-.hg-brand-link:hover .hg-brand-mark {
-  border-color: #aec3b0;
-  background-color: rgba(18, 69, 89, 0.6);
+.hg-brand-link:hover .hg-brand-logo {
+  opacity: 1;
 }
 
 .hg-brand-text {
@@ -636,7 +633,7 @@
 
 .hg-brand-name {
   font-family: var(--font-heading), system-ui, sans-serif;
-  font-size: 1.25rem;
+  font-size: 1.375rem;
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.1;
@@ -903,16 +900,15 @@
 .hg-nav-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  border-bottom: 1px solid var(--hg-border);
-}
-
-@media (min-width: 768px) {
-  .hg-nav-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
+  /* Rows share the column height so the dividers run the full height of the bento box. */
+  grid-auto-rows: 1fr;
+  flex: 1;
 }
 
 .hg-nav-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   padding: 2rem 1.5rem;
   border-bottom: 1px solid var(--hg-border);
 }
@@ -1024,106 +1020,6 @@
 .hg-nav-link:focus-visible .hg-nav-link-arrow {
   opacity: 1;
   transform: translate(0, 0);
-}
-
-/* --- The Hike Globally Trail Standards Strip ---------------------------- */
-.hg-standards-section {
-  padding: 2rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-@media (min-width: 768px) {
-  .hg-standards-section {
-    padding: 2.25rem 2rem;
-  }
-}
-
-.hg-standards-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-
-.hg-standards-eyebrow {
-  font-family: var(--font-heading), system-ui, sans-serif;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #aec3b0;
-}
-
-.hg-standards-meta {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.6875rem;
-  letter-spacing: 0.06em;
-  color: rgba(248, 249, 250, 0.45);
-}
-
-.hg-standards-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
-}
-
-@media (min-width: 640px) {
-  .hg-standards-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.hg-standard-card {
-  padding: 1.125rem 1.25rem;
-  border: 1px solid var(--hg-border);
-  background-color: rgba(12, 42, 54, 0.25);
-  transition:
-    border-color 0.3s var(--ease-brand),
-    background-color 0.3s var(--ease-brand);
-}
-
-.hg-standard-card:hover {
-  border-color: rgba(174, 195, 176, 0.35);
-  background-color: rgba(18, 69, 89, 0.32);
-}
-
-.hg-standard-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.hg-standard-code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.65rem;
-  letter-spacing: 0.08em;
-  color: #aec3b0;
-}
-
-.hg-standard-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 9999px;
-  background-color: rgba(174, 195, 176, 0.45);
-}
-
-.hg-standard-title {
-  margin-top: 0.5rem;
-  font-family: var(--font-heading), system-ui, sans-serif;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: #f8f9fa;
-}
-
-.hg-standard-detail {
-  margin-top: 0.3rem;
-  font-size: 0.8125rem;
-  line-height: 1.55;
-  font-weight: 300;
-  color: rgba(248, 249, 250, 0.66);
 }
 
 /* ==========================================================================
