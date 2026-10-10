@@ -394,6 +394,7 @@ const run = async () => {
       region: 'mustang' as const,
       bestSeasons: ['spring', 'summer', 'autumn'],
       coordinates: { latitude: 29.05, longitude: 83.95 },
+      featured: true,
       description: richText(
         paragraph(
           'North of the Dhaulagiri massif the monsoon never arrives. Mustang is a high desert of ochre cliffs and wind-carved canyons, culturally and geographically more Tibetan than Nepali — it was a forbidden kingdom until 1992.',
@@ -1575,7 +1576,7 @@ const run = async () => {
         heading: copy.destinations,
         subheading: copy.destinationsSub,
         source: 'featured',
-        limit: 4,
+        limit: 6,
         layout: 'editorial',
         viewAllLink: { label: copy.viewDestinations, type: 'custom', url: '/destinations' },
       },

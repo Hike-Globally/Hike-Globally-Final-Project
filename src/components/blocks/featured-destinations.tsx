@@ -1,4 +1,5 @@
 import { DestinationCard } from '@/components/cards/destination-card'
+import { DestinationCarousel } from '@/components/cards/destination-carousel'
 import { Reveal } from '@/components/motion/reveal'
 import { SectionHeading } from '@/components/sections/section-heading'
 import { sitePath } from '@/i18n/config'
@@ -28,7 +29,9 @@ export async function FeaturedDestinations({ block }: { block: FeaturedDestinati
   }
 
   if (destinations.length === 0) {
-    destinations = await getFeaturedDestinations(block.limit ?? 3)
+    // The slider shows three cards at a time, so `limit` is the size of the whole track —
+    // never fewer than 6, otherwise there would be nothing to slide to.
+    destinations = await getFeaturedDestinations(Math.max(block.limit ?? 6, 6))
   }
 
   if (destinations.length === 0) return null
@@ -40,6 +43,18 @@ export async function FeaturedDestinations({ block }: { block: FeaturedDestinati
   }
 
   const editorial = block.layout === 'editorial' && destinations.length >= 3
+
+  // More cards than fit in one row → slide them. Otherwise the static layout is nicer.
+  if (destinations.length > 3) {
+    return (
+      <DestinationCarousel
+        destinations={destinations}
+        title={block.heading}
+        description={block.subheading}
+        action={{ href: viewAll.href, label: viewAll.label }}
+      />
+    )
+  }
 
   return (
     <section className="py-16 md:py-24">

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import type { ReactNode } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -8,6 +9,7 @@ export function SectionHeading({
   title,
   description,
   action,
+  controls,
   align = 'left',
   variant = 'dark',
   className,
@@ -16,6 +18,8 @@ export function SectionHeading({
   title: string
   description?: string | null
   action?: { href: string; label: string } | null
+  /** Extra controls rendered next to the "view all" link — e.g. carousel arrows. */
+  controls?: ReactNode
   align?: 'left' | 'center'
   variant?: 'dark' | 'light'
   className?: string
@@ -40,17 +44,22 @@ export function SectionHeading({
         ) : null}
       </div>
 
-      {action ? (
-        <Link
-          href={action.href}
-          className={cn(
-            'group inline-flex shrink-0 items-center gap-2 text-[0.9375rem] font-medium transition-colors',
-            variant === 'light' ? 'text-white hover:text-sage' : 'text-deep hover:text-ink',
-          )}
-        >
-          {action.label}
-          <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
-        </Link>
+      {action || controls ? (
+        <div className="flex shrink-0 items-center gap-5">
+          {controls}
+          {action ? (
+            <Link
+              href={action.href}
+              className={cn(
+                'group inline-flex shrink-0 items-center gap-2 text-[0.9375rem] font-medium transition-colors',
+                variant === 'light' ? 'text-white hover:text-sage' : 'text-deep hover:text-ink',
+              )}
+            >
+              {action.label}
+              <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </Link>
+          ) : null}
+        </div>
       ) : null}
     </div>
   )

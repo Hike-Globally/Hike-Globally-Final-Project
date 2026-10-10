@@ -366,6 +366,19 @@
   padding-inline: 0.08em;
 }
 
+/* Hides the scrollbar of a horizontal scroller (carousel tracks) while keeping
+   it scrollable by wheel, touch, keyboard and the pagination buttons. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+}
+
 /* Thin gradient rule used to separate sections. */
 @utility rule-sage {
   height: 1px;

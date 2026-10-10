@@ -237,6 +237,38 @@ export const defaultFeaturedDestinations: DestinationCard[] = [
     region: 'langtang',
     featured: true,
   },
+  {
+    id: 4,
+    name: 'Mustang',
+    slug: 'mustang',
+    country: 'Nepal',
+    tagline: 'A Tibetan kingdom behind the rain shadow — ochre cliffs and cave monasteries.',
+    heroImage: {
+      id: 204,
+      url: '/images/admin/himalaya-01.jpg',
+      alt: 'Mustang desert cliffs above the Kali Gandaki',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      createdAt: '2026-01-01T00:00:00.000Z',
+    } as Media,
+    region: 'mustang',
+    featured: true,
+  },
+  {
+    id: 5,
+    name: 'Manaslu',
+    slug: 'manaslu',
+    country: 'Nepal',
+    tagline: 'The quiet circuit — 8,163 m of mountain and a trail that still feels remote.',
+    heroImage: {
+      id: 205,
+      url: '/images/admin/himalaya-02.jpg',
+      alt: 'Manaslu massif above the Budhi Gandaki valley',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      createdAt: '2026-01-01T00:00:00.000Z',
+    } as Media,
+    region: 'manaslu',
+    featured: true,
+  },
 ]
 
 export const defaultPosts: PostCard[] = [
