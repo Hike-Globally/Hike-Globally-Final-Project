@@ -1488,9 +1488,6 @@ const run = async () => {
       testimonialsSub: 'Unedited, straight out of the post-trip survey.',
       gallery: 'From the trail',
       gallerySub: 'Shot by guides and guests over the last two seasons.',
-      journal: 'From the journal',
-      journalSub:
-        'Packing lists, training plans and hard-won advice from people who spend 200 days a year at altitude.',
       faq: 'Questions we get every week',
       faqSub: 'If yours is not here, ask — a real person answers within 24 hours.',
       inquiry: 'Tell us what you are dreaming of',
@@ -1499,7 +1496,6 @@ const run = async () => {
       note: 'No payment is taken at this stage. We only ask for a deposit once the itinerary is agreed.',
       viewTrips: 'View all trips',
       viewDestinations: 'All destinations',
-      viewJournal: 'Read the journal',
       statsItems: [
         {
           value: '14',
@@ -1626,19 +1622,13 @@ const run = async () => {
         ],
       },
       {
-        blockType: 'latestPosts',
-        heading: copy.journal,
-        subheading: copy.journalSub,
-        limit: 3,
-        viewAllLink: { label: copy.viewJournal, type: 'custom', url: '/blog' },
-      },
-      {
         blockType: 'faq',
         heading: copy.faq,
         subheading: copy.faqSub,
         items: copy.faqs,
       },
       {
+        // The homepage ends here: the inquiry ("Plan your trip") section is the last block.
         blockType: 'inquiry',
         heading: copy.inquiry,
         subheading: copy.inquirySub,
