@@ -78,25 +78,6 @@ const SOCIAL_ICONS: Record<string, React.ReactNode> = {
 
 const DEFAULT_COLUMNS: { heading: string; links: ResolvedLink[] }[] = [
   {
-    heading: 'Signature Treks',
-    links: [
-      { href: sitePath('/trips/everest-base-camp'), label: 'Everest Base Camp', newTab: false },
-      { href: sitePath('/trips/annapurna-base-camp'), label: 'Annapurna Sanctuary', newTab: false },
-      { href: sitePath('/trips/langtang-valley'), label: 'Langtang & Kyanjin Ri', newTab: false },
-      { href: sitePath('/trips'), label: 'All Expeditions', newTab: false },
-    ],
-  },
-  {
-    heading: 'Mountain Regions',
-    links: [
-      { href: sitePath('/destinations/khumbu'), label: 'Khumbu · Everest', newTab: false },
-      { href: sitePath('/destinations/annapurna'), label: 'Annapurna Massif', newTab: false },
-      { href: sitePath('/destinations/mustang'), label: 'Upper Mustang', newTab: false },
-      { href: sitePath('/destinations/manaslu'), label: 'Manaslu Circuit', newTab: false },
-      { href: sitePath('/destinations'), label: 'All Regions', newTab: false },
-    ],
-  },
-  {
     heading: 'Field & Company',
     links: [
       { href: sitePath('/about'), label: 'About Our Team', newTab: false },
@@ -106,28 +87,11 @@ const DEFAULT_COLUMNS: { heading: string; links: ResolvedLink[] }[] = [
   },
 ]
 
-const TRAIL_STANDARDS = [
-  {
-    code: 'STD-01',
-    title: '100% In-House Guides',
-    detail: 'Salaried Sherpa & local guides on our payroll — never subcontracted.',
-  },
-  {
-    code: 'STD-02',
-    title: '25 kg Porter Ethics Cap',
-    detail: 'Loads weighed at the trailhead with full alpine gear and insurance.',
-  },
-  {
-    code: 'STD-03',
-    title: 'Built-In Weather Buffer',
-    detail: 'Contingency days included in your itinerary — never sold as an extra.',
-  },
-  {
-    code: 'STD-04',
-    title: '24/7 Heli-Rescue Desk',
-    detail: 'Direct satellite telemetry and rapid helicopter evacuation support.',
-  },
-]
+/**
+ * Columns retired from the footer to keep it minimal. They are dropped by heading so the
+ * legacy CMS link columns (`footer.columns`) are pruned exactly like the hardcoded defaults.
+ */
+const RETIRED_COLUMN_HEADINGS = ['signature treks', 'mountain regions']
 
 function KineticFooterLink({ link }: { link: ResolvedLink }) {
   const external = link.newTab ? { target: '_blank', rel: 'noopener noreferrer' } : {}
@@ -178,7 +142,9 @@ export async function Footer() {
     }))
     .filter((column) => column.links.length > 0)
 
-  const baseColumns = cmsColumns.length > 0 ? cmsColumns : DEFAULT_COLUMNS
+  const baseColumns = (cmsColumns.length > 0 ? cmsColumns : DEFAULT_COLUMNS).filter(
+    (column) => !RETIRED_COLUMN_HEADINGS.includes(column.heading.trim().toLowerCase()),
+  )
 
   const contactColumn = {
     heading: dict.footer.contactUs,
@@ -341,22 +307,21 @@ export async function Footer() {
         </section>
 
         {/* ===================================================================
-            TIER 2 — ARCHITECTURAL BENTO MATRIX (BRAND DOSSIER + NAV + STANDARDS)
+            TIER 2 — ARCHITECTURAL BENTO MATRIX (BRAND DOSSIER + NAV)
            =================================================================== */}
         <div className="hg-bento-matrix">
           {/* Left Column: Brand Dossier, Live Kathmandu Clock, Direct Comms */}
           <div className="hg-dossier">
             <div className="hg-brand-block">
               <Link href={sitePath('/')} className="hg-brand-link" aria-label={siteName}>
-                <span className="hg-brand-mark">
-                  <Image
-                    src="/images/logo.svg"
-                    alt=""
-                    width={1297}
-                    height={1212}
-                    className="h-9 w-auto object-contain invert"
-                  />
-                </span>
+                <Image
+                  src="/images/logo.svg"
+                  alt=""
+                  width={1297}
+                  height={1212}
+                  unoptimized
+                  className="hg-brand-logo"
+                />
                 <span className="hg-brand-text">
                   <span className="hg-brand-name">{siteName}</span>
                   <span className="hg-brand-tagline">{tagline}</span>
@@ -446,7 +411,7 @@ export async function Footer() {
             ) : null}
           </div>
 
-          {/* Right Column: Navigation Matrix + 4 Trail Standards */}
+          {/* Right Column: Navigation Matrix */}
           <div className="hg-nav-matrix">
             <nav className="hg-nav-grid" aria-label="Footer navigation">
               {columns.map((column, colIdx) => (
@@ -468,29 +433,6 @@ export async function Footer() {
                 </div>
               ))}
             </nav>
-
-            {/* The Hike Globally Trail Standards Strip */}
-            <div className="hg-standards-section">
-              <div className="hg-standards-header">
-                <span className="hg-standards-eyebrow">
-                  THE HIKE GLOBALLY EXPEDITION PROTOCOL
-                </span>
-                <span className="hg-standards-meta">NEPAL GOVT. LICENSED OPERATOR · EST. 2012</span>
-              </div>
-
-              <div className="hg-standards-grid">
-                {TRAIL_STANDARDS.map((item) => (
-                  <div key={item.code} className="hg-standard-card">
-                    <div className="hg-standard-top">
-                      <span className="hg-standard-code">{item.code}</span>
-                      <span className="hg-standard-dot" aria-hidden="true" />
-                    </div>
-                    <h4 className="hg-standard-title">{item.title}</h4>
-                    <p className="hg-standard-detail">{item.detail}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
 

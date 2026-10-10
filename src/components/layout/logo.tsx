@@ -27,6 +27,9 @@ export function Logo({
         alt=""
         width={1297}
         height={1212}
+        // The mark is an SVG, which Next's image optimizer refuses to serve unless
+        // `dangerouslyAllowSVG` is on — serve it straight from `public/` instead.
+        unoptimized
         className={cn('h-10 w-auto shrink-0 object-contain', variant === 'light' && 'invert')}
         priority
       />
