@@ -41,7 +41,7 @@ export default async function HomePage() {
 
   return (
     <>
-      {page ? <BlockRenderer blocks={page.blocks} /> : <HomeFallback />}
+      {page ? <BlockRenderer blocks={page.blocks} homepage /> : <HomeFallback />}
 
       <JsonLd
         data={[

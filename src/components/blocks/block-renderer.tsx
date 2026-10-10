@@ -21,7 +21,13 @@ type Block = NonNullable<Page['blocks']>[number]
  * block to the CMS produces a TypeScript error here until it has a component — new blocks can
  * never silently render as nothing.
  */
-export async function BlockRenderer({ blocks }: { blocks: Block[] | null | undefined }) {
+export async function BlockRenderer({
+  blocks,
+  homepage = false,
+}: {
+  blocks: Block[] | null | undefined
+  homepage?: boolean
+}) {
   if (!blocks?.length) return null
 
   return (
@@ -31,7 +37,7 @@ export async function BlockRenderer({ blocks }: { blocks: Block[] | null | undef
 
         switch (block.blockType) {
           case 'hero':
-            return <Hero key={key} block={block} />
+            return <Hero key={key} block={block} homepage={homepage} />
           case 'richText':
             return <RichTextSection key={key} block={block} />
           case 'featuredTrips':

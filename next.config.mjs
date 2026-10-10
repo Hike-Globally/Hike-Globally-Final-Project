@@ -35,6 +35,12 @@ const nextConfig = {
       // Amazon S3 / Cloudflare R2 / DigitalOcean Spaces, if you swap the storage adapter
       { protocol: 'https', hostname: '*.r2.cloudflarestorage.com' },
       { protocol: 'https', hostname: '*.amazonaws.com' },
+      // Homepage hero background image
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/photo-1718880474770-1952b4e5f37c',
+      },
     ],
   },
 
