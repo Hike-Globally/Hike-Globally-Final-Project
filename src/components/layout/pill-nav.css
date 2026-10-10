@@ -16,18 +16,14 @@
              bars 18×2 at top 16/22 left 11 · .framer-v-w3tplo expanded 316px
    ========================================================================== */
 
-/* Sticky, in-flow wrapper: reserves its height so content never hides under
-   the floating pill, and keeps the pill pinned while scrolling. */
+/* Sitewide sticky overlay: the zero-height wrapper keeps the nav pinned above
+   the opening section without inserting a separate header band before the hero. */
 .hg-header {
   position: sticky;
   top: 0;
   z-index: 50;
-  pointer-events: none;
-}
-
-/* Homepage: the header takes no vertical space and floats over the full-viewport hero. */
-.hg-header--overlay {
   height: 0;
+  pointer-events: none;
 }
 
 .pn-viewport {
