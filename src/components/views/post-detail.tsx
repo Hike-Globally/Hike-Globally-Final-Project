@@ -79,7 +79,7 @@ export function PostDetail({
         <header className="relative isolate overflow-hidden bg-ink text-mist">
           <TopographicLines />
 
-          <div className="container-content pt-6 md:pt-8">
+          <div className="container-content pt-28 md:pt-32">
             <Breadcrumbs
               className="mb-8 [&_a]:text-mist/65 [&_a:hover]:text-white [&_span]:text-white [&_svg]:text-mist/35"
               items={[
