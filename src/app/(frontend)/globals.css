@@ -255,7 +255,9 @@
     @apply bg-background text-foreground font-sans antialiased;
     /* Archivo Light is the locked body weight. */
     font-weight: 300;
-    font-feature-settings: 'kern' 1, 'liga' 1;
+    font-feature-settings:
+      'kern' 1,
+      'liga' 1;
     text-rendering: optimizeLegibility;
   }
 
@@ -439,6 +441,83 @@
   }
   .prose-hg figcaption {
     @apply mt-3 text-sm text-slate;
+  }
+}
+
+/* ==========================================================================
+   Editorial blog detail — shared by every `/blog/[slug]` page
+   ========================================================================== */
+@layer components {
+  .blog-prose > p:first-child::first-letter {
+    float: left;
+    margin: 0.12em 0.12em 0 0;
+    color: var(--color-deep);
+    font-family: var(--font-heading);
+    font-size: 4.1em;
+    font-weight: 600;
+    line-height: 0.72;
+  }
+
+  .blog-prose h2[id],
+  .blog-prose h3[id] {
+    scroll-margin-top: 8rem;
+  }
+
+  .blog-prose h2[id]::before {
+    display: block;
+    width: 2.25rem;
+    height: 2px;
+    margin-bottom: 1rem;
+    background: linear-gradient(to right, var(--color-deep), var(--color-sage));
+    content: '';
+  }
+
+  .blog-prose blockquote {
+    position: relative;
+    margin-block: 2.5rem;
+    border: 0;
+    border-left: 2px solid var(--color-deep);
+    background: var(--color-sage-20);
+    padding: 1.5rem 1.5rem 1.5rem 2rem;
+    font-family: var(--font-heading);
+    font-size: clamp(1.125rem, 1rem + 0.45vw, 1.375rem);
+    line-height: 1.55;
+  }
+
+  .blog-prose blockquote p {
+    color: var(--color-ink);
+    font-family: var(--font-heading);
+    font-weight: 500;
+  }
+
+  .blog-prose figure > div {
+    box-shadow: 0 1.25rem 3rem rgb(1 22 30 / 9%);
+  }
+
+  .blog-prose figcaption {
+    border-left: 2px solid var(--color-sage);
+    padding-left: 0.875rem;
+    text-align: left;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+
+  .blog-prose hr {
+    height: 1px;
+    border: 0;
+    background: linear-gradient(
+      to right,
+      transparent,
+      var(--color-slate-20) 15%,
+      var(--color-slate-20) 85%,
+      transparent
+    );
+  }
+
+  @media (width >= 1024px) {
+    .blog-prose figure {
+      margin-inline: -2rem;
+    }
   }
 }
 
