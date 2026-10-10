@@ -59,7 +59,12 @@ export function Hero({ block, homepage = false }: { block: HeroBlock; homepage?:
         />
       )}
 
-      <div className="container-content py-24 md:py-28">
+      <div
+        className={cn(
+          'container-content',
+          homepage ? 'pt-24 pb-12 md:pt-28 md:pb-16' : 'py-24 md:py-28',
+        )}
+      >
         <div className="max-w-3xl">
           {block.eyebrow ? (
             <p className={cn('eyebrow mb-5', hasImage ? 'text-sage' : 'text-slate')}>
