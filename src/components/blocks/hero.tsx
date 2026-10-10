@@ -6,6 +6,8 @@ import type { HeroBlock } from '@/payload-types'
 import { resolveLink } from '@/lib/links'
 import { cn } from '@/lib/utils'
 
+import { HomepageHeroBackground } from './hero-background'
+
 const heights: Record<string, string> = {
   full: 'min-h-[100svh]',
   tall: 'min-h-[88svh]',
@@ -18,10 +20,10 @@ const overlays: Record<string, string> = {
   none: 'bg-transparent',
 }
 
-export function Hero({ block }: { block: HeroBlock }) {
+export function Hero({ block, homepage = false }: { block: HeroBlock; homepage?: boolean }) {
   const primary = resolveLink(block.primaryLink)
   const secondary = resolveLink(block.secondaryLink)
-  const hasImage = Boolean(block.backgroundImage)
+  const hasImage = homepage || Boolean(block.backgroundImage)
   const height = heights[block.height ?? 'tall'] ?? heights.tall!
   const overlay = overlays[block.overlay ?? 'medium'] ?? overlays.medium!
 
@@ -33,7 +35,9 @@ export function Hero({ block }: { block: HeroBlock }) {
         hasImage ? 'bg-ink text-mist' : 'bg-mist text-ink',
       )}
     >
-      {block.backgroundImage ? (
+      {homepage ? (
+        <HomepageHeroBackground />
+      ) : block.backgroundImage ? (
         <>
           <PayloadImageFill
             media={block.backgroundImage}

@@ -1,13 +1,13 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 
+import { HomepageHeroBackground } from '@/components/blocks/hero-background'
 import { DestinationCard } from '@/components/cards/destination-card'
 import { PostCard } from '@/components/cards/post-card'
 import { TripCard } from '@/components/cards/trip-card'
 import { Reveal } from '@/components/motion/reveal'
 import { SectionHeading } from '@/components/sections/section-heading'
 import { Button } from '@/components/ui/button'
-import { PayloadImageFill } from '@/components/ui/payload-image'
 import { dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
 import { getFeaturedDestinations, getFeaturedTrips, getPosts, getSettings } from '@/lib/data'
@@ -26,29 +26,10 @@ export async function HomeFallback() {
     getPosts(3),
   ])
 
-  const heroImage = settings.defaultOgImage
-
   return (
     <>
       <section className="relative isolate flex min-h-[88svh] items-center overflow-hidden bg-ink text-mist">
-        {heroImage ? (
-          <>
-            <PayloadImageFill
-              media={heroImage}
-              size="hero"
-              sizes="100vw"
-              priority
-              className="-z-10"
-              imageClassName="object-cover"
-            />
-            <div className="absolute inset-0 -z-10 bg-ink/60" />
-          </>
-        ) : (
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -top-32 right-[-10%] -z-10 size-[32rem] rounded-full bg-sage/25 blur-3xl"
-          />
-        )}
+        <HomepageHeroBackground />
 
         <div className="container-content py-24 md:py-28">
           <div className="max-w-3xl">
