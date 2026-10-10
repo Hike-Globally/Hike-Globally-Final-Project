@@ -32,7 +32,7 @@ export function Hero({ block, homepage = false }: { block: HeroBlock; homepage?:
   return (
     <section
       className={cn(
-        'relative isolate flex items-center overflow-hidden',
+        'relative isolate flex items-end overflow-hidden',
         height,
         hasImage ? 'bg-ink text-mist' : 'bg-mist text-ink',
       )}
