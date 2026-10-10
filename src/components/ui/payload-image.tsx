@@ -44,6 +44,36 @@ const localMediaUrl = (url: string): string => {
 }
 
 /**
+ * Resolves a Media document to a plain `{ src, alt }` pair for contexts that
+ * render their own `<img>` (e.g. the rope carousel, whose cards are animated
+ * outside of next/image). Uses the same "smallest size that still fits"
+ * selection as the components above.
+ */
+export function resolveMediaImage(
+  media: number | Media | null | undefined,
+  size: ImageSize = 'tablet',
+): { src: string; alt: string } | null {
+  if (!media || typeof media === 'number') return null
+
+  const generated = media.sizes ?? {}
+  const candidates: ImageSize[] = [size, ...sizeOrder.filter((entry) => entry !== size)]
+  let url: string | null | undefined
+
+  for (const candidate of candidates) {
+    const entry = generated[candidate]
+    if (entry?.url) {
+      url = entry.url
+      break
+    }
+  }
+
+  url = url ?? media.url
+  if (!url) return null
+
+  return { src: localMediaUrl(url), alt: media.alt ?? '' }
+}
+
+/**
  * Renders a Payload Media document with next/image.
  *
  * - picks the smallest generated size that is still large enough for the requested slot

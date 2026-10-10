@@ -1,19 +1,11 @@
-import { TripCard } from '@/components/cards/trip-card'
-import { Reveal } from '@/components/motion/reveal'
+import { TripsRopeCarousel } from '@/components/cards/trips-rope-carousel'
 import { SectionHeading } from '@/components/sections/section-heading'
 import { sitePath } from '@/i18n/config'
 import { getHomepageTrips } from '@/lib/data'
 import type { TripCard as TripCardData } from '@/lib/data'
 import { resolveLink } from '@/lib/links'
 import { isRenderableTripPick, resolveTripSection } from '@/lib/trip-selection'
-import { cn } from '@/lib/utils'
 import type { FeaturedTripsBlock, Trip } from '@/payload-types'
-
-const columnClass: Record<string, string> = {
-  '2': 'sm:grid-cols-2',
-  '3': 'sm:grid-cols-2 lg:grid-cols-3',
-  '4': 'sm:grid-cols-2 lg:grid-cols-4',
-}
 
 export async function FeaturedTrips({ block }: { block: FeaturedTripsBlock }) {
   const limit = block.limit ?? 3
@@ -45,20 +37,16 @@ export async function FeaturedTrips({ block }: { block: FeaturedTripsBlock }) {
   }
 
   return (
-    <section className="py-16 md:py-24">
+    <section className="overflow-hidden py-16 md:py-24">
       <div className="container-content">
         <SectionHeading title={block.heading} description={block.subheading} action={viewAll} />
-
-        {/* `limit` sizes the automatic list; a manual selection is exactly what the editor picked,
-            so it is allowed to run longer — up to double — rather than silently dropping cards. */}
-        <div className={cn('grid gap-6', columnClass[block.columns ?? '3'] ?? columnClass['3'])}>
-          {trips.slice(0, limit * 2).map((trip, index) => (
-            <Reveal key={trip.id} delay={index * 80}>
-              <TripCard trip={trip} priority={index === 0} />
-            </Reveal>
-          ))}
-        </div>
       </div>
+
+      {/* `limit` sizes the automatic list; a manual selection is exactly what the editor picked,
+          so it is allowed to run longer — up to double — rather than silently dropping cards.
+          The trips ride the rope-curve carousel full-bleed, exactly like the reference
+          animation (`animation.html`). */}
+      <TripsRopeCarousel trips={trips.slice(0, limit * 2)} label={block.heading ?? undefined} />
     </section>
   )
 }

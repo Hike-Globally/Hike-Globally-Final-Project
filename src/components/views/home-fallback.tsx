@@ -5,7 +5,7 @@ import { HomepageHeroBackground } from '@/components/blocks/hero-background'
 import { DestinationCard } from '@/components/cards/destination-card'
 import { DestinationCarousel } from '@/components/cards/destination-carousel'
 import { StoryTiles } from '@/components/blocks/story-tiles'
-import { TripCard } from '@/components/cards/trip-card'
+import { TripsRopeCarousel } from '@/components/cards/trips-rope-carousel'
 import { HeroScrollCover } from '@/components/motion/hero-scroll-cover'
 import { Reveal } from '@/components/motion/reveal'
 import { SectionHeading } from '@/components/sections/section-heading'
@@ -57,21 +57,16 @@ export async function HomeFallback() {
   )
 
   const tripsSection = (
-    <section className="py-16 md:py-24">
+    <section className="overflow-hidden py-16 md:py-24">
       <div className="container-content">
         <SectionHeading
           title={dict.nav.trips}
           description={dict.trips.listingSubtitle}
           action={{ href: sitePath('/trips'), label: dict.common.viewAll }}
         />
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {trips.map((trip, index) => (
-            <Reveal key={trip.id} delay={index * 80}>
-              <TripCard trip={trip} priority={index === 0} />
-            </Reveal>
-          ))}
-        </div>
       </div>
+      {/* Trips hang on the rope-curve carousel — the exact animation from `animation.html`. */}
+      <TripsRopeCarousel trips={trips} label={dict.nav.trips} />
     </section>
   )
 

@@ -1,0 +1,64 @@
+/* ============================================================================
+   Rope Curve Carousel — hover choreography.
+   Lifted 1:1 from the reference build (ropecurvecarousel.framer.website,
+   saved in animation.html at the repo root). Only the class scope id changed
+   (fstR1mlp -> rcc); every property, timing and easing is verbatim.
+   ========================================================================== */
+
+.rcc-face {
+  box-shadow:
+    0 1px 2px rgba(24, 18, 12, 0.063),
+    0 12px 24px -14px rgba(24, 18, 12, 0.234),
+    0 34px 64px -34px rgba(24, 18, 12, 0.27),
+    inset 0 0 0 1px rgba(24, 18, 12, 0.045);
+  transition: box-shadow 0.5s ease;
+}
+.rcc-face:hover {
+  box-shadow:
+    0 1px 2px rgba(24, 18, 12, 0.063),
+    0 12px 24px -14px rgba(24, 18, 12, 0.328),
+    0 34px 64px -34px rgba(24, 18, 12, 0.378),
+    inset 0 0 0 1px rgba(24, 18, 12, 0.045);
+}
+.rcc-face img,
+.rcc-face video {
+  transition: transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.rcc-face:hover img,
+.rcc-face:hover video {
+  transform: scale(1.045);
+}
+.rcc-face:focus-visible {
+  outline: 2px solid rgb(255, 255, 255);
+  outline-offset: 3px;
+}
+.rcc-shade {
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+.rcc-cap {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.4s ease,
+    transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.rcc-face:hover .rcc-shade,
+.rcc-face:focus-visible .rcc-shade {
+  opacity: 1;
+}
+.rcc-face:hover .rcc-cap,
+.rcc-face:focus-visible .rcc-cap {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.05s;
+}
+@media (hover: none) {
+  .rcc-shade {
+    opacity: 1;
+  }
+  .rcc-cap {
+    opacity: 1;
+    transform: none;
+  }
+}
