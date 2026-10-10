@@ -15,6 +15,20 @@ import { Testimonials } from './testimonials'
 
 type Block = NonNullable<Page['blocks']>[number]
 
+/**
+ * Homepage section policy:
+ *  - the blog/journal section (`latestPosts`) never renders on the homepage, and
+ *  - the homepage ends at the inquiry ("Plan your trip") section — anything placed after it in
+ *    the CMS is not rendered here.
+ *
+ * Enforced at render time so the rule holds regardless of what the CMS page contains.
+ */
+function homepageBlocks(blocks: Block[]): Block[] {
+  const withoutBlog = blocks.filter((block) => block.blockType !== 'latestPosts')
+  const inquiryIndex = withoutBlog.findIndex((block) => block.blockType === 'inquiry')
+  return inquiryIndex === -1 ? withoutBlog : withoutBlog.slice(0, inquiryIndex + 1)
+}
+
 function renderBlock(block: Block, index: number, homepage: boolean) {
   const key = `${block.blockType}-${index}`
 
@@ -63,6 +77,9 @@ export async function BlockRenderer({
   if (!blocks?.length) return null
 
   if (homepage) {
+    blocks = homepageBlocks(blocks)
+    if (!blocks.length) return null
+
     const heroIndex = blocks.findIndex((b) => b.blockType === 'hero')
     if (heroIndex !== -1) {
       const heroBlock = blocks[heroIndex]!
