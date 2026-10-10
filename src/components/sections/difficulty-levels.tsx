@@ -14,6 +14,12 @@ import { DIFFICULTY_LEVELS, tripsByDifficultyPath } from '@/lib/difficulty'
  * The track stays a native horizontal scroller: swipe, trackpad, keyboard and the
  * arrow controls all work without introducing a carousel dependency or autoplay.
  *
+ * The track spans the viewport but carries `container-gutter` inline padding, so the first
+ * card starts on the same left line as the heading and description above it while the
+ * remaining cards still slide in from — and out to — the right-hand edge. `scroll-padding`
+ * repeats that gutter, so a card also comes to rest on that line after a swipe instead of
+ * snapping to the viewport edge.
+ *
  * Each card deep-links to `/trips?difficulty=<rung>` so published trips with that
  * CMS difficulty land on the matching listing.
  */
@@ -101,8 +107,7 @@ export function DifficultyLevels() {
           role="region"
           aria-label="Nine hiking difficulty levels"
           tabIndex={0}
-          className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-2 focus-visible:outline-offset-4 sm:gap-5"
-          style={{ paddingInline: 'max(1.5rem, calc((100vw - 80rem) / 2))' }}
+          className="container-gutter no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-2 focus-visible:outline-offset-4 [scroll-padding-inline:var(--container-gutter-offset)] sm:gap-5"
         >
           {DIFFICULTY_LEVELS.map((level, index) => (
             <Link
