@@ -48,7 +48,7 @@ export async function Header() {
 
       <div className="border-b border-black/[0.06] bg-mist/85 backdrop-blur-md supports-[backdrop-filter]:bg-mist/70">
         <div className="container-content flex h-[4.5rem] items-center justify-between gap-6">
-          <Logo name={settings.siteName} logo={settings.logo} tagline={settings.tagline} />
+          <Logo name={settings.siteName} tagline={settings.tagline} />
 
           <nav aria-label="Main" className="hidden lg:block">
             <ul className="flex items-center gap-8">

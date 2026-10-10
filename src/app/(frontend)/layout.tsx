@@ -49,6 +49,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: settings.tagline ?? undefined,
     applicationName: settings.siteName,
+    icons: { icon: '/images/logo.svg' },
     formatDetection: { telephone: false },
     other: {
       'theme-color': '#01161e',

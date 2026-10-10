@@ -48,10 +48,7 @@ export default async function HomePage() {
           organizationJsonLd({
             name: settings.legalName || settings.siteName,
             url: siteUrl,
-            logo:
-              typeof settings.logo === 'object' && settings.logo?.url
-                ? settings.logo.url
-                : undefined,
+            logo: `${siteUrl}/images/logo.svg`,
             email: settings.email,
             phone: settings.phone,
             address: settings.address,

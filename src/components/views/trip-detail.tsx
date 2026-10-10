@@ -54,8 +54,7 @@ const eyebrowOnDark =
 
 function SectionTitle({ title, className }: { title: string; className?: string }) {
   return (
-    <div className={cn('mb-10 flex items-center gap-5', className)}>
-      <span aria-hidden className="h-px w-12 shrink-0 bg-sage md:w-16" />
+    <div className={cn('mb-10', className)}>
       <h2 className="heading-lg">{title}</h2>
     </div>
   )
@@ -374,20 +373,14 @@ export function TripDetail({
             <TripBookingCard trip={trip} dict={dict} bookingHref={bookingHref} />
           </div>
 
-          {/* ---------------- Itinerary (timeline) ---------------- */}
+          {/* ---------------- Itinerary — full-width day cards ---------------- */}
           {trip.itinerary?.length ? (
             <section id="itinerary" className="scroll-mt-24 py-16 md:py-24">
-              <Reveal>
+              <div className="w-full min-w-0">
                 <SectionTitle title={dict.trip.itinerary} />
 
-                <div className="relative">
-                  {/* Vertical timeline rail, behind the day nodes. */}
-                  <span
-                    aria-hidden
-                    className="absolute top-6 bottom-6 left-[1.1rem] w-px bg-gradient-to-b from-sage via-slate-20 to-transparent md:left-[1.35rem]"
-                  />
-
-                  <Accordion type="multiple" className="space-y-4">
+                <div className="w-full min-w-0">
+                  <Accordion type="multiple" className="w-full min-w-0 space-y-4">
                     {trip.itinerary.map((day, index) => {
                       const food =
                         day.food === 'included' || day.food === 'not-included' ? day.food : null
@@ -396,35 +389,27 @@ export function TripDetail({
                         <AccordionItem
                           key={day.id ?? index}
                           value={`day-${day.id ?? index}`}
-                          className="relative border-b-0 pl-12 md:pl-16"
+                          className="w-full min-w-0 border-b-0"
                         >
-                          {/* Timeline node */}
-                          <span
-                            aria-hidden
-                            className="absolute top-7 left-0 grid size-9 place-items-center rounded-full border border-sage/70 bg-white shadow-sm md:size-11"
-                          >
-                            <span className="size-2.5 rounded-full bg-deep" />
-                          </span>
-
                           <div
                             className={cn(
                               surface,
-                              'overflow-hidden px-6 transition-shadow duration-300 data-[state=open]:shadow-[0_1px_2px_rgba(1,22,30,0.04),0_28px_56px_-28px_rgba(1,22,30,0.28)] md:px-8',
+                              'w-full min-w-0 overflow-hidden px-4 sm:px-6 md:px-8 [&_[data-slot=accordion-trigger]]:motion-reduce:transition-none [&_[data-slot=accordion-trigger]_span]:motion-reduce:transition-none [&_[data-slot=accordion-content]]:motion-reduce:animate-none',
                             )}
                           >
-                            <AccordionTrigger className="items-center py-6 hover:no-underline md:py-7">
-                              <span className="min-w-0 text-left font-heading text-base font-semibold text-ink md:text-lg">
+                            <AccordionTrigger className="min-w-0 items-center py-6 hover:no-underline md:py-7">
+                              <span className="min-w-0 break-words text-left font-heading text-base font-semibold text-ink md:text-lg">
                                 {day.title}
                               </span>
                             </AccordionTrigger>
 
                             <AccordionContent>
-                              <p className="max-w-3xl leading-relaxed text-ink-70">
+                              <p className="w-full break-words leading-relaxed text-ink-70">
                                 {day.description}
                               </p>
 
                               {day.accommodation || typeof day.altitude === 'number' || food ? (
-                                <div className="mt-6 grid gap-3 border-t border-black/[0.06] pt-6 sm:grid-cols-2 xl:grid-cols-3">
+                                <div className="mt-6 grid gap-3 border-t border-black/[0.06] pt-6 sm:grid-cols-2 2xl:grid-cols-3">
                                   {day.accommodation ? (
                                     <DayChip
                                       icon={BedDouble}
@@ -460,7 +445,7 @@ export function TripDetail({
                     })}
                   </Accordion>
                 </div>
-              </Reveal>
+              </div>
             </section>
           ) : null}
 

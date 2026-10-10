@@ -21,12 +21,7 @@ export async function Footer() {
       <div className="container-content py-16 md:py-20">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_2fr]">
           <div className="max-w-sm">
-            <Logo
-              name={settings.siteName}
-              logo={settings.logo}
-              tagline={settings.tagline}
-              variant="light"
-            />
+            <Logo name={settings.siteName} tagline={settings.tagline} variant="light" />
             {footer.introduction ? (
               <p className="mt-6 text-[0.9375rem] leading-relaxed text-mist/70">
                 {footer.introduction}
