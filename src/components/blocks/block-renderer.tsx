@@ -1,5 +1,6 @@
 import type { Page } from '@/payload-types'
 import { HeroScrollCover } from '@/components/motion/hero-scroll-cover'
+import { DifficultyLevels } from '@/components/sections/difficulty-levels'
 
 import { Cta } from './cta'
 import { Faq } from './faq'
@@ -85,12 +86,15 @@ export async function BlockRenderer({
       const heroBlock = blocks[heroIndex]!
       const otherBlocks = blocks.filter((_, i) => i !== heroIndex)
 
-      if (heroBlock.blockType === 'hero' && otherBlocks.length > 0) {
-        const firstOtherBlock = otherBlocks[0]!
-        const subsequentBlocks = otherBlocks.slice(1)
-
+      if (heroBlock.blockType === 'hero') {
+        const [firstOtherBlock, ...subsequentBlocks] = otherBlocks
         const heroElement = <Hero block={heroBlock} homepage={true} />
-        const firstSectionElement = renderBlock(firstOtherBlock, 0, false)
+        const firstSectionElement = (
+          <>
+            <DifficultyLevels />
+            {firstOtherBlock ? renderBlock(firstOtherBlock, 0, false) : null}
+          </>
+        )
         const subsequentElements = subsequentBlocks.map((b, i) => renderBlock(b, i + 1, false))
 
         return (
