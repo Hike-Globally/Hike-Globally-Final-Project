@@ -1,0 +1,174 @@
+'use client'
+
+import { useSyncExternalStore, type ReactNode } from 'react'
+import { motion, useScroll, useSpring, useTransform } from 'motion/react'
+
+import { cn } from '@/lib/utils'
+
+interface HeroScrollCoverProps {
+  hero: ReactNode
+  firstSection: ReactNode
+  subsequentSections?: ReactNode
+  className?: string
+}
+
+const emptySubscribe = () => () => {}
+
+function useIsMounted() {
+  return useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  )
+}
+
+function subscribeReducedMotion(callback: () => void) {
+  const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+  mediaQuery.addEventListener('change', callback)
+  return () => mediaQuery.removeEventListener('change', callback)
+}
+
+function getReducedMotionSnapshot() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+function getReducedMotionServerSnapshot() {
+  return false
+}
+
+function subscribeCoverDistance(callback: () => void) {
+  window.addEventListener('resize', callback)
+  return () => window.removeEventListener('resize', callback)
+}
+
+function getCoverDistanceSnapshot() {
+  const h = window.innerHeight - 72
+  return h > 400 ? h : 600
+}
+
+function getCoverDistanceServerSnapshot() {
+  return 700
+}
+
+/**
+ * Sticky hero section with smooth scroll covering animation.
+ *
+ * - The Hero sits static and sticky at `top-[4.5rem]` directly under the header.
+ * - The section after Hero (and subsequent content) rises from below and covers the Hero section.
+ * - While scrolling, the Hero subtly recedes with depth dimming and gentle parallax.
+ * - The section immediately after Hero performs a silky spring-driven entrance animation (translate, scale, opacity).
+ * - Full reduced-motion and SSR-safe fallback support with zero layout shift.
+ */
+export function HeroScrollCover({
+  hero,
+  firstSection,
+  subsequentSections,
+  className,
+}: HeroScrollCoverProps) {
+  const isMounted = useIsMounted()
+  const prefersReducedMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotionSnapshot,
+    getReducedMotionServerSnapshot,
+  )
+  const coverDistance = useSyncExternalStore(
+    subscribeCoverDistance,
+    getCoverDistanceSnapshot,
+    getCoverDistanceServerSnapshot,
+  )
+
+  const { scrollY } = useScroll()
+
+  // Raw scroll progress: 0 when at top of page, 1 when hero is completely covered
+  const scrollProgress = useTransform(scrollY, [0, coverDistance], [0, 1], {
+    clamp: true,
+  })
+
+  // Spring-smoothed progress for organic inertia (complements Lenis)
+  const smoothProgress = useSpring(scrollProgress, {
+    stiffness: 110,
+    damping: 24,
+    mass: 0.8,
+    restDelta: 0.001,
+  })
+
+  // Section after Hero animations
+  const firstSectionY = useTransform(smoothProgress, [0, 0.85, 1], [48, 0, 0])
+  const firstSectionOpacity = useTransform(smoothProgress, [0, 0.3, 0.85, 1], [0.35, 0.75, 1, 1])
+  const firstSectionScale = useTransform(smoothProgress, [0, 0.9, 1], [0.975, 1, 1])
+
+  // Sheet handle bar animation
+  const handleWidth = useTransform(smoothProgress, [0, 0.5, 1], [36, 52, 44])
+  const handleOpacity = useTransform(smoothProgress, [0, 0.3, 0.8, 1], [0.5, 0.9, 0.6, 0.35])
+
+  // Sticky hero depth effects (receding while sitting static and sticky)
+  const heroOverlayOpacity = useTransform(smoothProgress, [0, 0.7, 1], [0, 0.28, 0.42])
+  const heroContentY = useTransform(smoothProgress, [0, 1], [0, -32])
+  const heroContentOpacity = useTransform(smoothProgress, [0, 0.65, 1], [1, 0.6, 0.25])
+  const heroScale = useTransform(smoothProgress, [0, 1], [1, 0.98])
+
+  const enableMotion = isMounted && !prefersReducedMotion
+
+  return (
+    <div className={cn('relative w-full', className)}>
+      {/* Sticky Hero section: stays static and pinned at top-[4.5rem] */}
+      <div className="sticky top-[4.5rem] z-0 h-[calc(100svh-4.5rem)] min-h-[580px] w-full overflow-hidden">
+        <motion.div
+          style={
+            enableMotion
+              ? {
+                  y: heroContentY,
+                  opacity: heroContentOpacity,
+                  scale: heroScale,
+                }
+              : undefined
+          }
+          className="h-full w-full origin-bottom"
+        >
+          {hero}
+        </motion.div>
+
+        {/* Soft darkening veil for physical 3D depth as the next section glides over it */}
+        <motion.div
+          style={enableMotion ? { opacity: heroOverlayOpacity } : undefined}
+          className="pointer-events-none absolute inset-0 bg-ink/40"
+          aria-hidden="true"
+        />
+      </div>
+
+      {/* Covering surface: slides smoothly up and covers the Hero section */}
+      <div className="relative z-10 -mt-6 rounded-t-[2.5rem] border-t border-black/[0.06] bg-background shadow-[0_-25px_60px_-15px_rgba(0,0,0,0.25)] transition-shadow md:rounded-t-[3.5rem]">
+        {/* Subtle grab indicator bar */}
+        <div className="flex justify-center pt-3 pb-1" aria-hidden="true">
+          <motion.div
+            style={
+              enableMotion
+                ? { width: handleWidth, opacity: handleOpacity }
+                : undefined
+            }
+            className="h-1.5 w-11 rounded-full bg-slate-300/80"
+          />
+        </div>
+
+        {/* Section immediately after Hero — with smooth scroll-driven entrance animation */}
+        <motion.div
+          style={
+            enableMotion
+              ? {
+                  y: firstSectionY,
+                  opacity: firstSectionOpacity,
+                  scale: firstSectionScale,
+                }
+              : undefined
+          }
+          className="origin-top"
+        >
+          {firstSection}
+        </motion.div>
+
+        {/* Subsequent sections below (Destinations, Journal, Inquiry...) */}
+        {subsequentSections}
+      </div>
+    </div>
+  )
+}

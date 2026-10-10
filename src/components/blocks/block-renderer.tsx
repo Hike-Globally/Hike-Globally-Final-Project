@@ -1,4 +1,5 @@
 import type { Page } from '@/payload-types'
+import { HeroScrollCover } from '@/components/motion/hero-scroll-cover'
 
 import { Cta } from './cta'
 import { Faq } from './faq'
@@ -13,6 +14,37 @@ import { Stats } from './stats'
 import { Testimonials } from './testimonials'
 
 type Block = NonNullable<Page['blocks']>[number]
+
+function renderBlock(block: Block, index: number, homepage: boolean) {
+  const key = `${block.blockType}-${index}`
+
+  switch (block.blockType) {
+    case 'hero':
+      return <Hero key={key} block={block} homepage={homepage} />
+    case 'richText':
+      return <RichTextSection key={key} block={block} />
+    case 'featuredTrips':
+      return <FeaturedTrips key={key} block={block} />
+    case 'featuredDestinations':
+      return <FeaturedDestinations key={key} block={block} />
+    case 'latestPosts':
+      return <LatestPosts key={key} block={block} />
+    case 'stats':
+      return <Stats key={key} block={block} />
+    case 'gallery':
+      return <Gallery key={key} block={block} />
+    case 'testimonials':
+      return <Testimonials key={key} block={block} />
+    case 'faq':
+      return <Faq key={key} block={block} />
+    case 'inquiry':
+      return <InquirySection key={key} block={block} />
+    case 'cta':
+      return <Cta key={key} block={block} />
+    default:
+      return null
+  }
+}
 
 /**
  * Maps a Payload block to its React component.
@@ -30,38 +62,30 @@ export async function BlockRenderer({
 }) {
   if (!blocks?.length) return null
 
-  return (
-    <>
-      {blocks.map((block, index) => {
-        const key = `${block.blockType}-${index}`
+  if (homepage) {
+    const heroIndex = blocks.findIndex((b) => b.blockType === 'hero')
+    if (heroIndex !== -1) {
+      const heroBlock = blocks[heroIndex]!
+      const otherBlocks = blocks.filter((_, i) => i !== heroIndex)
 
-        switch (block.blockType) {
-          case 'hero':
-            return <Hero key={key} block={block} homepage={homepage} />
-          case 'richText':
-            return <RichTextSection key={key} block={block} />
-          case 'featuredTrips':
-            return <FeaturedTrips key={key} block={block} />
-          case 'featuredDestinations':
-            return <FeaturedDestinations key={key} block={block} />
-          case 'latestPosts':
-            return <LatestPosts key={key} block={block} />
-          case 'stats':
-            return <Stats key={key} block={block} />
-          case 'gallery':
-            return <Gallery key={key} block={block} />
-          case 'testimonials':
-            return <Testimonials key={key} block={block} />
-          case 'faq':
-            return <Faq key={key} block={block} />
-          case 'inquiry':
-            return <InquirySection key={key} block={block} />
-          case 'cta':
-            return <Cta key={key} block={block} />
-          default:
-            return null
-        }
-      })}
-    </>
-  )
+      if (heroBlock.blockType === 'hero' && otherBlocks.length > 0) {
+        const firstOtherBlock = otherBlocks[0]!
+        const subsequentBlocks = otherBlocks.slice(1)
+
+        const heroElement = <Hero block={heroBlock} homepage={true} />
+        const firstSectionElement = renderBlock(firstOtherBlock, 0, false)
+        const subsequentElements = subsequentBlocks.map((b, i) => renderBlock(b, i + 1, false))
+
+        return (
+          <HeroScrollCover
+            hero={heroElement}
+            firstSection={firstSectionElement}
+            subsequentSections={<>{subsequentElements}</>}
+          />
+        )
+      }
+    }
+  }
+
+  return <>{blocks.map((block, index) => renderBlock(block, index, homepage))}</>
 }

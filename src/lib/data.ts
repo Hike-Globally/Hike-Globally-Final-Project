@@ -116,6 +116,189 @@ const defaultSettings: Setting = {
   responseTimeNote: 'We reply to every enquiry within 24 hours.',
 }
 
+export const defaultFeaturedTrips: TripCard[] = [
+  {
+    id: 1,
+    title: 'Everest Base Camp Trek',
+    slug: 'everest-base-camp',
+    summary:
+      'The classic Himalayan journey through the Khumbu valley to the foot of the world’s highest peak.',
+    heroImage: {
+      id: 101,
+      url: '/images/admin/himalaya-01.jpg',
+      alt: 'Everest Base Camp trail with towering snowy peaks',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      createdAt: '2026-01-01T00:00:00.000Z',
+    } as Media,
+    tripType: 'trekking',
+    durationDays: 14,
+    groupSizeMax: 12,
+    maxAltitude: 5364,
+    difficulty: 'challenging',
+    priceFrom: 1850,
+    priceCurrency: 'USD',
+    featured: true,
+    destination: { id: 1, name: 'Khumbu', slug: 'khumbu' },
+  },
+  {
+    id: 2,
+    title: 'Annapurna Base Camp Trek',
+    slug: 'annapurna-base-camp',
+    summary:
+      'Hike into a natural mountain amphitheatre surrounded by ten peaks over 7,000 metres.',
+    heroImage: {
+      id: 102,
+      url: '/images/admin/himalaya-02.jpg',
+      alt: 'Annapurna range sunrise view from base camp',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      createdAt: '2026-01-01T00:00:00.000Z',
+    } as Media,
+    tripType: 'trekking',
+    durationDays: 11,
+    groupSizeMax: 10,
+    maxAltitude: 4130,
+    difficulty: 'moderate',
+    priceFrom: 1350,
+    priceCurrency: 'USD',
+    featured: true,
+    destination: { id: 2, name: 'Annapurna', slug: 'annapurna' },
+  },
+  {
+    id: 3,
+    title: 'Langtang Valley & Kyanjin Ri',
+    slug: 'langtang-valley',
+    summary:
+      'A quieter valley trek close to Kathmandu with sweeping views of the Tibetan border peaks.',
+    heroImage: {
+      id: 103,
+      url: '/images/admin/himalaya-03.jpg',
+      alt: 'Langtang valley trail winding through alpine meadows',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      createdAt: '2026-01-01T00:00:00.000Z',
+    } as Media,
+    tripType: 'trekking',
+    durationDays: 8,
+    groupSizeMax: 10,
+    maxAltitude: 4773,
+    difficulty: 'moderate',
+    priceFrom: 980,
+    priceCurrency: 'USD',
+    featured: true,
+    destination: { id: 3, name: 'Langtang', slug: 'langtang' },
+  },
+]
+
+export const defaultFeaturedDestinations: DestinationCard[] = [
+  {
+    id: 1,
+    name: 'Khumbu',
+    slug: 'khumbu',
+    country: 'Nepal',
+    tagline: 'Home of Everest, sherpa culture and ancient high monasteries.',
+    heroImage: {
+      id: 201,
+      url: '/images/admin/himalaya-01.jpg',
+      alt: 'Khumbu region with snowcapped peaks',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      createdAt: '2026-01-01T00:00:00.000Z',
+    } as Media,
+    region: 'khumbu',
+    featured: true,
+  },
+  {
+    id: 2,
+    name: 'Annapurna',
+    slug: 'annapurna',
+    country: 'Nepal',
+    tagline: 'Lush subtropical foothills leading to soaring glaciated peaks.',
+    heroImage: {
+      id: 202,
+      url: '/images/admin/himalaya-02.jpg',
+      alt: 'Annapurna range massif',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      createdAt: '2026-01-01T00:00:00.000Z',
+    } as Media,
+    region: 'annapurna',
+    featured: true,
+  },
+  {
+    id: 3,
+    name: 'Langtang',
+    slug: 'langtang',
+    country: 'Nepal',
+    tagline: 'Quiet pine forests, yak pastures and rugged border terrain.',
+    heroImage: {
+      id: 203,
+      url: '/images/admin/himalaya-03.jpg',
+      alt: 'Langtang valley alpine trail',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      createdAt: '2026-01-01T00:00:00.000Z',
+    } as Media,
+    region: 'langtang',
+    featured: true,
+  },
+]
+
+export const defaultPosts: PostCard[] = [
+  {
+    id: 1,
+    title: 'How to train for a 5,500 m trek (without a gym membership)',
+    slug: 'training-for-altitude',
+    excerpt:
+      'Cardio, stair climbs and the real secret to altitude stamina: eccentric quad strength and zone 2 pacing.',
+    featuredImage: {
+      id: 301,
+      url: '/images/admin/himalaya-01.jpg',
+      alt: 'Trekker ascending a rocky trail with trekking poles',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      createdAt: '2026-01-01T00:00:00.000Z',
+    } as Media,
+    author: { id: 1, name: 'Dawa Sherpa' },
+    categories: ['trekking-guides'],
+    publishedAt: '2026-01-15T00:00:00.000Z',
+    createdAt: '2026-01-15T00:00:00.000Z',
+    featured: true,
+  },
+  {
+    id: 2,
+    title: 'The honest packing list for the Khumbu in autumn',
+    slug: 'khumbu-packing-list',
+    excerpt:
+      'What you actually need, what the lodge rentals provide, and what you will regret carrying up the Namche hill.',
+    featuredImage: {
+      id: 302,
+      url: '/images/admin/himalaya-02.jpg',
+      alt: 'Backpack and trekking boots laid out on a lodge floor',
+      updatedAt: '2026-02-01T00:00:00.000Z',
+      createdAt: '2026-02-01T00:00:00.000Z',
+    } as Media,
+    author: { id: 2, name: 'Pasang Lhamu' },
+    categories: ['gear'],
+    publishedAt: '2026-02-01T00:00:00.000Z',
+    createdAt: '2026-02-01T00:00:00.000Z',
+    featured: true,
+  },
+  {
+    id: 3,
+    title: 'Altitude sickness: what the guide is watching for',
+    slug: 'altitude-sickness-guide',
+    excerpt:
+      'The subtle early symptoms most trekkers try to hide, when to rest, and when descending is non-negotiable.',
+    featuredImage: {
+      id: 303,
+      url: '/images/admin/himalaya-03.jpg',
+      alt: 'Trekking group resting at high altitude viewing peaks',
+      updatedAt: '2026-02-18T00:00:00.000Z',
+      createdAt: '2026-02-18T00:00:00.000Z',
+    } as Media,
+    author: { id: 1, name: 'Dawa Sherpa' },
+    categories: ['health-safety'],
+    publishedAt: '2026-02-18T00:00:00.000Z',
+    createdAt: '2026-02-18T00:00:00.000Z',
+    featured: true,
+  },
+]
+
 /* -------------------------------------------------------------------------- */
 /* Types describing the *shape* of each query result                            */
 /* -------------------------------------------------------------------------- */
@@ -206,7 +389,7 @@ export const getTrips = (limit = 100): Promise<TripCard[]> =>
       ['trips', String(limit)],
       { tags: [CACHE_TAG.trips], revalidate: REVALIDATE_SECONDS },
     ),
-    [],
+    defaultFeaturedTrips.slice(0, limit),
   )
 
 export const getFeaturedTrips = (limit = 3): Promise<TripCard[]> =>
@@ -228,7 +411,7 @@ export const getFeaturedTrips = (limit = 3): Promise<TripCard[]> =>
       ['trips', 'featured', String(limit)],
       { tags: [CACHE_TAG.trips], revalidate: REVALIDATE_SECONDS },
     ),
-    [],
+    defaultFeaturedTrips.slice(0, limit),
   )
 
 export const getTrip = (slug: string, includeDraft = false): Promise<Trip | null> =>
@@ -374,7 +557,7 @@ export const getDestinations = (limit = 100): Promise<DestinationCard[]> =>
       ['destinations'],
       { tags: [CACHE_TAG.destinations], revalidate: REVALIDATE_SECONDS },
     ),
-    [],
+    defaultFeaturedDestinations.slice(0, limit),
   )
 
 export const getFeaturedDestinations = (limit = 3): Promise<DestinationCard[]> =>
@@ -396,7 +579,7 @@ export const getFeaturedDestinations = (limit = 3): Promise<DestinationCard[]> =
       ['destinations', 'featured', String(limit)],
       { tags: [CACHE_TAG.destinations], revalidate: REVALIDATE_SECONDS },
     ),
-    [],
+    defaultFeaturedDestinations.slice(0, limit),
   )
 
 export const getDestination = (slug: string, includeDraft = false): Promise<Destination | null> =>
@@ -500,7 +683,7 @@ export const getPosts = (limit = 100): Promise<PostCard[]> =>
       ['posts'],
       { tags: [CACHE_TAG.posts], revalidate: REVALIDATE_SECONDS },
     ),
-    [],
+    defaultPosts.slice(0, limit),
   )
 
 export const getFeaturedPosts = (limit = 3): Promise<PostCard[]> =>
@@ -522,7 +705,7 @@ export const getFeaturedPosts = (limit = 3): Promise<PostCard[]> =>
       ['posts', 'featured', String(limit)],
       { tags: [CACHE_TAG.posts], revalidate: REVALIDATE_SECONDS },
     ),
-    [],
+    defaultPosts.slice(0, limit),
   )
 
 export const getPost = (slug: string, includeDraft = false): Promise<Blog | null> =>
