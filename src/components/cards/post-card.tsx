@@ -42,7 +42,7 @@ export function PostCard({
       <Link
         href={href}
         className={cn(
-          'relative block overflow-hidden rounded-2xl bg-mist-60',
+          'relative block overflow-hidden bg-mist-60',
           featured ? 'lg:w-[58%]' : '',
           featured ? 'aspect-[16/10]' : 'aspect-[16/11]',
         )}

@@ -18,9 +18,7 @@ export function Cta({ block }: { block: CtaBlock }) {
   return (
     <section className="py-16 md:py-24">
       <div className="container-content">
-        <div
-          className={`relative overflow-hidden rounded-3xl px-8 py-14 md:px-16 md:py-20 ${variant}`}
-        >
+        <div className={`relative overflow-hidden px-8 py-14 md:px-16 md:py-20 ${variant}`}>
           <div
             aria-hidden
             className="pointer-events-none absolute -top-24 -right-16 size-72 rounded-full bg-white/10 blur-2xl"

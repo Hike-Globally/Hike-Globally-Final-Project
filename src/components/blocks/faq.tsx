@@ -26,7 +26,7 @@ export function Faq({ block }: { block: FaqBlock }) {
 
         <div className="grid gap-10 lg:grid-cols-[1fr_1.6fr]">
           <div className="hidden lg:block">
-            <div className="sticky top-28 rounded-2xl bg-sage-20 p-7">
+            <div className="sticky top-28 bg-sage-20 p-7">
               <p className="eyebrow mb-3 text-deep">{block.heading}</p>
               <p className="text-[0.9375rem] leading-relaxed text-ink-70">
                 {block.subheading ??

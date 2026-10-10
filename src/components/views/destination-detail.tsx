@@ -124,7 +124,7 @@ export function DestinationDetail({
 
           <aside className="space-y-8 lg:sticky lg:top-28 lg:self-start">
             {seasons.length ? (
-              <div className="rounded-2xl bg-sage-20 p-7">
+              <div className="bg-sage-20 p-7">
                 <h2 className="heading-md mb-4 flex items-center gap-2">
                   <Clock className="size-4 text-deep" aria-hidden />
                   {dict.destinations.bestTime}
@@ -142,7 +142,7 @@ export function DestinationDetail({
             {destination.gallery?.length ? (
               <div className="grid grid-cols-2 gap-3">
                 {destination.gallery.slice(0, 4).map((item, index) => (
-                  <div key={item.id ?? index} className="overflow-hidden rounded-xl bg-mist-60">
+                  <div key={item.id ?? index} className="overflow-hidden bg-mist-60">
                     <PayloadImage
                       media={item.image}
                       size="card"

@@ -129,7 +129,7 @@ export async function HomeFallback() {
 
       <section className="py-16 md:py-24">
         <div className="container-content">
-          <div className="relative overflow-hidden rounded-3xl bg-sage px-8 py-14 md:px-16 md:py-20">
+          <div className="relative overflow-hidden bg-sage px-8 py-14 md:px-16 md:py-20">
             <div className="relative max-w-2xl">
               <h2 className="heading-lg text-ink">{dict.inquiry.title}</h2>
               <p className="lead mt-5 text-ink-70">{dict.inquiry.subtitle}</p>

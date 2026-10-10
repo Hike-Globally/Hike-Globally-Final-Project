@@ -56,18 +56,28 @@
   /* --- Motion: one shared easing curve keeps every animation feeling related --- */
   --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
 
-  /* --- shadcn/ui radius scale --- */
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  /* --- Radius scale: the site is square-cornered ---
+     Every step is pinned to 0, so `rounded-xs` … `rounded-4xl` — including the ones the
+     shadcn/ui primitives and any future component emit — render with no radius at all.
+     `rounded-full` is intentionally left alone: it is `calc(infinity * 1px)`, not a token, and
+     the genuinely circular elements (avatars, icon medallions, accordion +/−, list markers,
+     blurred background glows) stay round. */
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
 }
 
 /* ==========================================================================
    shadcn/ui semantic tokens — mapped onto the brand palette
    ========================================================================== */
 :root {
-  --radius: 0.75rem;
+  /* Base radius the shadcn scale derives from — 0, matching the square-cornered theme above. */
+  --radius: 0px;
 
   /* The global site background — pure white. */
   --background: #ffffff;
