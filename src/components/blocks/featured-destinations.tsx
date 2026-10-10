@@ -3,7 +3,7 @@ import { DestinationCarousel } from '@/components/cards/destination-carousel'
 import { Reveal } from '@/components/motion/reveal'
 import { SectionHeading } from '@/components/sections/section-heading'
 import { sitePath } from '@/i18n/config'
-import { getFeaturedDestinations } from '@/lib/data'
+import { getDestinationSlider } from '@/lib/data'
 import type { DestinationCard as DestinationCardData } from '@/lib/data'
 import type { Destination, FeaturedDestinationsBlock } from '@/payload-types'
 import { resolveLink } from '@/lib/links'
@@ -31,7 +31,7 @@ export async function FeaturedDestinations({ block }: { block: FeaturedDestinati
   if (destinations.length === 0) {
     // The slider shows three cards at a time, so `limit` is the size of the whole track —
     // never fewer than 6, otherwise there would be nothing to slide to.
-    destinations = await getFeaturedDestinations(Math.max(block.limit ?? 6, 6))
+    destinations = await getDestinationSlider(Math.max(block.limit ?? 6, 6))
   }
 
   if (destinations.length === 0) return null

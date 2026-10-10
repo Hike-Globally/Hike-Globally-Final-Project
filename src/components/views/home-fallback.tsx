@@ -12,7 +12,7 @@ import { SectionHeading } from '@/components/sections/section-heading'
 import { Button } from '@/components/ui/button'
 import { dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
-import { getFeaturedDestinations, getFeaturedTrips, getPosts, getSettings } from '@/lib/data'
+import { getDestinationSlider, getFeaturedTrips, getPosts, getSettings } from '@/lib/data'
 
 /**
  * Rendered when no page with the slug `home` exists in Payload yet.
@@ -25,7 +25,7 @@ export async function HomeFallback() {
     getSettings(),
     getFeaturedTrips(3),
     // Three destination cards are visible at a time; the rest are reached with the arrows.
-    getFeaturedDestinations(6),
+    getDestinationSlider(6),
     getPosts(3),
   ])
 

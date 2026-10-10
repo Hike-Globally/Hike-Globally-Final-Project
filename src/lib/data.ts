@@ -592,6 +592,35 @@ export const getDestinations = (limit = 100): Promise<DestinationCard[]> =>
     defaultFeaturedDestinations.slice(0, limit),
   )
 
+/**
+ * Destinations for the homepage slider.
+ *
+ * Every published destination goes in, featured ones first and then alphabetically — so the
+ * slider always has something to slide to, even when only a couple of regions are flagged as
+ * featured. `limit` caps the size of the track; three cards are visible at a time.
+ */
+export const getDestinationSlider = (limit = 6): Promise<DestinationCard[]> =>
+  safeQuery(
+    unstable_cache(
+      async () => {
+        const payload = await getPayloadClient()
+        const result = await payload.find({
+          collection: 'destinations',
+          locale: SITE_LOCALE,
+          depth: 1,
+          limit,
+          sort: ['-featured', 'name'],
+          where: { _status: { equals: 'published' } },
+          select: destinationCardSelect,
+        })
+        return result.docs as unknown as DestinationCard[]
+      },
+      ['destinations', 'slider', String(limit)],
+      { tags: [CACHE_TAG.destinations], revalidate: REVALIDATE_SECONDS },
+    ),
+    defaultFeaturedDestinations.slice(0, limit),
+  )
+
 export const getFeaturedDestinations = (limit = 3): Promise<DestinationCard[]> =>
   safeQuery(
     unstable_cache(
