@@ -17,7 +17,11 @@ export const FeaturedTrips: Block = {
         { label: 'Show featured trips automatically', value: 'featured' },
         { label: 'Pick specific trips', value: 'manual' },
       ],
-      admin: { layout: 'vertical' },
+      admin: {
+        layout: 'vertical',
+        description:
+          'Automatically means trips ticked “Featured” on their trip; if none are ticked yet, the newest published trips are shown instead.',
+      },
     },
     {
       name: 'trips',

@@ -12,7 +12,7 @@ import { SectionHeading } from '@/components/sections/section-heading'
 import { Button } from '@/components/ui/button'
 import { dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
-import { getDestinationSlider, getFeaturedTrips, getPosts, getSettings } from '@/lib/data'
+import { getDestinationSlider, getHomepageTrips, getPosts, getSettings } from '@/lib/data'
 
 /**
  * Rendered when no page with the slug `home` exists in Payload yet.
@@ -23,7 +23,9 @@ export async function HomeFallback() {
   const dict = dictionary
   const [settings, trips, destinations, posts] = await Promise.all([
     getSettings(),
-    getFeaturedTrips(3),
+    // Same rules as the CMS block: featured trips first, newest published ones if nothing is
+    // flagged, so the homepage never loses this section over a missing checkbox.
+    getHomepageTrips(3),
     // Three destination cards are visible at a time; the rest are reached with the arrows.
     getDestinationSlider(6),
     getPosts(3),
