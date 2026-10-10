@@ -426,7 +426,8 @@ export const Trips: CollectionConfig = {
           type: 'checkbox',
           defaultValue: false,
           admin: {
-            description: 'Featured trips surface on the homepage and are pinned first on /trips.',
+            description:
+              'Pinned first on /trips and picked by the homepage "Featured trips" section. With none ticked, the homepage falls back to the newest published trips rather than hiding the section.',
           },
         },
       ],

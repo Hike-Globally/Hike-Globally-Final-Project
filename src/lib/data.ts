@@ -15,6 +15,7 @@ import type {
   User,
 } from '@/payload-types'
 import { getPayloadClient, isDatabaseConfigured } from './payload'
+import { pickAutomaticTrips } from './trip-selection'
 
 /**
  * ============================================================================
@@ -441,6 +442,55 @@ export const getFeaturedTrips = (limit = 3): Promise<TripCard[]> =>
         return result.docs as unknown as TripCard[]
       },
       ['trips', 'featured', String(limit)],
+      { tags: [CACHE_TAG.trips], revalidate: REVALIDATE_SECONDS },
+    ),
+    defaultFeaturedTrips.slice(0, limit),
+  )
+
+/**
+ * The trips the homepage "Featured trips" section renders: featured ones, or — when nothing is
+ * flagged — the newest published ones.
+ *
+ * Why the second read exists: a block whose list comes back empty renders `null`, so a featured-only
+ * query silently deletes the section from the homepage the moment an editor publishes trips without
+ * ticking the "Featured" checkbox (and `safeQuery`'s fallback list cannot help, because a query that
+ * succeeds with zero rows is not an error). Falling back to published trips keeps the section on the
+ * page without inventing content; if the site has no published trip at all the list stays empty and
+ * the section correctly hides. Precedence lives in `src/lib/trip-selection.ts`, which `npm test`
+ * covers.
+ */
+export const getHomepageTrips = (limit = 3): Promise<TripCard[]> =>
+  safeQuery(
+    unstable_cache(
+      async () => {
+        const payload = await getPayloadClient()
+        const publishedOnly: Where = { _status: { equals: 'published' } }
+        const read = { collection: 'trips', locale: SITE_LOCALE, depth: 1, limit } as const
+
+        // Both tiers are read at once instead of falling back after the first one comes back
+        // empty: the extra query is parallel, so a cache miss costs no more latency, and the
+        // fallback is part of the contract rather than an error path.
+        const [featured, latest] = await Promise.all([
+          payload.find({
+            ...read,
+            sort: '-featured',
+            where: { and: [publishedOnly, { featured: { equals: true } }] },
+            select: tripCardSelect,
+          }),
+          payload.find({
+            ...read,
+            sort: '-createdAt',
+            where: publishedOnly,
+            select: tripCardSelect,
+          }),
+        ])
+
+        return pickAutomaticTrips(
+          featured.docs as unknown as TripCard[],
+          latest.docs as unknown as TripCard[],
+        )
+      },
+      ['trips', 'homepage', String(limit)],
       { tags: [CACHE_TAG.trips], revalidate: REVALIDATE_SECONDS },
     ),
     defaultFeaturedTrips.slice(0, limit),
