@@ -37,9 +37,6 @@ import { cn } from '@/lib/utils'
 import { breadcrumbJsonLd, faqJsonLd, touristTripJsonLd } from '@/lib/seo'
 import type { Trip } from '@/payload-types'
 
-type Food = 'included' | 'not-included'
-type FoodSummary = Food | 'partial' | null
-
 /* ----------------------------------------------------------------------------
    Shared styling
    ---------------------------------------------------------------------------- */
@@ -68,28 +65,6 @@ const capitalise = (value: string) => `${value.charAt(0).toUpperCase()}${value.s
 
 function difficultyLabel(difficulty: string, dict: Dictionary): string {
   return dict.trips[`difficulty${capitalise(difficulty)}` as keyof typeof dict.trips] ?? difficulty
-}
-
-/**
- * One food answer for the whole trip, from the per-day values:
- * every day included → included, none → not included, a mix → partly. No answers → null.
- */
-function summariseFood(itinerary: Trip['itinerary']): FoodSummary {
-  const answers = (itinerary ?? [])
-    .map((day) => day.food)
-    .filter((food): food is Food => food === 'included' || food === 'not-included')
-
-  if (!answers.length) return null
-  if (answers.every((food) => food === 'included')) return 'included'
-  if (answers.every((food) => food === 'not-included')) return 'not-included'
-  return 'partial'
-}
-
-const foodText = (food: FoodSummary, dict: Dictionary): string => {
-  if (food === 'included') return dict.trip.foodIncluded
-  if (food === 'not-included') return dict.trip.foodNotIncluded
-  if (food === 'partial') return dict.trip.foodPartial
-  return '—'
 }
 
 /* ----------------------------------------------------------------------------
@@ -236,8 +211,6 @@ export function TripDetail({
   const destination =
     trip.destination && typeof trip.destination !== 'number' ? trip.destination : null
 
-  const foodSummary = summariseFood(trip.itinerary)
-
   /* "Trip at a glance" dashboard — shown inside the hero. */
   const facts: { icon: LucideIcon; label: string; value: string }[] = [
     { icon: Clock, label: dict.trip.duration, value: `${trip.durationDays} ${dict.common.days}` },
@@ -251,7 +224,6 @@ export function TripDetail({
           value: `${formatNumber(trip.maxAltitude)} m`,
         }
       : null,
-    { icon: Utensils, label: dict.trip.food, value: foodText(foodSummary, dict) },
     { icon: MapPin, label: dict.trip.destination, value: destination?.name ?? '—' },
   ].filter((fact): fact is NonNullable<typeof fact> => fact !== null)
 
@@ -311,7 +283,7 @@ export function TripDetail({
           </div>
 
           {/* Glass dashboard. A 1px gap over a tinted background draws the grid lines. */}
-          <dl className="mt-14 grid grid-cols-2 gap-px overflow-hidden rounded-3xl bg-white/10 ring-1 ring-white/10 backdrop-blur-xl md:grid-cols-5">
+          <dl className="mt-14 grid grid-cols-2 gap-px overflow-hidden rounded-3xl bg-white/10 ring-1 ring-white/10 backdrop-blur-xl md:grid-cols-4">
             {facts.map((fact) => (
               <div
                 key={fact.label}

@@ -11,7 +11,10 @@
      #124559  deep   deep teal        — primary brand, buttons, links
      #598392  slate  muted blue       — secondary UI, rules, meta text
      #aec3b0  sage   soft green       — accents, highlights, light sections
-     #f8f9fa  mist   off-white        — page background
+     #f8f9fa  mist   off-white        — section tints, image placeholders
+
+   The global page background (--background) is pure white, #ffffff — the five brand
+   colours above are unchanged.
 
    Typography:
      Headings — Google Sans Flex, 600 (variable, self-hosted)
@@ -66,7 +69,8 @@
 :root {
   --radius: 0.75rem;
 
-  --background: #f8f9fa;
+  /* The global site background — pure white. */
+  --background: #ffffff;
   --foreground: #01161e;
 
   --card: #ffffff;
