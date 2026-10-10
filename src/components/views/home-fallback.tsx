@@ -8,6 +8,7 @@ import { StoryTiles } from '@/components/blocks/story-tiles'
 import { TripsRopeCarousel } from '@/components/cards/trips-rope-carousel'
 import { HeroScrollCover } from '@/components/motion/hero-scroll-cover'
 import { Reveal } from '@/components/motion/reveal'
+import { DifficultyLevels } from '@/components/sections/difficulty-levels'
 import { SectionHeading } from '@/components/sections/section-heading'
 import { Button } from '@/components/ui/button'
 import { dictionary } from '@/i18n/dictionaries'
@@ -132,8 +133,13 @@ export async function HomeFallback() {
   return (
     <HeroScrollCover
       hero={heroSection}
-      firstSection={firstSection}
-      subsequentSections={subsequentSections}
+      firstSection={<DifficultyLevels />}
+      subsequentSections={
+        <>
+          {firstSection}
+          {subsequentSections}
+        </>
+      }
     />
   )
 }
