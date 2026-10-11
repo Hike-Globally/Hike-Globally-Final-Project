@@ -122,6 +122,9 @@
   --sidebar-accent-foreground: #01161e;
   --sidebar-border: #dde3e4;
   --sidebar-ring: #598392;
+
+  /* Shared responsive type scale for short-form descriptions, reduced 2px from the original lead scale. */
+  --font-size-description: clamp(0.9375rem, 0.875rem + 0.35vw, 1.125rem);
 }
 
 /* Dark palette is defined so flipping next-themes to dark never produces an
@@ -371,8 +374,12 @@
   font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.6rem);
 }
 
+@utility description-copy {
+  font-size: var(--font-size-description);
+}
+
 @utility lead {
-  font-size: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+  font-size: var(--font-size-description);
   line-height: 1.65;
   font-weight: 300;
   color: var(--color-ink-60);

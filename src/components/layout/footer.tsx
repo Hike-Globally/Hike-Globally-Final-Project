@@ -247,7 +247,7 @@ export async function Footer() {
       <div className="mt-14 grid gap-12 px-5 sm:px-8 md:mt-24 lg:grid-cols-12 lg:gap-8">
         <div className="lg:col-span-5 xl:col-span-4">
           <h3 className="font-heading text-xs font-semibold text-white">{dict.footer.about}</h3>
-          <p className="mt-4 max-w-[34ch] text-xs leading-relaxed text-mist/90">{introduction}</p>
+          <p className="mt-4 max-w-[34ch] description-copy leading-relaxed text-mist/90">{introduction}</p>
           <div className="mt-8 flex gap-2.5">
             {socials.map((social) => (
               <a
