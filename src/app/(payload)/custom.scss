@@ -1867,49 +1867,6 @@ body {
   border-color: #c2d3c6;
 }
 
-/* Make the Trips collection's primary task unmistakable. Payload renders its default
-   "Create New" action as a small, low-contrast pill, so give it the same clear weight as
-   the workspace's primary actions without changing the other collection lists. */
-.template-default .collection-list--trips .list-create-new-doc__create-new-button {
-  display: inline-flex;
-  min-width: 128px;
-  min-height: 44px;
-  align-items: center;
-  justify-content: center;
-  padding: 0 18px;
-  border: 1px solid #174d42;
-  border-radius: 10px;
-  background-color: #174d42;
-  box-shadow: 0 5px 14px rgb(23 77 66 / 18%);
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.2;
-  text-decoration: none;
-  transition:
-    transform 160ms ease,
-    box-shadow 160ms ease,
-    background-color 160ms ease,
-    border-color 160ms ease;
-}
-
-.template-default .collection-list--trips .list-create-new-doc__create-new-button:hover {
-  transform: translateY(-1px);
-  border-color: #103f36;
-  background-color: #103f36;
-  box-shadow: 0 8px 18px rgb(23 77 66 / 24%);
-  color: #ffffff;
-}
-
-.template-default .collection-list--trips .list-create-new-doc__create-new-button:focus-visible {
-  outline: 3px solid #527f60;
-  outline-offset: 3px;
-}
-
-.template-default .collection-list--trips .list-create-new-doc__create-new-button:active {
-  transform: translateY(0);
-}
-
 /* Dashboard content container */
 .hg-dashboard {
   box-sizing: border-box;
