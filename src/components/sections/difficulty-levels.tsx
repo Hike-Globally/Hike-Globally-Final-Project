@@ -76,12 +76,17 @@ export function DifficultyLevels() {
           <p className="eyebrow mb-3">Find your level</p>
           <h2
             id="difficulty-heading"
-            className="font-heading text-[clamp(1.15rem,1.5vw,1.55rem)] leading-tight font-semibold tracking-[0.045em] text-ink uppercase"
+            className="font-heading text-[clamp(1.65rem,calc(0.5rem_+_1.5vw),2.05rem)] leading-tight font-semibold tracking-[0.045em] text-ink uppercase"
           >
             Different levels, all epic adventures
           </h2>
           <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-            <p className="max-w-2xl description-copy leading-relaxed text-ink-60">
+            {/* `description-copy` sets the shared scale; the inline override drops this
+                one line by exactly 2px while keeping it on the responsive clamp. */}
+            <p
+              className="max-w-2xl description-copy leading-relaxed text-ink-60"
+              style={{ fontSize: 'calc(var(--font-size-description) - 2px)' }}
+            >
               Find your match — from gentle days out to high-altitude challenges.
             </p>
             <span className="hidden text-slate/60 sm:inline" aria-hidden="true">
