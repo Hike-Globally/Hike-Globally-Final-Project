@@ -14,6 +14,15 @@ import { breadcrumbJsonLd, buildMetadata } from '@/lib/seo'
 
 export const revalidate = 3600
 
+/**
+ * Full-bleed background for the atlas hero.
+ *
+ * Deliberately bundled with the site instead of pulled from a destination document: the hero
+ * is the masthead of the whole listing, so it must look the same whether one region or twenty
+ * are published — and it keeps every destination photo available for its own card below.
+ */
+const DESTINATIONS_HERO_IMAGE = '/images/destinations/hero.jpg'
+
 export async function generateMetadata(): Promise<Metadata> {
   const dict = dictionary
 
@@ -28,69 +37,75 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function DestinationsPage() {
   const dict = dictionary
   const destinations = await getDestinations()
-  const [featuredDestination, ...otherDestinations] = destinations
   const destinationCount = String(destinations.length).padStart(2, '0')
 
   return (
     <>
-      <section className="relative isolate overflow-hidden bg-ink text-mist">
+      {/* HERO — full-width banner. Every destination (the featured one included) now appears in
+          the atlas grid below, so the hero stands on its own image rather than on a card. */}
+      <section className="relative isolate flex min-h-[78svh] items-end overflow-hidden bg-ink text-mist">
+        <Image
+          src={DESTINATIONS_HERO_IMAGE}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          aria-hidden="true"
+          className="-z-20 object-cover"
+        />
         <div
-          className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_70%_42%,rgba(18,69,89,0.58),transparent_62%)]"
+          className="absolute inset-0 -z-10 bg-gradient-to-t from-ink/95 via-ink/55 to-ink/35"
           aria-hidden="true"
         />
-        <div className="container-content relative grid min-h-[720px] items-center gap-12 pt-32 pb-12 sm:min-h-[760px] lg:grid-cols-[0.9fr_1fr] lg:gap-16 lg:pt-32 lg:pb-16">
-          <div className="max-w-xl">
-            <Breadcrumbs
-              items={[
-                { label: dict.nav.home, href: sitePath('/') },
-                { label: dict.nav.destinations },
-              ]}
-            />
 
-            <p className="eyebrow mt-10 text-sage">The destination atlas · Nepal</p>
-            <h1 className="heading-display mt-5 text-white">
-              <span className="block">The Himalaya,</span>
-              <span className="block text-sage">in all its scale.</span>
-            </h1>
-            <p className="lead mt-6 max-w-xl text-mist/75">{dict.destinations.listingSubtitle}</p>
+        <div className="container-content relative w-full pt-32 pb-14 md:pb-20">
+          <Breadcrumbs
+            items={[
+              { label: dict.nav.home, href: sitePath('/') },
+              { label: dict.nav.destinations },
+            ]}
+          />
 
-            <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4">
-              <Link
-                href="#regions"
-                className="group inline-flex items-center gap-3 border-b border-sage/70 pb-2 text-sm font-medium text-white transition-colors hover:border-white"
-              >
-                Explore the atlas
-                <ArrowDown
-                  className="size-4 transition-transform duration-300 group-hover:translate-y-1"
-                  aria-hidden="true"
-                />
-              </Link>
-              <span className="text-sm text-mist/55">
-                Led by people who call these mountains home.
-              </span>
-            </div>
+          <p className="eyebrow mt-10 text-sage">The destination atlas · Nepal</p>
+          <h1 className="heading-display mt-5 max-w-3xl text-white">
+            The Himalaya, <span className="text-sage">in all its scale.</span>
+          </h1>
+          <p className="lead mt-6 max-w-2xl text-mist/80">{dict.destinations.listingSubtitle}</p>
 
-            <div className="mt-12 grid max-w-md grid-cols-2 gap-6 border-t border-white/15 pt-5">
-              <div>
-                <p className="text-[0.65rem] font-semibold tracking-[0.18em] text-sage uppercase">
-                  Places on the map
-                </p>
-                <p className="mt-2 font-heading text-3xl font-semibold text-white">
-                  {destinationCount}
-                </p>
-              </div>
-              <div>
-                <p className="text-[0.65rem] font-semibold tracking-[0.18em] text-sage uppercase">
-                  A different kind of trip
-                </p>
-                <p className="mt-2 max-w-[15rem] text-sm leading-relaxed text-mist/75">
-                  Planned on the ground, around you.
-                </p>
-              </div>
-            </div>
+          <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4">
+            <Link
+              href="#regions"
+              className="group inline-flex items-center gap-3 border-b border-sage/70 pb-2 text-sm font-medium text-white transition-colors hover:border-white"
+            >
+              Explore the atlas
+              <ArrowDown
+                className="size-4 transition-transform duration-300 group-hover:translate-y-1"
+                aria-hidden="true"
+              />
+            </Link>
+            <span className="text-sm text-mist/70">
+              Led by people who call these mountains home.
+            </span>
           </div>
 
-          <FeatureDestination destination={featuredDestination} count={destinationCount} />
+          <div className="mt-12 grid max-w-2xl grid-cols-2 gap-6 border-t border-white/15 pt-5">
+            <div>
+              <p className="text-[0.65rem] font-semibold tracking-[0.18em] text-sage uppercase">
+                Places on the map
+              </p>
+              <p className="mt-2 font-heading text-3xl font-semibold text-white">
+                {destinationCount}
+              </p>
+            </div>
+            <div>
+              <p className="text-[0.65rem] font-semibold tracking-[0.18em] text-sage uppercase">
+                A different kind of trip
+              </p>
+              <p className="mt-2 max-w-[15rem] text-sm leading-relaxed text-mist/75">
+                Planned on the ground, around you.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -121,19 +136,14 @@ export default async function DestinationsPage() {
                 Plan a trip with us <ArrowRight className="size-4" aria-hidden="true" />
               </Link>
             </div>
-          ) : otherDestinations.length > 0 ? (
+          ) : (
             <div className="mt-10 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:mt-12 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-16">
-              {otherDestinations.map((destination, index) => (
+              {destinations.map((destination, index) => (
                 <Reveal key={destination.id} delay={index * 70}>
-                  <AtlasCard destination={destination} index={index + 1} />
+                  <AtlasCard destination={destination} index={index} />
                 </Reveal>
               ))}
             </div>
-          ) : (
-            <p className="mt-8 text-sm text-ink-60">
-              Explore the featured region above, or get in touch and we will help you find your next
-              trail.
-            </p>
           )}
         </div>
       </section>
@@ -168,73 +178,6 @@ export default async function DestinationsPage() {
         ])}
       />
     </>
-  )
-}
-
-function FeatureDestination({
-  destination,
-  count,
-}: {
-  destination?: DestinationCard
-  count: string
-}) {
-  if (!destination) {
-    return (
-      <div className="relative isolate min-h-[460px] overflow-hidden bg-deep sm:min-h-[560px] lg:h-[640px] lg:min-h-0">
-        <Image
-          src="/images/admin/himalaya-03.jpg"
-          alt=""
-          fill
-          priority
-          sizes="(min-width: 1024px) 48vw, 92vw"
-          className="-z-20 object-cover"
-          aria-hidden="true"
-        />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-ink/90 via-ink/15 to-ink/10" />
-        <div className="absolute inset-x-0 bottom-0 p-6 sm:p-9">
-          <p className="eyebrow text-sage">The mountains are waiting</p>
-          <h2 className="heading-lg mt-3 max-w-md text-white">Your next story starts here.</h2>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <article className="group relative isolate min-h-[460px] overflow-hidden bg-deep sm:min-h-[560px] lg:h-[640px] lg:min-h-0">
-      <Link
-        href={sitePath(`/destinations/${destination.slug}`)}
-        aria-label={`Explore ${destination.name}`}
-        className="absolute inset-0 z-10 focus-visible:outline-offset-[-5px]"
-      />
-      <PayloadImageFill
-        media={destination.heroImage}
-        size="hero"
-        sizes="(min-width: 1024px) 48vw, 92vw"
-        priority
-        className="-z-20 object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
-      />
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-t from-ink/90 via-ink/15 to-ink/10" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between p-5 sm:p-7">
-        <span className="text-[0.65rem] font-semibold tracking-[0.18em] text-white/85 uppercase">
-          A place to begin
-        </span>
-        <span className="text-[0.65rem] font-semibold tracking-[0.16em] text-white/85 tabular-nums">
-          01 / {count}
-        </span>
-      </div>
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 p-6 sm:p-9">
-        <p className="eyebrow text-sage">{regionName(destination.region)}</p>
-        <h2 className="heading-lg mt-2 text-white">{destination.name}</h2>
-        {destination.tagline ? (
-          <p className="mt-3 max-w-md text-[0.95rem] leading-relaxed text-white/80">
-            {destination.tagline}
-          </p>
-        ) : null}
-        <span className="mt-6 inline-flex size-11 items-center justify-center border border-white/60 text-white transition-colors duration-300 group-hover:border-sage group-hover:bg-sage group-hover:text-ink">
-          <ArrowUpRight className="size-5" aria-hidden="true" />
-        </span>
-      </div>
-    </article>
   )
 }
 
