@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { MapPin } from 'lucide-react'
 
 import { dictionary, t } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
@@ -14,11 +13,11 @@ import './footer.css'
  * rendered once from the root layout so it is the global, sitewide footer.
  *
  * Content still comes from the `footer` + `settings` Payload globals:
- *   • introduction   → the "About" statement under the wordmark
+ *   • introduction   → the "About" statement
  *   • columns        → the sitemap-style link columns
  *   • legalLinks     → the legal column
  *   • copyright      → bottom-left line (`{year}` is interpolated)
- *   • settings       → wordmark text, socials, contact column, location
+ *   • settings       → socials and contact details
  */
 
 type SocialPlatform = NonNullable<Setting['socials']>[number]['platform']
@@ -219,35 +218,15 @@ export async function Footer() {
     year,
     site: settings.siteName,
   })
-  const location = settings.address ?? dict.footer.locationFallback
-
   return (
     <footer className="hg-footer" aria-label={dict.footer.label}>
-      {/* 1 — the giant edge-to-edge wordmark */}
-      <div className="pt-8 pl-[var(--page-gutter-left,1rem)] pr-[var(--page-gutter-right,1rem)] md:pt-12">
-        <svg
-          viewBox="0 0 780 78"
-          className="hg-footer__wordmark"
-          role="img"
-          aria-label={settings.siteName}
-        >
-          <text
-            x="0"
-            y="74"
-            textLength="780"
-            lengthAdjust="spacingAndGlyphs"
-            className="hg-footer__wordmark-text"
-          >
-            {settings.siteName.toUpperCase()}
-          </text>
-        </svg>
-      </div>
-
-      {/* 2 — about + social chips on the left, link columns on the right */}
-      <div className="mt-14 grid gap-12 pl-[var(--page-gutter-left,1rem)] pr-[var(--page-gutter-right,1rem)] md:mt-24 lg:grid-cols-12 lg:gap-8">
+      {/* About + social chips on the left, link columns on the right */}
+      <div className="grid gap-12 pl-[var(--page-gutter-left,1rem)] pr-[var(--page-gutter-right,1rem)] pt-12 md:pt-16 lg:grid-cols-12 lg:gap-8">
         <div className="lg:col-span-5 xl:col-span-4">
           <h3 className="font-heading text-sm font-semibold text-white">{dict.footer.about}</h3>
-          <p className="mt-4 max-w-[34ch] description-copy leading-relaxed text-mist/90">{introduction}</p>
+          <p className="hg-footer__description mt-4 max-w-[34ch] leading-relaxed text-mist/90">
+            {introduction}
+          </p>
           <div className="mt-8 flex flex-wrap gap-2.5">
             {socials.map((social) => (
               <a
@@ -273,12 +252,19 @@ export async function Footer() {
         </div>
       </div>
 
-      {/* 3 — copyright left, location right, pinned to the very bottom */}
+      {/* Copyright left, creator credit right, pinned to the very bottom */}
       <div className="mt-16 flex flex-col gap-3 pb-6 pl-[var(--page-gutter-left,1rem)] pr-[var(--page-gutter-right,1rem)] sm:flex-row sm:items-center sm:justify-between md:mt-24">
         <p className="text-[11px] leading-snug text-mist/80">{copyright}</p>
-        <p className="flex min-w-0 items-center gap-1.5 text-[11px] leading-snug text-mist/80">
-          <MapPin size={12} strokeWidth={2} aria-hidden="true" />
-          {location}
+        <p className="text-[11px] leading-snug text-mist/80">
+          Made with ❤️ by{' '}
+          <a
+            href="https://growlithacademy.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline-offset-4 transition-colors hover:text-white hover:underline"
+          >
+            Growlith Academy
+          </a>
         </p>
       </div>
     </footer>

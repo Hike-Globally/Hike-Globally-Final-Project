@@ -1766,7 +1766,13 @@ const run = async () => {
           link: { label: 'Trips', type: 'custom', url: '/trips' },
           children: [
             { link: { label: 'All trips', type: 'custom', url: '/trips' } },
-            { link: { label: 'Everest region', type: 'custom', url: '/trips?region=khumbu-everest' } },
+            {
+              link: {
+                label: 'Everest region',
+                type: 'custom',
+                url: '/trips?region=khumbu-everest',
+              },
+            },
             { link: { label: 'Annapurna region', type: 'custom', url: '/trips?region=annapurna' } },
           ],
         },
@@ -1790,7 +1796,7 @@ const run = async () => {
 
     data: {
       introduction:
-        'A Kathmandu- and Pokhara-based trekking operator. Fourteen years, thirty people, one country we know properly.',
+        'Hike Globally offers curated travel packages and unforgettable adventures, helping you explore breathtaking destinations and create memories that last a lifetime.',
       columns: [
         {
           heading: 'Trips',
