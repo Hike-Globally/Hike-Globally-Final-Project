@@ -115,6 +115,35 @@ queries and a missing key is a _build_ error.
 bookmarks and search results keep working. It also normalises Payload's same-origin
 authentication headers for `/admin` and `/api` (see the comment in the file).
 
+### 4.1 Admin → storefront
+
+Editors work in `/admin` but are publishing to `/trips`, `/blog` and the rest of the public site,
+so each content collection carries two ways across that boundary:
+
+| Where                        | Control                          | Opens                                                                                                             |
+| ---------------------------- | -------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| List view, per row           | the **Live page** column         | the document's public URL — or, while it is still a draft, the authenticated preview route (see below)              |
+| Document editor, top right   | **View live**                    | the same, next to the live-preview pane's collapse control                                                          |
+
+Paths are resolved by one function, `resolveLivePreviewPath()` in `src/lib/live-preview-url.ts`,
+so the preview pane, the list column and the editor button can never disagree about where a
+document lives. Both links open in a new tab.
+
+A document that has never been published would 404 at its public URL (read access is
+`publishedOrSignedIn`), so in that case the link is relabelled **Preview** and routed through
+`/api/live-preview`, which verifies the editor's Payload session, enables Next's Draft Mode and
+redirects to the page. Published documents skip that hop and go straight to the real URL.
+
+Two implementation notes, both forced by Payload:
+
+- The list column is a `ui` field (`src/fields/live-page.ts`). Payload's list table has no per-row
+  action slot, and a `ui` field is presentational: it stores nothing, needs no migration, and
+  renders only the `Cell` — a column in the table and nothing at all in the edit form.
+- List column preferences are saved per user the first time that user sorts, searches or pages a
+  list, and Payload then ignores `admin.defaultColumns`. So
+  `src/migrations/…_live_page_column_preferences.ts` appends the column to the preferences that
+  already exist. It is additive and reversible; users can still hide or drag the column themselves.
+
 ---
 
 ## 5. Caching & revalidation

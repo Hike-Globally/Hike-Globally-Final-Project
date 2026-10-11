@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { adminOrEditor, publishedOrSignedIn } from '../access'
+import { livePageField } from '../fields/live-page'
 import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
 import { populatePublishedAt, revalidatePost, revalidatePostDelete } from '../hooks/revalidate'
@@ -10,11 +11,18 @@ export const Blog: CollectionConfig = {
   slug: 'blog',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'author', 'publishedAt', 'featured', 'updatedAt'],
+    defaultColumns: ['title', 'author', 'publishedAt', 'featured', 'livePage', 'updatedAt'],
     group: 'Content',
     components: {
       edit: {
-        beforeDocumentControls: ['@/components/admin/live-preview-toggle'],
+        beforeDocumentControls: [
+          '@/components/admin/live-preview-toggle',
+          // Payload's own preview button is an unlabelled glyph, and it is only rendered when
+          // `admin.preview` is set — which this project does not use (it configures
+          // `admin.livePreview` instead). So the way out to the storefront gets its own labelled
+          // control here. See src/components/admin/view-live-page.tsx.
+          '@/components/admin/view-live-page',
+        ],
       },
     },
     livePreview: { url: siteLivePreviewURL },
@@ -106,6 +114,9 @@ export const Blog: CollectionConfig = {
       defaultValue: false,
       admin: { description: 'Featured posts are pinned on /blog and can be highlighted on the homepage.' },
     },
+    // Read-only list column: a "View" / "Preview" link per post, straight to the storefront.
+    livePageField(),
+
     metaField(),
   ],
 }

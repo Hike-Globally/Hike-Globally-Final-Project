@@ -6,6 +6,7 @@ import * as migration_20261007_163309_trip_content_sections from './20261007_163
 import * as migration_20261009_124959_trip_itinerary_food from './20261009_124959_trip_itinerary_food'
 import * as migration_20261010_124847_nav_item_children from './20261010_124847_nav_item_children'
 import * as migration_20261010_180000_trip_difficulty_levels from './20261010_180000_trip_difficulty_levels'
+import * as migration_20261011_090000_live_page_column_preferences from './20261011_090000_live_page_column_preferences'
 
 export const migrations = [
   {
@@ -47,5 +48,10 @@ export const migrations = [
     up: migration_20261010_180000_trip_difficulty_levels.up,
     down: migration_20261010_180000_trip_difficulty_levels.down,
     name: '20261010_180000_trip_difficulty_levels',
+  },
+  {
+    up: migration_20261011_090000_live_page_column_preferences.up,
+    down: migration_20261011_090000_live_page_column_preferences.down,
+    name: '20261011_090000_live_page_column_preferences',
   },
 ]

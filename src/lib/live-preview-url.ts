@@ -48,3 +48,24 @@ export const siteLivePreviewURL = (args: LivePreviewURLArgs): string | null => {
   const path = resolveLivePreviewPath(args)
   return path ? buildLivePreviewURL(path) : null
 }
+
+/**
+ * The path of one document's own page, or null when the document has no public page yet.
+ *
+ * Two cases return null, and both mean "there is nothing to open":
+ *  - the collection has no public pages at all (Media, Users);
+ *  - the document has no slug yet, so it can only be reached through its listing page — a link
+ *    there would look like it belongs to the row but would really just open `/trips`.
+ *
+ * `resolveLivePreviewPath` is reused on purpose: the live-preview pane and the "View live" links
+ * must never disagree about where a document lives on the site.
+ */
+export const resolveDocumentPath = (
+  collectionSlug: string,
+  data: Record<string, unknown> | null | undefined,
+): string | null => {
+  const slug = typeof data?.slug === 'string' ? data.slug.trim() : ''
+  if (!slug) return null
+
+  return resolveLivePreviewPath({ collectionConfig: { slug: collectionSlug }, data: data ?? {} })
+}

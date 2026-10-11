@@ -5,6 +5,7 @@ import { linkField } from '../fields/link'
 import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
 import { revalidateTrip, revalidateTripDelete } from '../hooks/revalidate'
+import { livePageField } from '../fields/live-page'
 import { difficultySelectOptions } from '../lib/difficulty'
 import { siteLivePreviewURL } from '../lib/live-preview-url'
 
@@ -26,11 +27,26 @@ export const Trips: CollectionConfig = {
   slug: 'trips',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'destination', 'durationDays', 'priceFrom', 'featured', 'updatedAt'],
+    defaultColumns: [
+      'title',
+      'destination',
+      'durationDays',
+      'priceFrom',
+      'featured',
+      'livePage',
+      'updatedAt',
+    ],
     group: 'Content',
     components: {
       edit: {
-        beforeDocumentControls: ['@/components/admin/live-preview-toggle'],
+        beforeDocumentControls: [
+          '@/components/admin/live-preview-toggle',
+          // Payload's own preview button is an unlabelled glyph, and it is only rendered when
+          // `admin.preview` is set — which this project does not use (it configures
+          // `admin.livePreview` instead). So the way out to the storefront gets its own labelled
+          // control here. See src/components/admin/view-live-page.tsx.
+          '@/components/admin/view-live-page',
+        ],
       },
     },
     livePreview: { url: siteLivePreviewURL },
@@ -431,6 +447,10 @@ export const Trips: CollectionConfig = {
         },
       ],
     },
+
+    // A read-only column in the list view: a "View" / "Preview" link per trip, straight to the
+    // storefront. Stores nothing and adds nothing to the edit form.
+    livePageField(),
 
     metaField(),
   ],

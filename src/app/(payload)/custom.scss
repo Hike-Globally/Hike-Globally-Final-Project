@@ -2814,3 +2814,167 @@ body {
 .hg-live-preview-toggle svg {
   flex: 0 0 auto;
 }
+
+/* --------------------------------------------------------------------------
+   "Create New" — the primary action of every list view
+
+   Payload renders this as `btn--style-pill`, a light grey lozenge in the same
+   weight as the surrounding chrome, so on a busy list header it reads as one
+   more piece of furniture rather than the thing you came to click.
+
+   These rules promote it to a real primary button: filled in the brand green,
+   bold, with a plus glyph, sitting slightly raised. Everything is done through
+   the custom properties Payload's `.btn` reads (`--bg-color`, `--color`,
+   `--btn-padding-*`, …), so hover, focus, disabled and RTL states keep working
+   through Payload's own rules instead of being re-implemented here.
+
+   The plus is a masked SVG rather than a text "+": a mask is painted with
+   `currentColor`, so the icon follows the label colour on hover and on a
+   disabled button for free, with no second asset per state.
+
+   Selectors start at `.list-create-new-doc__create-new-button` — the class
+   Payload puts on the create button specifically — so nothing else that uses
+   the pill style (list selection, bulk actions) changes. The same treatment is
+   given to the create button of an empty list, whose only children are that
+   one button, so the two states of the same screen do not disagree.
+   -------------------------------------------------------------------------- */
+.list-create-new-doc__create-new-button,
+.no-results__actions .btn {
+  --bg-color: #174d42;
+  --color: #ffffff;
+  --hover-bg: #103f36;
+  --hover-color: #ffffff;
+  --btn-border: 1px solid #174d42;
+  --hover-btn-border: 1px solid #103f36;
+  --btn-font-weight: 600;
+  --btn-padding-block-start: calc(var(--base) * 0.45);
+  --btn-padding-block-end: calc(var(--base) * 0.45);
+  --btn-padding-inline-start: calc(var(--base) * 0.85);
+  --btn-padding-inline-end: calc(var(--base) * 0.7);
+
+  font-size: 13px;
+  border-radius: 10px;
+  box-shadow: 0 5px 14px rgb(23 77 66 / 13%);
+  letter-spacing: 0.01em;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.list-create-new-doc__create-new-button .btn__content,
+.no-results__actions .btn .btn__content {
+  gap: calc(var(--base) * 0.35);
+}
+
+/* The plus glyph. Drawn on the same 24px grid as the rest of the admin icons. */
+.list-create-new-doc__create-new-button .btn__content::before,
+.no-results__actions .btn .btn__content::before {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 13px;
+  background-color: currentColor;
+  content: '';
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.8' stroke-linecap='round'%3E%3Cpath d='M12 5v14M5 12h14'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.8' stroke-linecap='round'%3E%3Cpath d='M12 5v14M5 12h14'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
+.list-create-new-doc__create-new-button:hover,
+.list-create-new-doc__create-new-button:focus-visible,
+.no-results__actions .btn:hover,
+.no-results__actions .btn:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgb(23 77 66 / 19%);
+}
+
+.list-create-new-doc__create-new-button:active,
+.no-results__actions .btn:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 9px rgb(23 77 66 / 15%);
+}
+
+/* --------------------------------------------------------------------------
+   Live page links — the way out of the admin to the storefront
+
+   Two places use these: the "Live page" column in each list view (one link per
+   row) and the "View live" control in the document editor, which replaces
+   Payload's unlabelled preview glyph in the same slot.
+
+   Both are plain anchors rather than Payload `Button`s: they leave the admin
+   entirely, so they need `target="_blank"` and a real `href`, and a Button
+   would add nothing but markup. `pointer-events` are left alone — unlike
+   `.btn`, these are not wrapped in Payload's click-target rules.
+   -------------------------------------------------------------------------- */
+
+/* Shared chip shape. `currentColor` keeps the icon locked to the label. */
+.hg-live-page-cell,
+.hg-view-live-page {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--style-radius-s);
+  background: var(--theme-elevation-0);
+  color: var(--theme-elevation-800);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color 100ms cubic-bezier(0, 0.2, 0.2, 1),
+    background-color 100ms cubic-bezier(0, 0.2, 0.2, 1),
+    color 100ms cubic-bezier(0, 0.2, 0.2, 1);
+}
+
+.hg-live-page-cell:hover,
+.hg-view-live-page:hover {
+  border-color: var(--theme-elevation-400);
+  background: var(--theme-elevation-50);
+  color: var(--theme-elevation-950);
+}
+
+.hg-live-page-cell:focus-visible,
+.hg-view-live-page:focus-visible {
+  outline: 2px solid var(--theme-info-500);
+  outline-offset: 2px;
+}
+
+.hg-live-page-cell svg,
+.hg-view-live-page svg {
+  flex: 0 0 auto;
+}
+
+/* Row cell: compact, and muted when it is a draft preview rather than a live page. */
+.hg-live-page-cell {
+  min-height: 26px;
+  padding: 0 9px;
+}
+
+.hg-live-page-cell--draft {
+  border-style: dashed;
+  color: var(--theme-elevation-650);
+  font-weight: 500;
+}
+
+.hg-live-page-cell--empty {
+  color: var(--theme-elevation-400);
+  font-size: 0.8125rem;
+}
+
+/* Editor control: the same chip, sized to sit beside Save and Publish. */
+.hg-view-live-page {
+  min-height: calc(var(--base) * 1.8);
+  padding: 0 calc(var(--base) * 0.65);
+}
+
+.hg-view-live-page--draft {
+  border-style: dashed;
+  color: var(--theme-elevation-700);
+  font-weight: 500;
+}

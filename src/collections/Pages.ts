@@ -12,6 +12,7 @@ import { RichTextBlock } from '../blocks/RichText'
 import { Stats } from '../blocks/Stats'
 import { Testimonials } from '../blocks/Testimonials'
 import { adminOrEditor, publishedOrSignedIn } from '../access'
+import { livePageField } from '../fields/live-page'
 import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
 import { revalidatePage, revalidatePageDelete } from '../hooks/revalidate'
@@ -34,11 +35,18 @@ export const Pages: CollectionConfig = {
   slug: 'pages',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'slug', 'updatedAt'],
+    defaultColumns: ['title', 'slug', 'livePage', 'updatedAt'],
     group: 'Content',
     components: {
       edit: {
-        beforeDocumentControls: ['@/components/admin/live-preview-toggle'],
+        beforeDocumentControls: [
+          '@/components/admin/live-preview-toggle',
+          // Payload's own preview button is an unlabelled glyph, and it is only rendered when
+          // `admin.preview` is set — which this project does not use (it configures
+          // `admin.livePreview` instead). So the way out to the storefront gets its own labelled
+          // control here. See src/components/admin/view-live-page.tsx.
+          '@/components/admin/view-live-page',
+        ],
       },
     },
     livePreview: { url: siteLivePreviewURL },
@@ -85,6 +93,9 @@ export const Pages: CollectionConfig = {
       ],
       required: true,
     },
+    // Read-only list column: a "View" / "Preview" link per page, straight to the storefront.
+    livePageField(),
+
     metaField(),
   ],
 }

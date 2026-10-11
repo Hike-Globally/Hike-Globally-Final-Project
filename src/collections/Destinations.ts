@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { adminOrEditor, publishedOrSignedIn } from '../access'
+import { livePageField } from '../fields/live-page'
 import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
 import { revalidateDestination, revalidateDestinationDelete } from '../hooks/revalidate'
@@ -10,11 +11,18 @@ export const Destinations: CollectionConfig = {
   slug: 'destinations',
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'country', 'region', 'featured', 'updatedAt'],
+    defaultColumns: ['name', 'country', 'region', 'featured', 'livePage', 'updatedAt'],
     group: 'Content',
     components: {
       edit: {
-        beforeDocumentControls: ['@/components/admin/live-preview-toggle'],
+        beforeDocumentControls: [
+          '@/components/admin/live-preview-toggle',
+          // Payload's own preview button is an unlabelled glyph, and it is only rendered when
+          // `admin.preview` is set — which this project does not use (it configures
+          // `admin.livePreview` instead). So the way out to the storefront gets its own labelled
+          // control here. See src/components/admin/view-live-page.tsx.
+          '@/components/admin/view-live-page',
+        ],
       },
     },
     livePreview: { url: siteLivePreviewURL },
@@ -136,6 +144,10 @@ export const Destinations: CollectionConfig = {
       maxDepth: 1,
       admin: { defaultColumns: ['title', 'durationDays', 'priceFrom'] },
     },
+    // Read-only list column: a "View" / "Preview" link per destination, straight to the
+    // storefront.
+    livePageField(),
+
     metaField(),
   ],
 }
