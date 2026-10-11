@@ -69,7 +69,7 @@ export function TripCard({
           </Link>
         </h3>
 
-        <p className="mt-2 line-clamp-2 text-[0.9375rem] leading-relaxed text-ink-60">
+        <p className="mt-2 line-clamp-2 description-copy leading-relaxed text-ink-60">
           {trip.summary}
         </p>
 

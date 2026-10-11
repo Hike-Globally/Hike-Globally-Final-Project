@@ -82,8 +82,8 @@ export function PostCard({
 
         <p
           className={cn(
-            'mt-3 leading-relaxed text-ink-60',
-            featured ? 'text-[1.0625rem]' : 'line-clamp-3 text-[0.9375rem]',
+            'mt-3 description-copy leading-relaxed text-ink-60',
+            featured ? '' : 'line-clamp-3',
           )}
         >
           {post.excerpt}

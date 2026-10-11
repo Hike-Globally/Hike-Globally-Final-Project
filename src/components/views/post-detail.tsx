@@ -108,7 +108,7 @@ export function PostDetail({
                 >
                   {post.title}
                 </h1>
-                <p className="mt-6 max-w-xl text-base leading-relaxed text-mist/75 md:text-[1.0625rem] md:leading-[1.75]">
+                <p className="mt-6 max-w-xl description-copy leading-relaxed text-mist/75 md:leading-[1.75]">
                   {post.excerpt}
                 </p>
 
@@ -257,7 +257,7 @@ export function PostDetail({
                       <p className="mt-1 font-heading text-xl font-semibold text-ink">
                         {authorName}
                       </p>
-                      <p className="mt-2 text-[0.9375rem] leading-relaxed text-ink-60">
+                      <p className="mt-2 description-copy leading-relaxed text-ink-60">
                         {author.bio}
                       </p>
                     </div>
@@ -290,7 +290,7 @@ export function PostDetail({
               <h2 id="next-trail-title" className="heading-lg mt-3">
                 {dict.blog.planningTitle}
               </h2>
-              <p className="mt-4 max-w-xl text-[0.9375rem] leading-relaxed text-ink-60 md:text-base">
+              <p className="mt-4 max-w-xl description-copy leading-relaxed text-ink-60">
                 {dict.blog.planningText}
               </p>
               <Button asChild size="lg" className="mt-7">
@@ -320,7 +320,7 @@ export function PostDetail({
               <div>
                 <p className="eyebrow text-slate">{dict.blog.fieldNotes}</p>
                 <h2 className="heading-lg mt-2">{dict.blog.related}</h2>
-                <p className="mt-3 max-w-xl text-[0.9375rem] leading-relaxed text-ink-60">
+                <p className="mt-3 max-w-xl description-copy leading-relaxed text-ink-60">
                   {dict.blog.relatedSubtitle}
                 </p>
               </div>

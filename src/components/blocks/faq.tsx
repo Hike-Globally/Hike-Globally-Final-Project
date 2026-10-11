@@ -28,7 +28,7 @@ export function Faq({ block }: { block: FaqBlock }) {
           <div className="hidden lg:block">
             <div className="sticky top-28 bg-sage-20 p-7">
               <p className="eyebrow mb-3 text-deep">{block.heading}</p>
-              <p className="text-[0.9375rem] leading-relaxed text-ink-70">
+              <p className="description-copy leading-relaxed text-ink-70">
                 {block.subheading ??
                   'Still unsure about something? Send us a message — we answer every question ourselves.'}
               </p>

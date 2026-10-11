@@ -81,7 +81,7 @@ export function DifficultyLevels() {
             Different levels, all epic adventures
           </h2>
           <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-            <p className="max-w-2xl text-sm leading-relaxed text-ink-60 md:text-base">
+            <p className="max-w-2xl description-copy leading-relaxed text-ink-60">
               Find your match — from gentle days out to high-altitude challenges.
             </p>
             <span className="hidden text-slate/60 sm:inline" aria-hidden="true">
@@ -170,7 +170,7 @@ export function DifficultyLevels() {
                 </h3>
                 <p
                   id={`difficulty-${level.value}-desc`}
-                  className="mt-2 max-w-[18rem] text-[0.79rem] leading-relaxed text-white/90 sm:text-[0.84rem]"
+                  className="mt-2 max-w-[18rem] description-copy leading-relaxed text-white/90"
                 >
                   {level.description}
                 </p>

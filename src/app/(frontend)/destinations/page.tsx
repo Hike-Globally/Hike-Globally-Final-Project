@@ -106,7 +106,7 @@ export default async function DestinationsPage() {
               <p className="text-[0.65rem] font-semibold tracking-[0.18em] text-sage uppercase">
                 A different kind of trip
               </p>
-              <p className="mt-2 max-w-[15rem] text-sm leading-relaxed text-mist/75">
+              <p className="mt-2 max-w-[15rem] description-copy leading-relaxed text-mist/75">
                 Planned on the ground, around you.
               </p>
             </div>
@@ -121,7 +121,7 @@ export default async function DestinationsPage() {
               <p className="eyebrow">A closer look</p>
               <h2 className="heading-xl mt-3 max-w-2xl">Find the Nepal that feels like yours.</h2>
             </div>
-            <p className="max-w-xl text-[0.98rem] leading-relaxed text-ink-60 md:justify-self-end">
+            <p className="max-w-xl description-copy leading-relaxed text-ink-60 md:justify-self-end">
               From well-loved trails to quieter corners beyond the usual route, each region has a
               character all its own. Start with a place; we will help with the rest.
             </p>
@@ -131,7 +131,7 @@ export default async function DestinationsPage() {
             <div className="mt-10 border border-dashed border-ink/15 bg-mist px-6 py-14 text-center md:px-12">
               <p className="eyebrow">The atlas is taking shape</p>
               <h3 className="heading-md mt-3">No destinations are published just yet.</h3>
-              <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-ink-60">
+              <p className="mx-auto mt-3 max-w-lg description-copy leading-relaxed text-ink-60">
                 Check back soon, or tell us what kind of Himalayan journey you have in mind.
               </p>
               <Link
@@ -158,7 +158,7 @@ export default async function DestinationsPage() {
           <div className="max-w-2xl">
             <p className="eyebrow">A good place to begin</p>
             <h2 className="heading-lg mt-3">The right route starts with a real conversation.</h2>
-            <p className="mt-4 max-w-xl leading-relaxed text-ink-80">
+            <p className="mt-4 max-w-xl description-copy leading-relaxed text-ink-80">
               Tell us what you are drawn to. Our local team will help shape the region, pace, and
               trail around you.
             </p>
@@ -219,7 +219,7 @@ function AtlasCard({ destination, index }: { destination: DestinationCard; index
                 {destination.name}
               </h3>
               {destination.tagline ? (
-                <p className="mt-2 max-w-sm text-sm leading-relaxed text-white/75">
+                <p className="mt-2 max-w-sm description-copy leading-relaxed text-white/75">
                   {destination.tagline}
                 </p>
               ) : null}
