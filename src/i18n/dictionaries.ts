@@ -209,13 +209,7 @@ const en = {
     openWhatsApp: 'Chat on WhatsApp',
     emailUs: 'Email us directly',
     callUs: 'Call us',
-  },
-  footer: {
     contact: 'Contact',
-    contactUs: 'Contact us',
-    about: 'About',
-    follow: 'Follow',
-    rights: 'All rights reserved',
   },
   notFound: {
     title: 'This trail runs out here',
