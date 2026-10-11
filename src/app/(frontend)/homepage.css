@@ -1,27 +1,22 @@
 /* ============================================================================
-   HOMEPAGE TYPE SCALE — one place for every headline/body size on `/`
+   HOMEPAGE TYPE SCALE — one place for headline/body sizes on `/`
    ----------------------------------------------------------------------------
-   The homepage runs on exactly four type sizes. They are declared once, here,
-   as fluid `clamp()`s whose ceilings are the specified pixel values, and then
-   applied through four semantic classes:
+   Fluid sizes for the homepage's display copy are declared once, here, as
+   `clamp()`s whose ceilings are the specified pixel values. Destination card
+   titles and descriptions use their requested fixed sizes:
 
-     .home-hero-title     65px  hero headline      ("Walk where the map runs out…")
-     .home-hero-lead      17px  hero standfirst   ("Small-group treks and…")
-     .home-section-title  50px  every section headline, uppercase
-                                 ("Different levels, all epic adventures",
-                                  "Curated Travel Packages",
-                                  "One platform. Every trail on Earth.",
-                                  "Destinations")
-     .home-section-lead   17px  the About Hike Globally standfirst
-     .home-section-intro  16px  every other section intro
-                                 ("Find your match — …",
-                                  "Explore our curated travel packages…",
-                                  "Eight mountain regions, …")
+     .home-hero-title             65px  hero headline ("Walk where the map runs out…")
+     .home-hero-lead              17px  hero standfirst ("Small-group treks and…")
+     .home-section-title          50px  every section headline, uppercase
+     .home-section-lead           17px  the About Hike Globally standfirst
+     .home-section-intro          16px  every other section intro
+     .destination-card-title      23px  destination card heading
+     .destination-card-description 16px destination card description
 
    The scope is `[data-homepage]`, set once in `src/app/(frontend)/page.tsx`, so
    nothing outside the homepage can pick these sizes up — the shared
-   `SectionHeading` / `DestinationCarousel` / `FeaturedTrips` components keep
-   their own type everywhere else.
+   `SectionHeading` / `DestinationCarousel` / `FeaturedTrips` / `DestinationCard`
+   components keep their own type everywhere else.
 
    These rules are intentionally *unlayered* plain CSS: real (unlayered) rules
    beat anything inside `@layer`, which includes every Tailwind v4 `@utility`
@@ -30,10 +25,11 @@
    a utility's `font-size` without `!important` and without fighting source
    order. The same technique `curated-trips-section.css` already relies on.
 
-   Fluid, not fixed: each size is the *ceiling* of a clamp, so a 5" phone still
-   gets a 36px hero and a 32px section headline instead of a 65px/50px wall of
-   text, while everything from the desktop column width (1280px) up renders at
-   exactly the specified pixel value.
+   Fluid, not fixed: each page-copy size is the *ceiling* of a clamp, so a 5"
+   phone still gets a 36px hero and a 32px section headline instead of a
+   65px/50px wall of text, while everything from the desktop column width
+   (1280px) up renders at exactly the specified pixel value. Destination card
+   sizes remain fixed at 23px / 16px at every viewport width.
    ==========================================================================*/
 
 [data-homepage] {
@@ -48,6 +44,10 @@
 
   /* 16px — section intros. */
   --home-intro-size: clamp(0.9375rem, 0.82rem + 0.45vw, 1rem);
+
+  /* Fixed homepage destination-card sizes. */
+  --home-destination-card-title-size: 23px;
+  --home-destination-card-description-size: 16px;
 }
 
 /* ---------------------------------------------------------------------------
@@ -78,6 +78,17 @@
 
 [data-homepage] .home-section-intro {
   font-size: var(--home-intro-size);
+}
+
+/* ---------------------------------------------------------------------------
+   Destination cards — fixed at 23px / 16px on the homepage
+   --------------------------------------------------------------------------- */
+[data-homepage] .destination-card-title {
+  font-size: var(--home-destination-card-title-size);
+}
+
+[data-homepage] .destination-card-description {
+  font-size: var(--home-destination-card-description-size);
 }
 
 /* Short landscape phones (5–6" rotated): keep the hero headline inside the

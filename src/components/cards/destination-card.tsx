@@ -73,14 +73,16 @@ export function DestinationCard({
         </p>
         <h3
           className={cn(
-            'mt-2 font-heading font-semibold break-words text-white',
+            'destination-card-title mt-2 font-heading font-semibold break-words text-white',
             size === 'large' ? 'text-3xl md:text-4xl' : 'text-2xl',
           )}
         >
           {destination.name}
         </h3>
         {destination.tagline ? (
-          <p className="mt-2 max-w-md card-description-copy leading-relaxed text-white/80">
+          <p
+            className="destination-card-description mt-2 max-w-md card-description-copy leading-relaxed text-white/80"
+          >
             {destination.tagline}
           </p>
         ) : null}
