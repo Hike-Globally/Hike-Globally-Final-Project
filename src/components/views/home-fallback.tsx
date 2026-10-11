@@ -60,13 +60,10 @@ export async function HomeFallback() {
   )
 
   const tripsSection = (
-    <>
-      <CuratedTripsSection
-        trips={trips}
-        action={{ href: sitePath('/trips'), label: dict.common.viewAll }}
-      />
-      <AboutHikeGlobally />
-    </>
+    <CuratedTripsSection
+      trips={trips}
+      action={{ href: sitePath('/trips'), label: dict.common.viewAll }}
+    />
   )
 
   const destinationsSection =
@@ -116,13 +113,20 @@ export async function HomeFallback() {
     </section>
   )
 
-  const firstSection =
-    trips.length > 0 ? tripsSection : destinations.length > 0 ? destinationsSection : inquirySection
-
+  /**
+   * Everything after the difficulty levels, in order: the curated packages, the "About Hike
+   * Globally" band, destinations, then the closing inquiry section.
+   *
+   * The About band follows the packages section — and keeps that slot even on a database with no
+   * trips yet, so the page always says what Hike Globally is. The homepage ends at the inquiry
+   * section: no journal/blog tiles and nothing after it.
+   */
   const subsequentSections = (
     <>
-      {trips.length > 0 ? destinationsSection : null}
-      {trips.length > 0 || destinations.length > 0 ? inquirySection : null}
+      {trips.length > 0 ? tripsSection : null}
+      <AboutHikeGlobally />
+      {destinations.length > 0 ? destinationsSection : null}
+      {inquirySection}
     </>
   )
 
@@ -130,12 +134,7 @@ export async function HomeFallback() {
     <HeroScrollCover
       hero={heroSection}
       firstSection={<DifficultyLevels />}
-      subsequentSections={
-        <>
-          {firstSection}
-          {subsequentSections}
-        </>
-      }
+      subsequentSections={subsequentSections}
     />
   )
 }

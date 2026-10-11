@@ -1,87 +1,113 @@
 /* ============================================================================
-   About Hike Globally — orbit visual + marquee ticker.
+   About Hike Globally — section-local styling
    ============================================================================
-   Kept in a dedicated stylesheet (rather than Tailwind utility soup) because the
-   orbit relies on paired, perfectly-synced `@keyframes` — the ring spins one way
-   while every pin counter-rotates the exact same duration so it stays upright.
-   That pairing is easiest to read, tune and keep in sync as plain CSS.
-   All of it is skipped under `prefers-reduced-motion: reduce` at the bottom.
+   Only the pieces Tailwind utilities cannot express live here: the background
+   texture, the pointer spotlight and the package ticker's keyframes. Everything
+   else about the section is utility classes in `about-hike-globally.tsx`.
+
+   The section is square-cornered and stays inside the locked palette (ink, deep,
+   slate, sage, mist) — no new colours are introduced.
    ========================================================================== */
 
-[data-about-globe] {
-  --orbit-duration-1: 26s;
-  --orbit-duration-2: 38s;
+/* --------------------------------------------------------------------------
+   Entrance choreography gate
+   --------------------------------------------------------------------------
+   Every element that animates in carries the animation library's "hidden"
+   start state as an inline style, so the server HTML alone would show the
+   section half empty.
+
+   This rule neutralises those inline styles until the section is armed — an
+   attribute the component sets from an effect, i.e. only once JavaScript is
+   running and only when the visitor has not asked for reduced motion:
+
+     • no JavaScript      → never armed → the section renders complete;
+     • reduced motion     → never armed → no animation, content visible;
+     • everyone else      → armed on mount → the choreography plays as designed.
+
+   `!important` is required, and is the point: the start state it has to beat is
+   an inline style written by the animation library.
+   -------------------------------------------------------------------------- */
+.hg-about:not([data-armed]) [data-hg-reveal] {
+  opacity: 1 !important;
+  transform: none !important;
 }
 
-[data-about-globe] .ahg-ring {
-  animation: ahg-spin var(--orbit-duration, 30s) linear infinite;
+/* --------------------------------------------------------------------------
+   Survey grid — a faint metric texture behind the copy, faded out towards the
+   bottom so the figures band sits on plain ink.
+   -------------------------------------------------------------------------- */
+.hg-about-grid {
+  background-image:
+    linear-gradient(to right, rgba(174, 195, 176, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(174, 195, 176, 0.045) 1px, transparent 1px);
+  background-size: 88px 88px;
+  mask-image: radial-gradient(130% 95% at 18% 0%, #000 0%, rgba(0, 0, 0, 0.35) 55%, transparent 78%);
+  -webkit-mask-image: radial-gradient(
+    130% 95% at 18% 0%,
+    #000 0%,
+    rgba(0, 0, 0, 0.35) 55%,
+    transparent 78%
+  );
 }
 
-[data-about-globe] .ahg-ring--reverse {
-  animation-direction: reverse;
+/* --------------------------------------------------------------------------
+   Pointer spotlight — the two custom properties are written by the section's
+   pointer handler (directly on the element, outside React), and the whole layer
+   cross-fades in and out. It is invisible until a fine pointer actually moves.
+   -------------------------------------------------------------------------- */
+.hg-about-spotlight {
+  --hg-spot-x: 50%;
+  --hg-spot-y: 35%;
+  --hg-spot-opacity: 0;
+  background: radial-gradient(
+    26rem circle at var(--hg-spot-x) var(--hg-spot-y),
+    rgba(174, 195, 176, 0.1),
+    rgba(174, 195, 176, 0.025) 55%,
+    transparent 74%
+  );
+  opacity: var(--hg-spot-opacity);
+  transition: opacity 700ms var(--ease-brand);
 }
 
-[data-about-globe] .ahg-pin-counter {
-  animation: ahg-spin var(--orbit-duration, 30s) linear infinite reverse;
+/* --------------------------------------------------------------------------
+   Package ticker
+   --------------------------------------------------------------------------
+   One track holding the list three times, translated by exactly one copy's
+   width (-33.3333%): the second copy lands precisely where the first one
+   started, so the loop has no seam — and three copies are wider than any
+   viewport, so there is never a gap while one cycles past. The strip is
+   decorative (aria-hidden) and pauses on hover so a name can be read.
+   -------------------------------------------------------------------------- */
+.hg-about-marquee {
+  mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
 }
 
-[data-about-globe] .ahg-ring--reverse .ahg-pin-counter {
-  animation-direction: normal;
+.hg-about-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: hg-about-marquee 52s linear infinite;
+  will-change: transform;
 }
 
-[data-about-globe] .ahg-sphere {
-  animation: ahg-spin 70s linear infinite;
-}
-
-[data-about-globe] .ahg-pulse {
-  animation: ahg-pulse 2.6s var(--ease-brand, ease-in-out) infinite;
-}
-
-@keyframes ahg-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes ahg-pulse {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.55;
-  }
-  50% {
-    transform: scale(1.9);
-    opacity: 0;
-  }
-}
-
-/* Infinite horizontal ticker — two identical lists back to back, scrolled exactly -50%. */
-[data-about-ticker] {
-  animation: ahg-marquee 32s linear infinite;
-}
-
-[data-about-ticker-group]:hover [data-about-ticker] {
+.hg-about-marquee:hover .hg-about-marquee-track {
   animation-play-state: paused;
 }
 
-@keyframes ahg-marquee {
+@keyframes hg-about-marquee {
   from {
     transform: translate3d(0, 0, 0);
   }
   to {
-    transform: translate3d(-50%, 0, 0);
+    transform: translate3d(-33.3333%, 0, 0);
   }
 }
 
+/* The global reduced-motion rule already collapses the ticker's duration to
+   nothing; this keeps it parked at the start rather than mid-slide. */
 @media (prefers-reduced-motion: reduce) {
-  [data-about-globe] .ahg-ring,
-  [data-about-globe] .ahg-pin-counter,
-  [data-about-globe] .ahg-sphere,
-  [data-about-globe] .ahg-pulse,
-  [data-about-ticker] {
-    animation: none !important;
+  .hg-about-marquee-track {
+    animation: none;
+    transform: none;
   }
 }

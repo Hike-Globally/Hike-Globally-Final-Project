@@ -149,6 +149,15 @@ is worse than one extra regeneration.
 - **Motion** — Lenis runs once in the root layout (`prefers-reduced-motion` respected);
   `Reveal` fades sections in with a small stagger; hero media uses a slow parallax only when the
   visitor has not asked for reduced motion.
+- **Homepage "About Hike Globally" band** — `src/components/sections/about-hike-globally.tsx`
+  always renders directly after the curated travel packages section (enforced at render time in
+  `block-renderer.tsx`, so it holds whatever the CMS page contains). It pairs a two-line brand
+  statement, a pointer-tracked spotlight and count-up figures with an interactive dotted globe
+  (`components/motion/dotted-globe.tsx`): regions are projected onto the sphere on a 2D canvas,
+  the globe turns to face whichever region is highlighted, and a great-circle route animates from
+  the Kathmandu hub to it. Entry animations are gated behind a `data-armed` attribute set from an
+  effect, so the section renders complete with JavaScript disabled and animates not at all under
+  `prefers-reduced-motion`; the globe's render loop runs only while it is on screen.
 
 ---
 
