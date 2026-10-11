@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 
@@ -121,6 +122,17 @@ export function PillNav({ logoLabel, logoHref, links, cta }: PillNavProps) {
 
   return (
     <div className="pn-viewport" style={{ ['--pn-font' as string]: PN_FONT }}>
+      <Link href={logoHref} className="pn-mobile-logo" aria-label={logoLabel}>
+        <Image
+          src="/images/logo.svg"
+          alt=""
+          width={1297}
+          height={1212}
+          unoptimized
+          className="pn-mobile-logo-mark"
+        />
+      </Link>
+
       <nav className="pn-track" data-open={mobileOpen} aria-label="Main">
         <button
           type="button"
