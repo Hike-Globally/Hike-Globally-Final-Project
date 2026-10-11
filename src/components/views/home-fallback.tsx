@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react'
 import { HomepageHeroBackground } from '@/components/blocks/hero-background'
 import { DestinationCard } from '@/components/cards/destination-card'
 import { DestinationCarousel } from '@/components/cards/destination-carousel'
+import { AboutHikeGlobally } from '@/components/sections/about-hike-globally'
 import {
   CuratedTripsSection,
   HOMEPAGE_TRIP_LIMIT,
@@ -59,10 +60,13 @@ export async function HomeFallback() {
   )
 
   const tripsSection = (
-    <CuratedTripsSection
-      trips={trips}
-      action={{ href: sitePath('/trips'), label: dict.common.viewAll }}
-    />
+    <>
+      <CuratedTripsSection
+        trips={trips}
+        action={{ href: sitePath('/trips'), label: dict.common.viewAll }}
+      />
+      <AboutHikeGlobally />
+    </>
   )
 
   const destinationsSection =
