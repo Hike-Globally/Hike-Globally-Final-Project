@@ -14,10 +14,13 @@ export function TripCard({
   trip,
   priority = false,
   className,
+  summaryClassName,
 }: {
   trip: TripCard
   priority?: boolean
   className?: string
+  /** Extra classes for the summary paragraph — lets a section retune its copy in place. */
+  summaryClassName?: string
 }) {
   const dict = dictionary
   const href = sitePath(`/trips/${trip.slug}`)
@@ -69,7 +72,12 @@ export function TripCard({
           </Link>
         </h3>
 
-        <p className="mt-2 line-clamp-2 card-description-copy leading-relaxed text-ink-60">
+        <p
+          className={cn(
+            'mt-2 line-clamp-2 card-description-copy leading-relaxed text-ink-60',
+            summaryClassName,
+          )}
+        >
           {trip.summary}
         </p>
 

@@ -2,6 +2,8 @@ import { TripCard } from '@/components/cards/trip-card'
 import { SectionHeading } from '@/components/sections/section-heading'
 import type { TripCard as TripCardData } from '@/lib/data'
 
+import './curated-trips-section.css'
+
 export const HOMEPAGE_TRIP_LIMIT = 6
 
 const heading = 'Curated Travel Packages'
@@ -20,13 +22,24 @@ export function CuratedTripsSection({
   if (visibleTrips.length === 0) return null
 
   return (
-    <section className="py-16 md:py-24">
+    <section data-curated-trips="" className="py-16 md:py-24">
       <div className="container-content">
-        <SectionHeading title={heading} description={description} action={action} />
+        <SectionHeading
+          title={heading}
+          description={description}
+          action={action}
+          titleClassName="ct-heading"
+          descriptionClassName="ct-description"
+        />
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
           {visibleTrips.map((trip, index) => (
-            <TripCard key={trip.id} trip={trip} priority={index < 3} />
+            <TripCard
+              key={trip.id}
+              trip={trip}
+              priority={index < 3}
+              summaryClassName="ct-card-summary"
+            />
           ))}
         </div>
       </div>

@@ -13,6 +13,8 @@ export function SectionHeading({
   align = 'left',
   variant = 'dark',
   className,
+  titleClassName,
+  descriptionClassName,
 }: {
   eyebrow?: string | null
   title: string
@@ -23,6 +25,10 @@ export function SectionHeading({
   align?: 'left' | 'center'
   variant?: 'dark' | 'light'
   className?: string
+  /** Extra classes for the `<h2>` — lets a section retune the title without forking the heading. */
+  titleClassName?: string
+  /** Extra classes for the description paragraph. */
+  descriptionClassName?: string
 }) {
   return (
     <div
@@ -34,11 +40,27 @@ export function SectionHeading({
     >
       <div className={align === 'center' ? 'max-w-2xl' : 'max-w-2xl'}>
         {eyebrow ? (
-          <p className={cn('eyebrow mb-3', variant === 'light' ? 'text-sage' : 'text-slate')}>{eyebrow}</p>
+          <p className={cn('eyebrow mb-3', variant === 'light' ? 'text-sage' : 'text-slate')}>
+            {eyebrow}
+          </p>
         ) : null}
-        <h2 className={cn('heading-lg', variant === 'light' ? 'text-white' : 'text-ink')}>{title}</h2>
+        <h2
+          className={cn(
+            'heading-lg',
+            variant === 'light' ? 'text-white' : 'text-ink',
+            titleClassName,
+          )}
+        >
+          {title}
+        </h2>
         {description ? (
-          <p className={cn('lead mt-4', variant === 'light' ? 'text-mist/75' : 'text-ink-60')}>
+          <p
+            className={cn(
+              'lead mt-4',
+              variant === 'light' ? 'text-mist/75' : 'text-ink-60',
+              descriptionClassName,
+            )}
+          >
             {description}
           </p>
         ) : null}
