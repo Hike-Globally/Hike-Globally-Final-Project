@@ -1,9 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react'
-import { animate, motion, useInView, useMotionValue, useSpring, useTransform } from 'motion/react'
-import { ArrowRight, Compass, Globe2, MapPin, Star } from 'lucide-react'
+import { useRef, type CSSProperties, type PointerEvent } from 'react'
+import { motion, useMotionValue, useSpring, useTransform } from 'motion/react'
+import { ArrowRight, Compass, MapPin } from 'lucide-react'
 
 import './about-hike-globally.css'
 import { Reveal } from '@/components/motion/reveal'
@@ -15,13 +15,6 @@ const EYEBROW = 'About Hike Globally'
 const HEADING = 'One platform. Every trail on Earth.'
 const LEAD =
   'Hike Globally is a travel booking platform that curates and sells travel packages to destinations all around the globe — treks, safaris, coastal escapes and city breaks — researched, priced and ready to book in one place.'
-
-const STATS = [
-  { value: 120, suffix: '+', label: 'Travel packages' },
-  { value: 54, suffix: '', label: 'Countries covered' },
-  { value: 32, suffix: 'k+', label: 'Travelers hosted' },
-  { value: 4.9, decimals: 1, suffix: '', label: 'Average rating' },
-] as const
 
 const TICKER_DESTINATIONS = [
   'Nepal',
@@ -52,8 +45,7 @@ const OUTER_ORBIT_ANGLES = [70, 190, 310]
  *  1. A cursor-tracked spotlight that makes the whole section feel alive under the pointer.
  *  2. A hand-built CSS/SVG-free orbit — a glowing globe with two independently spinning rings
  *     of destination pins — that tilts toward the pointer in 3D.
- *  3. Count-up stats and an infinite destination ticker, both driven by real scroll/viewport
- *     state rather than autoplay, so nothing moves before a visitor actually arrives here.
+ *  3. An infinite destination ticker that can be paused on hover.
  * Every animation collapses to a static, fully legible layout under `prefers-reduced-motion`.
  */
 export function AboutHikeGlobally() {
@@ -136,20 +128,6 @@ export function AboutHikeGlobally() {
             <GlobeVisual />
           </Reveal>
         </div>
-
-        {/* Count-up stats */}
-        <Reveal delay={120} className="mt-20 md:mt-24">
-          <dl className="grid grid-cols-2 gap-x-6 gap-y-10 border-t border-white/10 pt-10 sm:grid-cols-4">
-            {STATS.map((stat) => (
-              <div key={stat.label} className="text-center sm:text-left">
-                <dd className="font-heading text-4xl font-semibold tracking-tight text-sage md:text-5xl">
-                  <StatCounter value={stat.value} decimals={'decimals' in stat ? stat.decimals : 0} suffix={stat.suffix} />
-                </dd>
-                <dt className="mt-2 text-[0.9375rem] text-mist/70">{stat.label}</dt>
-              </div>
-            ))}
-          </dl>
-        </Reveal>
       </div>
 
       {/* Infinite destination ticker */}
@@ -177,47 +155,6 @@ export function AboutHikeGlobally() {
         </div>
       </Reveal>
     </section>
-  )
-}
-
-/** Counts up from 0 to `value` once the element scrolls into view; renders statically under reduced motion. */
-function StatCounter({
-  value,
-  decimals = 0,
-  suffix = '',
-}: {
-  value: number
-  decimals?: number
-  suffix?: string
-}) {
-  const ref = useRef<HTMLSpanElement>(null)
-  const isInView = useInView(ref, { once: true, margin: '-10% 0px' })
-  const [prefersReducedMotion] = useState(
-    () =>
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-  )
-  const [display, setDisplay] = useState(() =>
-    (prefersReducedMotion ? value : 0).toFixed(decimals),
-  )
-
-  useEffect(() => {
-    if (prefersReducedMotion || !isInView) return
-
-    const controls = animate(0, value, {
-      duration: 1.8,
-      ease: [0.22, 1, 0.36, 1],
-      onUpdate: (latest) => setDisplay(latest.toFixed(decimals)),
-    })
-
-    return () => controls.stop()
-  }, [isInView, value, decimals, prefersReducedMotion])
-
-  return (
-    <span ref={ref}>
-      {display}
-      {suffix}
-    </span>
   )
 }
 
@@ -258,19 +195,6 @@ function GlobeVisual() {
       style={{ perspective: '1100px' }}
       data-about-globe
     >
-      {/* Floating badges */}
-      <div className="ahg-float pointer-events-none absolute -top-2 right-0 z-20 flex items-center gap-2 border border-white/10 bg-ink/80 px-3 py-2 text-xs font-medium text-white shadow-[0_18px_40px_-14px_rgba(0,0,0,0.7)] backdrop-blur-sm sm:right-4">
-        <Globe2 className="size-3.5 text-sage" aria-hidden="true" />
-        120+ destinations
-      </div>
-      <div
-        className="ahg-float pointer-events-none absolute bottom-6 -left-2 z-20 flex items-center gap-2 border border-white/10 bg-ink/80 px-3 py-2 text-xs font-medium text-white shadow-[0_18px_40px_-14px_rgba(0,0,0,0.7)] backdrop-blur-sm sm:-left-6"
-        style={{ animationDelay: '-3s' }}
-      >
-        <Star className="size-3.5 fill-sage text-sage" aria-hidden="true" />
-        4.9 rated by travelers
-      </div>
-
       <motion.div
         style={{ rotateX, rotateY }}
         className="relative h-full w-full [transform-style:preserve-3d]"
