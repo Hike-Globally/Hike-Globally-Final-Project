@@ -1,5 +1,8 @@
+import { Fragment } from 'react'
+
 import type { Page } from '@/payload-types'
 import { HeroScrollCover } from '@/components/motion/hero-scroll-cover'
+import { AboutHikeGlobally } from '@/components/sections/about-hike-globally'
 import { DifficultyLevels } from '@/components/sections/difficulty-levels'
 
 import { Cta } from './cta'
@@ -18,11 +21,12 @@ type Block = NonNullable<Page['blocks']>[number]
 
 /**
  * Homepage section policy:
- *  - the blog/journal section (`latestPosts`) never renders on the homepage, and
+ *  - the blog/journal section (`latestPosts`) never renders on the homepage,
+ *  - the "About Hike Globally" band always follows the curated travel packages section, and
  *  - the homepage ends at the inquiry ("Plan your trip") section — anything placed after it in
  *    the CMS is not rendered here.
  *
- * Enforced at render time so the rule holds regardless of what the CMS page contains.
+ * Enforced at render time so the rules hold regardless of what the CMS page contains.
  */
 function homepageBlocks(blocks: Block[]): Block[] {
   const withoutBlog = blocks.filter((block) => block.blockType !== 'latestPosts')
@@ -68,6 +72,19 @@ function renderBlock(
 }
 
 /**
+ * Renders a homepage block together with the "About Hike Globally" band, which always follows
+ * the curated travel packages section (see the homepage section policy above).
+ */
+function renderHomepageBlock(block: Block, index: number) {
+  return (
+    <Fragment key={`${block.blockType}-${index}`}>
+      {renderBlock(block, index, false)}
+      {block.blockType === 'featuredTrips' ? <AboutHikeGlobally /> : null}
+    </Fragment>
+  )
+}
+
+/**
  * Maps a Payload block to its React component.
  *
  * The `blockType` discriminant comes straight from the generated Payload types, so adding a new
@@ -97,14 +114,21 @@ export async function BlockRenderer({
 
       if (heroBlock.blockType === 'hero') {
         const [firstOtherBlock, ...subsequentBlocks] = otherBlocks
+        // On a homepage whose CMS page has no curated-trips block at all, the band keeps the top
+        // slot instead of disappearing.
+        const hasCuratedTrips = otherBlocks.some((block) => block.blockType === 'featuredTrips')
+
         const heroElement = <Hero block={heroBlock} homepage={true} />
         const firstSectionElement = (
           <>
             <DifficultyLevels />
-            {firstOtherBlock ? renderBlock(firstOtherBlock, 0, false) : null}
+            {firstOtherBlock ? renderHomepageBlock(firstOtherBlock, 0) : null}
+            {hasCuratedTrips ? null : <AboutHikeGlobally />}
           </>
         )
-        const subsequentElements = subsequentBlocks.map((b, i) => renderBlock(b, i + 1, false))
+        const subsequentElements = subsequentBlocks.map((block, index) =>
+          renderHomepageBlock(block, index + 1),
+        )
 
         return (
           <HeroScrollCover

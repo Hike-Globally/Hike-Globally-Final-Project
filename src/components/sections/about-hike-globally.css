@@ -1,0 +1,113 @@
+/* ============================================================================
+   About Hike Globally — section-local styling
+   ============================================================================
+   Only the pieces Tailwind utilities cannot express live here: the background
+   texture, the pointer spotlight and the package ticker's keyframes. Everything
+   else about the section is utility classes in `about-hike-globally.tsx`.
+
+   The section is square-cornered and stays inside the locked palette (ink, deep,
+   slate, sage, mist) — no new colours are introduced.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Entrance choreography gate
+   --------------------------------------------------------------------------
+   Every element that animates in carries the animation library's "hidden"
+   start state as an inline style, so the server HTML alone would show the
+   section half empty.
+
+   This rule neutralises those inline styles until the section is armed — an
+   attribute the component sets from an effect, i.e. only once JavaScript is
+   running and only when the visitor has not asked for reduced motion:
+
+     • no JavaScript      → never armed → the section renders complete;
+     • reduced motion     → never armed → no animation, content visible;
+     • everyone else      → armed on mount → the choreography plays as designed.
+
+   `!important` is required, and is the point: the start state it has to beat is
+   an inline style written by the animation library.
+   -------------------------------------------------------------------------- */
+.hg-about:not([data-armed]) [data-hg-reveal] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   Survey grid — a faint metric texture behind the copy, faded out towards the
+   bottom so the figures band sits on plain ink.
+   -------------------------------------------------------------------------- */
+.hg-about-grid {
+  background-image:
+    linear-gradient(to right, rgba(174, 195, 176, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(174, 195, 176, 0.045) 1px, transparent 1px);
+  background-size: 88px 88px;
+  mask-image: radial-gradient(130% 95% at 18% 0%, #000 0%, rgba(0, 0, 0, 0.35) 55%, transparent 78%);
+  -webkit-mask-image: radial-gradient(
+    130% 95% at 18% 0%,
+    #000 0%,
+    rgba(0, 0, 0, 0.35) 55%,
+    transparent 78%
+  );
+}
+
+/* --------------------------------------------------------------------------
+   Pointer spotlight — the two custom properties are written by the section's
+   pointer handler (directly on the element, outside React), and the whole layer
+   cross-fades in and out. It is invisible until a fine pointer actually moves.
+   -------------------------------------------------------------------------- */
+.hg-about-spotlight {
+  --hg-spot-x: 50%;
+  --hg-spot-y: 35%;
+  --hg-spot-opacity: 0;
+  background: radial-gradient(
+    26rem circle at var(--hg-spot-x) var(--hg-spot-y),
+    rgba(174, 195, 176, 0.1),
+    rgba(174, 195, 176, 0.025) 55%,
+    transparent 74%
+  );
+  opacity: var(--hg-spot-opacity);
+  transition: opacity 700ms var(--ease-brand);
+}
+
+/* --------------------------------------------------------------------------
+   Package ticker
+   --------------------------------------------------------------------------
+   One track holding the list three times, translated by exactly one copy's
+   width (-33.3333%): the second copy lands precisely where the first one
+   started, so the loop has no seam — and three copies are wider than any
+   viewport, so there is never a gap while one cycles past. The strip is
+   decorative (aria-hidden) and pauses on hover so a name can be read.
+   -------------------------------------------------------------------------- */
+.hg-about-marquee {
+  mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+}
+
+.hg-about-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: hg-about-marquee 52s linear infinite;
+  will-change: transform;
+}
+
+.hg-about-marquee:hover .hg-about-marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes hg-about-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-33.3333%, 0, 0);
+  }
+}
+
+/* The global reduced-motion rule already collapses the ticker's duration to
+   nothing; this keeps it parked at the start rather than mid-slide. */
+@media (prefers-reduced-motion: reduce) {
+  .hg-about-marquee-track {
+    animation: none;
+    transform: none;
+  }
+}

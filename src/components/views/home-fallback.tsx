@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react'
 import { HomepageHeroBackground } from '@/components/blocks/hero-background'
 import { DestinationCard } from '@/components/cards/destination-card'
 import { DestinationCarousel } from '@/components/cards/destination-carousel'
+import { AboutHikeGlobally } from '@/components/sections/about-hike-globally'
 import {
   CuratedTripsSection,
   HOMEPAGE_TRIP_LIMIT,
@@ -112,13 +113,20 @@ export async function HomeFallback() {
     </section>
   )
 
-  const firstSection =
-    trips.length > 0 ? tripsSection : destinations.length > 0 ? destinationsSection : inquirySection
-
+  /**
+   * Everything after the difficulty levels, in order: the curated packages, the "About Hike
+   * Globally" band, destinations, then the closing inquiry section.
+   *
+   * The About band follows the packages section — and keeps that slot even on a database with no
+   * trips yet, so the page always says what Hike Globally is. The homepage ends at the inquiry
+   * section: no journal/blog tiles and nothing after it.
+   */
   const subsequentSections = (
     <>
-      {trips.length > 0 ? destinationsSection : null}
-      {trips.length > 0 || destinations.length > 0 ? inquirySection : null}
+      {trips.length > 0 ? tripsSection : null}
+      <AboutHikeGlobally />
+      {destinations.length > 0 ? destinationsSection : null}
+      {inquirySection}
     </>
   )
 
@@ -126,12 +134,7 @@ export async function HomeFallback() {
     <HeroScrollCover
       hero={heroSection}
       firstSection={<DifficultyLevels />}
-      subsequentSections={
-        <>
-          {firstSection}
-          {subsequentSections}
-        </>
-      }
+      subsequentSections={subsequentSections}
     />
   )
 }
