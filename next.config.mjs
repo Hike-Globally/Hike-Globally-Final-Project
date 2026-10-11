@@ -24,11 +24,21 @@ const nextConfig = {
     // body is only buffered in memory while a request is in flight, and Payload streams it
     // straight to a temp file (`upload.useTempFiles`).
     proxyClientMaxBodySize: maxMediaUploadSize + 10 * 1024 * 1024,
+
+    // Barrel-import optimisation. `lucide-react` ships 1,500+ icons from a single entry point;
+    // importing even one icon naively pulls the whole barrel into the bundle. This tells Next to
+    // compile each icon to its own module so a page only ships the handful it actually renders.
+    // (lucide-react is imported across 28 components — the single biggest client-JS win here.)
+    optimizePackageImports: ['lucide-react'],
   },
 
   images: {
     // AVIF first — roughly 50% smaller than WebP at the same visual quality.
     formats: ['image/avif', 'image/webp'],
+    // How long an optimised `/_next/image` response may be reused by browsers/CDNs. The URL
+    // encodes the source + dimensions, and Payload media filenames are unique per upload, so a
+    // long TTL is safe and removes repeat optimisation work for returning visitors.
+    minimumCacheTTL: 60 * 60 * 24 * 30,
     remotePatterns: [
       // Vercel Blob storage in production
       { protocol: 'https', hostname: '*.public.blob.vercel-storage.com' },
@@ -46,6 +56,21 @@ const nextConfig = {
 
   // Payload + sharp must never be bundled by the Next compiler.
   serverExternalPackages: ['sharp', 'payload', '@payloadcms/db-postgres'],
+
+  async headers() {
+    return [
+      {
+        // Static design assets under public/images (logo, difficulty badges, hero art) are never
+        // mutated in place, so a long browser cache makes repeat visits instant. Media served by
+        // Payload (`/api/media/file/...`) is deliberately NOT touched here — its route handler
+        // sets its own Cache-Control *and* Content-Security-Policy, which must not be clobbered.
+        source: '/images/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=2592000, stale-while-revalidate=86400' },
+        ],
+      },
+    ]
+  },
 
   typescript: { ignoreBuildErrors: false },
 }
