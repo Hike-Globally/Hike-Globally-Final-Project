@@ -15,6 +15,7 @@ import type { PostCard as PostCardData } from '@/lib/data'
 import { getArticleHeadings } from '@/lib/article-headings'
 import { formatDate, readingTimeMinutes } from '@/lib/format'
 import { blogPostingJsonLd, breadcrumbJsonLd } from '@/lib/seo'
+import { cn } from '@/lib/utils'
 import type { Blog } from '@/payload-types'
 
 function TopographicLines() {
@@ -77,11 +78,46 @@ export function PostDetail({
 
       <article id="blog-post" className="blog-post">
         {/* Hero region: the header stays pinned while this masthead is on screen
-            (see header-frame.tsx). */}
-        <header data-header-hero className="relative isolate overflow-hidden bg-ink text-mist">
-          <TopographicLines />
+            (see header-frame.tsx).
 
-          <div className="container-content pt-28 md:pt-32">
+            The featured image is ALWAYS the backdrop of this band — never a framed
+            thumbnail next to the title. It covers the whole hero edge to edge (the `hero`
+            upload size, `object-cover`, and the focal point the editor chose in the admin),
+            so every post opens on its own photograph regardless of how that photograph was
+            cropped on upload. */}
+        <header
+          data-header-hero
+          className="relative isolate flex min-h-[68svh] items-end overflow-hidden bg-ink text-mist md:min-h-[76svh] lg:min-h-[86svh]"
+        >
+          <PayloadImageFill
+            media={post.featuredImage}
+            size="hero"
+            sizes="100vw"
+            priority
+            className="-z-10"
+            imageClassName="object-cover"
+          />
+          {/* Scrims do the legibility work: a flat darken so a bright sky can never swallow
+              the type, a bottom-up gradient the masthead sits in, and — from `lg` up — a
+              left-to-right one that lets the right half of the photograph read as image.
+              All three are `-z-10`, like the image itself, so DOM order is paint order. */}
+          <div className="absolute inset-0 -z-10 bg-ink/55" aria-hidden="true" />
+          <div
+            className="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/60 to-ink/10"
+            aria-hidden="true"
+          />
+          <div
+            className="absolute inset-0 -z-10 hidden lg:block lg:bg-gradient-to-r lg:from-ink/85 lg:via-ink/40 lg:to-transparent"
+            aria-hidden="true"
+          />
+          <TopographicLines />
+          {/* Hairline frame, so the full-bleed photo still reads as a laid-out page. */}
+          <div
+            className="pointer-events-none absolute inset-3 z-10 border border-white/20 sm:inset-5 lg:inset-7"
+            aria-hidden="true"
+          />
+
+          <div className="container-content relative z-10 w-full pt-28 pb-12 md:pt-32 md:pb-16">
             <Breadcrumbs
               className="mb-8 [&_a]:text-mist/65 [&_a:hover]:text-white [&_span]:text-white [&_svg]:text-mist/35"
               items={[
@@ -91,121 +127,97 @@ export function PostDetail({
               ]}
             />
 
-            <div className="grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-stretch lg:gap-12">
-              <div className="relative z-10 flex flex-col justify-center py-2 pb-7 sm:pb-10 lg:py-12">
-                <p className="eyebrow flex flex-wrap items-center gap-x-3 gap-y-2 text-sage">
-                  <span className="size-1.5 bg-sage" aria-hidden="true" />
-                  <span>{dict.blog.fieldNotes}</span>
-                  <span className="text-white/30" aria-hidden="true">
-                    /
-                  </span>
-                  <span className="text-mist/70">{categoryLabel ?? dict.nav.blog}</span>
-                </p>
+            <p className="eyebrow flex flex-wrap items-center gap-x-3 gap-y-2 text-sage">
+              <span className="size-1.5 bg-sage" aria-hidden="true" />
+              <span>{dict.blog.fieldNotes}</span>
+              <span className="text-white/30" aria-hidden="true">
+                /
+              </span>
+              <span className="text-mist/70">{categoryLabel ?? dict.nav.blog}</span>
+            </p>
 
-                <h1
-                  id="post-title"
-                  className="mt-6 max-w-[12ch] font-heading text-[clamp(2.8rem,5.1vw,5.35rem)] leading-[0.98] font-semibold tracking-[-0.045em] text-white"
-                >
-                  {post.title}
-                </h1>
-                <p className="mt-6 max-w-xl description-copy leading-relaxed text-mist/75 md:leading-[1.75]">
-                  {post.excerpt}
-                </p>
+            <div className="mt-6 max-w-[34rem] lg:max-w-[42rem]">
+              <h1
+                id="post-title"
+                className="font-heading text-[clamp(2.6rem,4.7vw,4.9rem)] leading-[0.98] font-semibold tracking-[-0.045em] text-white"
+              >
+                {post.title}
+              </h1>
+              <p className="mt-6 max-w-2xl description-copy leading-relaxed text-mist/80 md:leading-[1.75]">
+                {post.excerpt}
+              </p>
+            </div>
 
-                <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3 text-[0.8125rem] text-mist/75">
-                  <span className="inline-flex items-center gap-2">
-                    <CalendarDays className="size-4 text-sage" aria-hidden="true" />
-                    <time dateTime={publishedAt}>{formatDate(publishedAt)}</time>
-                  </span>
-                  <span className="hidden h-4 w-px bg-white/20 sm:block" aria-hidden="true" />
-                  <span className="inline-flex items-center gap-2">
-                    <Clock className="size-4 text-sage" aria-hidden="true" />
-                    {dict.blog.readTime.replace('{minutes}', String(minutes))}
-                  </span>
-                </div>
+            <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3 text-[0.8125rem] text-mist/75">
+              <span className="inline-flex items-center gap-2">
+                <CalendarDays className="size-4 text-sage" aria-hidden="true" />
+                <time dateTime={publishedAt}>{formatDate(publishedAt)}</time>
+              </span>
+              <span className="hidden h-4 w-px bg-white/20 sm:block" aria-hidden="true" />
+              <span className="inline-flex items-center gap-2">
+                <Clock className="size-4 text-sage" aria-hidden="true" />
+                {dict.blog.readTime.replace('{minutes}', String(minutes))}
+              </span>
+            </div>
 
-                <div className="mt-8 flex flex-wrap items-center justify-between gap-5 border-t border-white/15 pt-5">
-                  {authorName ? (
-                    <div className="flex min-w-0 items-center gap-3">
-                      {author?.avatar && typeof author.avatar !== 'number' ? (
-                        <PayloadImage
-                          media={author.avatar}
-                          size="thumbnail"
-                          sizes="44px"
-                          className="size-11 shrink-0 rounded-full ring-2 ring-sage/45"
-                        />
-                      ) : (
-                        <span className="grid size-11 shrink-0 place-items-center rounded-full bg-sage/15 font-heading text-base font-semibold text-sage ring-1 ring-sage/30">
-                          {authorName.slice(0, 1)}
-                        </span>
-                      )}
-                      <div className="min-w-0">
-                        <p className="text-[0.6875rem] tracking-[0.14em] text-mist/50 uppercase">
-                          {dict.blog.by}
-                        </p>
-                        <p className="mt-0.5 truncate font-heading text-[0.9375rem] font-semibold text-white">
-                          {authorName}
-                        </p>
-                      </div>
-                    </div>
+            <div className="mt-8 flex flex-wrap items-center justify-between gap-5 border-t border-white/15 pt-5">
+              {authorName ? (
+                <div className="flex min-w-0 items-center gap-3">
+                  {author?.avatar && typeof author.avatar !== 'number' ? (
+                    <PayloadImage
+                      media={author.avatar}
+                      size="thumbnail"
+                      sizes="44px"
+                      className="size-11 shrink-0 rounded-full ring-2 ring-sage/45"
+                    />
                   ) : (
-                    <p className="text-[0.75rem] tracking-[0.13em] text-mist/60 uppercase">
-                      {siteName} <span className="px-1 text-sage/70">/</span> {dict.nav.blog}
-                    </p>
+                    <span className="grid size-11 shrink-0 place-items-center rounded-full bg-sage/15 font-heading text-base font-semibold text-sage ring-1 ring-sage/30">
+                      {authorName.slice(0, 1)}
+                    </span>
                   )}
+                  <div className="min-w-0">
+                    <p className="text-[0.6875rem] tracking-[0.14em] text-mist/50 uppercase">
+                      {dict.blog.by}
+                    </p>
+                    <p className="mt-0.5 truncate font-heading text-[0.9375rem] font-semibold text-white">
+                      {authorName}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-[0.75rem] tracking-[0.13em] text-mist/60 uppercase">
+                  {siteName} <span className="px-1 text-sage/70">/</span> {dict.nav.blog}
+                </p>
+              )}
 
-                  <ArticleShareButton
-                    title={post.title}
-                    shareLabel={dict.common.share}
-                    copiedLabel={dict.common.copied}
-                    errorLabel={dict.common.shareError}
-                  />
-                </div>
-              </div>
-
-              <figure className="group relative isolate aspect-[4/3] min-h-[18rem] overflow-hidden bg-deep sm:min-h-[24rem] lg:aspect-auto lg:min-h-[36rem]">
-                <PayloadImageFill
-                  media={post.featuredImage}
-                  size="hero"
-                  sizes="(min-width: 1024px) 54vw, 100vw"
-                  priority
-                  imageClassName="transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.025]"
-                />
-                <div
-                  className="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink/15 via-transparent to-ink/45"
-                  aria-hidden="true"
-                />
-                <div
-                  className="pointer-events-none absolute inset-4 border border-white/25"
-                  aria-hidden="true"
-                />
-                <div className="absolute left-7 top-7 inline-flex items-center gap-2 border border-white/25 bg-ink/45 px-3 py-2 text-[0.6875rem] tracking-[0.15em] text-white uppercase backdrop-blur-sm">
-                  <span className="size-1.5 bg-sage" aria-hidden="true" />
-                  {dict.blog.fieldNotes}
-                </div>
-                <div className="absolute right-7 bottom-7 grid size-14 place-items-center border border-white/35 bg-ink/15 text-white backdrop-blur-sm">
-                  <Compass className="size-6" strokeWidth={1.25} aria-hidden="true" />
-                </div>
-              </figure>
+              <ArticleShareButton
+                title={post.title}
+                shareLabel={dict.common.share}
+                copiedLabel={dict.common.copied}
+                errorLabel={dict.common.shareError}
+              />
             </div>
           </div>
         </header>
 
         <section className="bg-white py-12 md:py-20" aria-labelledby="post-title">
           <div className="container-content">
+            {/* Two columns only from `lg` up, because the outline that occupies the right-hand
+                column is a desktop affordance. Below that the article keeps its single
+                44rem reading measure instead of stretching to the wider grid. */}
             <div
-              className={
-                headings.length
-                  ? 'mx-auto grid max-w-[65rem] gap-8 lg:grid-cols-[minmax(0,44rem)_16rem] lg:gap-x-20 lg:gap-y-0'
-                  : 'mx-auto max-w-[44rem]'
-              }
+              className={cn(
+                'mx-auto max-w-[44rem]',
+                headings.length > 0 &&
+                  'lg:grid lg:max-w-[65rem] lg:grid-cols-[minmax(0,44rem)_16rem] lg:gap-x-20 lg:gap-y-0',
+              )}
             >
+              {/* "In this story" is deliberately hidden on mobile and tablet (`< lg`): a
+                  numbered index of the article is only useful next to a sticky column, and on
+                  a phone it just pushes the story down. `lg:block` re-enables it. */}
               {headings.length > 0 ? (
-                <aside className="lg:sticky lg:top-32 lg:col-start-2 lg:row-start-1 lg:self-start">
-                  <nav
-                    aria-label={dict.blog.inThisStory}
-                    className="border-l-2 border-sage bg-mist p-5 sm:p-6 lg:border-l lg:bg-transparent lg:p-0 lg:pl-6"
-                  >
+                <aside className="hidden lg:sticky lg:top-32 lg:col-start-2 lg:row-start-1 lg:block lg:self-start">
+                  <nav aria-label={dict.blog.inThisStory} className="border-l border-sage pl-6">
                     <p className="eyebrow text-slate">{dict.blog.inThisStory}</p>
                     <ol className="mt-4 max-h-[calc(100svh-11rem)] space-y-2 overflow-y-auto pr-2">
                       {headings.map((heading, index) => (
@@ -229,13 +241,7 @@ export function PostDetail({
               ) : null}
 
               {/* The article body — 17px pure-black running copy (see `.single-page-body`). */}
-              <div
-                className={
-                  headings.length
-                    ? 'single-page-body min-w-0 lg:col-start-1 lg:row-start-1'
-                    : 'single-page-body'
-                }
-              >
+              <div className="single-page-body min-w-0 lg:col-start-1 lg:row-start-1">
                 <RichText content={post.content} className="blog-prose" headingIds={headingIds} />
 
                 {authorName && author?.bio ? (
