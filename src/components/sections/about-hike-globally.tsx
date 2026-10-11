@@ -230,7 +230,7 @@ function PillarCard({
         <Icon className="size-5" aria-hidden="true" />
       </span>
       <h3 className="mt-4 text-[0.95rem] font-semibold tracking-[0.01em] text-white">{title}</h3>
-      <p className="mt-1.5 text-[0.84rem] leading-relaxed text-mist/65">{description}</p>
+      <p className="mt-1.5 description-copy leading-relaxed text-mist/65">{description}</p>
     </div>
   )
 }

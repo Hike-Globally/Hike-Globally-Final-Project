@@ -36,7 +36,7 @@ export function Stats({ block }: { block: StatsBlock }) {
                 </dd>
                 <dt className="mt-2 text-[0.9375rem] font-medium">{item.label}</dt>
                 {item.description ? (
-                  <p className={cn('mt-1 text-[0.8125rem]', dark ? 'text-mist/60' : 'text-ink-60')}>
+                  <p className={cn('mt-1 description-copy', dark ? 'text-mist/60' : 'text-ink-60')}>
                     {item.description}
                   </p>
                 ) : null}

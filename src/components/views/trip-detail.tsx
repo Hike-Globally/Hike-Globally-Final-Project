@@ -370,7 +370,7 @@ export function TripDetail({
                             </AccordionTrigger>
 
                             <AccordionContent>
-                              <p className="w-full break-words leading-relaxed text-ink-70">
+                              <p className="w-full break-words description-copy leading-relaxed text-ink-70">
                                 {day.description}
                               </p>
 
