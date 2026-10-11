@@ -48,7 +48,7 @@ export function DestinationCard({
       />
       <PayloadImageFill
         media={destination.heroImage}
-        size={size === 'large' ? 'tablet' : 'card'}
+        size={size === 'large' ? 'hero' : 'tablet'}
         sizes={
           size === 'large'
             ? '(min-width: 1024px) 60vw, 92vw'
