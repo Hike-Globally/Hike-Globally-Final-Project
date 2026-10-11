@@ -1,5 +1,6 @@
 import type { Page } from '@/payload-types'
 import { HeroScrollCover } from '@/components/motion/hero-scroll-cover'
+import { AboutHikeGlobally } from '@/components/sections/about-hike-globally'
 import { DifficultyLevels } from '@/components/sections/difficulty-levels'
 
 import { Cta } from './cta'
@@ -98,13 +99,23 @@ export async function BlockRenderer({
       if (heroBlock.blockType === 'hero') {
         const [firstOtherBlock, ...subsequentBlocks] = otherBlocks
         const heroElement = <Hero block={heroBlock} homepage={true} />
+
+        // "About Hike Globally" always follows the Curated Travel Packages section
+        // (the `featuredTrips` block), wherever an editor has placed it on the page.
+        const aboutElement = <AboutHikeGlobally key="about-hike-globally" />
+
         const firstSectionElement = (
           <>
             <DifficultyLevels />
             {firstOtherBlock ? renderBlock(firstOtherBlock, 0, false) : null}
+            {firstOtherBlock?.blockType === 'featuredTrips' ? aboutElement : null}
           </>
         )
-        const subsequentElements = subsequentBlocks.map((b, i) => renderBlock(b, i + 1, false))
+        const subsequentElements = subsequentBlocks.flatMap((b, i) =>
+          b.blockType === 'featuredTrips'
+            ? [renderBlock(b, i + 1, false), aboutElement]
+            : [renderBlock(b, i + 1, false)],
+        )
 
         return (
           <HeroScrollCover

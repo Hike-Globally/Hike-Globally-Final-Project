@@ -1,0 +1,102 @@
+/* ============================================================================
+   About Hike Globally — orbit visual + marquee ticker.
+   ============================================================================
+   Kept in a dedicated stylesheet (rather than Tailwind utility soup) because the
+   orbit relies on paired, perfectly-synced `@keyframes` — the ring spins one way
+   while every pin counter-rotates the exact same duration so it stays upright.
+   That pairing is easiest to read, tune and keep in sync as plain CSS.
+   All of it is skipped under `prefers-reduced-motion: reduce` at the bottom.
+   ========================================================================== */
+
+[data-about-globe] {
+  --orbit-duration-1: 26s;
+  --orbit-duration-2: 38s;
+}
+
+[data-about-globe] .ahg-ring {
+  animation: ahg-spin var(--orbit-duration, 30s) linear infinite;
+}
+
+[data-about-globe] .ahg-ring--reverse {
+  animation-direction: reverse;
+}
+
+[data-about-globe] .ahg-pin-counter {
+  animation: ahg-spin var(--orbit-duration, 30s) linear infinite reverse;
+}
+
+[data-about-globe] .ahg-ring--reverse .ahg-pin-counter {
+  animation-direction: normal;
+}
+
+[data-about-globe] .ahg-sphere {
+  animation: ahg-spin 70s linear infinite;
+}
+
+[data-about-globe] .ahg-pulse {
+  animation: ahg-pulse 2.6s var(--ease-brand, ease-in-out) infinite;
+}
+
+[data-about-globe] .ahg-float {
+  animation: ahg-float 6s var(--ease-brand, ease-in-out) infinite;
+}
+
+@keyframes ahg-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ahg-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+@keyframes ahg-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -10px, 0);
+  }
+}
+
+/* Infinite horizontal ticker — two identical lists back to back, scrolled exactly -50%. */
+[data-about-ticker] {
+  animation: ahg-marquee 32s linear infinite;
+}
+
+[data-about-ticker-group]:hover [data-about-ticker] {
+  animation-play-state: paused;
+}
+
+@keyframes ahg-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-about-globe] .ahg-ring,
+  [data-about-globe] .ahg-pin-counter,
+  [data-about-globe] .ahg-sphere,
+  [data-about-globe] .ahg-pulse,
+  [data-about-globe] .ahg-float,
+  [data-about-ticker] {
+    animation: none !important;
+  }
+}
