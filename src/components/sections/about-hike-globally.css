@@ -5,7 +5,8 @@
    orbit relies on paired, perfectly-synced `@keyframes` — the ring spins one way
    while every pin counter-rotates the exact same duration so it stays upright.
    That pairing is easiest to read, tune and keep in sync as plain CSS.
-   All of it is skipped under `prefers-reduced-motion: reduce` at the bottom.
+   The globe's spin/pulse is switched off below `md` (mobile) and, along with the
+   ticker, under `prefers-reduced-motion: reduce` — see the two blocks at the bottom.
    ========================================================================== */
 
 [data-about-globe] {
@@ -73,6 +74,24 @@
   }
   to {
     transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* Mobile opt-out — below `md` (768px, Tailwind's default and the breakpoint this
+   section already uses for its two-column switch) the globe keeps its exact
+   composition but stops moving: the pulse ring, both orbit rings, the pins'
+   counter-rotation and the sphere spin all sit still. On a phone the section is
+   one narrow column with the globe right under the copy, so a permanently
+   spinning orbit competes with the text and costs battery for pure decoration.
+   The static pulse ring is concentric inside the opaque sphere, so it simply
+   disappears rather than leaving a stray circle. Everything from `md` up — and
+   the destination ticker at every width — is untouched. */
+@media (max-width: 767.98px) {
+  [data-about-globe] .ahg-ring,
+  [data-about-globe] .ahg-pin-counter,
+  [data-about-globe] .ahg-sphere,
+  [data-about-globe] .ahg-pulse {
+    animation: none;
   }
 }
 

@@ -46,7 +46,10 @@ const OUTER_ORBIT_ANGLES = [70, 190, 310]
  *  2. A hand-built CSS/SVG-free orbit — a glowing globe with two independently spinning rings
  *     of destination pins — that tilts toward the pointer in 3D.
  *  3. An infinite destination ticker that can be paused on hover.
- * Every animation collapses to a static, fully legible layout under `prefers-reduced-motion`.
+ * On mobile (below `md`) the orbit is deliberately static — no ring spin, no sphere spin, no
+ * pulse — so it reads as a calm emblem under the copy instead of competing with it; see the
+ * media query in `about-hike-globally.css`. Every animation also collapses to a static, fully
+ * legible layout under `prefers-reduced-motion`.
  */
 export function AboutHikeGlobally() {
   const glowRef = useRef<HTMLDivElement>(null)
@@ -158,7 +161,11 @@ export function AboutHikeGlobally() {
   )
 }
 
-/** Globe with two independently spinning orbit rings of destination pins, tilting toward the pointer. */
+/**
+ * Globe with two independently spinning orbit rings of destination pins, tilting toward the
+ * pointer. The spin/pulse is switched off below `md` — the markup is identical at every width,
+ * only the CSS animations are dropped, so the mobile globe is the same composition frozen.
+ */
 function GlobeVisual() {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const pointerX = useMotionValue(0.5)
