@@ -1,5 +1,7 @@
-import { TripsRopeCarousel } from '@/components/cards/trips-rope-carousel'
-import { SectionHeading } from '@/components/sections/section-heading'
+import {
+  CuratedTripsSection,
+  HOMEPAGE_TRIP_LIMIT,
+} from '@/components/sections/curated-trips-section'
 import { sitePath } from '@/i18n/config'
 import { getHomepageTrips } from '@/lib/data'
 import type { TripCard as TripCardData } from '@/lib/data'
@@ -8,11 +10,8 @@ import { isRenderableTripPick, resolveTripSection } from '@/lib/trip-selection'
 import type { FeaturedTripsBlock, Trip } from '@/payload-types'
 
 export async function FeaturedTrips({ block }: { block: FeaturedTripsBlock }) {
-  const limit = block.limit ?? 3
-
-  // The editor's own picks, minus any that cannot be drawn on a card (unpopulated relationship or
-  // a since-deleted hero image). A pick that would render an empty image box counts as no pick, so
-  // the automatic list below still gets its chance.
+  // Keep the editor's picks, but never render more than six cards. If the block has no valid
+  // manual picks, load up to six featured trips (or the newest published trips as a fallback).
   const manualPicks =
     block.source === 'manual' && Array.isArray(block.trips)
       ? block.trips.filter(
@@ -21,12 +20,12 @@ export async function FeaturedTrips({ block }: { block: FeaturedTripsBlock }) {
         )
       : []
 
-  // Nothing to read when the editor chose trips by hand. Otherwise: featured trips, falling back
-  // to the newest published ones so an unflagged catalogue still fills this section — a block that
-  // renders `null` takes its heading and "View all" link with it, which looks like a broken CMS.
-  const automatic = manualPicks.length > 0 ? [] : await getHomepageTrips(limit)
+  const automatic = manualPicks.length > 0 ? [] : await getHomepageTrips(HOMEPAGE_TRIP_LIMIT)
 
-  const trips = resolveTripSection(manualPicks as unknown as TripCardData[], automatic)
+  const trips = resolveTripSection(manualPicks as unknown as TripCardData[], automatic).slice(
+    0,
+    HOMEPAGE_TRIP_LIMIT,
+  )
 
   if (trips.length === 0) return null
 
@@ -36,17 +35,5 @@ export async function FeaturedTrips({ block }: { block: FeaturedTripsBlock }) {
     newTab: false,
   }
 
-  return (
-    <section className="overflow-hidden py-16 md:py-24">
-      <div className="container-content">
-        <SectionHeading title={block.heading} description={block.subheading} action={viewAll} />
-      </div>
-
-      {/* `limit` sizes the automatic list; a manual selection is exactly what the editor picked,
-          so it is allowed to run longer — up to double — rather than silently dropping cards.
-          The trips ride the rope-curve carousel full-bleed, exactly like the reference
-          animation (`animation.html`). */}
-      <TripsRopeCarousel trips={trips.slice(0, limit * 2)} label={block.heading ?? undefined} />
-    </section>
-  )
+  return <CuratedTripsSection trips={trips} action={{ href: viewAll.href, label: viewAll.label }} />
 }

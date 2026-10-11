@@ -1478,9 +1478,9 @@ const run = async () => {
       primary: 'Browse all trips',
       secondary: 'Plan your trip',
       stats: 'Why people keep coming back',
-      trips: 'Trips worth building a year around',
+      trips: 'Curated Travel Packages',
       tripsSub:
-        'Every itinerary below has been walked by the person who wrote it. Pick one as it stands, or tell us what to change.',
+        'Explore our curated travel packages designed to suit every budget, travel style, and adventure. From luxury holidays and family vacations to romantic getaways and adventure tours, discover the best travel deals for unforgettable experiences at top destinations.',
       destinations: 'Four regions, one mountain country',
       destinationsSub:
         'Start with the classic valleys, or go looking for the quiet ones behind the rain shadow.',
@@ -1562,7 +1562,7 @@ const run = async () => {
         heading: copy.trips,
         subheading: copy.tripsSub,
         source: 'featured',
-        limit: 3,
+        limit: 6,
         columns: '3',
         viewAllLink: { label: copy.viewTrips, type: 'custom', url: '/trips' },
       },
