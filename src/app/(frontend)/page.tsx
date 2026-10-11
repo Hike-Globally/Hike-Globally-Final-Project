@@ -7,6 +7,8 @@ import { getPage, getSettings } from '@/lib/data'
 import { isLivePreviewRequest } from '@/lib/live-preview-access'
 import { buildMetadata, organizationJsonLd, seoFromDoc, siteUrl, websiteJsonLd } from '@/lib/seo'
 
+import './homepage.css'
+
 /**
  * ============================================================================
  * HOMEPAGE — `/`
@@ -40,7 +42,11 @@ export default async function HomePage() {
   const [page, settings] = await Promise.all([getPage('home', includeDraft), getSettings()])
 
   return (
-    <>
+    /* `data-homepage` scopes the homepage type scale (see `homepage.css`): the
+       hero headline, every section headline and every section intro take their
+       size from it, while the same shared components keep their own type on
+       every other page. */
+    <div data-homepage="">
       {page ? <BlockRenderer blocks={page.blocks} homepage /> : <HomeFallback />}
 
       <JsonLd
@@ -60,6 +66,6 @@ export default async function HomePage() {
           websiteJsonLd({ name: settings.siteName, url: siteUrl }),
         ]}
       />
-    </>
+    </div>
   )
 }

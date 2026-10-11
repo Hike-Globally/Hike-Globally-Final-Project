@@ -6,35 +6,29 @@
    `about-hike-globally.css` flips its animation off at), so the mobile
    rendering is exactly what it was before:
 
-     .ct-heading        the section title drops to the size the
-                        "Different levels, all epic adventures" heading uses in
-                        `difficulty-levels.tsx`, so the two read as equals.
-     .ct-description    the intro paragraph is 2px smaller than `lead` and is
-                        held to three quarters of the heading column.
-     .ct-card-summary   the trip-card summaries are a further 2px smaller than
+     .ct-description    the intro paragraph is held to three quarters of the
+                        heading column.
+     .ct-card-summary   the trip-card summaries are 2px smaller than
                         `card-description-copy`.
 
-   The sizes stay token-driven (`--font-size-description` and viewport units)
-   instead of pinning fixed pixels, so they keep scaling with the canvas — the
-   120rem+ step in `globals.css` included. These rules are intentionally
-   unlayered plain CSS: they beat both `heading-lg`/`lead`/`card-description-copy`
-   and those utilities' own media queries without any `!important`.
+   The *sizes* no longer live here: the section's headline and intro take them
+   from the homepage type scale (`home-section-title` / `home-section-intro` in
+   `src/app/(frontend)/homepage.css`), so the headline matches the difficulty
+   and destinations headlines exactly instead of being re-tuned by hand. Only
+   the layout-only rules that are genuinely about this section stay.
+
+   These rules are intentionally unlayered plain CSS: they beat both
+   `heading-lg`/`lead`/`card-description-copy` and those utilities' own media
+   queries without any `!important`.
    ========================================================================== */
 
 @media (width >= 768px) {
-  /* Same expression as the `text-[clamp(1.15rem,1.5vw,1.55rem)]` on the
-     difficulty-levels heading — keep the two in sync. */
-  [data-curated-trips] .ct-heading {
-    font-size: clamp(1.15rem, 1.5vw, 1.55rem);
-  }
-
-  /* `lead` minus 2px. */
+  /* Intro measure — three quarters of the heading column. */
   [data-curated-trips] .ct-description {
     width: 75%;
-    font-size: calc(var(--font-size-description) - 2px);
   }
 
-  /* `card-description-copy` minus a further 2px. */
+  /* `card-description-copy` minus 2px. */
   [data-curated-trips] .ct-card-summary {
     font-size: calc(var(--font-size-description) - 4px);
   }

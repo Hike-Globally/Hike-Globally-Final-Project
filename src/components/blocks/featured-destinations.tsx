@@ -52,6 +52,8 @@ export async function FeaturedDestinations({ block }: { block: FeaturedDestinati
         title={block.heading}
         description={block.subheading}
         action={{ href: viewAll.href, label: viewAll.label }}
+        titleClassName="home-section-title"
+        descriptionClassName="home-section-intro"
       />
     )
   }
@@ -59,7 +61,13 @@ export async function FeaturedDestinations({ block }: { block: FeaturedDestinati
   return (
     <section className="py-16 md:py-24">
       <div className="container-content">
-        <SectionHeading title={block.heading} description={block.subheading} action={viewAll} />
+        <SectionHeading
+          title={block.heading}
+          description={block.subheading}
+          action={viewAll}
+          titleClassName="home-section-title"
+          descriptionClassName="home-section-intro"
+        />
 
         {editorial ? (
           <div className="grid gap-6 lg:grid-cols-2">
