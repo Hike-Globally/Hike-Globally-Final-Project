@@ -45,7 +45,7 @@ export default async function InquiryPage() {
         <div className="container-content grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
           <aside className="space-y-8">
             <div className="bg-sage-20 p-7">
-              <h2 className="heading-md mb-5">{dict.footer.contact}</h2>
+              <h2 className="heading-md mb-5">{dict.inquiry.contact}</h2>
               <ul className="space-y-4 text-[0.9375rem]">
                 {settings.email ? (
                   <li className="flex items-center gap-3">
