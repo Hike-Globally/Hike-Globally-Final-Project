@@ -88,7 +88,13 @@ export function Hero({
             <p className={cn('eyebrow mb-5', hasImage ? 'text-sage' : 'text-slate')}>{eyebrow}</p>
           ) : null}
 
-          <h1 className={cn('heading-display', hasImage ? 'text-white' : 'text-ink')}>
+          <h1
+            className={cn(
+              'heading-display',
+              homepage ? 'home-hero-title' : '',
+              hasImage ? 'text-white' : 'text-ink',
+            )}
+          >
             {block.heading}
           </h1>
 
@@ -96,6 +102,7 @@ export function Hero({
             <p
               className={cn(
                 'lead mt-6',
+                homepage ? 'home-hero-lead' : '',
                 homepage ? 'w-3/4' : 'max-w-2xl',
                 hasImage ? 'text-mist/85' : 'text-ink-60',
               )}

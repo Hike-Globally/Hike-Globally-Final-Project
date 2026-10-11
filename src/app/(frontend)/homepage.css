@@ -1,0 +1,93 @@
+/* ============================================================================
+   HOMEPAGE TYPE SCALE — one place for every headline/body size on `/`
+   ----------------------------------------------------------------------------
+   The homepage runs on exactly four type sizes. They are declared once, here,
+   as fluid `clamp()`s whose ceilings are the specified pixel values, and then
+   applied through four semantic classes:
+
+     .home-hero-title     65px  hero headline      ("Walk where the map runs out…")
+     .home-hero-lead      17px  hero standfirst   ("Small-group treks and…")
+     .home-section-title  50px  every section headline, uppercase
+                                 ("Different levels, all epic adventures",
+                                  "Curated Travel Packages",
+                                  "One platform. Every trail on Earth.",
+                                  "Destinations")
+     .home-section-lead   17px  the About Hike Globally standfirst
+     .home-section-intro  16px  every other section intro
+                                 ("Find your match — …",
+                                  "Explore our curated travel packages…",
+                                  "Eight mountain regions, …")
+
+   The scope is `[data-homepage]`, set once in `src/app/(frontend)/page.tsx`, so
+   nothing outside the homepage can pick these sizes up — the shared
+   `SectionHeading` / `DestinationCarousel` / `FeaturedTrips` components keep
+   their own type everywhere else.
+
+   These rules are intentionally *unlayered* plain CSS: real (unlayered) rules
+   beat anything inside `@layer`, which includes every Tailwind v4 `@utility`
+   in `globals.css` (`heading-display`, `heading-lg`, `heading-xl`, `lead`,
+   `description-copy`) and their own media queries — so a class here overrides
+   a utility's `font-size` without `!important` and without fighting source
+   order. The same technique `curated-trips-section.css` already relies on.
+
+   Fluid, not fixed: each size is the *ceiling* of a clamp, so a 5" phone still
+   gets a 36px hero and a 32px section headline instead of a 65px/50px wall of
+   text, while everything from the desktop column width (1280px) up renders at
+   exactly the specified pixel value.
+   ==========================================================================*/
+
+[data-homepage] {
+  /* 65px — hero headline. */
+  --home-hero-title-size: clamp(2.25rem, 1.15rem + 4.6vw, 4.0625rem);
+
+  /* 50px — section headlines. */
+  --home-section-title-size: clamp(2rem, 1.05rem + 3.25vw, 3.125rem);
+
+  /* 17px — hero standfirst + the About Hike Globally lead. */
+  --home-lead-size: clamp(0.9375rem, 0.82rem + 0.45vw, 1.0625rem);
+
+  /* 16px — section intros. */
+  --home-intro-size: clamp(0.9375rem, 0.82rem + 0.45vw, 1rem);
+}
+
+/* ---------------------------------------------------------------------------
+   Hero
+   --------------------------------------------------------------------------- */
+[data-homepage] .home-hero-title {
+  font-size: var(--home-hero-title-size);
+}
+
+[data-homepage] .home-hero-lead {
+  font-size: var(--home-lead-size);
+}
+
+/* ---------------------------------------------------------------------------
+   Section headlines — 50px, uppercase
+   --------------------------------------------------------------------------- */
+[data-homepage] .home-section-title {
+  font-size: var(--home-section-title-size);
+  text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------------------------
+   Section body copy — 17px (lead) / 16px (intro)
+   --------------------------------------------------------------------------- */
+[data-homepage] .home-section-lead {
+  font-size: var(--home-lead-size);
+}
+
+[data-homepage] .home-section-intro {
+  font-size: var(--home-intro-size);
+}
+
+/* Short landscape phones (5–6" rotated): keep the hero headline inside the
+   viewport, matching the `heading-display` override in `globals.css`. */
+@media (max-height: 500px) and (orientation: landscape) {
+  [data-homepage] .home-hero-title {
+    font-size: clamp(1.6rem, 8vh, 2.4rem);
+  }
+
+  [data-homepage] .home-section-title {
+    font-size: clamp(1.35rem, 6.5vh, 2rem);
+  }
+}

@@ -102,13 +102,13 @@ export function AboutHikeGlobally() {
             <Reveal delay={80}>
               <h2
                 id="about-hike-globally-heading"
-                className="heading-xl mt-4 max-w-xl text-white"
+                className="heading-xl home-section-title mt-4 max-w-xl text-white"
               >
                 {HEADING}
               </h2>
             </Reveal>
             <Reveal delay={140}>
-              <p className="lead mt-6 max-w-xl text-mist/75">{LEAD}</p>
+              <p className="lead home-section-lead mt-6 max-w-xl text-mist/75">{LEAD}</p>
             </Reveal>
 
             <Reveal delay={200}>

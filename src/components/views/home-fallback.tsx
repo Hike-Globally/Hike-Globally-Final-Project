@@ -43,15 +43,12 @@ export async function HomeFallback() {
       <div className="container-content py-16 md:py-20 [@media(max-height:500px)]:py-8">
         <div className="max-w-3xl min-w-0 3xl:max-w-4xl">
           {showHeroEyebrow ? <p className="eyebrow mb-5 text-sage">{heroEyebrow}</p> : null}
-          <h1 className="heading-display text-white">
+          <h1 className="heading-display home-hero-title text-white">
             Walk where the
             <br />
             map runs out of names.
           </h1>
-          <p
-            className="lead mt-6 w-3/4 text-mist/85"
-            style={{ fontSize: 'calc(var(--font-size-description) - 2px)' }}
-          >
+          <p className="lead home-hero-lead mt-6 w-3/4 text-mist/85">
             Small-group treks and expeditions across Nepal, led by guides who grew up on these
             trails. Tell us what you are dreaming of — we will build the itinerary around it.
           </p>
@@ -85,6 +82,8 @@ export async function HomeFallback() {
         title={dict.nav.destinations}
         description={dict.destinations.listingSubtitle}
         action={{ href: sitePath('/destinations'), label: dict.common.viewAll }}
+        titleClassName="home-section-title"
+        descriptionClassName="home-section-intro"
       />
     ) : (
       <section className="py-16 md:py-24">
@@ -93,6 +92,8 @@ export async function HomeFallback() {
             title={dict.nav.destinations}
             description={dict.destinations.listingSubtitle}
             action={{ href: sitePath('/destinations'), label: dict.common.viewAll }}
+            titleClassName="home-section-title"
+            descriptionClassName="home-section-intro"
           />
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
             {destinations.map((destination, index) => (

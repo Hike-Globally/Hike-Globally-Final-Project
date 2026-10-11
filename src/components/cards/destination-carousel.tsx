@@ -31,12 +31,16 @@ export function DestinationCarousel({
   description,
   action,
   className,
+  titleClassName,
+  descriptionClassName,
 }: {
   destinations: DestinationCardData[]
   title: string
   description?: string | null
   action?: { href: string; label: string } | null
   className?: string
+  titleClassName?: string
+  descriptionClassName?: string
 }) {
   const trackRef = useRef<HTMLDivElement | null>(null)
   const [atStart, setAtStart] = useState(true)
@@ -96,6 +100,8 @@ export function DestinationCarousel({
           title={title}
           description={description}
           action={action}
+          titleClassName={titleClassName}
+          descriptionClassName={descriptionClassName}
           controls={
             <div className="flex w-24 shrink-0 items-center justify-end gap-2">
               {canScroll ? (

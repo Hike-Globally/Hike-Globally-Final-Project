@@ -28,8 +28,8 @@ export function CuratedTripsSection({
           title={heading}
           description={description}
           action={action}
-          titleClassName="ct-heading"
-          descriptionClassName="ct-description"
+          titleClassName="home-section-title"
+          descriptionClassName="home-section-intro ct-description"
         />
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
