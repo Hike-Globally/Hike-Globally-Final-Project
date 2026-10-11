@@ -988,8 +988,15 @@ body {
   }
 }
 
+/* The rail is pinned to the viewport, not to the page: `position: sticky` + `top: 0` hold it in
+   place on every admin view while the content column scrolls underneath it. Payload ships the
+   rail this way and sizes it `height: 100vh`, which is what gives the rail a scrolling area of
+   its own (`.hg-rail__body`) instead of growing with the document. The `position` value here is
+   load-bearing: `relative` — or any static value — silently downgrades the rail to an ordinary
+   block that scrolls out of view with the page. */
 .template-default .nav {
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 2;
   border-right: 1px solid var(--hg-rail-line);
   background-color: var(--hg-rail-bg);
@@ -1001,6 +1008,16 @@ body {
     18px 0 48px rgb(3 18 14 / 18%);
   color: var(--hg-rail-ink);
   font-family: var(--hg-rail-font);
+}
+
+/* Now that the rail is pinned, its height decides how much of it is reachable: `100vh` is
+   taller than the visible viewport on mobile browsers (the URL bar overlaps it), which would
+   put the account footer below the fold in the full-screen drawer. `dvh` tracks the height
+   that is actually on screen; on desktop the two are identical. */
+@supports (height: 100dvh) {
+  .template-default .nav {
+    height: 100dvh;
+  }
 }
 
 /* Contour texture: drawn as an inline SVG so the rail keeps its depth on any
