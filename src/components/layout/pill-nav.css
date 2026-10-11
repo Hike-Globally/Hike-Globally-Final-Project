@@ -65,6 +65,10 @@
 }
 
 /* --- track ------------------------------------------------------------- */
+.pn-mobile-logo {
+  display: none;
+}
+
 .pn-track {
   pointer-events: auto;
   position: relative;
@@ -256,12 +260,33 @@
 /* --- mobile: collapsed 56×56 track, expanded 316px column --------------- */
 @media (max-width: 809.98px) {
   .pn-viewport {
+    position: relative;
     height: 88px;
     align-items: flex-end;
     padding: 16px 16px 0;
   }
 
+  .pn-mobile-logo {
+    position: absolute;
+    top: 50%;
+    left: 16px;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(-50%);
+    pointer-events: auto;
+  }
+
+  .pn-mobile-logo-mark {
+    display: block;
+    width: auto;
+    height: 40px;
+    filter: brightness(0) invert(1);
+  }
+
   .pn-track {
+    z-index: 2;
     flex-direction: column;
     place-content: flex-start;
     align-items: flex-start;
