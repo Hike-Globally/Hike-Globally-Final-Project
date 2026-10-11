@@ -1,33 +1,39 @@
-/* Admin panel theming — a quiet, high-contrast palette for the Hike Globally workspace. */
+/* Admin panel theming — the Hike Globally brand palette on a pure white canvas.
+   The workspace background is #ffffff, so every surface above it carries its own
+   contrast: ink text, deep-teal actions, sage accents and cool hairline borders. */
 :root {
+  /* A cool ink→mist ramp derived from the brand palette (#01161e / #124559 /
+     #598392). The canvas below it is pure white, so the low steps are kept a
+     shade deeper than a tint would be: they are what draws the borders,
+     hover washes and table rules that keep every surface readable on white. */
   --theme-elevation-0: #ffffff;
-  --theme-elevation-50: #f8faf7;
-  --theme-elevation-100: #f1f5f1;
-  --theme-elevation-150: #e8eee9;
-  --theme-elevation-200: #dfe8e1;
-  --theme-elevation-250: #d1ded4;
-  --theme-elevation-300: #c2d3c6;
-  --theme-elevation-350: #b2c8b7;
-  --theme-elevation-400: #9db9a4;
-  --theme-elevation-450: #87a891;
-  --theme-elevation-500: #6f9580;
-  --theme-elevation-550: #5c8771;
-  --theme-elevation-600: #4a7864;
-  --theme-elevation-650: #3a6958;
-  --theme-elevation-700: #2c594c;
-  --theme-elevation-750: #234b41;
-  --theme-elevation-800: #1a3e36;
-  --theme-elevation-850: #14352f;
-  --theme-elevation-900: #102c27;
-  --theme-elevation-950: #0d2521;
-  --theme-elevation-1000: #091d1a;
-  --theme-bg: #f5f7f4;
+  --theme-elevation-50: #f6f9f9;
+  --theme-elevation-100: #edf2f3;
+  --theme-elevation-150: #e2e9eb;
+  --theme-elevation-200: #d7e0e3;
+  --theme-elevation-250: #c6d3d7;
+  --theme-elevation-300: #b3c4c9;
+  --theme-elevation-350: #9db2b8;
+  --theme-elevation-400: #86a0a7;
+  --theme-elevation-450: #6f8d95;
+  --theme-elevation-500: #5b7c85;
+  --theme-elevation-550: #4b6c75;
+  --theme-elevation-600: #3d5d66;
+  --theme-elevation-650: #324f57;
+  --theme-elevation-700: #28434a;
+  --theme-elevation-750: #1f383e;
+  --theme-elevation-800: #193035;
+  --theme-elevation-850: #14282d;
+  --theme-elevation-900: #0f2126;
+  --theme-elevation-950: #0b1b1f;
+  --theme-elevation-1000: #071518;
+  --theme-bg: #ffffff;
   --theme-input-bg: #ffffff;
-  --theme-text: #17342e;
-  --theme-success-500: #4a8261;
-  --theme-warning-500: #b9853d;
-  --theme-error-500: #b9574e;
-  --theme-info-500: #527f93;
+  --theme-text: #01161e;
+  --theme-success-500: #3f7d63;
+  --theme-warning-500: #a9762b;
+  --theme-error-500: #b0453c;
+  --theme-info-500: #4a7f95;
 }
 
 /* --------------------------------------------------------------------------
@@ -886,17 +892,17 @@ html:has(.hg-login-gallery) body {
    Editorial workspace — dashboard and Payload admin chrome
    -------------------------------------------------------------------------- */
 html[data-theme='light'] {
-  --theme-bg: #f5f7f4;
+  --theme-bg: #ffffff;
   --theme-input-bg: #ffffff;
-  --theme-text: #17342e;
-  --theme-success-500: #4a8261;
-  --theme-warning-500: #b9853d;
-  --theme-error-500: #b9574e;
-  --theme-info-500: #527f93;
+  --theme-text: #01161e;
+  --theme-success-500: #3f7d63;
+  --theme-warning-500: #a9762b;
+  --theme-error-500: #b0453c;
+  --theme-info-500: #4a7f95;
 }
 
 body {
-  color: #17342e;
+  color: #01161e;
   font-family: 'Archivo Variable', 'Archivo', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -904,10 +910,15 @@ body {
 
 /* Payload lays the admin out with its own CSS grid (`--nav-width` + content column), so the
    surface rules here must not introduce a competing display mode. */
+/* The canvas is pure white. Because Payload draws its own surfaces in
+   `--theme-elevation-0` (also white), the separation now has to come from
+   edges and shadows rather than from a tinted page behind them — the rules
+   below give the header, the cards and the controls borders that hold up
+   against #ffffff. */
 .template-default {
   min-height: 100vh;
-  background: #f5f7f4;
-  color: #17342e;
+  background: #ffffff;
+  color: #01161e;
 }
 
 /* --------------------------------------------------------------------------
@@ -925,16 +936,17 @@ body {
    -------------------------------------------------------------------------- */
 .template-default {
   --hg-rail-width: 296px;
-  --hg-rail-bg: #0a2722;
-  --hg-rail-bg-top: #0e3229;
-  --hg-rail-bg-bottom: #071c18;
-  --hg-rail-line: rgb(255 255 255 / 7%);
-  --hg-rail-line-strong: rgb(255 255 255 / 13%);
-  --hg-rail-ink: rgb(226 240 231 / 66%);
-  --hg-rail-ink-strong: #f4faf6;
-  --hg-rail-muted: rgb(209 232 216 / 42%);
-  --hg-rail-accent: #9ad3ae;
-  --hg-rail-danger: #e08a7a;
+  /* Brand deep teal, #124559 — the same primary the storefront uses. */
+  --hg-rail-bg: #124559;
+  --hg-rail-bg-top: #17566d;
+  --hg-rail-bg-bottom: #0c3546;
+  --hg-rail-line: rgb(255 255 255 / 9%);
+  --hg-rail-line-strong: rgb(255 255 255 / 16%);
+  --hg-rail-ink: rgb(219 237 242 / 72%);
+  --hg-rail-ink-strong: #f3f9fb;
+  --hg-rail-muted: rgb(186 213 222 / 62%);
+  --hg-rail-accent: #86d3cb;
+  --hg-rail-danger: #f2a08d;
   --hg-rail-font: 'Archivo Variable', 'Archivo', Arial, sans-serif;
 }
 
@@ -1001,11 +1013,11 @@ body {
   border-right: 1px solid var(--hg-rail-line);
   background-color: var(--hg-rail-bg);
   background-image:
-    radial-gradient(115% 46% at 8% -6%, rgb(154 211 174 / 15%), transparent 62%),
+    radial-gradient(115% 46% at 8% -6%, rgb(134 211 203 / 16%), transparent 62%),
     linear-gradient(180deg, var(--hg-rail-bg-top) 0%, var(--hg-rail-bg) 44%, var(--hg-rail-bg-bottom) 100%);
   box-shadow:
     1px 0 0 rgb(255 255 255 / 3%),
-    18px 0 48px rgb(3 18 14 / 18%);
+    18px 0 48px rgb(1 22 30 / 20%);
   color: var(--hg-rail-ink);
   font-family: var(--hg-rail-font);
 }
@@ -1084,19 +1096,19 @@ body {
     linear-gradient(150deg, rgb(255 255 255 / 16%), rgb(255 255 255 / 3%));
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 16%),
-    0 6px 16px rgb(2 16 13 / 30%);
+    0 6px 16px rgb(1 22 30 / 32%);
   transition: transform 200ms ease, border-color 200ms ease;
 }
 
 .template-default .hg-rail__identity:hover .hg-rail__mark {
   transform: translateY(-1px);
-  border-color: rgb(154 211 174 / 34%);
+  border-color: rgb(134 211 203 / 36%);
 }
 
 .template-default .hg-rail__mark svg {
   width: 23px;
   height: 23px;
-  stroke: #cfe9d8;
+  stroke: #cbe8ee;
 }
 
 .template-default .hg-rail__wordmark {
@@ -1108,7 +1120,7 @@ body {
 
 .template-default .hg-rail__name {
   overflow: hidden;
-  color: #f5fbf7;
+  color: #f2f9fb;
   font-family: 'Google Sans Flex Variable', 'Google Sans Flex', var(--hg-rail-font);
   font-size: 15px;
   font-weight: 600;
@@ -1146,7 +1158,7 @@ body {
   border: 1px solid transparent;
   border-radius: 9px;
   background: transparent;
-  color: rgb(226 240 231 / 52%);
+  color: rgb(219 237 242 / 62%);
   cursor: pointer;
   text-decoration: none;
   transition:
@@ -1188,16 +1200,16 @@ body {
 }
 
 .template-default .hg-rail__search:focus-within {
-  border-color: rgb(154 211 174 / 40%);
+  border-color: rgb(134 211 203 / 42%);
   background: rgb(255 255 255 / 7%);
-  box-shadow: 0 0 0 3px rgb(154 211 174 / 9%);
+  box-shadow: 0 0 0 3px rgb(134 211 203 / 10%);
 }
 
 .template-default .hg-rail__search-icon {
   width: 15px;
   height: 15px;
   flex: 0 0 15px;
-  color: rgb(226 240 231 / 48%);
+  color: rgb(219 237 242 / 58%);
 }
 
 .template-default .hg-rail__search:focus-within .hg-rail__search-icon {
@@ -1224,7 +1236,7 @@ body {
 }
 
 .template-default .hg-rail__search input::placeholder {
-  color: rgb(209 232 216 / 40%);
+  color: rgb(186 213 222 / 52%);
 }
 
 .template-default .hg-rail__kbd {
@@ -1233,7 +1245,7 @@ body {
   border: 1px solid rgb(255 255 255 / 10%);
   border-radius: 6px;
   background: rgb(255 255 255 / 5%);
-  color: rgb(209 232 216 / 52%);
+  color: rgb(186 213 222 / 60%);
   font-family: inherit;
   font-size: 9.5px;
   font-weight: 600;
@@ -1251,7 +1263,7 @@ body {
   border: 0;
   border-radius: 6px;
   background: rgb(255 255 255 / 8%);
-  color: rgb(226 240 231 / 70%);
+  color: rgb(219 237 242 / 72%);
   cursor: pointer;
 }
 
@@ -1315,7 +1327,7 @@ body {
 
 .template-default .hg-rail__section-label {
   flex: 0 0 auto;
-  color: rgb(209 232 216 / 38%);
+  color: rgb(186 213 222 / 52%);
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.19em;
@@ -1369,7 +1381,7 @@ body {
   height: 20px;
   flex: 0 0 20px;
   place-items: center;
-  color: rgb(209 232 216 / 56%);
+  color: rgb(186 213 222 / 62%);
   transition:
     color 150ms ease,
     transform 150ms ease;
@@ -1381,7 +1393,7 @@ body {
 }
 
 .template-default .hg-rail__item:hover .hg-rail__item-icon {
-  color: rgb(240 250 243 / 88%);
+  color: rgb(238 248 250 / 88%);
 }
 
 .template-default .hg-rail__item-label {
@@ -1392,10 +1404,10 @@ body {
 
 .template-default .hg-rail__item--active {
   background:
-    linear-gradient(96deg, rgb(154 211 174 / 22%) 0%, rgb(154 211 174 / 8%) 58%, rgb(154 211 174 / 2%) 100%);
+    linear-gradient(96deg, rgb(134 211 203 / 20%) 0%, rgb(134 211 203 / 7%) 58%, rgb(134 211 203 / 2%) 100%);
   box-shadow:
-    inset 0 0 0 1px rgb(154 211 174 / 15%),
-    0 8px 20px rgb(2 16 13 / 26%);
+    inset 0 0 0 1px rgb(134 211 203 / 16%),
+    0 8px 20px rgb(1 22 30 / 28%);
   color: #ffffff;
   font-weight: 600;
 }
@@ -1408,7 +1420,7 @@ body {
   height: 17px;
   border-radius: 0 3px 3px 0;
   background: var(--hg-rail-accent);
-  box-shadow: 0 0 12px rgb(154 211 174 / 60%);
+  box-shadow: 0 0 12px rgb(134 211 203 / 60%);
   content: '';
   transform: translateY(-50%);
 }
@@ -1425,7 +1437,7 @@ body {
 }
 
 .template-default .hg-rail__empty strong {
-  color: rgb(240 250 243 / 82%);
+  color: rgb(238 248 250 / 84%);
   font-weight: 600;
 }
 
@@ -1461,8 +1473,8 @@ body {
 }
 
 .template-default .hg-rail__account--active {
-  border-color: rgb(154 211 174 / 26%);
-  background: rgb(154 211 174 / 9%);
+  border-color: rgb(134 211 203 / 28%);
+  background: rgb(134 211 203 / 10%);
 }
 
 .template-default .hg-rail__avatar {
@@ -1473,11 +1485,11 @@ body {
   place-items: center;
   border: 1px solid rgb(255 255 255 / 14%);
   border-radius: 50%;
-  background: linear-gradient(150deg, #358264 0%, #1a4a3c 100%);
+  background: linear-gradient(150deg, #347f92 0%, #124559 100%);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 18%),
-    0 4px 10px rgb(2 16 13 / 26%);
-  color: #e6f5ea;
+    0 4px 10px rgb(1 22 30 / 28%);
+  color: #e2f2f6;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -1493,7 +1505,7 @@ body {
 
 .template-default .hg-rail__account-name {
   overflow: hidden;
-  color: #f2f9f4;
+  color: #f1f8fa;
   font-size: 12.5px;
   font-weight: 600;
   letter-spacing: -0.009em;
@@ -1522,10 +1534,10 @@ body {
 .template-default .hg-rail__role {
   flex: 0 0 auto;
   padding: 1.5px 6px;
-  border: 1px solid rgb(154 211 174 / 26%);
+  border: 1px solid rgb(134 211 203 / 28%);
   border-radius: 999px;
-  background: rgb(154 211 174 / 12%);
-  color: #bde4c8;
+  background: rgb(134 211 203 / 13%);
+  color: #a9dcd6;
   font-size: 8px;
   font-weight: 700;
   letter-spacing: 0.09em;
@@ -1537,12 +1549,12 @@ body {
   width: 16px;
   height: 16px;
   flex: 0 0 16px;
-  color: rgb(209 232 216 / 34%);
+  color: rgb(186 213 222 / 46%);
   transition: color 160ms ease, transform 160ms ease;
 }
 
 .template-default .hg-rail__account:hover .hg-rail__account-cue {
-  color: rgb(240 250 243 / 74%);
+  color: rgb(238 248 250 / 76%);
   transform: translateX(1px);
 }
 
@@ -1561,7 +1573,7 @@ body {
   border: 1px solid rgb(255 255 255 / 7%);
   border-radius: 11px;
   background: rgb(255 255 255 / 3%);
-  color: rgb(233 243 236 / 74%);
+  color: rgb(224 240 244 / 76%);
   cursor: pointer;
   font-family: inherit;
   font-size: 12.5px;
@@ -1582,9 +1594,9 @@ body {
 }
 
 .template-default .hg-rail__signout:hover:not(:disabled) {
-  border-color: rgb(224 138 122 / 36%);
-  background: rgb(224 138 122 / 14%);
-  color: #fbdcd4;
+  border-color: rgb(242 160 141 / 36%);
+  background: rgb(242 160 141 / 14%);
+  color: #fbdad2;
 }
 
 .template-default .hg-rail__signout:disabled {
@@ -1594,7 +1606,7 @@ body {
 
 .template-default .hg-rail__signout-failure {
   margin: 0 2px;
-  color: #f0c8c0;
+  color: #f2c9c1;
   font-size: 10.5px;
   line-height: 1.45;
 }
@@ -1636,11 +1648,11 @@ body {
   width: 34px;
   height: 34px;
   place-items: center;
-  border: 1px solid #d9e3db;
+  border: 1px solid #dde3e4;
   border-radius: 11px;
   background: #ffffff;
-  box-shadow: 0 5px 14px rgb(11 40 34 / 9%);
-  color: #12453b;
+  box-shadow: 0 5px 14px rgb(1 22 30 / 10%);
+  color: #124559;
   transition:
     transform 160ms ease,
     border-color 160ms ease,
@@ -1649,8 +1661,8 @@ body {
 
 .template-default__nav-toggler-wrapper .template-default__nav-toggler:hover .hamburger {
   transform: translateY(-1px);
-  border-color: #bcd2c2;
-  box-shadow: 0 8px 18px rgb(11 40 34 / 13%);
+  border-color: #b9cbd0;
+  box-shadow: 0 8px 18px rgb(1 22 30 / 14%);
 }
 
 .template-default__nav-toggler-wrapper .hamburger__close-icon svg {
@@ -1671,7 +1683,7 @@ body {
 .template-default .hg-rail__signout:focus-visible,
 .template-default .hg-rail__search-clear:focus-visible,
 .template-default .nav__mobile-close:focus-visible {
-  outline: 2px solid rgb(154 211 174 / 75%);
+  outline: 2px solid rgb(134 211 203 / 80%);
   outline-offset: 2px;
 }
 
@@ -1727,7 +1739,7 @@ body {
     border: 1px solid rgb(255 255 255 / 12%);
     border-radius: 11px;
     background: rgb(255 255 255 / 6%);
-    color: rgb(233 243 236 / 80%);
+    color: rgb(224 240 244 / 82%);
   }
 
   .template-default .nav__mobile-close svg {
@@ -1781,8 +1793,9 @@ body {
 /* Main content area — Payload owns the grid column that follows the rail. */
 
 .template-default .app-header {
-  border-bottom: 1px solid #e6ece7;
-  background: rgb(250 251 249 / 94%);
+  border-bottom: 1px solid #dde3e4;
+  background: rgb(255 255 255 / 92%);
+  box-shadow: 0 1px 3px rgb(1 22 30 / 4%);
   backdrop-filter: blur(16px);
   position: sticky;
   top: 0;
@@ -1814,7 +1827,7 @@ body {
 }
 
 .template-default .app-header__breadcrumbs a:hover {
-  color: #103f36;
+  color: #0a2c3b;
 }
 
 .template-default .app-header__actions {
@@ -1826,8 +1839,8 @@ body {
 .template-default .app-header .btn--style-primary,
 .template-default .btn--style-primary {
   border-radius: 10px;
-  background: #174d42;
-  box-shadow: 0 5px 14px rgb(23 77 66 / 13%);
+  background: #124559;
+  box-shadow: 0 5px 14px rgb(18 69 89 / 16%);
   color: #ffffff;
   transition:
     transform 160ms ease,
@@ -1846,8 +1859,8 @@ body {
 .template-default .app-header .btn--style-primary:hover,
 .template-default .btn--style-primary:hover {
   transform: translateY(-1px);
-  background: #103f36;
-  box-shadow: 0 8px 18px rgb(23 77 66 / 19%);
+  background: #0e374a;
+  box-shadow: 0 8px 18px rgb(18 69 89 / 22%);
 }
 
 .template-default .btn--style-secondary {
@@ -1857,14 +1870,14 @@ body {
   font-weight: 500;
   border: 1px solid #dde3e4;
   background: #ffffff;
-  color: #17342e;
+  color: #01161e;
   cursor: pointer;
   transition: all 150ms ease;
 }
 
 .template-default .btn--style-secondary:hover {
-  background: #f8faf7;
-  border-color: #c2d3c6;
+  background: #f1f6f7;
+  border-color: #b9cbd0;
 }
 
 /* Dashboard content container */
@@ -1874,7 +1887,7 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 34px 40px 68px;
-  color: #17342e;
+  color: #01161e;
 }
 
 .hg-dashboard *,
@@ -1894,13 +1907,13 @@ body {
   isolation: isolate;
   border: 1px solid rgb(255 255 255 / 9%);
   border-radius: 22px;
-  background-color: #15332f;
+  background-color: #0e374a;
   background-image:
-    linear-gradient(96deg, rgb(8 31 29 / 94%) 0%, rgb(11 42 38 / 83%) 47%, rgb(12 39 38 / 26%) 100%),
+    linear-gradient(96deg, rgb(1 22 30 / 95%) 0%, rgb(18 69 89 / 86%) 47%, rgb(30 105 130 / 30%) 100%),
     url('/images/admin/himalaya-03.jpg');
   background-position: center, 63% 43%;
   background-size: cover;
-  box-shadow: 0 22px 48px rgb(19 48 39 / 12%);
+  box-shadow: 0 22px 48px rgb(1 22 30 / 16%);
   color: #ffffff;
 }
 
@@ -1910,7 +1923,7 @@ body {
   inset: 0;
   background:
     radial-gradient(ellipse at 76% 16%, rgb(255 255 255 / 19%), transparent 31%),
-    linear-gradient(0deg, rgb(4 20 19 / 38%), transparent 42%);
+    linear-gradient(0deg, rgb(1 22 30 / 40%), transparent 42%);
   content: '';
 }
 
@@ -1927,7 +1940,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: rgb(244 248 244 / 83%);
+  color: rgb(232 243 246 / 86%);
   font-size: 10px;
   font-weight: 650;
   letter-spacing: 0.16em;
@@ -1936,7 +1949,7 @@ body {
 }
 
 .hg-dashboard__date {
-  color: rgb(244 248 244 / 68%);
+  color: rgb(232 243 246 / 72%);
   letter-spacing: 0.08em;
 }
 
@@ -1946,8 +1959,8 @@ body {
   height: 7px;
   flex: 0 0 7px;
   border-radius: 50%;
-  background: #c5d5b8;
-  box-shadow: 0 0 0 4px rgb(197 213 184 / 12%);
+  background: #a9dcd6;
+  box-shadow: 0 0 0 4px rgb(169 220 214 / 18%);
 }
 
 .hg-dashboard__hero-content {
@@ -1974,7 +1987,7 @@ body {
 }
 
 .hg-dashboard__hero-kicker {
-  color: #d1dfc7;
+  color: #bcd9d5;
 }
 
 .hg-dashboard__hero h1 {
@@ -1989,13 +2002,13 @@ body {
 }
 
 .hg-dashboard__hero h1 span {
-  color: #d8e2d1;
+  color: #c6dcdf;
 }
 
 .hg-dashboard__hero-description {
   max-width: 465px;
   margin: 14px 0 0;
-  color: rgb(240 246 240 / 77%);
+  color: rgb(232 243 246 / 78%);
   font-size: 14px;
   line-height: 1.65;
 }
@@ -2010,9 +2023,9 @@ body {
   padding: 0 18px;
   border: 1px solid rgb(255 255 255 / 70%);
   border-radius: 10px;
-  background: #f6f8f2;
-  box-shadow: 0 8px 20px rgb(2 18 16 / 18%);
-  color: #183d34;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgb(1 22 30 / 20%);
+  color: #01161e;
   font-size: 12px;
   font-weight: 700;
   text-decoration: none;
@@ -2026,20 +2039,20 @@ body {
 .hg-dashboard__primary-action:hover {
   transform: translateY(-2px);
   background: #ffffff;
-  box-shadow: 0 12px 26px rgb(2 18 16 / 23%);
+  box-shadow: 0 12px 26px rgb(1 22 30 / 26%);
 }
 
 .hg-dashboard__primary-action:focus-visible,
 .hg-dashboard__hero-footer a:focus-visible,
 .hg-dashboard a:focus-visible {
-  outline: 3px solid rgb(121 169 143 / 45%);
+  outline: 3px solid rgb(169 220 214 / 55%);
   outline-offset: 3px;
 }
 
 .hg-dashboard__hero-footer {
   padding-top: 17px;
   border-top: 1px solid rgb(255 255 255 / 18%);
-  color: rgb(241 246 240 / 76%);
+  color: rgb(232 243 246 / 78%);
   font-size: 11px;
 }
 
@@ -2075,11 +2088,11 @@ body {
   flex-direction: column;
   align-items: flex-start;
   padding: 20px 21px 19px;
-  border: 1px solid #e6ece6;
+  border: 1px solid #d3dde1;
   border-radius: 16px;
   background: #ffffff;
-  box-shadow: 0 3px 11px rgb(25 50 39 / 3%);
-  color: #17342e;
+  box-shadow: 0 4px 14px rgb(1 22 30 / 5%);
+  color: #01161e;
   text-decoration: none;
   transition:
     transform 170ms ease,
@@ -2089,8 +2102,8 @@ body {
 
 .hg-dashboard__metric:hover {
   transform: translateY(-3px);
-  border-color: #ceddce;
-  box-shadow: 0 12px 25px rgb(25 50 39 / 8%);
+  border-color: #b9cbd0;
+  box-shadow: 0 14px 28px rgb(1 22 30 / 10%);
 }
 
 .hg-dashboard__metric-icon,
@@ -2105,25 +2118,25 @@ body {
 
 .hg-dashboard__metric-icon--evergreen,
 .hg-dashboard__action-icon--evergreen {
-  background: #e8f0e9;
-  color: #3c735a;
+  background: #e4efe7;
+  color: #2f6b53;
 }
 
 .hg-dashboard__metric-icon--clay,
 .hg-dashboard__action-icon--clay {
-  background: #f5ece5;
-  color: #a96b4b;
+  background: #f6ece4;
+  color: #a2643f;
 }
 
 .hg-dashboard__metric-icon--blue,
 .hg-dashboard__action-icon--blue {
-  background: #e9eff2;
-  color: #577d8e;
+  background: #e4edf1;
+  color: #4a7386;
 }
 
 .hg-dashboard__metric-icon--gold {
-  background: #f5f0e2;
-  color: #9b8248;
+  background: #f7f1e0;
+  color: #8d7439;
 }
 
 .hg-dashboard__metric-arrow,
@@ -2135,9 +2148,9 @@ body {
   width: 30px;
   height: 30px;
   place-items: center;
-  border: 1px solid #edf1ed;
+  border: 1px solid #e2e9eb;
   border-radius: 50%;
-  color: #85938a;
+  color: #5d737a;
   transition:
     transform 160ms ease,
     color 160ms ease,
@@ -2147,13 +2160,13 @@ body {
 .hg-dashboard__metric:hover .hg-dashboard__metric-arrow,
 .hg-dashboard__action-card:hover .hg-dashboard__action-arrow {
   transform: translate(2px, -2px);
-  background: #eff5ef;
-  color: #255f4d;
+  background: #eef4f5;
+  color: #124559;
 }
 
 .hg-dashboard__metric-value {
   margin-top: 17px;
-  color: #18372f;
+  color: #01161e;
   font-family: 'Google Sans Flex Variable', 'Google Sans Flex', 'Archivo Variable', sans-serif;
   font-size: 30px;
   font-weight: 570;
@@ -2163,14 +2176,14 @@ body {
 
 .hg-dashboard__metric-label {
   margin-top: 7px;
-  color: #30483f;
+  color: #2b3b42;
   font-size: 12px;
   font-weight: 700;
 }
 
 .hg-dashboard__metric-detail {
   margin-top: 3px;
-  color: #87958c;
+  color: #5d737a;
   font-size: 10px;
   line-height: 1.5;
 }
@@ -2190,7 +2203,7 @@ body {
 .hg-dashboard__section-heading h2,
 .hg-dashboard__panel-heading h2 {
   margin: 0;
-  color: #18372f;
+  color: #01161e;
   font-family: 'Google Sans Flex Variable', 'Google Sans Flex', 'Archivo Variable', sans-serif;
   font-size: 22px;
   font-weight: 560;
@@ -2200,7 +2213,7 @@ body {
 
 .hg-dashboard__section-kicker {
   margin-bottom: 6px;
-  color: #73867c;
+  color: #4a5c63;
   font-size: 9px;
 }
 
@@ -2209,7 +2222,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #396f58;
+  color: #124559;
   font-size: 11px;
   font-weight: 700;
   text-decoration: none;
@@ -2222,7 +2235,7 @@ body {
 .hg-dashboard__text-link:hover,
 .hg-dashboard__site-link:hover {
   gap: 11px;
-  color: #173f33;
+  color: #0a2c3b;
 }
 
 .hg-dashboard__actions {
@@ -2239,10 +2252,10 @@ body {
   align-items: center;
   gap: 15px;
   padding: 17px 49px 17px 17px;
-  border: 1px solid #e6ece6;
+  border: 1px solid #d3dde1;
   border-radius: 15px;
   background: #ffffff;
-  color: #18372f;
+  color: #01161e;
   text-decoration: none;
   transition:
     transform 170ms ease,
@@ -2252,8 +2265,8 @@ body {
 
 .hg-dashboard__action-card:hover {
   transform: translateY(-2px);
-  border-color: #cfddd0;
-  box-shadow: 0 10px 22px rgb(25 50 39 / 6%);
+  border-color: #b9cbd0;
+  box-shadow: 0 10px 22px rgb(1 22 30 / 8%);
 }
 
 .hg-dashboard__action-copy {
@@ -2265,7 +2278,7 @@ body {
 
 .hg-dashboard__action-copy strong {
   overflow: hidden;
-  color: #254238;
+  color: #14343c;
   font-size: 12px;
   font-weight: 700;
   text-overflow: ellipsis;
@@ -2273,7 +2286,7 @@ body {
 }
 
 .hg-dashboard__action-copy > span {
-  color: #84928a;
+  color: #5d737a;
   font-size: 10px;
   line-height: 1.45;
 }
@@ -2300,16 +2313,16 @@ body {
 .hg-dashboard__panel {
   min-width: 0;
   padding: 23px 23px 19px;
-  border: 1px solid #e6ece6;
+  border: 1px solid #d3dde1;
   border-radius: 17px;
   background: #ffffff;
-  box-shadow: 0 3px 11px rgb(25 50 39 / 3%);
+  box-shadow: 0 4px 14px rgb(1 22 30 / 5%);
 }
 
 .hg-dashboard__panel-heading {
   align-items: center;
   padding-bottom: 16px;
-  border-bottom: 1px solid #edf1ed;
+  border-bottom: 1px solid #e2e9eb;
 }
 
 .hg-dashboard__panel-heading h2 {
@@ -2321,9 +2334,9 @@ body {
   width: 34px;
   height: 34px;
   place-items: center;
-  border: 1px solid #e8eee8;
+  border: 1px solid #dde3e4;
   border-radius: 50%;
-  color: #55796a;
+  color: #124559;
   transition:
     transform 150ms ease,
     background-color 150ms ease;
@@ -2331,7 +2344,7 @@ body {
 
 .hg-dashboard__icon-link:hover {
   transform: translateX(2px);
-  background: #f1f6f1;
+  background: #eef4f5;
 }
 
 .hg-dashboard__activity-list {
@@ -2341,7 +2354,7 @@ body {
 }
 
 .hg-dashboard__activity-list li + li {
-  border-top: 1px solid #f0f3f0;
+  border-top: 1px solid #eaeeee;
 }
 
 .hg-dashboard__activity-link {
@@ -2357,9 +2370,9 @@ body {
   width: 8px;
   height: 8px;
   flex: 0 0 8px;
-  border: 2px solid #82a58e;
+  border: 2px solid #598392;
   border-radius: 50%;
-  background: #edf4ee;
+  background: #eef4f5;
 }
 
 .hg-dashboard__activity-copy {
@@ -2372,7 +2385,7 @@ body {
 
 .hg-dashboard__activity-copy strong {
   overflow: hidden;
-  color: #2b463c;
+  color: #14343c;
   font-size: 11px;
   font-weight: 650;
   text-overflow: ellipsis;
@@ -2380,12 +2393,12 @@ body {
 }
 
 .hg-dashboard__activity-copy > span {
-  color: #87958d;
+  color: #5d737a;
   font-size: 10px;
 }
 
 .hg-dashboard__activity-link:hover .hg-dashboard__activity-copy strong {
-  color: #386c55;
+  color: #124559;
 }
 
 .hg-dashboard__status {
@@ -2399,13 +2412,13 @@ body {
 }
 
 .hg-dashboard__status--published {
-  background: #eaf3eb;
-  color: #4a7958;
+  background: #e4efe7;
+  color: #2f6b53;
 }
 
 .hg-dashboard__status--draft {
-  background: #f3f0e8;
-  color: #8d7544;
+  background: #f7f1e0;
+  color: #8d7439;
 }
 
 .hg-dashboard__activity-empty {
@@ -2415,7 +2428,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 9px;
-  color: #85948b;
+  color: #5d737a;
   text-align: center;
 }
 
@@ -2425,7 +2438,7 @@ body {
 }
 
 .hg-dashboard__activity-empty a {
-  color: #47745e;
+  color: #124559;
   font-size: 10px;
   font-weight: 700;
   text-decoration: none;
@@ -2439,12 +2452,12 @@ body {
   align-items: flex-start;
   overflow: hidden;
   padding: 23px;
-  border: 1px solid #dfe9df;
+  border: 1px solid #d3dde1;
   border-radius: 17px;
   background:
-    radial-gradient(ellipse at 100% 0%, rgb(200 219 197 / 62%), transparent 43%),
-    linear-gradient(145deg, #f1f6ef 0%, #e8f0e8 100%);
-  color: #19392f;
+    radial-gradient(ellipse at 100% 0%, rgb(174 195 176 / 55%), transparent 43%),
+    linear-gradient(145deg, #eef4f4 0%, #e2ebee 100%);
+  color: #01161e;
 }
 
 .hg-dashboard__site-mark {
@@ -2453,20 +2466,20 @@ body {
   height: 40px;
   margin-bottom: 24px;
   place-items: center;
-  border: 1px solid rgb(71 117 90 / 15%);
+  border: 1px solid rgb(18 69 89 / 18%);
   border-radius: 13px;
-  background: rgb(255 255 255 / 65%);
-  color: #44725a;
+  background: rgb(255 255 255 / 72%);
+  color: #124559;
 }
 
 .hg-dashboard__site-card .hg-dashboard__section-kicker {
-  color: #64806d;
+  color: #4a5c63;
 }
 
 .hg-dashboard__site-card h2 {
   max-width: 290px;
   margin: 0;
-  color: #1d4034;
+  color: #01161e;
   font-family: 'Google Sans Flex Variable', 'Google Sans Flex', 'Archivo Variable', sans-serif;
   font-size: 22px;
   font-weight: 560;
@@ -2477,14 +2490,14 @@ body {
 .hg-dashboard__site-description {
   max-width: 300px;
   margin: 10px 0 17px;
-  color: #61766a;
+  color: #4a5c63;
   font-size: 11px;
   line-height: 1.6;
 }
 
 .hg-dashboard__site-link {
   margin-bottom: auto;
-  color: #315f4a;
+  color: #124559;
 }
 
 .hg-dashboard__site-footer {
@@ -2494,8 +2507,8 @@ body {
   gap: 8px;
   margin-top: 26px;
   padding-top: 14px;
-  border-top: 1px solid rgb(81 116 88 / 17%);
-  color: #6b7e70;
+  border-top: 1px solid rgb(89 131 146 / 22%);
+  color: #4a5c63;
   font-size: 9px;
   line-height: 1.4;
 }
@@ -2504,10 +2517,10 @@ body {
   max-width: 460px;
   margin: 40px auto;
   padding: 26px;
-  border: 1px solid #e6ece6;
+  border: 1px solid #d3dde1;
   border-radius: 16px;
   background: #ffffff;
-  color: #52675c;
+  color: #4a5c63;
   text-align: center;
 }
 
@@ -2575,7 +2588,7 @@ body {
     padding: 23px 20px 19px;
     border-radius: 17px;
     background-image:
-      linear-gradient(100deg, rgb(8 31 29 / 94%) 0%, rgb(11 42 38 / 81%) 58%, rgb(12 39 38 / 45%) 100%),
+      linear-gradient(100deg, rgb(1 22 30 / 95%) 0%, rgb(18 69 89 / 84%) 58%, rgb(30 105 130 / 45%) 100%),
       url('/images/admin/himalaya-03.jpg');
     background-position: center, 59% 42%;
   }
@@ -2703,23 +2716,23 @@ body {
    missing `overflow` either — the ribbon's dropdown menus are portalled to
    <body>. */
 .field-type.rich-text-lexical:not(.error) .rich-text-lexical__wrap {
-  border: 1px solid var(--theme-elevation-150);
+  border: 1px solid var(--theme-elevation-200);
   border-radius: var(--style-radius-s);
   background: var(--theme-input-bg);
-  box-shadow: 0 2px 2px -1px rgb(0 0 0 / 10%);
+  box-shadow: 0 2px 2px -1px rgb(1 22 30 / 8%);
   transition:
     border-color 100ms cubic-bezier(0, 0.2, 0.2, 1),
     box-shadow 100ms cubic-bezier(0, 0.2, 0.2, 1);
 }
 
 .field-type.rich-text-lexical:not(.error):hover .rich-text-lexical__wrap {
-  border-color: var(--theme-elevation-250);
+  border-color: var(--theme-elevation-300);
 }
 
 /* Typing anywhere inside the card lights up its whole outline, like a focused
    text input. */
 .field-type.rich-text-lexical:not(.error):focus-within .rich-text-lexical__wrap {
-  border-color: var(--theme-elevation-400);
+  border-color: var(--theme-elevation-500);
 }
 
 /* The ribbon. Payload's rule draws a border all the way round the toolbar and
