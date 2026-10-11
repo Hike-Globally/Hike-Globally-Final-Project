@@ -2857,3 +2857,65 @@ body {
 .hg-live-preview-toggle svg {
   flex: 0 0 auto;
 }
+
+/* "View live page" — opens the public storefront page in a new tab, from the editor and the lists. */
+.hg-view-live {
+  display: inline-flex;
+  min-height: calc(var(--base) * 1.8);
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--base) * 0.35);
+  padding: 0 calc(var(--base) * 0.65);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--style-radius-s);
+  background: var(--theme-elevation-0);
+  color: var(--theme-elevation-800);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    border-color 100ms cubic-bezier(0, 0.2, 0.2, 1),
+    background-color 100ms cubic-bezier(0, 0.2, 0.2, 1);
+}
+
+.hg-view-live:hover {
+  border-color: var(--theme-elevation-300);
+  background: var(--theme-elevation-100);
+  color: var(--theme-elevation-800);
+}
+
+.hg-view-live:focus-visible {
+  outline: 2px solid var(--theme-info-500);
+  outline-offset: 2px;
+}
+
+.hg-view-live svg {
+  flex: 0 0 auto;
+}
+
+.hg-view-live--cell {
+  min-height: calc(var(--base) * 1.4);
+  padding: 0 calc(var(--base) * 0.5);
+  font-size: 0.75rem;
+}
+
+.hg-view-live--none {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--theme-elevation-400);
+}
+
+.hg-view-live__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

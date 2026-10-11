@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { adminOrEditor, publishedOrSignedIn } from '../access'
 import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
+import { viewLiveField } from '../fields/view-live'
 import { populatePublishedAt, revalidatePost, revalidatePostDelete } from '../hooks/revalidate'
 import { siteLivePreviewURL } from '../lib/live-preview-url'
 
@@ -10,11 +11,14 @@ export const Blog: CollectionConfig = {
   slug: 'blog',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'author', 'publishedAt', 'featured', 'updatedAt'],
+    defaultColumns: ['title', 'author', 'publishedAt', 'featured', 'updatedAt', 'viewLive'],
     group: 'Content',
     components: {
       edit: {
-        beforeDocumentControls: ['@/components/admin/live-preview-toggle'],
+        beforeDocumentControls: [
+          '@/components/admin/view-live-button',
+          '@/components/admin/live-preview-toggle',
+        ],
       },
     },
     livePreview: { url: siteLivePreviewURL },
@@ -107,5 +111,6 @@ export const Blog: CollectionConfig = {
       admin: { description: 'Featured posts are pinned on /blog and can be highlighted on the homepage.' },
     },
     metaField(),
+    viewLiveField(),
   ],
 }

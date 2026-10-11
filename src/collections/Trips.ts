@@ -4,6 +4,7 @@ import { adminOrEditor, publishedOrSignedIn } from '../access'
 import { linkField } from '../fields/link'
 import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
+import { viewLiveField } from '../fields/view-live'
 import { revalidateTrip, revalidateTripDelete } from '../hooks/revalidate'
 import { difficultySelectOptions } from '../lib/difficulty'
 import { siteLivePreviewURL } from '../lib/live-preview-url'
@@ -26,11 +27,14 @@ export const Trips: CollectionConfig = {
   slug: 'trips',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'destination', 'durationDays', 'priceFrom', 'featured', 'updatedAt'],
+    defaultColumns: ['title', 'destination', 'durationDays', 'priceFrom', 'featured', 'updatedAt', 'viewLive'],
     group: 'Content',
     components: {
       edit: {
-        beforeDocumentControls: ['@/components/admin/live-preview-toggle'],
+        beforeDocumentControls: [
+          '@/components/admin/view-live-button',
+          '@/components/admin/live-preview-toggle',
+        ],
       },
     },
     livePreview: { url: siteLivePreviewURL },
@@ -433,5 +437,6 @@ export const Trips: CollectionConfig = {
     },
 
     metaField(),
+    viewLiveField(),
   ],
 }

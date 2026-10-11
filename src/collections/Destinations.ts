@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { adminOrEditor, publishedOrSignedIn } from '../access'
 import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
+import { viewLiveField } from '../fields/view-live'
 import { revalidateDestination, revalidateDestinationDelete } from '../hooks/revalidate'
 import { siteLivePreviewURL } from '../lib/live-preview-url'
 
@@ -10,11 +11,14 @@ export const Destinations: CollectionConfig = {
   slug: 'destinations',
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'country', 'region', 'featured', 'updatedAt'],
+    defaultColumns: ['name', 'country', 'region', 'featured', 'updatedAt', 'viewLive'],
     group: 'Content',
     components: {
       edit: {
-        beforeDocumentControls: ['@/components/admin/live-preview-toggle'],
+        beforeDocumentControls: [
+          '@/components/admin/view-live-button',
+          '@/components/admin/live-preview-toggle',
+        ],
       },
     },
     livePreview: { url: siteLivePreviewURL },
@@ -137,5 +141,6 @@ export const Destinations: CollectionConfig = {
       admin: { defaultColumns: ['title', 'durationDays', 'priceFrom'] },
     },
     metaField(),
+    viewLiveField(),
   ],
 }

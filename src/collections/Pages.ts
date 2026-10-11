@@ -14,6 +14,7 @@ import { Testimonials } from '../blocks/Testimonials'
 import { adminOrEditor, publishedOrSignedIn } from '../access'
 import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
+import { viewLiveField } from '../fields/view-live'
 import { revalidatePage, revalidatePageDelete } from '../hooks/revalidate'
 import { siteLivePreviewURL } from '../lib/live-preview-url'
 
@@ -34,11 +35,14 @@ export const Pages: CollectionConfig = {
   slug: 'pages',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'slug', 'updatedAt'],
+    defaultColumns: ['title', 'slug', 'updatedAt', 'viewLive'],
     group: 'Content',
     components: {
       edit: {
-        beforeDocumentControls: ['@/components/admin/live-preview-toggle'],
+        beforeDocumentControls: [
+          '@/components/admin/view-live-button',
+          '@/components/admin/live-preview-toggle',
+        ],
       },
     },
     livePreview: { url: siteLivePreviewURL },
@@ -86,5 +90,6 @@ export const Pages: CollectionConfig = {
       required: true,
     },
     metaField(),
+    viewLiveField(),
   ],
 }
