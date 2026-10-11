@@ -219,7 +219,7 @@ function AtlasCard({ destination, index }: { destination: DestinationCard; index
                 {destination.name}
               </h3>
               {destination.tagline ? (
-                <p className="mt-2 max-w-sm description-copy leading-relaxed text-white/75">
+                <p className="mt-2 max-w-sm card-description-copy leading-relaxed text-white/75">
                   {destination.tagline}
                 </p>
               ) : null}

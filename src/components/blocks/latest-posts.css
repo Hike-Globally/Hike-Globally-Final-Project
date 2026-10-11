@@ -115,7 +115,8 @@ overflow-wrap: anywhere;
 }
 [data-service-tiles="hg-stories"] .st-description {
 margin: 10px 0 0;
-font-size: var(--font-size-description);
+/* Matches `card-description-copy`: the shared description scale minus 2px. */
+font-size: calc(var(--font-size-description) - 2px);
 color: rgb(104, 104, 99);
 overflow-wrap: anywhere;
 }
