@@ -226,7 +226,14 @@ export function PostDetail({
                 </aside>
               ) : null}
 
-              <div className={headings.length ? 'min-w-0 lg:col-start-1 lg:row-start-1' : ''}>
+              {/* The article body — 17px pure-black running copy (see `.single-page-body`). */}
+              <div
+                className={
+                  headings.length
+                    ? 'single-page-body min-w-0 lg:col-start-1 lg:row-start-1'
+                    : 'single-page-body'
+                }
+              >
                 <RichText content={post.content} className="blog-prose" headingIds={headingIds} />
 
                 {authorName && author?.bio ? (

@@ -30,14 +30,14 @@ function homepageBlocks(blocks: Block[]): Block[] {
   return inquiryIndex === -1 ? withoutBlog : withoutBlog.slice(0, inquiryIndex + 1)
 }
 
-function renderBlock(block: Block, index: number, homepage: boolean) {
+function renderBlock(block: Block, index: number, homepage: boolean, singlePage = false) {
   const key = `${block.blockType}-${index}`
 
   switch (block.blockType) {
     case 'hero':
       return <Hero key={key} block={block} homepage={homepage} />
     case 'richText':
-      return <RichTextSection key={key} block={block} />
+      return <RichTextSection key={key} block={block} singlePage={singlePage} />
     case 'featuredTrips':
       return <FeaturedTrips key={key} block={block} />
     case 'featuredDestinations':
@@ -71,9 +71,12 @@ function renderBlock(block: Block, index: number, homepage: boolean) {
 export async function BlockRenderer({
   blocks,
   homepage = false,
+  singlePage = false,
 }: {
   blocks: Block[] | null | undefined
   homepage?: boolean
+  /** `/slug` pages pass `true` so their body copy uses the single-page type style. */
+  singlePage?: boolean
 }) {
   if (!blocks?.length) return null
 
@@ -108,5 +111,5 @@ export async function BlockRenderer({
     }
   }
 
-  return <>{blocks.map((block, index) => renderBlock(block, index, homepage))}</>
+  return <>{blocks.map((block, index) => renderBlock(block, index, homepage, singlePage))}</>
 }

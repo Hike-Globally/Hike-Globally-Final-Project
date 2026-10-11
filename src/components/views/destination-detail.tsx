@@ -104,7 +104,8 @@ export function DestinationDetail({
 
       <section className="py-16 md:py-24">
         <div className="container-content grid gap-12 lg:grid-cols-[1.6fr_1fr] lg:gap-16">
-          <div>
+          {/* Destination copy — 17px pure-black running copy (see `.single-page-body`). */}
+          <div className="single-page-body">
             <h2 className="heading-lg">
               {dict.destinations.about} {destination.name}
             </h2>
