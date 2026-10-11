@@ -1,35 +1,42 @@
 /* ============================================================================
-   Curated Travel Packages — heading, intro and card copy on desktop.
+   Curated Travel Packages — card copy.
 
-   Everything here is scoped to the section (`data-curated-trips`) and gated to
-   `md` and up (>= 768px — the project's mobile/desktop line, the same one
-   `about-hike-globally.css` flips its animation off at), so the mobile
-   rendering is exactly what it was before:
-
-     .ct-description    the intro paragraph is held to three quarters of the
-                        heading column.
-     .ct-card-summary   the trip-card summaries are 2px smaller than
-                        `card-description-copy`.
-
-   The *sizes* no longer live here: the section's headline and intro take them
-   from the homepage type scale (`home-section-title` / `home-section-intro` in
+   The section's headline and intro sizes no longer live here: they come from
+   the homepage type scale (`home-section-title` / `home-section-intro` in
    `src/app/(frontend)/homepage.css`), so the headline matches the difficulty
-   and destinations headlines exactly instead of being re-tuned by hand. Only
-   the layout-only rules that are genuinely about this section stay.
+   and destinations headlines exactly instead of being re-tuned by hand.
 
-   These rules are intentionally unlayered plain CSS: they beat both
-   `heading-lg`/`lead`/`card-description-copy` and those utilities' own media
-   queries without any `!important`.
+   What stays is the *card* tier of the same section, scoped to the section
+   (`data-curated-trips`) so no other surface that renders the shared TripCard
+   picks these sizes up:
+
+     .ct-card-title     the trip-card headings are pinned to 23px.
+     .ct-card-summary   the trip-card summaries (excerpts) are pinned to 16px.
+     .ct-description    layout only — the intro is held to three quarters of
+                        the heading column.
+
+   The card-copy sizes are deliberately fixed pixels — the design calls for one
+   legible size per card at any canvas — unlike the fluid clamps above them.
+   These rules are intentionally unlayered plain CSS: they beat the `text-lg` on
+   the trip-card title and `card-description-copy` (plus that utility's own
+   media queries) without any `!important`, the same technique `homepage.css`
+   relies on. They also sit outside the `md` query on purpose: they replace a
+   rule that applied on mobile too, so mobile gets the specified size as well.
    ========================================================================== */
+
+/* Card heading — 23px, all viewports. */
+[data-curated-trips] .ct-card-title {
+  font-size: 23px;
+}
+
+/* Card excerpt — 16px, all viewports. */
+[data-curated-trips] .ct-card-summary {
+  font-size: 16px;
+}
 
 @media (width >= 768px) {
   /* Intro measure — three quarters of the heading column. */
   [data-curated-trips] .ct-description {
     width: 75%;
-  }
-
-  /* `card-description-copy` minus 2px. */
-  [data-curated-trips] .ct-card-summary {
-    font-size: calc(var(--font-size-description) - 4px);
   }
 }

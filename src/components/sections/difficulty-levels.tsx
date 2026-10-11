@@ -162,15 +162,18 @@ export function DifficultyLevels() {
                   </span>
                 </div>
 
+                {/* Card copy is pinned to the sizes the design calls for — 25px
+                    headings, 16px descriptions — rather than the responsive
+                    description scale, so every rung reads the same at any width. */}
                 <h3
                   id={`difficulty-${level.value}-title`}
-                  className="mt-3 font-heading text-[0.93rem] leading-snug font-semibold tracking-[0.025em] text-white uppercase sm:text-base"
+                  className="mt-3 font-heading text-[25px] leading-snug font-semibold tracking-[0.025em] text-white uppercase"
                 >
                   {level.label}
                 </h3>
                 <p
                   id={`difficulty-${level.value}-desc`}
-                  className="mt-2 max-w-[18rem] card-description-copy leading-relaxed text-white/90"
+                  className="mt-2 max-w-[18rem] text-[16px] leading-relaxed text-white/90"
                 >
                   {level.description}
                 </p>
