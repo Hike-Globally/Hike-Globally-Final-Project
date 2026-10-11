@@ -97,7 +97,7 @@ const platformLabel: Record<SocialPlatform, string> = {
 function FooterLink({ link }: { link: ResolvedLink }) {
   const external = /^https?:\/\//.test(link.href)
   const className =
-    'text-xs leading-none text-mist/90 transition-colors hover:text-white hover:underline underline-offset-4'
+    'text-sm leading-none text-mist/90 transition-colors hover:text-white hover:underline underline-offset-4'
 
   return external ? (
     <a href={link.href} className={className} target="_blank" rel="noopener noreferrer">
@@ -113,7 +113,7 @@ function FooterLink({ link }: { link: ResolvedLink }) {
 function FooterColumnBlock({ column }: { column: FooterColumn }) {
   return (
     <nav aria-label={column.heading}>
-      <h3 className="font-heading text-xs font-semibold text-white">{column.heading}</h3>
+      <h3 className="font-heading text-sm font-semibold text-white">{column.heading}</h3>
       <ul className="mt-4 space-y-2.5">
         {column.links.map((link) => (
           <li key={`${link.href}-${link.label}`}>
@@ -246,7 +246,7 @@ export async function Footer() {
       {/* 2 — about + social chips on the left, link columns on the right */}
       <div className="mt-14 grid gap-12 px-5 sm:px-8 md:mt-24 lg:grid-cols-12 lg:gap-8">
         <div className="lg:col-span-5 xl:col-span-4">
-          <h3 className="font-heading text-xs font-semibold text-white">{dict.footer.about}</h3>
+          <h3 className="font-heading text-sm font-semibold text-white">{dict.footer.about}</h3>
           <p className="mt-4 max-w-[34ch] description-copy leading-relaxed text-mist/90">{introduction}</p>
           <div className="mt-8 flex gap-2.5">
             {socials.map((social) => (

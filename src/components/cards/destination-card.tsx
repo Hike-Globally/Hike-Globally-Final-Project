@@ -78,7 +78,7 @@ export function DestinationCard({
           {destination.name}
         </h3>
         {destination.tagline ? (
-          <p className="mt-2 max-w-md description-copy leading-relaxed text-white/80">
+          <p className="mt-2 max-w-md card-description-copy leading-relaxed text-white/80">
             {destination.tagline}
           </p>
         ) : null}

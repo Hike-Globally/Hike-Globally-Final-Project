@@ -378,6 +378,13 @@
   font-size: var(--font-size-description);
 }
 
+/* Description copy inside the compact card surfaces (trip, blog, destination and
+   difficulty-level cards) — the shared description scale minus exactly 2px, so the
+   cards stay in step with the responsive scale instead of pinning a fixed size. */
+@utility card-description-copy {
+  font-size: calc(var(--font-size-description) - 2px);
+}
+
 @utility lead {
   font-size: var(--font-size-description);
   line-height: 1.65;

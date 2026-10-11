@@ -170,7 +170,7 @@ export function DifficultyLevels() {
                 </h3>
                 <p
                   id={`difficulty-${level.value}-desc`}
-                  className="mt-2 max-w-[18rem] description-copy leading-relaxed text-white/90"
+                  className="mt-2 max-w-[18rem] card-description-copy leading-relaxed text-white/90"
                 >
                   {level.description}
                 </p>
