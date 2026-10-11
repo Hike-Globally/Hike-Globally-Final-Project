@@ -33,6 +33,8 @@ export async function HomeFallback() {
     // Three destination cards are visible at a time; the rest are reached with the arrows.
     getDestinationSlider(6),
   ])
+  const heroEyebrow = settings.tagline?.trim()
+  const showHeroEyebrow = Boolean(heroEyebrow && heroEyebrow.toLowerCase() !== 'home')
 
   const heroSection = (
     <section className="relative isolate flex h-full min-h-[100svh] items-center overflow-hidden bg-ink text-mist">
@@ -40,14 +42,14 @@ export async function HomeFallback() {
 
       <div className="container-content py-16 md:py-20 [@media(max-height:500px)]:py-8">
         <div className="max-w-3xl min-w-0 3xl:max-w-4xl">
-          <p className="eyebrow mb-5 text-sage">{settings.tagline ?? dict.nav.home}</p>
+          {showHeroEyebrow ? <p className="eyebrow mb-5 text-sage">{heroEyebrow}</p> : null}
           <h1 className="heading-display text-white">
             Walk where the
             <br />
             map runs out of names.
           </h1>
           <p
-            className="lead mt-6 max-w-2xl text-mist/85"
+            className="lead mt-6 w-3/4 text-mist/85"
             style={{ fontSize: 'calc(var(--font-size-description) - 2px)' }}
           >
             Small-group treks and expeditions across Nepal, led by guides who grew up on these
