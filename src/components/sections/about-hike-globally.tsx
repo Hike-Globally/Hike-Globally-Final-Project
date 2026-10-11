@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react'
 import { animate, motion, useInView, useMotionValue, useSpring, useTransform } from 'motion/react'
-import { ArrowRight, Compass, Globe2, HeadphonesIcon, MapPin, ShieldCheck, Star } from 'lucide-react'
+import { ArrowRight, Compass, Globe2, MapPin, Star } from 'lucide-react'
 
 import './about-hike-globally.css'
 import { Reveal } from '@/components/motion/reveal'
@@ -15,29 +15,6 @@ const EYEBROW = 'About Hike Globally'
 const HEADING = 'One platform. Every trail on Earth.'
 const LEAD =
   'Hike Globally is a travel booking platform that curates and sells travel packages to destinations all around the globe — treks, safaris, coastal escapes and city breaks — researched, priced and ready to book in one place.'
-
-const PILLARS = [
-  {
-    icon: Globe2,
-    title: 'Worldwide reach',
-    description: 'Packages spanning 50+ countries across six continents, and counting.',
-  },
-  {
-    icon: Compass,
-    title: 'Hand-picked routes',
-    description: 'Every itinerary is scouted and vetted by our own team before it goes live.',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Booked with confidence',
-    description: 'Transparent pricing, secure checkout, and licensed local operators only.',
-  },
-  {
-    icon: HeadphonesIcon,
-    title: 'Real humans, 24/7',
-    description: 'A real person replies within a day — before you book and while you travel.',
-  },
-] as const
 
 const STATS = [
   { value: 120, suffix: '+', label: 'Travel packages' },
@@ -152,14 +129,6 @@ export function AboutHikeGlobally() {
                 </Button>
               </div>
             </Reveal>
-
-            <ul className="mt-12 grid gap-4 sm:grid-cols-2" role="list">
-              {PILLARS.map((pillar, index) => (
-                <Reveal key={pillar.title} as="li" delay={260 + index * 70}>
-                  <PillarCard {...pillar} />
-                </Reveal>
-              ))}
-            </ul>
           </div>
 
           {/* Interactive globe visual */}
@@ -208,30 +177,6 @@ export function AboutHikeGlobally() {
         </div>
       </Reveal>
     </section>
-  )
-}
-
-function PillarCard({
-  icon: Icon,
-  title,
-  description,
-}: {
-  icon: typeof Globe2
-  title: string
-  description: string
-}) {
-  return (
-    <div className="group relative h-full overflow-hidden border border-white/10 bg-white/[0.03] p-5 transition-colors duration-300 hover:border-sage/40 hover:bg-white/[0.06]">
-      <span
-        aria-hidden="true"
-        className="absolute inset-x-0 top-0 h-px origin-left scale-x-0 bg-gradient-to-r from-sage via-sage/60 to-transparent transition-transform duration-500 ease-[var(--ease-brand)] group-hover:scale-x-100"
-      />
-      <span className="inline-flex size-10 items-center justify-center rounded-full bg-sage/15 text-sage transition-transform duration-500 ease-[var(--ease-brand)] group-hover:-translate-y-0.5 group-hover:rotate-6">
-        <Icon className="size-5" aria-hidden="true" />
-      </span>
-      <h3 className="mt-4 text-[0.95rem] font-semibold tracking-[0.01em] text-white">{title}</h3>
-      <p className="mt-1.5 text-[0.84rem] leading-relaxed text-mist/65">{description}</p>
-    </div>
   )
 }
 
