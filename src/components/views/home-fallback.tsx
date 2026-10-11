@@ -4,7 +4,10 @@ import { ArrowRight } from 'lucide-react'
 import { HomepageHeroBackground } from '@/components/blocks/hero-background'
 import { DestinationCard } from '@/components/cards/destination-card'
 import { DestinationCarousel } from '@/components/cards/destination-carousel'
-import { TripsRopeCarousel } from '@/components/cards/trips-rope-carousel'
+import {
+  CuratedTripsSection,
+  HOMEPAGE_TRIP_LIMIT,
+} from '@/components/sections/curated-trips-section'
 import { HeroScrollCover } from '@/components/motion/hero-scroll-cover'
 import { Reveal } from '@/components/motion/reveal'
 import { DifficultyLevels } from '@/components/sections/difficulty-levels'
@@ -25,7 +28,7 @@ export async function HomeFallback() {
     getSettings(),
     // Same rules as the CMS block: featured trips first, newest published ones if nothing is
     // flagged, so the homepage never loses this section over a missing checkbox.
-    getHomepageTrips(3),
+    getHomepageTrips(HOMEPAGE_TRIP_LIMIT),
     // Three destination cards are visible at a time; the rest are reached with the arrows.
     getDestinationSlider(6),
   ])
@@ -56,17 +59,10 @@ export async function HomeFallback() {
   )
 
   const tripsSection = (
-    <section className="overflow-hidden py-16 md:py-24">
-      <div className="container-content">
-        <SectionHeading
-          title={dict.nav.trips}
-          description={dict.trips.listingSubtitle}
-          action={{ href: sitePath('/trips'), label: dict.common.viewAll }}
-        />
-      </div>
-      {/* Trips hang on the rope-curve carousel — the exact animation from `animation.html`. */}
-      <TripsRopeCarousel trips={trips} label={dict.nav.trips} />
-    </section>
+    <CuratedTripsSection
+      trips={trips}
+      action={{ href: sitePath('/trips'), label: dict.common.viewAll }}
+    />
   )
 
   const destinationsSection =
