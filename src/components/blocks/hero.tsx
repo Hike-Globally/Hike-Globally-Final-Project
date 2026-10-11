@@ -41,6 +41,8 @@ export function Hero({
     ? 'h-full min-h-[100svh]'
     : (heights[block.height ?? 'tall'] ?? heights.tall!)
   const overlay = overlays[block.overlay ?? 'medium'] ?? overlays.medium!
+  const eyebrow = block.eyebrow?.trim()
+  const showEyebrow = Boolean(eyebrow && (!homepage || eyebrow.toLowerCase() !== 'home'))
 
   return (
     <section
@@ -82,10 +84,8 @@ export function Hero({
         )}
       >
         <div className="max-w-3xl min-w-0 3xl:max-w-4xl">
-          {block.eyebrow ? (
-            <p className={cn('eyebrow mb-5', hasImage ? 'text-sage' : 'text-slate')}>
-              {block.eyebrow}
-            </p>
+          {showEyebrow ? (
+            <p className={cn('eyebrow mb-5', hasImage ? 'text-sage' : 'text-slate')}>{eyebrow}</p>
           ) : null}
 
           <h1 className={cn('heading-display', hasImage ? 'text-white' : 'text-ink')}>
@@ -93,7 +93,13 @@ export function Hero({
           </h1>
 
           {block.subheading ? (
-            <p className={cn('lead mt-6 max-w-2xl', hasImage ? 'text-mist/85' : 'text-ink-60')}>
+            <p
+              className={cn(
+                'lead mt-6',
+                homepage ? 'w-3/4' : 'max-w-2xl',
+                hasImage ? 'text-mist/85' : 'text-ink-60',
+              )}
+            >
               {block.subheading}
             </p>
           ) : null}
