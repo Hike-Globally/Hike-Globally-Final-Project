@@ -14,11 +14,14 @@ export function TripCard({
   trip,
   priority = false,
   className,
+  titleClassName,
   summaryClassName,
 }: {
   trip: TripCard
   priority?: boolean
   className?: string
+  /** Extra classes for the title — lets a section retune its copy in place. */
+  titleClassName?: string
   /** Extra classes for the summary paragraph — lets a section retune its copy in place. */
   summaryClassName?: string
 }) {
@@ -66,7 +69,12 @@ export function TripCard({
       </Link>
 
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="font-heading text-lg leading-snug font-semibold break-words text-ink">
+        <h3
+          className={cn(
+            'font-heading text-lg leading-snug font-semibold break-words text-ink',
+            titleClassName,
+          )}
+        >
           <Link href={href} className="after:absolute after:inset-0">
             {trip.title}
           </Link>

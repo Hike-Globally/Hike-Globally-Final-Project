@@ -38,6 +38,7 @@ export function CuratedTripsSection({
               key={trip.id}
               trip={trip}
               priority={index < 3}
+              titleClassName="ct-card-title"
               summaryClassName="ct-card-summary"
             />
           ))}
