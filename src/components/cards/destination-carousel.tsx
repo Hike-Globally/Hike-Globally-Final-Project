@@ -119,7 +119,7 @@ export function DestinationCarousel({
         {destinations.map((destination, index) => (
           <div
             key={destination.id}
-            className="w-full shrink-0 snap-start sm:w-[calc((100%_-_1.25rem)/2)] lg:w-[calc((100%_-_2.5rem)/3)]"
+            className="w-full shrink-0 snap-start sm:w-[calc((100%_-_1.25rem)/2)] lg:w-[calc((100%_-_2.5rem)/3)] 3xl:w-[calc((100%_-_3.75rem)/4)]"
           >
             <DestinationCard destination={destination} priority={index === 0} className="h-full" />
           </div>

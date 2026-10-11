@@ -28,7 +28,7 @@ export function Stats({ block }: { block: StatsBlock }) {
               <div>
                 <dd
                   className={cn(
-                    'font-heading text-4xl font-semibold tracking-tight md:text-5xl',
+                    'font-heading text-4xl font-semibold tracking-tight md:text-5xl 3xl:text-6xl',
                     dark ? 'text-sage' : 'text-deep',
                   )}
                 >

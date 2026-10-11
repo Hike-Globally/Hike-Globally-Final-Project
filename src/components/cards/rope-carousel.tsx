@@ -64,9 +64,6 @@ const SHADE_W_RATIO = 33.75 / 350
 const SHADE_H_RATIO = 12.5 / 350
 const CAP_INSET = 21 // caption padding from the card edges
 
-const MASK =
-  'linear-gradient(90deg, transparent 0px, #000 72px, #000 calc(100% - 72px), transparent 100%)'
-
 /* ---------------------------------------------------------------------------
  * Dynamics
  * ------------------------------------------------------------------------- */
@@ -125,8 +122,10 @@ type Layout = {
 }
 
 function computeDims(width: number): Dims {
-  const W = Math.max(280, width)
-  const cardW = Math.min(350, Math.max(230, W * 0.72))
+  const W = Math.max(260, width)
+  const maxCard = width >= 3840 ? 560 : width >= 2560 ? 480 : width >= 1920 ? 420 : 350
+  const minCard = Math.min(230, Math.max(168, W * 0.68))
+  const cardW = Math.min(maxCard, Math.max(minCard, W * 0.72))
   const cardH = cardW / RATIO
   const pivot = PIVOT_RATIO * cardW
   const sag = SAG_RATIO * cardW
@@ -607,7 +606,7 @@ export function RopeCarousel({
             >
               <div
                 style={{
-                  fontSize: 24,
+                  fontSize: 'clamp(1.05rem, 0.7rem + 1.6vw, 1.5rem)',
                   fontWeight: 500,
                   letterSpacing: '-0.01em',
                   lineHeight: '1.2em',
@@ -623,7 +622,7 @@ export function RopeCarousel({
               </div>
               <div
                 style={{
-                  fontSize: 16,
+                  fontSize: 'clamp(0.8125rem, 0.7rem + 0.6vw, 1rem)',
                   fontWeight: 400,
                   letterSpacing: '0em',
                   lineHeight: '1.4em',
@@ -734,11 +733,10 @@ export function RopeCarousel({
       }}
     >
       <div
+        className="rcc-mask"
         style={{
           position: 'absolute',
           inset: 0,
-          WebkitMaskImage: MASK,
-          maskImage: MASK,
         }}
       >
         <svg

@@ -46,7 +46,7 @@ export default async function DestinationsPage() {
           screen (see header-frame.tsx). */}
       <section
         data-header-hero
-        className="relative isolate flex min-h-[78svh] items-end overflow-hidden bg-ink text-mist"
+        className="relative isolate flex min-h-[min(78svh,52rem)] items-end overflow-hidden bg-ink text-mist"
       >
         <Image
           src={DESTINATIONS_HERO_IMAGE}
@@ -122,7 +122,7 @@ export default async function DestinationsPage() {
               </Link>
             </div>
           ) : (
-            <div className="mt-10 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:mt-12 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-16">
+            <div className="mt-10 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:mt-12 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-16 3xl:grid-cols-4">
               {destinations.map((destination, index) => (
                 <Reveal key={destination.id} delay={index * 70}>
                   <AtlasCard destination={destination} index={index} />
@@ -145,7 +145,7 @@ export default async function DestinationsPage() {
           </div>
           <Link
             href={sitePath('/inquiry')}
-            className="group inline-flex shrink-0 items-center justify-center gap-3 bg-ink px-6 py-4 text-sm font-medium text-white transition-colors hover:bg-deep"
+            className="group inline-flex w-full shrink-0 items-center justify-center gap-3 bg-ink px-6 py-4 text-sm font-medium text-white transition-colors hover:bg-deep sm:w-auto"
           >
             Plan your trip
             <ArrowRight

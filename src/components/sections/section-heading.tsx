@@ -45,7 +45,7 @@ export function SectionHeading({
       </div>
 
       {action || controls ? (
-        <div className="flex shrink-0 items-center gap-5">
+        <div className="flex min-w-0 shrink-0 flex-wrap items-center gap-4 sm:gap-5">
           {controls}
           {action ? (
             <Link

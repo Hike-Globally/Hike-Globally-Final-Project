@@ -50,7 +50,7 @@ export function DestinationDetail({
           (see header-frame.tsx). */}
       <section
         data-header-hero
-        className="relative isolate min-h-[64svh] overflow-hidden bg-ink text-mist"
+        className="relative isolate min-h-[min(64svh,42rem)] overflow-hidden bg-ink text-mist"
       >
         <PayloadImageFill
           media={destination.heroImage}
@@ -63,7 +63,7 @@ export function DestinationDetail({
         <div className="absolute inset-0 -z-10 bg-ink/58" />
         <div className="absolute inset-x-0 bottom-0 -z-10 h-1/2 bg-gradient-to-t from-ink/85 to-transparent" />
 
-        <div className="container-content pt-28 pb-16 md:pt-36 md:pb-20">
+        <div className="container-content pt-28 pb-12 sm:pb-16 md:pt-36 md:pb-20">
           <Breadcrumbs
             className="mb-6"
             items={[
@@ -110,7 +110,7 @@ export function DestinationDetail({
       <section className="py-16 md:py-24">
         <div className="container-content grid gap-12 lg:grid-cols-[1.6fr_1fr] lg:gap-16">
           {/* Destination copy — 17px pure-black running copy (see `.single-page-body`). */}
-          <div className="single-page-body">
+          <div className="single-page-body min-w-0">
             <h2 className="heading-lg">
               {dict.destinations.about} {destination.name}
             </h2>
@@ -173,7 +173,7 @@ export function DestinationDetail({
               {plural(dict.destinations as unknown as Record<string, string>, trips.length)}
             </p>
 
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
               {trips.map((trip, index) => (
                 <Reveal key={trip.id} delay={index * 70}>
                   <TripCard trip={trip} priority={index < 3} />
@@ -188,7 +188,7 @@ export function DestinationDetail({
         <section className="py-16 md:py-24">
           <div className="container-content">
             <h2 className="heading-lg mb-10">{dict.destinations.listingTitle}</h2>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
               {otherDestinations.map((destinationItem, index) => (
                 <Reveal key={destinationItem.id} delay={index * 70}>
                   <DestinationCard destination={destinationItem} />

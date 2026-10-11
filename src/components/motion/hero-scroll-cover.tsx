@@ -43,7 +43,7 @@ function subscribeCoverDistance(callback: () => void) {
 
 function getCoverDistanceSnapshot() {
   const h = window.innerHeight - 72
-  return h > 400 ? h : 600
+  return h > 280 ? h : 320
 }
 
 function getCoverDistanceServerSnapshot() {
@@ -115,7 +115,7 @@ export function HeroScrollCover({
   return (
     <div className={cn('relative w-full', className)}>
       {/* Sticky Hero section: full-screen, pinned to the top of the viewport (z-0, under the header) */}
-      <div className="sticky top-0 z-0 h-[100svh] min-h-[580px] w-full overflow-hidden">
+      <div className="sticky top-0 z-0 h-[100svh] w-full overflow-hidden">
         <motion.div
           style={
             enableMotion

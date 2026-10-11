@@ -42,9 +42,9 @@ export default async function InquiryPage() {
       />
 
       <section className="py-14 md:py-20">
-        <div className="container-content grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+        <div className="container-content grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16 3xl:gap-20">
           <aside className="space-y-8">
-            <div className="bg-sage-20 p-7">
+            <div className="bg-sage-20 p-5 sm:p-7">
               <h2 className="heading-md mb-5">{dict.inquiry.contact}</h2>
               <ul className="space-y-4 text-[0.9375rem]">
                 {settings.email ? (
@@ -87,7 +87,7 @@ export default async function InquiryPage() {
             </div>
 
             {settings.address ? (
-              <div className="border border-black/[0.06] p-7">
+              <div className="border border-black/[0.06] p-5 sm:p-7">
                 <h2 className="heading-md mb-4">{dict.structuredData.organization}</h2>
                 <p className="text-[0.9375rem] whitespace-pre-line text-ink-70">
                   {settings.address}

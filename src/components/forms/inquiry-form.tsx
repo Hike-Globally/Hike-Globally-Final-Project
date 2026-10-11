@@ -74,7 +74,7 @@ export function InquiryForm({
               // a translucent white film on the dark ink panels (same treatment as the testimonial
               // cards). Hardcoding `bg-card` here made the dark-variant form a solid white block
               // with near-white labels and inputs on top of it — i.e. unreadable.
-              'grid gap-5 border p-6 sm:p-8 md:grid-cols-2',
+              'grid gap-5 border p-4 sm:p-6 md:grid-cols-2 md:p-8',
               isDark
                 ? 'border-white/10 bg-white/[0.04]'
                 : 'border-black/[0.06] bg-card shadow-[0_1px_2px_rgba(1,22,30,0.04)]',
@@ -217,6 +217,7 @@ export function InquiryForm({
           size="lg"
           variant={variant === 'dark' ? 'sage' : 'default'}
           disabled={submitting}
+          className="w-full sm:w-auto"
         >
           {submitting ? dict.inquiry.submitting : dict.inquiry.submit}
         </Button>

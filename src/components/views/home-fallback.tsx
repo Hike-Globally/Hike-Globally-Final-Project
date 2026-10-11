@@ -38,8 +38,8 @@ export async function HomeFallback() {
     <section className="relative isolate flex h-full min-h-[100svh] items-center overflow-hidden bg-ink text-mist">
       <HomepageHeroBackground />
 
-      <div className="container-content py-16 md:py-20">
-        <div className="max-w-3xl">
+      <div className="container-content py-16 md:py-20 [@media(max-height:500px)]:py-8">
+        <div className="max-w-3xl min-w-0 3xl:max-w-4xl">
           <p className="eyebrow mb-5 text-sage">{settings.tagline ?? dict.nav.home}</p>
           <h1 className="heading-display text-white">Walk where the map runs out of names.</h1>
           <p className="lead mt-6 max-w-2xl text-mist/85">
@@ -85,7 +85,7 @@ export async function HomeFallback() {
             description={dict.destinations.listingSubtitle}
             action={{ href: sitePath('/destinations'), label: dict.common.viewAll }}
           />
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
             {destinations.map((destination, index) => (
               <Reveal key={destination.id} delay={index * 80}>
                 <DestinationCard destination={destination} />
@@ -100,8 +100,8 @@ export async function HomeFallback() {
   const inquirySection = (
     <section className="py-16 md:py-24">
       <div className="container-content">
-        <div className="relative overflow-hidden bg-sage px-8 py-14 md:px-16 md:py-20">
-          <div className="relative max-w-2xl">
+        <div className="relative overflow-hidden bg-sage px-5 py-10 sm:px-8 sm:py-14 md:px-16 md:py-20 3xl:px-20 3xl:py-24">
+          <div className="relative max-w-2xl min-w-0 3xl:max-w-3xl">
             <h2 className="heading-lg text-ink">{dict.inquiry.title}</h2>
             <p className="lead mt-5 text-ink-70">{dict.inquiry.subtitle}</p>
             <Button asChild size="lg" className="mt-9">

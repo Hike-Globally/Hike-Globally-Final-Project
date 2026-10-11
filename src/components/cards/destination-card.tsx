@@ -37,7 +37,9 @@ export function DestinationCard({
       className={cn(
         'group relative isolate flex flex-col overflow-hidden bg-ink',
         // Heights are the previous values ×1.5 (26rem → 39rem, 32rem → 48rem, 20rem → 30rem).
-        size === 'large' ? 'min-h-[39rem] lg:min-h-[48rem]' : 'min-h-[30rem]',
+        size === 'large'
+          ? 'min-h-[min(28rem,75svh)] sm:min-h-[min(39rem,80svh)] lg:min-h-[min(48rem,85svh)]'
+          : 'min-h-[min(22rem,70svh)] sm:min-h-[min(30rem,75svh)]',
         className,
       )}
     >
@@ -71,7 +73,7 @@ export function DestinationCard({
         </p>
         <h3
           className={cn(
-            'mt-2 font-heading font-semibold text-white',
+            'mt-2 font-heading font-semibold break-words text-white',
             size === 'large' ? 'text-3xl md:text-4xl' : 'text-2xl',
           )}
         >

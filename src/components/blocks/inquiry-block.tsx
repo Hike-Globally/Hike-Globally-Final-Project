@@ -33,7 +33,7 @@ export async function InquirySection({ block }: { block: InquiryBlock }) {
       className={cn('py-16 md:py-24', dark ? 'bg-ink text-mist' : 'bg-sage-20 text-ink')}
     >
       <div className="container-content">
-        <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
+        <div className="grid min-w-0 gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
           <div>
             <SectionHeading
               title={block.heading}

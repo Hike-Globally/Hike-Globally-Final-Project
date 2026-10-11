@@ -22,7 +22,7 @@ export function Testimonials({ block }: { block: TestimonialsBlock }) {
           variant={dark ? 'light' : 'dark'}
         />
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
           {items.map((item, index) => {
             const rating = Number(item.rating ?? 5)
             const tripSlug =

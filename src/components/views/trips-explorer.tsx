@@ -216,7 +216,7 @@ export function TripsExplorer({
 
       <div className="container-content mt-12">
         {filtered.length === 0 ? (
-          <div className="border border-dashed border-black/10 bg-mist p-12 text-center">
+          <div className="border border-dashed border-black/10 bg-mist p-8 text-center sm:p-12">
             <h2 className="heading-md">{dict.common.noResultsTitle}</h2>
             <p className="lead mx-auto mt-3 max-w-lg">{dict.common.noResultsText}</p>
             <Button variant="outline" className="mt-6" onClick={reset}>
@@ -224,7 +224,7 @@ export function TripsExplorer({
             </Button>
           </div>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
             {filtered.map((trip, index) => (
               <TripCard key={trip.id} trip={trip} priority={index < 3} />
             ))}
