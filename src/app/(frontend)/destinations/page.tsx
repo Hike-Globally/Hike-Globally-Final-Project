@@ -37,7 +37,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function DestinationsPage() {
   const dict = dictionary
   const destinations = await getDestinations()
-  const destinationCount = String(destinations.length).padStart(2, '0')
 
   return (
     <>
@@ -91,25 +90,6 @@ export default async function DestinationsPage() {
             <span className="text-sm text-mist/70">
               Led by people who call these mountains home.
             </span>
-          </div>
-
-          <div className="mt-12 grid max-w-2xl grid-cols-2 gap-6 border-t border-white/15 pt-5">
-            <div>
-              <p className="text-[0.65rem] font-semibold tracking-[0.18em] text-sage uppercase">
-                Places on the map
-              </p>
-              <p className="mt-2 font-heading text-3xl font-semibold text-white">
-                {destinationCount}
-              </p>
-            </div>
-            <div>
-              <p className="text-[0.65rem] font-semibold tracking-[0.18em] text-sage uppercase">
-                A different kind of trip
-              </p>
-              <p className="mt-2 max-w-[15rem] description-copy leading-relaxed text-mist/75">
-                Planned on the ground, around you.
-              </p>
-            </div>
           </div>
         </div>
       </section>
