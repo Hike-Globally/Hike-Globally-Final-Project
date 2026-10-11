@@ -39,6 +39,7 @@ export default async function TripsPage() {
     <>
       <section
         aria-labelledby="trips-heading"
+        data-header-hero
         className="relative isolate flex min-h-[78svh] items-end overflow-hidden bg-ink text-mist"
       >
         <Image

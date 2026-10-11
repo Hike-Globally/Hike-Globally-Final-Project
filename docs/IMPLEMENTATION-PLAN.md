@@ -224,6 +224,7 @@ Then: seed content (4 destinations, 6 trips, 5 journal posts, 2 flexible pages, 
 | Native `<select>` + native POST        | Radix Select + client fetch                 | Works without JS, zero client bundle for the form. Cost: the picker cannot be styled per-option.                                                                                           |
 | Self-hosted fonts                      | Google Fonts CDN                            | The sandbox (and some regions) cannot reach the CDN; self-hosting also removes a render-blocking third-party request.                                                                      |
 | Drafts with autosave                   | Publish-only                                | Editors can prepare a full page and publish it in one click; the public never sees half-finished content.                                                                                  |
+| Auto-hiding header with a pointer-band reveal | Hide on scroll down, show on scroll up | The brief asks for a header that hides while scrolling and comes back when the pointer reaches the top of the screen; touch devices, which have no pointer, get the scroll-up reveal instead. Pages opt into "always visible over the hero" by marking their opening band with `data-header-hero` (see `src/components/layout/header-frame.tsx`). |
 
 ---
 

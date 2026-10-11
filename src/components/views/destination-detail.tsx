@@ -46,7 +46,12 @@ export function DestinationDetail({
 
   return (
     <>
-      <section className="relative isolate min-h-[64svh] overflow-hidden bg-ink text-mist">
+      {/* Hero region: while this banner is on screen the global header stays pinned
+          (see header-frame.tsx). */}
+      <section
+        data-header-hero
+        className="relative isolate min-h-[64svh] overflow-hidden bg-ink text-mist"
+      >
         <PayloadImageFill
           media={destination.heroImage}
           size="hero"

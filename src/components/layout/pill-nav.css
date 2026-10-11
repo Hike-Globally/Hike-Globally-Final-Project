@@ -26,6 +26,13 @@
   pointer-events: none;
 }
 
+/* Slid out of the way (see header-frame.tsx): the nav must not swallow clicks or
+   hovers over the content it just uncovered, even mid-animation. */
+.hg-header[data-hidden='true'] .pn-track,
+.hg-header[data-hidden='true'] .pn-announcement {
+  pointer-events: none;
+}
+
 .pn-viewport {
   display: flex;
   flex-direction: column;
