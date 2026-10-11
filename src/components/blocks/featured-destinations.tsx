@@ -75,7 +75,7 @@ export async function FeaturedDestinations({ block }: { block: FeaturedDestinati
             </div>
           </div>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
             {destinations.map((destination, index) => (
               <Reveal key={destination.id} delay={index * 80}>
                 <DestinationCard destination={destination} priority={index === 0} />

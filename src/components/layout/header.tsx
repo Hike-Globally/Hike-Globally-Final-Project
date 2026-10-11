@@ -50,13 +50,7 @@ export async function Header() {
   return (
     <HeaderFrame>
       {header.announcement ? (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            padding: '10px 20px 0',
-          }}
-        >
+        <div className="flex justify-center px-[max(1.25rem,env(safe-area-inset-left))] pr-[max(1.25rem,env(safe-area-inset-right))] pt-2.5">
           <p className="pn-announcement">{header.announcement}</p>
         </div>
       ) : null}

@@ -39,13 +39,14 @@
   align-items: center;
   gap: 10px;
   height: 92px;
-  padding: 16px 20px 0;
+  padding: max(16px, env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) 0
+    max(20px, env(safe-area-inset-left, 0px));
   pointer-events: none;
 }
 
 .pn-announcement {
   pointer-events: auto;
-  max-width: 100%;
+  max-width: min(100%, 72rem);
   padding: 7px 16px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 999px;
@@ -81,6 +82,7 @@
   max-width: 100%;
   height: min-content;
   padding: 8px 12px;
+  box-sizing: border-box;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
   background-color: rgba(17, 17, 17, 0.94);
@@ -263,13 +265,14 @@
     position: relative;
     height: 88px;
     align-items: flex-end;
-    padding: 16px 16px 0;
+    padding: max(12px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) 0
+      max(12px, env(safe-area-inset-left, 0px));
   }
 
   .pn-mobile-logo {
     position: absolute;
     top: 50%;
-    left: 16px;
+    left: max(12px, env(safe-area-inset-left, 0px));
     z-index: 1;
     display: inline-flex;
     align-items: center;
@@ -299,7 +302,10 @@
 
   .pn-track[data-open='true'] {
     width: 316px;
-    max-width: calc(100vw - 32px);
+    max-width: min(
+      316px,
+      calc(100dvw - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))
+    );
     height: auto;
     overflow: visible;
   }
@@ -357,6 +363,48 @@
   .pn-cta {
     width: 100%;
     justify-content: center;
+  }
+}
+
+/* Compact the desktop pills on small tablets so logo + tabs + CTA stay on one row. */
+@media (min-width: 810px) and (max-width: 1024px) {
+  .pn-tab {
+    padding: 11px 12px;
+    gap: 6px;
+  }
+
+  .pn-logo,
+  .pn-label,
+  .pn-cta {
+    font-size: 14px;
+  }
+
+  .pn-cta {
+    padding: 11px 14px;
+  }
+}
+
+/* Living-room / 4K: slightly larger hit targets and type without changing the pill shape. */
+@media (min-width: 1920px) {
+  .pn-viewport {
+    height: 108px;
+  }
+
+  .pn-logo,
+  .pn-label,
+  .pn-cta {
+    font-size: 16px;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .pn-viewport {
+    height: 64px;
+    padding-top: max(8px, env(safe-area-inset-top, 0px));
+  }
+
+  .pn-mobile-logo-mark {
+    height: 32px;
   }
 }
 

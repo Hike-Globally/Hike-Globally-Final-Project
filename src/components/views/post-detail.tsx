@@ -87,7 +87,7 @@ export function PostDetail({
             cropped on upload. */}
         <header
           data-header-hero
-          className="relative isolate flex min-h-[68svh] items-end overflow-hidden bg-ink text-mist md:min-h-[76svh] lg:min-h-[86svh]"
+          className="relative isolate flex min-h-[min(68svh,46rem)] items-end overflow-hidden bg-ink text-mist md:min-h-[min(76svh,52rem)] lg:min-h-[min(86svh,58rem)]"
         >
           <PayloadImageFill
             media={post.featuredImage}
@@ -117,7 +117,7 @@ export function PostDetail({
             aria-hidden="true"
           />
 
-          <div className="container-content relative z-10 w-full pt-28 pb-12 md:pt-32 md:pb-16">
+          <div className="container-content relative z-10 w-full pt-28 pb-10 sm:pb-12 md:pt-32 md:pb-16">
             <Breadcrumbs
               className="mb-8 [&_a]:text-mist/65 [&_a:hover]:text-white [&_span]:text-white [&_svg]:text-mist/35"
               items={[
@@ -139,7 +139,7 @@ export function PostDetail({
             <div className="mt-6 max-w-[34rem] lg:max-w-[42rem]">
               <h1
                 id="post-title"
-                className="font-heading text-[clamp(2.6rem,4.7vw,4.9rem)] leading-[0.98] font-semibold tracking-[-0.045em] text-white"
+                className="font-heading text-[clamp(2.1rem,6vw,4.9rem)] leading-[0.98] font-semibold tracking-[-0.045em] text-white 3xl:text-[clamp(4.9rem,3vw,6.5rem)]"
               >
                 {post.title}
               </h1>
@@ -341,7 +341,7 @@ export function PostDetail({
                 />
               </Link>
             </div>
-            <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
               {related.map((item) => (
                 <PostCard key={item.id} post={item} />
               ))}

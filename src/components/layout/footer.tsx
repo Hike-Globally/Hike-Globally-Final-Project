@@ -224,7 +224,7 @@ export async function Footer() {
   return (
     <footer className="hg-footer" aria-label={dict.footer.label}>
       {/* 1 — the giant edge-to-edge wordmark */}
-      <div className="px-5 pt-8 sm:px-8 md:pt-12">
+      <div className="pt-8 pl-[var(--page-gutter-left,1rem)] pr-[var(--page-gutter-right,1rem)] md:pt-12">
         <svg
           viewBox="0 0 780 78"
           className="hg-footer__wordmark"
@@ -244,11 +244,11 @@ export async function Footer() {
       </div>
 
       {/* 2 — about + social chips on the left, link columns on the right */}
-      <div className="mt-14 grid gap-12 px-5 sm:px-8 md:mt-24 lg:grid-cols-12 lg:gap-8">
+      <div className="mt-14 grid gap-12 pl-[var(--page-gutter-left,1rem)] pr-[var(--page-gutter-right,1rem)] md:mt-24 lg:grid-cols-12 lg:gap-8">
         <div className="lg:col-span-5 xl:col-span-4">
           <h3 className="font-heading text-sm font-semibold text-white">{dict.footer.about}</h3>
           <p className="mt-4 max-w-[34ch] description-copy leading-relaxed text-mist/90">{introduction}</p>
-          <div className="mt-8 flex gap-2.5">
+          <div className="mt-8 flex flex-wrap gap-2.5">
             {socials.map((social) => (
               <a
                 key={social.platform}
@@ -265,7 +265,7 @@ export async function Footer() {
         </div>
 
         <div
-          className={`grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:col-span-7 lg:gap-x-6 xl:col-span-8 ${tracks}`}
+          className={`grid grid-cols-1 gap-x-8 gap-y-10 xs:grid-cols-2 sm:grid-cols-3 lg:col-span-7 lg:gap-x-6 xl:col-span-8 ${tracks}`}
         >
           {rightColumns.map((column) => (
             <FooterColumnBlock key={column.heading} column={column} />
@@ -274,9 +274,9 @@ export async function Footer() {
       </div>
 
       {/* 3 — copyright left, location right, pinned to the very bottom */}
-      <div className="mt-16 flex flex-col gap-3 px-5 pb-6 sm:flex-row sm:items-center sm:justify-between sm:px-8 md:mt-24">
-        <p className="text-[11px] leading-none text-mist/80">{copyright}</p>
-        <p className="flex items-center gap-1.5 text-[11px] leading-none text-mist/80">
+      <div className="mt-16 flex flex-col gap-3 pb-6 pl-[var(--page-gutter-left,1rem)] pr-[var(--page-gutter-right,1rem)] sm:flex-row sm:items-center sm:justify-between md:mt-24">
+        <p className="text-[11px] leading-snug text-mist/80">{copyright}</p>
+        <p className="flex min-w-0 items-center gap-1.5 text-[11px] leading-snug text-mist/80">
           <MapPin size={12} strokeWidth={2} aria-hidden="true" />
           {location}
         </p>

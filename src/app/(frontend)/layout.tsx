@@ -85,14 +85,15 @@ export const viewport: Viewport = {
   colorScheme: 'light',
   width: 'device-width',
   initialScale: 1,
+  viewportFit: 'cover',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const dict = dictionary
 
   return (
-    <html lang={htmlLang} className={`${headingFont.variable} ${bodyFont.variable}`}>
-      <body className="flex min-h-screen flex-col bg-background text-foreground">
+    <html lang={htmlLang} className={`${headingFont.variable} ${bodyFont.variable} overflow-x-clip`}>
+      <body className="flex min-h-dvh min-w-0 flex-col overflow-x-clip bg-background text-foreground">
         <LivePreviewRefresh />
         <a
           href="#main"
@@ -103,7 +104,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <Header />
 
-        <main id="main" className="flex-1">
+        <main id="main" className="w-full min-w-0 flex-1 overflow-x-clip">
           {children}
         </main>
 

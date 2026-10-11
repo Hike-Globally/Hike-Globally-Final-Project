@@ -78,7 +78,7 @@ function TripBookingCard({
   return (
     <div
       className={cn(
-        'relative overflow-hidden bg-ink p-7 text-mist ring-1 ring-white/10 shadow-[0_40px_80px_-30px_rgba(1,22,30,0.6)]',
+        'relative overflow-hidden bg-ink p-5 text-mist ring-1 ring-white/10 shadow-[0_40px_80px_-30px_rgba(1,22,30,0.6)] sm:p-7',
         className,
       )}
     >
@@ -239,7 +239,7 @@ export function TripDetail({
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-ink/95 via-ink/70 to-ink/25" />
         <div className="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/30 to-ink/40" />
 
-        <div className="container-content pt-28 pb-14 md:pt-36 md:pb-16">
+        <div className="container-content pt-28 pb-12 sm:pb-14 md:pt-36 md:pb-16">
           <Breadcrumbs
             className="mb-8"
             items={[
@@ -276,7 +276,7 @@ export function TripDetail({
           </div>
 
           {/* Glass dashboard. A 1px gap over a tinted background draws the grid lines. */}
-          <dl className="mt-14 grid grid-cols-2 gap-px overflow-hidden bg-white/10 ring-1 ring-white/10 backdrop-blur-xl md:grid-cols-4">
+          <dl className="mt-10 grid grid-cols-1 gap-px overflow-hidden bg-white/10 ring-1 ring-white/10 backdrop-blur-xl xs:grid-cols-2 md:mt-14 md:grid-cols-4">
             {facts.map((fact) => (
               <div
                 key={fact.label}
@@ -302,7 +302,7 @@ export function TripDetail({
       {/* ---------------- Trip content + sticky booking card ---------------- */}
       {/* A sticky element can only travel as far as its grid area, so ending this grid right
           before the full-width inquiry panel is what releases the booking card. */}
-      <div className="container-content grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14">
+      <div className="container-content grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14 3xl:grid-cols-[minmax(0,1fr)_26rem]">
         {/* Trip content — 17px pure-black running copy (see `.single-page-body`). */}
         <div className="single-page-body min-w-0">
           {/* ---------------- Overview + highlights ---------------- */}
@@ -426,7 +426,7 @@ export function TripDetail({
                     <AccordionItem
                       key={contentSection.id ?? index}
                       value={`section-${contentSection.id ?? index}`}
-                      className={cn(surface, 'overflow-hidden px-6 md:px-8')}
+                      className={cn(surface, 'overflow-hidden px-4 sm:px-6 md:px-8')}
                     >
                       <AccordionTrigger
                         indicator="chevron"
@@ -454,7 +454,7 @@ export function TripDetail({
             <Reveal as="section" className="py-16 md:py-24">
               <div className="grid gap-6 md:grid-cols-2">
                 {trip.included?.length ? (
-                  <div className="bg-sage-20 p-8 ring-1 ring-sage/30 md:p-10">
+                  <div className="bg-sage-20 p-5 ring-1 ring-sage/30 sm:p-8 md:p-10">
                     <h2 className="heading-md mb-7">{dict.trip.included}</h2>
                     <ul className="space-y-4">
                       {trip.included.map((item) => (
@@ -472,7 +472,7 @@ export function TripDetail({
                 ) : null}
 
                 {trip.notIncluded?.length ? (
-                  <div className={cn(surface, 'p-8 md:p-10')}>
+                  <div className={cn(surface, 'p-5 sm:p-8 md:p-10')}>
                     <h2 className="heading-md mb-7">{dict.trip.notIncluded}</h2>
                     <ul className="space-y-4">
                       {trip.notIncluded.map((item) => (
@@ -553,7 +553,7 @@ export function TripDetail({
       {/* ---------------- Inquiry — full width, dark panel ---------------- */}
       <section id="inquiry" className="scroll-mt-24 py-16 md:py-24">
         <div className="container-content">
-          <div className="relative isolate overflow-hidden bg-ink p-8 text-mist ring-1 ring-white/10 md:p-14">
+          <div className="relative isolate overflow-hidden bg-ink p-5 text-mist ring-1 ring-white/10 sm:p-8 md:p-14">
             <div
               aria-hidden
               className="pointer-events-none absolute -top-40 -right-32 -z-10 size-[28rem] rounded-full bg-sage/15 blur-3xl"
@@ -585,7 +585,7 @@ export function TripDetail({
         <section className="py-16 md:py-24">
           <div className="container-content">
             <SectionTitle title={dict.trip.related} />
-            <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
               {related.map((item, index) => (
                 <Reveal key={item.id} delay={index * 70}>
                   <TripCard trip={item} />

@@ -90,7 +90,7 @@ export function AboutHikeGlobally() {
       />
 
       <div className="container-content relative">
-        <div className="grid items-center gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+        <div className="grid min-w-0 items-center gap-12 sm:gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
           {/* Copy column */}
           <div>
             <Reveal>
@@ -141,7 +141,7 @@ export function AboutHikeGlobally() {
               {[...TICKER_DESTINATIONS, ...TICKER_DESTINATIONS].map((destination, index) => (
                 <span
                   key={`${destination}-${index}`}
-                  className="flex shrink-0 items-center gap-2 text-lg font-medium text-mist/60"
+                  className="flex shrink-0 items-center gap-2 text-base font-medium text-mist/60 sm:text-lg 3xl:text-xl"
                 >
                   <MapPin className="size-4 text-sage" aria-hidden="true" />
                   {destination}
@@ -191,7 +191,7 @@ function GlobeVisual() {
       ref={wrapperRef}
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
-      className="relative mx-auto aspect-square w-72 sm:w-80 md:w-[22rem] lg:w-[24rem]"
+      className="relative mx-auto aspect-square w-full max-w-[min(18rem,calc(100%-0.5rem))] sm:max-w-80 md:max-w-[22rem] lg:max-w-[24rem] 3xl:max-w-[28rem]"
       style={{ perspective: '1100px' }}
       data-about-globe
     >

@@ -76,10 +76,12 @@ export function Hero({
       <div
         className={cn(
           'container-content',
-          homepage ? 'pt-24 pb-12 md:pt-28 md:pb-16' : 'py-24 md:py-28',
+          homepage
+            ? 'pt-24 pb-10 sm:pb-12 md:pt-28 md:pb-16 [@media(max-height:500px)]:py-8'
+            : 'py-20 sm:py-24 md:py-28 [@media(max-height:500px)]:py-12',
         )}
       >
-        <div className="max-w-3xl">
+        <div className="max-w-3xl min-w-0 3xl:max-w-4xl">
           {block.eyebrow ? (
             <p className={cn('eyebrow mb-5', hasImage ? 'text-sage' : 'text-slate')}>
               {block.eyebrow}

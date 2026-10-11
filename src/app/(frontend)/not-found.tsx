@@ -24,7 +24,7 @@ export default function NotFound() {
   const dict = dictionary
 
   return (
-    <section className="py-28 md:py-36">
+    <section className="pt-32 pb-24 md:pt-40 md:pb-36">
       <div className="container-prose text-center">
         <p className="eyebrow mb-4">404</p>
         <h1 className="heading-lg">{dict.notFound.title}</h1>

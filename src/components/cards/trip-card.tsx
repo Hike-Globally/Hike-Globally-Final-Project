@@ -63,7 +63,7 @@ export function TripCard({
       </Link>
 
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="font-heading text-lg leading-snug font-semibold text-ink">
+        <h3 className="font-heading text-lg leading-snug font-semibold break-words text-ink">
           <Link href={href} className="after:absolute after:inset-0">
             {trip.title}
           </Link>
@@ -97,7 +97,7 @@ export function TripCard({
           ) : null}
         </dl>
 
-        <div className="mt-5 flex items-end justify-between border-t border-black/[0.06] pt-4">
+        <div className="mt-5 flex flex-wrap items-end justify-between gap-3 border-t border-black/[0.06] pt-4">
           <p className="text-[0.8125rem] text-slate">
             {dict.common.from}{' '}
             <span className="font-heading text-lg font-semibold text-ink">

@@ -48,9 +48,18 @@
   --font-heading: var(--font-google-sans-flex), 'Google Sans Flex', system-ui, sans-serif;
   --font-sans: var(--font-archivo), 'Archivo', system-ui, sans-serif;
 
+  /* --- Breakpoints (5" phones → 100" TVs) ---
+     Defaults remain: sm 640, md 768, lg 1024, xl 1280, 2xl 1536.
+     Extra steps cover small phones just above 320px, Full HD / living-room TVs,
+     QHD monitors, and 4K / 100-inch canvases. */ 
+  --breakpoint-xs: 22.5rem; /* 360px */
+  --breakpoint-3xl: 120rem; /* 1920px */
+  --breakpoint-4xl: 160rem; /* 2560px */
+  --breakpoint-tv: 240rem; /* 3840px */
+
   /* --- Spacing & layout --- */
   --container-*: initial;
-  --container-content: 80rem; /* 1280px */
+  --container-content: 80rem; /* 1280px — overridden fluidly below for large canvases */
   --container-prose: 44rem; /* 704px — optimal line length for reading */
 
   /* --- Motion: one shared easing curve keeps every animation feeling related --- */
@@ -124,7 +133,19 @@
   --sidebar-ring: #598392;
 
   /* Shared responsive type scale for short-form descriptions, reduced 2px from the original lead scale. */
-  --font-size-description: clamp(0.9375rem, 0.875rem + 0.35vw, 1.125rem);
+  --font-size-description: clamp(0.9375rem, 0.82rem + 0.45vw, 1.25rem);
+
+  /* Fluid page gutter: ~16px on a 5" phone, ~32px on a tablet, ~48–72px on a TV.
+     Safe-area insets keep content clear of notches and curved TV bezels. */
+  --page-gutter: clamp(1rem, 0.3rem + 2.5vw, 4.5rem);
+  --page-gutter-left: max(var(--page-gutter), env(safe-area-inset-left, 0px));
+  --page-gutter-right: max(var(--page-gutter), env(safe-area-inset-right, 0px));
+  --section-space: clamp(3.25rem, 1.8rem + 4vw, 8rem);
+
+  /* Runtime column widths — same tokens as @theme, so the large-canvas media
+     queries further down can widen them without fighting the theme layer. */
+  --container-content: 80rem;
+  --container-prose: 44rem;
 }
 
 /* Dark palette is defined so flipping next-themes to dark never produces an
@@ -234,6 +255,7 @@
   html {
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
+    overflow-x: clip;
   }
 
   /* Lenis drives scrolling with rAF — native smooth scrolling would fight it. */
@@ -262,6 +284,22 @@
       'kern' 1,
       'liga' 1;
     text-rendering: optimizeLegibility;
+    min-width: 0;
+    overflow-x: clip;
+    overflow-wrap: break-word;
+  }
+
+  /* Flex/grid children default to min-width:auto, which is the usual cause of
+     a page-wide horizontal scrollbar when a card or heading won't shrink. */
+  #main {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  img,
+  video,
+  iframe {
+    max-width: 100%;
   }
 
   h1,
@@ -298,17 +336,16 @@
   margin-inline: auto;
   width: 100%;
   max-width: var(--container-content);
-  padding-inline: 1.5rem;
-  @media (width >= 768px) {
-    padding-inline: 2rem;
-  }
+  padding-left: var(--page-gutter-left);
+  padding-right: var(--page-gutter-right);
 }
 
 @utility container-prose {
   margin-inline: auto;
   width: 100%;
   max-width: var(--container-prose);
-  padding-inline: 1.5rem;
+  padding-left: var(--page-gutter-left);
+  padding-right: var(--page-gutter-right);
   @media (width >= 768px) {
     padding-inline: 0;
   }
@@ -325,11 +362,10 @@
    scrollport (the padding box), so without it the cards would come to rest on the viewport
    edge instead of on the column line. */
 @utility container-gutter {
-  --container-gutter-offset: calc(max(0px, (100% - var(--container-content)) / 2) + 1.5rem);
+  --container-gutter-offset: calc(
+    max(0px, (100% - var(--container-content)) / 2) + var(--page-gutter-left)
+  );
   padding-inline: var(--container-gutter-offset);
-  @media (width >= 768px) {
-    --container-gutter-offset: calc(max(0px, (100% - var(--container-content)) / 2) + 2rem);
-  }
 }
 
 /* Eyebrow / kicker label above headings. */
@@ -347,7 +383,10 @@
   font-weight: 600;
   letter-spacing: -0.03em;
   line-height: 1.02;
-  font-size: clamp(2.5rem, 1.5rem + 4vw, 4.75rem);
+  font-size: clamp(2.125rem, 1.15rem + 4.2vw, 4.75rem);
+  @media (width >= 120rem) {
+    font-size: clamp(4.75rem, 2.2rem + 2.1vw, 7rem);
+  }
 }
 
 @utility heading-xl {
@@ -355,7 +394,10 @@
   font-weight: 600;
   letter-spacing: -0.025em;
   line-height: 1.06;
-  font-size: clamp(2rem, 1.4rem + 2.2vw, 3.5rem);
+  font-size: clamp(1.75rem, 1.15rem + 2.4vw, 3.5rem);
+  @media (width >= 120rem) {
+    font-size: clamp(3.5rem, 1.8rem + 1.4vw, 5rem);
+  }
 }
 
 @utility heading-lg {
@@ -363,7 +405,10 @@
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.12;
-  font-size: clamp(1.6rem, 1.2rem + 1.2vw, 2.4rem);
+  font-size: clamp(1.4rem, 1.1rem + 1.2vw, 2.4rem);
+  @media (width >= 120rem) {
+    font-size: clamp(2.4rem, 1.4rem + 0.9vw, 3.25rem);
+  }
 }
 
 @utility heading-md {
@@ -371,7 +416,10 @@
   font-weight: 600;
   letter-spacing: -0.015em;
   line-height: 1.2;
-  font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.6rem);
+  font-size: clamp(1.15rem, 1.05rem + 0.5vw, 1.6rem);
+  @media (width >= 120rem) {
+    font-size: clamp(1.6rem, 1.1rem + 0.4vw, 2rem);
+  }
 }
 
 @utility description-copy {
@@ -481,6 +529,11 @@
   .prose-hg strong {
     @apply font-semibold text-ink;
   }
+  .prose-hg table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
   .prose-hg figure {
     @apply my-10;
   }
@@ -586,8 +639,83 @@
 
   @media (width >= 1024px) {
     .blog-prose figure {
-      margin-inline: -2rem;
+      margin-inline: max(-2rem, calc(var(--page-gutter-left, 2rem) * -1));
     }
+  }
+}
+
+/* ==========================================================================
+   Device canvas — 5" phones through 100" TVs
+   --------------------------------------------------------------------------
+   CSS cannot see physical inches, only CSS pixels, so the ranges below map
+   the common canvases for those diagonals:
+
+     ~320–479px    5–6" phones (portrait)
+     ~480–809px    large phones / small tablets
+     ~810–1279px   tablets / small laptops
+     ~1280–1919px  desktops
+     ~1920–2559px  Full HD / living-room TVs
+     ~2560–3839px  QHD / large monitors
+     ~3840px+      4K and 100-inch canvases
+
+   The layout column (`--container-content`) grows with the canvas so a 100"
+   TV is not looking at a 1280px strip, while `--container-prose` stays a
+   reading measure. Type continues to climb after 1920px so copy remains
+   legible from sofa distance.
+   ========================================================================== */
+
+/* 2xl — 1536px laptops / small TVs */
+@media (width >= 96rem) {
+  :root {
+    --container-content: 90rem;
+  }
+}
+
+/* 3xl — 1920px Full HD / most TVs */
+@media (width >= 120rem) {
+  :root {
+    --container-content: 108rem;
+    --container-prose: 48rem;
+    --font-size-description: clamp(1.125rem, 0.9rem + 0.35vw, 1.5rem);
+  }
+
+  body {
+    font-size: 1.125rem;
+  }
+}
+
+/* 4xl — 2560px QHD / large TVs */
+@media (width >= 160rem) {
+  :root {
+    --container-content: 128rem;
+    --container-prose: 52rem;
+  }
+
+  body {
+    font-size: 1.25rem;
+  }
+}
+
+/* tv — 3840px 4K / 100-inch canvases */
+@media (width >= 240rem) {
+  :root {
+    --container-content: 160rem;
+    --container-prose: 56rem;
+  }
+
+  body {
+    font-size: 1.375rem;
+  }
+}
+
+/* Short landscape phones (5–6" rotated): keep hero copy inside the viewport. */
+@media (max-height: 500px) and (orientation: landscape) {
+  .heading-display {
+    font-size: clamp(1.6rem, 8vh, 2.4rem);
+  }
+
+  .heading-xl {
+    font-size: clamp(1.35rem, 6.5vh, 2rem);
   }
 }
 

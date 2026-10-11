@@ -40,7 +40,7 @@ export default async function TripsPage() {
       <section
         aria-labelledby="trips-heading"
         data-header-hero
-        className="relative isolate flex min-h-[78svh] items-end overflow-hidden bg-ink text-mist"
+        className="relative isolate flex min-h-[min(78svh,52rem)] items-end overflow-hidden bg-ink text-mist"
       >
         <Image
           src={TRIPS_HERO_IMAGE}

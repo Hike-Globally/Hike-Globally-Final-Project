@@ -57,7 +57,9 @@ export function PageHeader({
       <div
         className={cn(
           'container-content',
-          hasBackground ? 'pt-28 pb-20 md:pt-36 md:pb-28' : 'pt-16 pb-12 md:pt-24 md:pb-16',
+          hasBackground
+            ? 'pt-28 pb-16 sm:pb-20 md:pt-36 md:pb-28'
+            : 'pt-28 pb-12 md:pt-32 md:pb-16',
           align === 'center' ? 'text-center' : '',
         )}
       >

@@ -18,12 +18,12 @@ export function Cta({ block }: { block: CtaBlock }) {
   return (
     <section className="py-16 md:py-24">
       <div className="container-content">
-        <div className={`relative overflow-hidden px-8 py-14 md:px-16 md:py-20 ${variant}`}>
+        <div className={`relative overflow-hidden px-5 py-10 sm:px-8 sm:py-14 md:px-16 md:py-20 3xl:px-20 3xl:py-24 ${variant}`}>
           <div
             aria-hidden
             className="pointer-events-none absolute -top-24 -right-16 size-72 rounded-full bg-white/10 blur-2xl"
           />
-          <div className="relative max-w-2xl">
+          <div className="relative max-w-2xl min-w-0 3xl:max-w-3xl">
             {block.eyebrow ? <p className="eyebrow mb-4 text-sage">{block.eyebrow}</p> : null}
             <h2 className="heading-lg">{block.heading}</h2>
             {block.text ? <p className="lead mt-5 opacity-80">{block.text}</p> : null}

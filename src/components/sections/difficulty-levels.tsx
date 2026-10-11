@@ -124,7 +124,7 @@ export function DifficultyLevels() {
               href={tripsByDifficultyPath(level.value)}
               aria-labelledby={`difficulty-${level.value}-title`}
               aria-describedby={`difficulty-${level.value}-desc`}
-              className="group relative isolate h-[30rem] w-[78vw] max-w-[21rem] shrink-0 snap-start overflow-hidden bg-ink text-white focus-visible:outline-offset-4 sm:h-[31rem] sm:w-[min(42vw,20rem)] lg:h-[32rem] lg:w-[min(23vw,20.5rem)]"
+              className="group relative isolate h-[min(30rem,72svh)] w-[min(78vw,21rem)] shrink-0 snap-start overflow-hidden bg-ink text-white focus-visible:outline-offset-4 sm:h-[min(31rem,74svh)] sm:w-[min(42vw,20rem)] lg:h-[min(32rem,76svh)] lg:w-[min(23vw,20.5rem)] 3xl:h-[min(36rem,70svh)] 3xl:w-[min(18vw,24rem)] tv:w-[min(16vw,28rem)]"
             >
               <Image
                 src={level.image}

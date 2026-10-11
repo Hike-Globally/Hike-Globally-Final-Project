@@ -43,7 +43,7 @@ export function BlogExplorer({ posts }: { posts: PostCardData[] }) {
 
   if (categories.length === 0) {
     return (
-      <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
         {filtered.map((post, index) => (
           <PostCard key={post.id} post={post} priority={index < 3} />
         ))}
@@ -89,7 +89,7 @@ export function BlogExplorer({ posts }: { posts: PostCardData[] }) {
         </div>
       ) : null}
 
-      <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
         {rest.map((post, index) => (
           <PostCard key={post.id} post={post} priority={index < 2} />
         ))}
