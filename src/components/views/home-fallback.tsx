@@ -41,8 +41,15 @@ export async function HomeFallback() {
       <div className="container-content py-16 md:py-20 [@media(max-height:500px)]:py-8">
         <div className="max-w-3xl min-w-0 3xl:max-w-4xl">
           <p className="eyebrow mb-5 text-sage">{settings.tagline ?? dict.nav.home}</p>
-          <h1 className="heading-display text-white">Walk where the map runs out of names.</h1>
-          <p className="lead mt-6 max-w-2xl text-mist/85">
+          <h1 className="heading-display text-white">
+            Walk where the
+            <br />
+            map runs out of names.
+          </h1>
+          <p
+            className="lead mt-6 max-w-2xl text-mist/85"
+            style={{ fontSize: 'calc(var(--font-size-description) - 2px)' }}
+          >
             Small-group treks and expeditions across Nepal, led by guides who grew up on these
             trails. Tell us what you are dreaming of — we will build the itinerary around it.
           </p>
