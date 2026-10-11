@@ -48,3 +48,37 @@ export const siteLivePreviewURL = (args: LivePreviewURLArgs): string | null => {
   const path = resolveLivePreviewPath(args)
   return path ? buildLivePreviewURL(path) : null
 }
+
+type ViewLiveArgs = {
+  collectionSlug?: string
+  globalSlug?: string
+  /** The saved slug of the document (ignored for globals). */
+  slug?: unknown
+  /** Whether a published version exists, i.e. whether the public page is actually reachable. */
+  published?: boolean
+}
+
+/**
+ * The "View live page" target for the admin. Returns the public storefront URL when the document
+ * is published (or is a global, which always renders), the authenticated draft-preview route when
+ * the document has never been published (the public URL would 404), and `null` for entities that
+ * have no storefront page (users, media) or no slug yet.
+ */
+export const resolveViewLiveHref = ({
+  collectionSlug,
+  globalSlug,
+  slug,
+  published = true,
+}: ViewLiveArgs): { href: string; isDraftPreview: boolean } | null => {
+  if (globalSlug) return { href: '/', isDraftPreview: false }
+
+  const cleanSlug = typeof slug === 'string' ? slug.trim() : ''
+  if (!collectionSlug || !cleanSlug) return null
+
+  const path = resolveLivePreviewPath({ collectionConfig: { slug: collectionSlug }, data: { slug: cleanSlug } })
+  if (!path) return null
+
+  return published
+    ? { href: path, isDraftPreview: false }
+    : { href: buildLivePreviewURL(path), isDraftPreview: true }
+}

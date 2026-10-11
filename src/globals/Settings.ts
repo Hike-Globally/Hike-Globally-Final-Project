@@ -10,7 +10,10 @@ export const Settings: GlobalConfig = {
   admin: {
     components: {
       elements: {
-        beforeDocumentControls: ['@/components/admin/live-preview-toggle'],
+        beforeDocumentControls: [
+          '@/components/admin/view-live-button',
+          '@/components/admin/live-preview-toggle',
+        ],
       },
     },
     livePreview: { url: siteLivePreviewURL },
