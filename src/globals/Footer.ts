@@ -32,7 +32,7 @@ export const Footer: GlobalConfig = {
       type: 'textarea',
       localized: true,
       maxLength: 320,
-      admin: { description: 'Short brand statement under the logo.' },
+      admin: { description: 'Short brand statement in the About section of the footer.' },
     },
     {
       name: 'columns',

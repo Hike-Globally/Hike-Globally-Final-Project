@@ -1,16 +1,6 @@
 /* ==========================================================================
-   Global footer — ported from `footer-sample.png`.
-
-   The sample's design, top to bottom:
-     1. a giant one-line wordmark stretched edge to edge,
-     2. a row of small link columns (about + social chips on the left,
-        sitemap / legal / contact on the right),
-     3. a thin copyright-left · location-right bar at the very bottom,
-   all sitting on a dark corner-glow gradient (black at the top-left melting
-   into a saturated glow at the bottom-right corner).
-
-   The sample's black → red glow is rendered here in the site's locked brand
-   palette: ink #01161e → deep #124559, glow anchored at the bottom-right.
+   Global footer — compact about and navigation columns over a dark
+   corner-glow gradient, followed by a copyright and creator-credit bar.
    ========================================================================== */
 
 .hg-footer {
@@ -29,22 +19,8 @@
   );
 }
 
-/* Giant wordmark — an inline SVG <text> whose `textLength` stretches the brand
-   name to exactly the full viewport width at any size or name length, so the
-   edge-to-edge fill of the sample holds on every screen without JS measuring. */
-.hg-footer__wordmark {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  height: auto;
-}
-
-.hg-footer__wordmark-text {
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 100px; /* viewBox units — the rendered size scales with the width */
-  letter-spacing: -0.015em;
-  fill: #f8f9fa;
+.hg-footer__description {
+  font-size: calc(var(--font-size-description) - 2px);
 }
 
 /* Boxed social icons — the small outlined rounded chips of the sample. The

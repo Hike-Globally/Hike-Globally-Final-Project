@@ -56,9 +56,8 @@ const en = {
     privacy: 'Privacy',
     terms: 'Terms',
     introductionFallback:
-      'A Kathmandu- and Pokhara-based trekking operator. Fourteen years, thirty people, one country we know properly.',
+      'Hike Globally offers curated travel packages and unforgettable adventures, helping you explore breathtaking destinations and create memories that last a lifetime.',
     copyright: '© {year} {site}. All rights reserved.',
-    locationFallback: 'Kathmandu, Nepal',
   },
   trips: {
     listingTitle: 'Trekking trips & expeditions',
