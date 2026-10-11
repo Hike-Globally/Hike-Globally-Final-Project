@@ -76,7 +76,9 @@ export function PostDetail({
       <ArticleReadingProgress articleId="blog-post" label={dict.blog.readingProgress} />
 
       <article id="blog-post" className="blog-post">
-        <header className="relative isolate overflow-hidden bg-ink text-mist">
+        {/* Hero region: the header stays pinned while this masthead is on screen
+            (see header-frame.tsx). */}
+        <header data-header-hero className="relative isolate overflow-hidden bg-ink text-mist">
           <TopographicLines />
 
           <div className="container-content pt-28 md:pt-32">

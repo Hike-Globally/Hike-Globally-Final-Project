@@ -30,12 +30,18 @@ function homepageBlocks(blocks: Block[]): Block[] {
   return inquiryIndex === -1 ? withoutBlog : withoutBlog.slice(0, inquiryIndex + 1)
 }
 
-function renderBlock(block: Block, index: number, homepage: boolean, singlePage = false) {
+function renderBlock(
+  block: Block,
+  index: number,
+  homepage: boolean,
+  singlePage = false,
+  opening = false,
+) {
   const key = `${block.blockType}-${index}`
 
   switch (block.blockType) {
     case 'hero':
-      return <Hero key={key} block={block} homepage={homepage} />
+      return <Hero key={key} block={block} homepage={homepage} opening={opening} />
     case 'richText':
       return <RichTextSection key={key} block={block} singlePage={singlePage} />
     case 'featuredTrips':
@@ -111,5 +117,13 @@ export async function BlockRenderer({
     }
   }
 
-  return <>{blocks.map((block, index) => renderBlock(block, index, homepage, singlePage))}</>
+  // Only ever a page's *first* block: a hero further down the page must not re-pin the
+  // header while the visitor scrolls through it (see header-frame.tsx).
+  return (
+    <>
+      {blocks.map((block, index) =>
+        renderBlock(block, index, homepage, singlePage, !homepage && index === 0),
+      )}
+    </>
+  )
 }

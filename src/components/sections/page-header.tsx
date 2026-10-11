@@ -31,6 +31,9 @@ export function PageHeader({
 
   return (
     <section
+      // Marks the opening band as this page's hero region: while it is still on
+      // screen the global header stays pinned (see header-frame.tsx).
+      data-header-hero
       className={cn(
         'relative isolate overflow-hidden',
         hasBackground ? 'bg-ink text-mist' : 'bg-mist text-ink',

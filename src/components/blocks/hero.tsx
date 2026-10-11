@@ -20,7 +20,20 @@ const overlays: Record<string, string> = {
   none: 'bg-transparent',
 }
 
-export function Hero({ block, homepage = false }: { block: HeroBlock; homepage?: boolean }) {
+export function Hero({
+  block,
+  homepage = false,
+  opening = false,
+}: {
+  block: HeroBlock
+  homepage?: boolean
+  /**
+   * This hero is the page's first block, so it *is* the hero region: the global
+   * header stays pinned over it. The homepage's hero is covered by
+   * `HeroScrollCover`'s own marker instead (see header-frame.tsx).
+   */
+  opening?: boolean
+}) {
   const primary = resolveLink(block.primaryLink)
   const secondary = resolveLink(block.secondaryLink)
   const hasImage = homepage || Boolean(block.backgroundImage)
@@ -31,6 +44,7 @@ export function Hero({ block, homepage = false }: { block: HeroBlock; homepage?:
 
   return (
     <section
+      data-header-hero={opening ? 'true' : undefined}
       className={cn(
         'relative isolate flex items-end overflow-hidden',
         height,

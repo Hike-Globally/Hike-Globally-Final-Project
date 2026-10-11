@@ -225,7 +225,9 @@ export function TripDetail({
   return (
     <>
       {/* ---------------- Hero + trip dashboard ---------------- */}
-      <section className="relative isolate overflow-hidden bg-ink text-mist">
+      {/* Hero region: the header stays pinned until this band has scrolled past
+          (see header-frame.tsx). */}
+      <section data-header-hero className="relative isolate overflow-hidden bg-ink text-mist">
         <PayloadImageFill
           media={trip.heroImage}
           size="hero"

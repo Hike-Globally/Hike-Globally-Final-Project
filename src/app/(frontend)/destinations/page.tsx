@@ -42,8 +42,13 @@ export default async function DestinationsPage() {
   return (
     <>
       {/* HERO — full-width banner. Every destination (the featured one included) now appears in
-          the atlas grid below, so the hero stands on its own image rather than on a card. */}
-      <section className="relative isolate flex min-h-[78svh] items-end overflow-hidden bg-ink text-mist">
+          the atlas grid below, so the hero stands on its own image rather than on a card.
+          Marked as the hero region: the global header stays pinned for as long as it is on
+          screen (see header-frame.tsx). */}
+      <section
+        data-header-hero
+        className="relative isolate flex min-h-[78svh] items-end overflow-hidden bg-ink text-mist"
+      >
         <Image
           src={DESTINATIONS_HERO_IMAGE}
           alt=""
