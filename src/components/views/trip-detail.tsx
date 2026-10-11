@@ -301,11 +301,12 @@ export function TripDetail({
       {/* A sticky element can only travel as far as its grid area, so ending this grid right
           before the full-width inquiry panel is what releases the booking card. */}
       <div className="container-content grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14">
-        <div className="min-w-0">
+        {/* Trip content — 17px pure-black running copy (see `.single-page-body`). */}
+        <div className="single-page-body min-w-0">
           {/* ---------------- Overview + highlights ---------------- */}
           <Reveal as="section" className="py-16 md:py-24">
             <SectionTitle title={dict.trip.overview} />
-            <div className="prose-hg max-w-none text-[1.0625rem] leading-[1.8]">
+            <div className="prose-hg max-w-none leading-[1.8]">
               <RichText content={trip.description} />
             </div>
 

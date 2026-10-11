@@ -476,6 +476,31 @@
 }
 
 /* ==========================================================================
+   Single pages — running copy for trips, blog posts, destinations & CMS pages
+   ==========================================================================
+   One pixel above the site body size (16px → 17px) and pure black, so long-form
+   reading copy is as legible as possible on the white page.
+
+   Only elements that inherit their type inherit this — headings, eyebrows, links,
+   captions, meta rows and UI accents keep their own size and colour. */
+@layer components {
+  .single-page-body {
+    font-size: 1.0625rem; /* 1rem body size + 1px */
+    color: #000000;
+  }
+
+  /* `prose-hg` tints its running copy with ink-80 for the multi-purpose rich-text
+     contexts; inside a single page the paragraphs, list items and bold runs are
+     pure black instead. Headings, quotes and links keep their own colours. */
+  .single-page-body .prose-hg,
+  .single-page-body .prose-hg p,
+  .single-page-body .prose-hg li,
+  .single-page-body .prose-hg strong {
+    color: #000000;
+  }
+}
+
+/* ==========================================================================
    Editorial blog detail — shared by every `/blog/[slug]` page
    ========================================================================== */
 @layer components {

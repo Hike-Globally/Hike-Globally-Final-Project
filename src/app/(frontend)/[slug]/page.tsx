@@ -70,7 +70,7 @@ export default async function FlexiblePage({ params }: { params: Promise<{ slug:
 
   return (
     <>
-      <BlockRenderer blocks={page.blocks} />
+      <BlockRenderer blocks={page.blocks} singlePage />
       <JsonLd
         data={breadcrumbJsonLd([
           { name: 'Home', url: sitePath('/') },
