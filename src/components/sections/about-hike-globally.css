@@ -37,10 +37,6 @@
   animation: ahg-pulse 2.6s var(--ease-brand, ease-in-out) infinite;
 }
 
-[data-about-globe] .ahg-float {
-  animation: ahg-float 6s var(--ease-brand, ease-in-out) infinite;
-}
-
 @keyframes ahg-spin {
   from {
     transform: rotate(0deg);
@@ -59,16 +55,6 @@
   50% {
     transform: scale(1.9);
     opacity: 0;
-  }
-}
-
-@keyframes ahg-float {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-  50% {
-    transform: translate3d(0, -10px, 0);
   }
 }
 
@@ -95,7 +81,6 @@
   [data-about-globe] .ahg-pin-counter,
   [data-about-globe] .ahg-sphere,
   [data-about-globe] .ahg-pulse,
-  [data-about-globe] .ahg-float,
   [data-about-ticker] {
     animation: none !important;
   }
