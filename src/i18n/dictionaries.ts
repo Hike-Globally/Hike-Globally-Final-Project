@@ -45,6 +45,21 @@ const en = {
     inquiry: 'Plan your trip',
     contact: 'Contact',
   },
+  footer: {
+    label: 'Footer',
+    about: 'About',
+    company: 'Company',
+    legalPages: 'Legal pages',
+    contactUs: 'Contact us',
+    allTrips: 'All trips',
+    aboutUs: 'About us',
+    privacy: 'Privacy',
+    terms: 'Terms',
+    introductionFallback:
+      'A Kathmandu- and Pokhara-based trekking operator. Fourteen years, thirty people, one country we know properly.',
+    copyright: '© {year} {site}. All rights reserved.',
+    locationFallback: 'Kathmandu, Nepal',
+  },
   trips: {
     listingTitle: 'Trekking trips & expeditions',
     listingSubtitle:

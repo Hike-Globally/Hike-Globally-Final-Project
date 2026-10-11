@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
 import { Analytics } from '@vercel/analytics/next'
 
+import { Footer } from '@/components/layout/footer'
 import { Header } from '@/components/layout/header'
 import { LivePreviewRefresh } from '@/components/live-preview-refresh'
 import { SmoothScroll } from '@/components/providers/smooth-scroll'
@@ -105,6 +106,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main id="main" className="flex-1">
           {children}
         </main>
+
+        <Footer />
 
         {/* Lenis smooth scrolling — ~6KB, disabled for reduced-motion users. */}
         <SmoothScroll />
