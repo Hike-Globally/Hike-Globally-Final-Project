@@ -2,13 +2,16 @@
 name: tmp-check-ga-tag
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - 'arena/**'
 
 permissions:
   contents: write
 
 jobs:
   probe:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: ubuntu-latest
     steps:
       - name: Probe each host for the GA4 tag
