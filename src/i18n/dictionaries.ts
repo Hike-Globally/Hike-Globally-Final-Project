@@ -100,7 +100,9 @@ const en = {
   },
   trip: {
     overview: 'Trip overview',
-    itinerary: 'Day-by-day itinerary',
+    itinerary: 'Detailed Itinerary',
+    /** Label on the switch beside the itinerary heading — opens/closes every day at once. */
+    expandAll: 'Expand all',
     essentialInformation: 'Essential Information You Must Know',
     included: "What's included",
     notIncluded: "What's not included",
