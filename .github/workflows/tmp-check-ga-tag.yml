@@ -3,38 +3,54 @@ name: tmp-check-ga-tag
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - 'arena/**'
+
+permissions:
+  contents: write
 
 jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
       - name: Probe each host for the GA4 tag
+        env:
+          TAG_ID: G-WWQBTLKKBW
         run: |
           set -u
+          OUT=tmp-ga-probe-output.txt
+          : > "$OUT"
+          log() { echo "$*" >> "$OUT"; }
+
           for url in \
             "https://hikeglobally.com/" \
             "https://www.hikeglobally.com/" \
             "https://hike-globally-final-project.vercel.app/" \
             "https://hikeglobally.com/trips" ; do
-            echo "================================================================"
-            echo "URL: $url"
-            out=$(curl -sSL --max-time 25 -D /tmp/hdr.txt -o /tmp/body.html \
-                   -w 'HTTP_CODE=%{http_code} FINAL_URL=%{url_effective} REDIRECTS=%{num_redirects}' \
-                   -A 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' \
-                   "$url" 2>&1) || true
-            echo "RESULT: $out"
-            echo "--- response headers (first 20) ---"
-            head -20 /tmp/hdr.txt 2>/dev/null || true
-            echo "--- body size ---"
-            wc -c < /tmp/body.html 2>/dev/null || echo "no body"
-            echo "--- G-WWQBTLKKBW occurrences ---"
-            grep -o 'G-WWQBTLKKBW' /tmp/body.html 2>/dev/null | wc -l || echo 0
-            echo "--- googletagmanager occurrences ---"
-            grep -o 'googletagmanager.com[^"]\{0,60\}' /tmp/body.html 2>/dev/null | sort | uniq -c || true
-            echo "--- first 600 chars of body ---"
-            head -c 600 /tmp/body.html 2>/dev/null || true
-            echo
+            log "================================================================"
+            log "URL: $url"
+            result=$(curl -sSL --max-time 25 -D /tmp/hdr.txt -o /tmp/body.html \
+                     -w 'HTTP_CODE=%{http_code} FINAL_URL=%{url_effective} REDIRECTS=%{num_redirects} SIZE=%{size_download}' \
+                     -A 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' \
+                     "$url" 2>&1) || result="curl failed"
+            log "RESULT: $result"
+            log "--- response headers ---"
+            cat /tmp/hdr.txt >> "$OUT" 2>/dev/null
+            log "--- tag id occurrences ---"
+            grep -o "$TAG_ID" /tmp/body.html 2>/dev/null | wc -l >> "$OUT"
+            log "--- googletagmanager matches ---"
+            grep -o 'googletagmanager\.com[^"]\{0,70\}' /tmp/body.html 2>/dev/null | sort | uniq -c >> "$OUT"
+            log "--- gtag( matches ---"
+            grep -o "gtag('[a-z]*'" /tmp/body.html 2>/dev/null | sort | uniq -c >> "$OUT"
+            log "--- <head> (first 2500 chars of body) ---"
+            head -c 2500 /tmp/body.html >> "$OUT" 2>/dev/null
+            log ""
+            log ""
           done
+          wc -c < "$OUT"
+
+      - name: Commit probe output
+        run: |
+          git config user.name  "arena-probe"
+          git config user.email "probe@arena.local"
+          git add -f tmp-ga-probe-output.txt
+          git commit -m "chore: GA probe output [skip ci]" || echo "nothing to commit"
+          git push origin HEAD:arena/74e22db5-hike-globally-final-project
