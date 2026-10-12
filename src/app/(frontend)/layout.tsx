@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
+import Script from 'next/script'
 import { Analytics } from '@vercel/analytics/next'
 
 import { Footer } from '@/components/layout/footer'
@@ -94,6 +95,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang={htmlLang} className={`${headingFont.variable} ${bodyFont.variable} overflow-x-clip`}>
       <body className="flex min-h-dvh min-w-0 flex-col overflow-x-clip bg-background text-foreground">
+        {/* Google tag (gtag.js) */}
+        <Script async src="https://www.googletagmanager.com/gtag/js?id=G-WWQBTLKKBW" />
+        <Script id="gtag-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-WWQBTLKKBW');
+          `}
+        </Script>
+
         <LivePreviewRefresh />
         <a
           href="#main"
