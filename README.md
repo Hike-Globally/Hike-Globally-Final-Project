@@ -106,6 +106,47 @@ rule holds for pages written later, not just the ones written today.
 Every URL is built from `NEXT_PUBLIC_SITE_URL`, so point it at the production origin before
 deploying.
 
+## Analytics (GA4)
+
+The Google tag lives in the root layout, `src/app/(frontend)/layout.tsx`, inside `<head>` — the
+Next.js equivalent of pasting the snippet immediately after the opening `<head>` tag. The root
+layout wraps every public page, so the tag is emitted on `/`, `/trips`, `/trips/[slug]`, `/blog`,
+`/destinations`, `/inquiry` and every CMS page.
+
+The snippet is the verbatim contents of [`gtag.txt`](gtag.txt) at the repo root (measurement ID
+`G-WWQBTLKKBW`). Keep the two in sync, or change both together.
+
+**Verify the tag is actually being served** — this is the only check that matters, because it is
+exactly what Google's own checker does (a plain HTTP GET of the page):
+
+```bash
+curl -sSL https://www.hikeglobally.com/ | grep -c G-WWQBTLKKBW
+```
+
+`2` (one `<script src>` + one `gtag('config', …)`) means it is live. `0` means Google will not see
+it either.
+
+### "Google Analytics says it can't detect the tag"
+
+If the `curl` above returns `0` while the code is unchanged, the request is not reaching Next.js at
+all — something in front of the app is answering instead. The cause is almost always a bot-protection
+layer:
+
+- **Cloudflare.** A managed challenge or Bot Fight Mode returns `HTTP 403` with a
+  `cf-mitigated: challenge` response header and a `Just a moment...` page body instead of your HTML.
+  Google's tag checker cannot solve that challenge, so it reports the tag as missing. Fix it in the
+  Cloudflare dashboard: **Security → Bots** (turn off Bot Fight Mode, or switch it to allow verified
+  bots), **Security → Settings → Security Level** (Medium, not "I'm Under Attack"), and check
+  **Security → WAF** for a custom rule set to _Managed Challenge_. Then re-run the `curl` above.
+- **Vercel Deployment Protection.** Applies to preview deployments by default, and can be enabled for
+  production. Turn it off for production, or Google's fetcher gets a login wall.
+- **Wrong host in the data stream.** The GA4 data-stream URL must match the host the site actually
+  serves on. `hike-globally-final-project.vercel.app` 308-redirects to `www.hikeglobally.com`, so
+  `www.hikeglobally.com` is the production host.
+
+Note that a challenge here is not only an analytics problem: it blocks Googlebot the same way, so it
+also stalls indexing of the sitemap.
+
 ## Deployment
 
 Vercel + hosted Postgres + Vercel Blob for media (without a Blob store the deployment falls back to
