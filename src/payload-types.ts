@@ -405,6 +405,9 @@ export interface Trip {
    * Highest point, in metres.
    */
   maxAltitude?: number | null;
+  /**
+   * Nine rungs, from Easy to Extreme. The homepage slider after the hero groups published trips by this value.
+   */
   difficulty:
     | 'easy'
     | 'easy-moderate'
@@ -628,6 +631,9 @@ export interface HeroBlock {
    * Small label above the heading.
    */
   eyebrow?: string | null;
+  /**
+   * Wrap part of the heading in <i>…</i> to set it in the italic accent face. On the homepage that part becomes its own second line in Instrument Serif italic at 90px, under the first line at 120px — e.g. "Walk Where The <i>Map Runs Out of Names</i>". Anywhere else it stays inline italic. Only <i> and <em> are recognised; every other tag is shown as plain text.
+   */
   heading: string;
   subheading?: string | null;
   /**
@@ -1833,7 +1839,7 @@ export interface Header {
 export interface Footer {
   id: number;
   /**
-   * Short brand statement under the logo.
+   * Short brand statement in the About section of the footer.
    */
   introduction?: string | null;
   columns?:
