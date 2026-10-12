@@ -107,7 +107,7 @@ const en = {
     included: "What's included",
     notIncluded: "What's not included",
     gallery: 'Gallery',
-    faqs: 'Questions & answers',
+    faqs: 'Frequently Asked Questions',
     related: 'You may also like',
     highlights: 'Highlights',
     factsTitle: 'Trip at a glance',
