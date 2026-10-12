@@ -1,0 +1,40 @@
+# TEMPORARY DIAGNOSTIC — deleted after use. Probes the live site for the GA4 tag.
+name: tmp-check-ga-tag
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'arena/**'
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe each host for the GA4 tag
+        run: |
+          set -u
+          for url in \
+            "https://hikeglobally.com/" \
+            "https://www.hikeglobally.com/" \
+            "https://hike-globally-final-project.vercel.app/" \
+            "https://hikeglobally.com/trips" ; do
+            echo "================================================================"
+            echo "URL: $url"
+            out=$(curl -sSL --max-time 25 -D /tmp/hdr.txt -o /tmp/body.html \
+                   -w 'HTTP_CODE=%{http_code} FINAL_URL=%{url_effective} REDIRECTS=%{num_redirects}' \
+                   -A 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' \
+                   "$url" 2>&1) || true
+            echo "RESULT: $out"
+            echo "--- response headers (first 20) ---"
+            head -20 /tmp/hdr.txt 2>/dev/null || true
+            echo "--- body size ---"
+            wc -c < /tmp/body.html 2>/dev/null || echo "no body"
+            echo "--- G-WWQBTLKKBW occurrences ---"
+            grep -o 'G-WWQBTLKKBW' /tmp/body.html 2>/dev/null | wc -l || echo 0
+            echo "--- googletagmanager occurrences ---"
+            grep -o 'googletagmanager.com[^"]\{0,60\}' /tmp/body.html 2>/dev/null | sort | uniq -c || true
+            echo "--- first 600 chars of body ---"
+            head -c 600 /tmp/body.html 2>/dev/null || true
+            echo
+          done
