@@ -14,6 +14,10 @@ jobs:
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: arena/74e22db5-hike-globally-final-project
+
       - name: Probe each host for the GA4 tag
         env:
           TAG_ID: G-WWQBTLKKBW
