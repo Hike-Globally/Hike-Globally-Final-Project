@@ -1,14 +1,12 @@
 import Link from 'next/link'
 import {
   ArrowRight,
-  BedDouble,
   Check,
   Clock,
   Gauge,
   MapPin,
   Mountain,
   Users,
-  Utensils,
   X,
   type LucideIcon,
 } from 'lucide-react'
@@ -27,6 +25,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
+import { ItinerarySection } from '@/components/sections/itinerary-section'
+import { surface } from '@/components/ui/surface'
 import { PayloadImageFill, PayloadImage } from '@/components/ui/payload-image'
 import { dictionary, type Dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
@@ -41,10 +41,6 @@ import type { Trip } from '@/payload-types'
 /* ----------------------------------------------------------------------------
    Shared styling
    ---------------------------------------------------------------------------- */
-
-/** The one card surface used across the page: white, hairline border, soft layered shadow. */
-const surface =
-  'border border-black/[0.06] bg-white shadow-[0_1px_2px_rgba(1,22,30,0.04),0_18px_40px_-24px_rgba(1,22,30,0.18)]'
 
 /** Eyebrow for dark backgrounds (the shared `.eyebrow` utility is tuned for light ones). */
 const eyebrowOnDark =
@@ -133,60 +129,6 @@ function TripBookingCard({
             <ArrowRight aria-hidden />
           </Link>
         </Button>
-      </div>
-    </div>
-  )
-}
-
-/**
- * Splits plain textarea content into paragraphs. A blank line (two or more
- * line breaks, optionally with spaces) starts a new paragraph; single line
- * breaks are kept inside the paragraph.
- */
-function splitParagraphs(text: string | null | undefined): string[] {
-  if (!text) return []
-  return text
-    .replace(/\r\n?/g, '\n')
-    .split(/\n[ \t]*\n\s*/)
-    .map((paragraph) => paragraph.trim())
-    .filter(Boolean)
-}
-
-/* ----------------------------------------------------------------------------
-   Itinerary day meta chip (accommodation / altitude / food)
-   ---------------------------------------------------------------------------- */
-
-function DayChip({
-  icon: Icon,
-  label,
-  value,
-  tone = 'default',
-}: {
-  icon: LucideIcon
-  label: string
-  value: string
-  tone?: 'default' | 'positive' | 'muted'
-}) {
-  return (
-    <div className="flex min-w-0 items-center gap-3 bg-mist px-4 py-3">
-      <span
-        className={cn(
-          'grid size-9 shrink-0 place-items-center rounded-full',
-          tone === 'positive' ? 'bg-sage text-ink' : 'bg-white text-deep shadow-sm',
-        )}
-      >
-        <Icon className="size-4" aria-hidden />
-      </span>
-      <div className="min-w-0">
-        <p className="text-[0.6875rem] tracking-[0.14em] text-slate uppercase">{label}</p>
-        <p
-          className={cn(
-            'truncate font-heading text-[0.9375rem] font-semibold',
-            tone === 'muted' ? 'text-ink-60' : 'text-ink',
-          )}
-        >
-          {value}
-        </p>
       </div>
     </div>
   )
@@ -353,88 +295,10 @@ export function TripDetail({
             <TripBookingCard trip={trip} dict={dict} bookingHref={bookingHref} />
           </div>
 
-          {/* ---------------- Itinerary — full-width day cards ---------------- */}
-          {trip.itinerary?.length ? (
-            <section id="itinerary" className="scroll-mt-24 py-16 md:py-24">
-              <div className="w-full min-w-0">
-                <SectionTitle title={dict.trip.itinerary} />
-
-                <div className="w-full min-w-0">
-                  <Accordion type="multiple" className="w-full min-w-0 space-y-4">
-                    {trip.itinerary.map((day, index) => {
-                      const food =
-                        day.food === 'included' || day.food === 'not-included' ? day.food : null
-
-                      return (
-                        <AccordionItem
-                          key={day.id ?? index}
-                          value={`day-${day.id ?? index}`}
-                          className="w-full min-w-0 border-b-0"
-                        >
-                          <div
-                            className={cn(
-                              surface,
-                              'w-full min-w-0 overflow-hidden px-4 sm:px-6 md:px-8 [&_[data-slot=accordion-trigger]]:motion-reduce:transition-none [&_[data-slot=accordion-trigger]_span]:motion-reduce:transition-none [&_[data-slot=accordion-content]]:motion-reduce:animate-none',
-                            )}
-                          >
-                            <AccordionTrigger className="min-w-0 items-center py-6 hover:no-underline md:py-7">
-                              <span className="min-w-0 break-words text-left font-heading text-base font-semibold text-ink md:text-lg">
-                                {day.title}
-                              </span>
-                            </AccordionTrigger>
-
-                            <AccordionContent>
-                              <div className="w-full min-w-0 space-y-4">
-                                {splitParagraphs(day.description).map((paragraph, pIndex) => (
-                                  <p
-                                    key={pIndex}
-                                    className="w-full break-words whitespace-pre-line description-copy leading-relaxed text-ink-70"
-                                  >
-                                    {paragraph}
-                                  </p>
-                                ))}
-                              </div>
-
-                              {day.accommodation || typeof day.altitude === 'number' || food ? (
-                                <div className="mt-6 grid gap-3 border-t border-black/[0.06] pt-6 sm:grid-cols-2 2xl:grid-cols-3">
-                                  {day.accommodation ? (
-                                    <DayChip
-                                      icon={BedDouble}
-                                      label={dict.trip.accommodation}
-                                      value={day.accommodation}
-                                    />
-                                  ) : null}
-                                  {typeof day.altitude === 'number' ? (
-                                    <DayChip
-                                      icon={Mountain}
-                                      label={dict.trip.altitude}
-                                      value={`${formatNumber(day.altitude)} m`}
-                                    />
-                                  ) : null}
-                                  {food ? (
-                                    <DayChip
-                                      icon={Utensils}
-                                      label={dict.trip.food}
-                                      value={
-                                        food === 'included'
-                                          ? dict.trip.foodIncluded
-                                          : dict.trip.foodNotIncluded
-                                      }
-                                      tone={food === 'included' ? 'positive' : 'muted'}
-                                    />
-                                  ) : null}
-                                </div>
-                              ) : null}
-                            </AccordionContent>
-                          </div>
-                        </AccordionItem>
-                      )
-                    })}
-                  </Accordion>
-                </div>
-              </div>
-            </section>
-          ) : null}
+          {/* ---------------- Detailed itinerary — full-width day cards ----------------
+              The heading row carries the "Expand all" switch, so heading, switch and day
+              list share one piece of client state (see itinerary-section.tsx). */}
+          {trip.itinerary?.length ? <ItinerarySection days={trip.itinerary} /> : null}
 
           {/* ------- Essential information ------- */}
           {trip.contentSections?.length ? (
