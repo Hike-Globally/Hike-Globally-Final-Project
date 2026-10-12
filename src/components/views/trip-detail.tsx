@@ -138,6 +138,20 @@ function TripBookingCard({
   )
 }
 
+/**
+ * Splits plain textarea content into paragraphs. A blank line (two or more
+ * line breaks, optionally with spaces) starts a new paragraph; single line
+ * breaks are kept inside the paragraph.
+ */
+function splitParagraphs(text: string | null | undefined): string[] {
+  if (!text) return []
+  return text
+    .replace(/\r\n?/g, '\n')
+    .split(/\n[ \t]*\n\s*/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean)
+}
+
 /* ----------------------------------------------------------------------------
    Itinerary day meta chip (accommodation / altitude / food)
    ---------------------------------------------------------------------------- */
@@ -370,9 +384,16 @@ export function TripDetail({
                             </AccordionTrigger>
 
                             <AccordionContent>
-                              <p className="w-full break-words description-copy leading-relaxed text-ink-70">
-                                {day.description}
-                              </p>
+                              <div className="w-full min-w-0 space-y-4">
+                                {splitParagraphs(day.description).map((paragraph, pIndex) => (
+                                  <p
+                                    key={pIndex}
+                                    className="w-full break-words whitespace-pre-line description-copy leading-relaxed text-ink-70"
+                                  >
+                                    {paragraph}
+                                  </p>
+                                ))}
+                              </div>
 
                               {day.accommodation || typeof day.altitude === 'number' || food ? (
                                 <div className="mt-6 grid gap-3 border-t border-black/[0.06] pt-6 sm:grid-cols-2 2xl:grid-cols-3">
