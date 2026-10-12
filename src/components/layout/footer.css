@@ -19,8 +19,11 @@
   );
 }
 
+/* The About statement is set at a fixed 16px rather than the fluid description
+   scale — the footer is a compact block, and 16px keeps it readable from a
+   phone right up to a TV. */
 .hg-footer__description {
-  font-size: calc(var(--font-size-description) - 2px);
+  font-size: 16px;
 }
 
 /* Boxed social icons — the small outlined rounded chips of the sample. The

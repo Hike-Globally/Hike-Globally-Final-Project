@@ -18,6 +18,10 @@ import './footer.css'
  *   • legalLinks     → the legal column
  *   • copyright      → bottom-left line (`{year}` is interpolated)
  *   • settings       → socials and contact details
+ *
+ * Both rows sit in `container-content`, so the About column starts on the exact
+ * same line as every section above it — the centred content column the "Plan your
+ * trip" box (and the rest of the page) is built on — instead of on the raw gutter.
  */
 
 type SocialPlatform = NonNullable<Setting['socials']>[number]['platform']
@@ -141,12 +145,18 @@ export async function Footer() {
   /* --- About column: CMS introduction + the social chips ------------------ */
   const introduction = footer.introduction ?? dict.footer.introductionFallback
 
-  const socials = settings.socials?.length
-    ? settings.socials
-    : ([
+  /* Facebook, Instagram and LinkedIn are the three channels the footer shows.
+     Profiles edited in the CMS still drive the row (and can add others), but a
+     YouTube entry is left out, and with nothing usable stored — or a database
+     that has not been seeded — the trio above is rendered rather than no icons. */
+  const cmsSocials = (settings.socials ?? []).filter((social) => social.platform !== 'youtube')
+  const socials: NonNullable<Setting['socials']> = cmsSocials.length
+    ? cmsSocials
+    : [
+        { platform: 'facebook', url: 'https://facebook.com/hikeglobally' },
         { platform: 'instagram', url: 'https://instagram.com/hikeglobally' },
-        { platform: 'youtube', url: 'https://youtube.com/@hikeglobally' },
-      ] as NonNullable<Setting['socials']>)
+        { platform: 'linkedin', url: 'https://linkedin.com/company/hikeglobally' },
+      ]
 
   /* --- Sitemap-style columns: CMS `columns`, falling back like the header - */
   const cmsColumns: FooterColumn[] = (footer.columns ?? [])
@@ -220,8 +230,10 @@ export async function Footer() {
   })
   return (
     <footer className="hg-footer" aria-label={dict.footer.label}>
-      {/* About + social chips on the left, link columns on the right */}
-      <div className="grid gap-12 pl-[var(--page-gutter-left,1rem)] pr-[var(--page-gutter-right,1rem)] pt-12 md:pt-16 lg:grid-cols-12 lg:gap-8">
+      {/* About + social chips on the left, link columns on the right. The row lives
+          in `container-content`, so the About column starts on the same line the
+          "Plan your trip" box section above it does. */}
+      <div className="container-content grid gap-12 pt-12 md:pt-16 lg:grid-cols-12 lg:gap-8">
         <div className="lg:col-span-5 xl:col-span-4">
           <h3 className="font-heading text-sm font-semibold text-white">{dict.footer.about}</h3>
           <p className="hg-footer__description mt-4 max-w-[34ch] leading-relaxed text-mist/90">
@@ -252,8 +264,9 @@ export async function Footer() {
         </div>
       </div>
 
-      {/* Copyright left, creator credit right, pinned to the very bottom */}
-      <div className="mt-16 flex flex-col gap-3 pb-6 pl-[var(--page-gutter-left,1rem)] pr-[var(--page-gutter-right,1rem)] sm:flex-row sm:items-center sm:justify-between md:mt-24">
+      {/* Copyright left, creator credit right, pinned to the very bottom — on the
+          same content column as the row above. */}
+      <div className="container-content mt-16 flex flex-col gap-3 pb-6 sm:flex-row sm:items-center sm:justify-between md:mt-24">
         <p className="text-[11px] leading-snug text-mist/80">{copyright}</p>
         <p className="text-[11px] leading-snug text-mist/80">
           Made with ❤️ by{' '}
