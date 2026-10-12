@@ -46,10 +46,11 @@ const OUTER_ORBIT_ANGLES = [70, 190, 310]
  *  2. A hand-built CSS/SVG-free orbit — a glowing globe with two independently spinning rings
  *     of destination pins — that tilts toward the pointer in 3D.
  *  3. An infinite destination ticker that can be paused on hover.
- * On mobile (below `md`) the orbit is deliberately static — no ring spin, no sphere spin, no
- * pulse — so it reads as a calm emblem under the copy instead of competing with it; see the
- * media query in `about-hike-globally.css`. Every animation also collapses to a static, fully
- * legible layout under `prefers-reduced-motion`.
+ * The orbit visual itself is desktop-only: on phones and tablets (everything below `lg`, where
+ * the section is still a single stacked column) it is taken out of the layout entirely with
+ * `hidden lg:block`, so the section reads as copy + ticker without a large decorative circle
+ * eating a screen of scroll. From `lg` up it renders exactly as before. Every animation also
+ * collapses to a static, fully legible layout under `prefers-reduced-motion`.
  */
 export function AboutHikeGlobally() {
   const glowRef = useRef<HTMLDivElement>(null)
@@ -126,8 +127,8 @@ export function AboutHikeGlobally() {
             </Reveal>
           </div>
 
-          {/* Interactive globe visual */}
-          <Reveal delay={160} className="mx-auto w-full max-w-[22rem] lg:max-w-none">
+          {/* Interactive globe visual — desktop only, hidden below `lg` (see the file header) */}
+          <Reveal delay={160} className="mx-auto hidden w-full max-w-[22rem] lg:block lg:max-w-none">
             <GlobeVisual />
           </Reveal>
         </div>
@@ -163,8 +164,9 @@ export function AboutHikeGlobally() {
 
 /**
  * Globe with two independently spinning orbit rings of destination pins, tilting toward the
- * pointer. The spin/pulse is switched off below `md` — the markup is identical at every width,
- * only the CSS animations are dropped, so the mobile globe is the same composition frozen.
+ * pointer. Desktop-only: `lg` and up is the only place it is rendered (the visual is hidden
+ * below `lg`), so the ring/sphere/pulse animations need no mobile opt-out — but they still
+ * stop under `prefers-reduced-motion`.
  */
 function GlobeVisual() {
   const wrapperRef = useRef<HTMLDivElement>(null)
