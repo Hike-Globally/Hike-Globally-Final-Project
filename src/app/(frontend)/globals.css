@@ -17,8 +17,9 @@
    colours above are unchanged.
 
    Typography:
-     Headings — Google Sans Flex, 600 (variable, self-hosted)
-     Body     — Archivo, 300 (variable, self-hosted)
+     Headings    — Google Sans Flex, 600 (variable, self-hosted)
+     Body        — Archivo, 300 (variable, self-hosted)
+     Hero accent — Instrument Serif italic, 400 (self-hosted, homepage hero only)
 
    Both fonts are self-hosted with next/font/local instead of loaded from
    fonts.googleapis.com. That removes two cross-origin requests from the critical
@@ -48,10 +49,15 @@
   --font-heading: var(--font-google-sans-flex), 'Google Sans Flex', system-ui, sans-serif;
   --font-sans: var(--font-archivo), 'Archivo', system-ui, sans-serif;
 
+  /* Display serif for emphasized headline lines — Instrument Serif, self-hosted
+     via the @fontsource imports in layout.tsx. Only ever used with
+     `font-style: italic`, where the family ships a true italic cut. */
+  --font-serif-accent: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+
   /* --- Breakpoints (5" phones → 100" TVs) ---
      Defaults remain: sm 640, md 768, lg 1024, xl 1280, 2xl 1536.
      Extra steps cover small phones just above 320px, Full HD / living-room TVs,
-     QHD monitors, and 4K / 100-inch canvases. */ 
+     QHD monitors, and 4K / 100-inch canvases. */
   --breakpoint-xs: 22.5rem; /* 360px */
   --breakpoint-3xl: 120rem; /* 1920px */
   --breakpoint-4xl: 160rem; /* 2560px */

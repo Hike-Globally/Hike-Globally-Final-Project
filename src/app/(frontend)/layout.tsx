@@ -14,11 +14,19 @@ import { resolveSiteUrlObject } from '@/lib/site-url'
 import './globals.css'
 
 /* Section typefaces, self-hosted from node_modules — the exact families the
-   ported designs specify: Inter (Latest Stories tiles) and Switzer (pill nav). */
+   ported designs specify: Inter (Latest Stories tiles), Switzer (pill nav) and
+   Instrument Serif (the homepage hero's italic accent line).
+
+   Instrument Serif is a plain @font-face import rather than a preloaded
+   next/font like the two primary families below: only the homepage hero uses
+   it, so its two small latin files are fetched on that page alone instead of
+   sitting on every page's critical path. */
 import '@fontsource-variable/inter'
 import '@carrot-kpi/switzer-font/400.css'
 import '@carrot-kpi/switzer-font/500.css'
 import '@carrot-kpi/switzer-font/700.css'
+import '@fontsource/instrument-serif/latin-400.css'
+import '@fontsource/instrument-serif/latin-400-italic.css'
 
 /**
  * Fonts are self-hosted from node_modules (@fontsource) instead of fetched from
@@ -93,7 +101,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const dict = dictionary
 
   return (
-    <html lang={htmlLang} className={`${headingFont.variable} ${bodyFont.variable} overflow-x-clip`}>
+    <html
+      lang={htmlLang}
+      className={`${headingFont.variable} ${bodyFont.variable} overflow-x-clip`}
+    >
       <body className="flex min-h-dvh min-w-0 flex-col overflow-x-clip bg-background text-foreground">
         {/* Google tag (gtag.js) */}
         <Script async src="https://www.googletagmanager.com/gtag/js?id=G-WWQBTLKKBW" />
