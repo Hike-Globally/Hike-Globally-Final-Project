@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
-import Script from 'next/script'
 import { Analytics } from '@vercel/analytics/next'
 
 import { Footer } from '@/components/layout/footer'
@@ -105,18 +104,26 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang={htmlLang}
       className={`${headingFont.variable} ${bodyFont.variable} overflow-x-clip`}
     >
-      <body className="flex min-h-dvh min-w-0 flex-col overflow-x-clip bg-background text-foreground">
+      {/* Google tag (gtag.js) — verbatim from gtag.txt at the repo root. This root layout wraps
+          every public page, so placing the snippet right after <head> is the Next.js equivalent
+          of pasting the GA4 global tag immediately after the opening <head> tag of each page. */}
+      <head>
         {/* Google tag (gtag.js) */}
-        <Script async src="https://www.googletagmanager.com/gtag/js?id=G-WWQBTLKKBW" />
-        <Script id="gtag-init" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-WWQBTLKKBW');
-          `}
-        </Script>
+        {/* eslint-disable-next-line @next/next/next-script-for-ga -- gtag.txt is pasted verbatim as requested, rather than the @next/third-parties wrapper */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-WWQBTLKKBW"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
+  gtag('config', 'G-WWQBTLKKBW');
+`,
+          }}
+        ></script>
+      </head>
+      <body className="flex min-h-dvh min-w-0 flex-col overflow-x-clip bg-background text-foreground">
         <LivePreviewRefresh />
         <a
           href="#main"
