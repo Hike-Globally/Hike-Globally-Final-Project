@@ -324,7 +324,7 @@ export function TripDetail({
                       <AccordionContent>
                         <RichText
                           content={contentSection.content}
-                          className="w-full min-w-0 break-words"
+                          className="w-full min-w-0 break-words text-[1.0625rem]"
                         />
                       </AccordionContent>
                     </AccordionItem>
@@ -396,7 +396,7 @@ export function TripDetail({
                         </span>
                       </AccordionTrigger>
                       <AccordionContent>
-                        <p className="max-w-3xl leading-relaxed whitespace-pre-line text-ink-70">
+                        <p className="max-w-3xl text-[1.0625rem] leading-relaxed whitespace-pre-line text-ink-70">
                           {faq.answer}
                         </p>
                       </AccordionContent>

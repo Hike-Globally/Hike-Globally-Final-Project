@@ -203,7 +203,7 @@ export function ItinerarySection({ days }: { days: ItineraryDay[] }) {
                     {splitParagraphs(day.description).map((paragraph, pIndex) => (
                       <p
                         key={pIndex}
-                        className="w-full break-words whitespace-pre-line description-copy leading-relaxed text-ink-70"
+                        className="w-full break-words whitespace-pre-line text-[1.0625rem] leading-relaxed text-ink-70"
                       >
                         {paragraph}
                       </p>
