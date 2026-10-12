@@ -79,7 +79,7 @@ export function Hero({
         className={cn(
           'container-content',
           homepage
-            ? 'pt-24 pb-10 sm:pb-12 md:pt-28 md:pb-16 [@media(max-height:500px)]:py-8'
+            ? 'pt-24 pb-20 md:pt-28 md:pb-20 [@media(max-height:500px)]:py-8'
             : 'py-20 sm:py-24 md:py-28 [@media(max-height:500px)]:py-12',
         )}
       >
