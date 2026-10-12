@@ -5,7 +5,11 @@
    `clamp()`s whose ceilings are the specified pixel values. Destination card
    titles and descriptions use their requested fixed sizes:
 
-     .home-hero-title             65px  hero headline ("Walk where the map runs out…")
+     .home-hero-title            120px  hero headline, first line ("Walk Where The")
+     .home-hero-title i           90px  hero headline, second line ("Map Runs Out of
+                                        Names") — Instrument Serif italic, produced by
+                                        the `<i>…</i>` the editor writes in the hero
+                                        heading field (see lib/inline-emphasis.ts)
      .home-hero-lead              17px  hero standfirst ("Small-group treks and…")
      .home-section-title          50px  every section headline, uppercase
      .home-section-lead           17px  the About Hike Globally standfirst
@@ -26,15 +30,44 @@
    order. The same technique `curated-trips-section.css` already relies on.
 
    Fluid, not fixed: each page-copy size is the *ceiling* of a clamp, so a 5"
-   phone still gets a 36px hero and a 32px section headline instead of a
-   65px/50px wall of text, while everything from the desktop column width
-   (1280px) up renders at exactly the specified pixel value. Destination card
-   sizes remain fixed at 23px / 16px at every viewport width.
+   phone still gets a 40px hero (and a 30px italic accent line) and a 32px
+   section headline instead of a 120px/90px/50px wall of text, while everything
+   from the desktop column width (1280px) up renders at exactly the specified
+   pixel value. Destination card sizes remain fixed at 23px / 16px at every
+   viewport width.
+
+   The hero headline is the one size that also answers to viewport *height*: it
+   is the tallest thing on the page and it lives inside a full-viewport
+   `overflow-hidden` sticky wrapper, so on a short window the height term of its
+   `min()` takes over and the whole composition scales down instead of losing
+   the buttons off the bottom of the screen.
    ==========================================================================*/
 
 [data-homepage] {
-  /* 65px — hero headline. */
-  --home-hero-title-size: clamp(2.25rem, 1.15rem + 4.6vw, 4.0625rem);
+  /* 120px — hero headline, first line ("Walk Where The").
+
+     Two constraints compete and the tighter one wins:
+
+       · WIDTH  — 40px on a 360px phone, climbing to the 120px ceiling exactly
+                  at the 1280px desktop column.
+       · HEIGHT — the hero is pinned inside a `h-[100svh] overflow-hidden`
+                  sticky wrapper (`motion/hero-scroll-cover.tsx`), so a
+                  headline taller than the viewport is simply cut off. The rest
+                  of the hero (paddings, eyebrow, standfirst, buttons) is
+                  ~426px, and the two headline lines together are ~1.87× the
+                  first line's size (1.02 line-height + 0.05em gap + 0.75 ×
+                  1.08), which makes `53svh - 14.25rem` the largest first line
+                  that still leaves the buttons on screen.
+
+     Any viewport at least ~657px tall — every desktop and laptop — is limited
+     by width, not height, and renders at exactly the specified 120px. */
+  --home-hero-title-size: clamp(2rem, min(0.5425rem + 8.7vw, 53svh - 14.25rem), 7.5rem);
+
+  /* 90px — hero headline, italic accent line ("Map Runs Out of Names"). Derived
+     as a constant 3:4 of the line above rather than sized independently, so the
+     pair can never drift apart as one composition: 30px on a 360px phone, 90px
+     from 1280px up. */
+  --home-hero-title-accent-size: calc(var(--home-hero-title-size) * 0.75);
 
   /* 50px — section headlines. */
   --home-section-title-size: clamp(2rem, 1.05rem + 3.25vw, 3.125rem);
@@ -51,10 +84,31 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Hero
+   Hero — "Walk Where The" at 120px, "Map Runs Out of Names" at 90px italic
    --------------------------------------------------------------------------- */
 [data-homepage] .home-hero-title {
   font-size: var(--home-hero-title-size);
+}
+
+/* The emphasized second line: the `<i>` an editor writes into the hero heading
+   field (parsed by `lib/inline-emphasis.ts`, rendered by `blocks/hero.tsx`).
+
+   `display: block` is what actually makes it a second line — deterministic at
+   every viewport width, rather than relying on 120px copy happening to wrap.
+
+   Instrument Serif ships a single 400 weight and a *true* 400 italic, so both
+   `font-weight` and the inherited `-0.03em` tracking from `heading-display`
+   have to be reset — otherwise the browser synthesises a bold out of a face
+   that has none and squeezes letterforms that were drawn to be loose. */
+[data-homepage] .home-hero-title i {
+  display: block;
+  margin-top: 0.05em;
+  font-family: var(--font-serif-accent);
+  font-size: var(--home-hero-title-accent-size);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1.08;
 }
 
 [data-homepage] .home-hero-lead {
@@ -96,6 +150,11 @@
 @media (max-height: 500px) and (orientation: landscape) {
   [data-homepage] .home-hero-title {
     font-size: clamp(1.6rem, 8vh, 2.4rem);
+  }
+
+  /* Same 3:4 ratio as the fluid scale above. */
+  [data-homepage] .home-hero-title i {
+    font-size: clamp(1.2rem, 6vh, 1.8rem);
   }
 
   [data-homepage] .home-section-title {

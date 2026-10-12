@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { PayloadImageFill } from '@/components/ui/payload-image'
 import type { HeroBlock } from '@/payload-types'
 import { resolveLink } from '@/lib/links'
+import { splitInlineEmphasis } from '@/lib/inline-emphasis'
 import { cn } from '@/lib/utils'
 
 import { HomepageHeroBackground } from './hero-background'
@@ -44,6 +45,12 @@ export function Hero({
   const eyebrow = block.eyebrow?.trim()
   const showEyebrow = Boolean(eyebrow && (!homepage || eyebrow.toLowerCase() !== 'home'))
 
+  /* The heading is a plain-text field, but an editor may wrap part of it in
+     `<i>…</i>` to have it set in the accent face — on the homepage that is the
+     90px Instrument Serif italic line under the 120px first line. Anything
+     else in the string stays literal text (see lib/inline-emphasis.ts). */
+  const headingSegments = splitInlineEmphasis(block.heading)
+
   return (
     <section
       data-header-hero={opening ? 'true' : undefined}
@@ -83,7 +90,11 @@ export function Hero({
             : 'py-20 sm:py-24 md:py-28 [@media(max-height:500px)]:py-12',
         )}
       >
-        <div className="max-w-3xl min-w-0 3xl:max-w-4xl">
+        {/* The homepage hero's copy column spans the full content width: its
+            headline is set at 120px (90px on the italic second line), and the
+            768px measure every other hero uses would wrap "Walk Where The"
+            mid-phrase. Individual elements below cap their own width. */}
+        <div className={cn('min-w-0', homepage ? 'max-w-none' : 'max-w-3xl 3xl:max-w-4xl')}>
           {showEyebrow ? (
             <p className={cn('eyebrow mb-5', hasImage ? 'text-sage' : 'text-slate')}>{eyebrow}</p>
           ) : null}
@@ -95,7 +106,11 @@ export function Hero({
               hasImage ? 'text-white' : 'text-ink',
             )}
           >
-            {block.heading}
+            {headingSegments.length
+              ? headingSegments.map((segment, index) =>
+                  segment.emphasized ? <i key={index}>{segment.text}</i> : segment.text,
+                )
+              : block.heading}
           </h1>
 
           {block.subheading ? (
@@ -103,7 +118,9 @@ export function Hero({
               className={cn(
                 'lead mt-6',
                 homepage ? 'home-hero-lead' : '',
-                homepage ? 'w-3/4' : 'max-w-2xl',
+                /* 36rem keeps the standfirst on the same ~576px measure it had
+                   when the column itself was 768px wide and this was `w-3/4`. */
+                homepage ? 'max-w-[36rem]' : 'max-w-2xl',
                 hasImage ? 'text-mist/85' : 'text-ink-60',
               )}
             >
