@@ -37,10 +37,10 @@ export async function HomeFallback() {
   const showHeroEyebrow = Boolean(heroEyebrow && heroEyebrow.toLowerCase() !== 'home')
 
   const heroSection = (
-    <section className="relative isolate flex h-full min-h-[100svh] items-center overflow-hidden bg-ink text-mist">
+    <section className="relative isolate flex h-full min-h-[100svh] items-end overflow-hidden bg-ink text-mist">
       <HomepageHeroBackground />
 
-      <div className="container-content py-16 md:py-20 [@media(max-height:500px)]:py-8">
+      <div className="container-content pt-24 pb-20 md:pt-28 md:pb-20 [@media(max-height:500px)]:py-8">
         <div className="max-w-3xl min-w-0 3xl:max-w-4xl">
           {showHeroEyebrow ? <p className="eyebrow mb-5 text-sage">{heroEyebrow}</p> : null}
           <h1 className="heading-display home-hero-title text-white">
