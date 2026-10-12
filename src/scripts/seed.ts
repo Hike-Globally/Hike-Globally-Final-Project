@@ -1852,8 +1852,9 @@ const run = async () => {
       responseTimeNote: 'We reply to every enquiry within 24 hours.',
       formsubmitEmail: 'hello@hikeglobally.com',
       socials: [
+        { platform: 'facebook', url: 'https://facebook.com/hikeglobally' },
         { platform: 'instagram', url: 'https://instagram.com/hikeglobally' },
-        { platform: 'youtube', url: 'https://youtube.com/@hikeglobally' },
+        { platform: 'linkedin', url: 'https://linkedin.com/company/hikeglobally' },
       ],
       defaultOgImage: imageAt(0),
     },
