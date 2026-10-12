@@ -41,14 +41,17 @@ export async function HomeFallback() {
       <HomepageHeroBackground />
 
       <div className="container-content pt-24 pb-20 md:pt-28 md:pb-20 [@media(max-height:500px)]:py-8">
-        <div className="max-w-3xl min-w-0 3xl:max-w-4xl">
+        {/* Mirrors `blocks/hero.tsx` on the homepage: full-width copy column, with the
+            standfirst capped at the same ~576px measure it always had. */}
+        <div className="max-w-none min-w-0">
           {showHeroEyebrow ? <p className="eyebrow mb-5 text-sage">{heroEyebrow}</p> : null}
+          {/* The `<i>` is the accent line — 90px Instrument Serif italic under the
+              120px "Walk Where The" (see `homepage.css`). CMS-driven pages reach it
+              by writing the same tag into the hero heading field. */}
           <h1 className="heading-display home-hero-title text-white">
-            Walk where the
-            <br />
-            map runs out of names.
+            Walk Where The <i>Map Runs Out of Names</i>
           </h1>
-          <p className="lead home-hero-lead mt-6 w-3/4 text-mist/85">
+          <p className="lead home-hero-lead mt-6 max-w-[36rem] text-mist/85">
             Small-group treks and expeditions across Nepal, led by guides who grew up on these
             trails. Tell us what you are dreaming of — we will build the itinerary around it.
           </p>
