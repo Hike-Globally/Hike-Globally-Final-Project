@@ -19,6 +19,7 @@
      .home-blog-lead-title        40px  the lead story of the journal board
      .home-blog-row-title         23px  journal board index-row titles — the same
                                         card tier as `.destination-card-title`
+     .home-blog-description       16px  descriptions on every journal-board card
 
    The scope is `[data-homepage]`, set once in `src/app/(frontend)/page.tsx`, so
    nothing outside the homepage can pick these sizes up — the shared
@@ -36,8 +37,8 @@
    phone still gets a 40px hero (and a 30px italic accent line) and a 32px
    section headline instead of a 120px/90px/50px wall of text, while everything
    from the desktop column width (1280px) up renders at exactly the specified
-   pixel value. Destination card sizes remain fixed at 23px / 16px at every
-   viewport width.
+   pixel value. At every viewport width, destination card sizes stay fixed at
+   23px / 16px and journal-board descriptions stay fixed at 16px.
 
    The hero headline is the one size that also answers to viewport *height*: it
    is the tallest thing on the page and it lives inside a full-viewport
@@ -96,6 +97,9 @@
      matching `.destination-card-title` exactly so every card-level heading on
      the homepage is the same size. */
   --home-blog-row-title-size: clamp(1.125rem, 1rem + 0.5vw, 1.4375rem);
+
+  /* 16px — descriptions on the lead story and every index-row card. */
+  --home-blog-description-size: 16px;
 }
 
 @media (width >= 120rem) {
@@ -177,6 +181,10 @@
 
 [data-homepage] .home-blog-row-title {
   font-size: var(--home-blog-row-title-size);
+}
+
+[data-homepage] .home-blog-description {
+  font-size: var(--home-blog-description-size);
 }
 
 /* Short landscape phones (5–6" rotated): keep the hero headline inside the
