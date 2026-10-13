@@ -149,17 +149,31 @@ test('the 404 page emits no canonical at all', () => {
 })
 
 test('the sitemap lists exactly the URLs the pages canonicalize to', () => {
-  const sitemap = readFileSync(path.join(repoRoot, 'src', 'app', 'sitemap.ts'), 'utf8')
+  const route = readFileSync(path.join(repoRoot, 'src', 'app', 'sitemap.ts'), 'utf8')
+  const builder = readFileSync(path.join(repoRoot, 'src', 'lib', 'sitemap.ts'), 'utf8')
+
+  // The route stays a shell: it reads the content and hands it to the builder, so the rules are
+  // testable without a database (see src/lib/sitemap.test.ts) and exist in exactly one place.
+  assert.match(
+    route,
+    /buildSitemap\(/,
+    'src/app/sitemap.ts: delegate to buildSitemap() from src/lib/sitemap.ts',
+  )
+  assert.doesNotMatch(
+    route,
+    /url:\s*['"`]/,
+    'src/app/sitemap.ts: build no URLs in the route itself — buildSitemap() owns the list',
+  )
 
   assert.match(
-    sitemap,
+    builder,
     /url:\s*canonicalUrl\(/,
-    'src/app/sitemap.ts: build entries with canonicalUrl() so a sitemap URL and the canonical of ' +
+    'src/lib/sitemap.ts: build entries with canonicalUrl() so a sitemap URL and the canonical of ' +
       'the page it points at are the same string',
   )
   assert.doesNotMatch(
-    sitemap,
+    builder,
     /absoluteUrl\(/,
-    'src/app/sitemap.ts: use canonicalUrl(), not absoluteUrl()',
+    'src/lib/sitemap.ts: use canonicalUrl(), not absoluteUrl()',
   )
 })
