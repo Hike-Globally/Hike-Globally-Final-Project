@@ -60,9 +60,12 @@ const setDifficultySearch = (value: string) => {
 export function TripsExplorer({
   trips,
   destinations,
+  cardSummaryClassName,
 }: {
   trips: TripCardData[]
   destinations: { slug: string; name: string }[]
+  /** Extra classes for each trip card's summary — lets the page retune card copy in place. */
+  cardSummaryClassName?: string
 }) {
   const dict = dictionary
 
@@ -226,7 +229,12 @@ export function TripsExplorer({
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
             {filtered.map((trip, index) => (
-              <TripCard key={trip.id} trip={trip} priority={index < 3} />
+              <TripCard
+                key={trip.id}
+                trip={trip}
+                priority={index < 3}
+                summaryClassName={cardSummaryClassName}
+              />
             ))}
           </div>
         )}

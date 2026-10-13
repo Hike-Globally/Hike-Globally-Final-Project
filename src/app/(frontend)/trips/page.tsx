@@ -11,6 +11,8 @@ import { sitePath } from '@/i18n/config'
 import { getDestinations, getSettings, getTrips } from '@/lib/data'
 import { breadcrumbJsonLd, buildMetadata, webPageJsonLd } from '@/lib/seo'
 
+import './trips.css'
+
 export const revalidate = 3600
 
 const TRIPS_HERO_IMAGE = '/images/trips/hero.jpg'
@@ -43,6 +45,7 @@ export default async function TripsPage() {
       <section
         aria-labelledby="trips-heading"
         data-header-hero
+        data-trips-page
         className="relative isolate flex min-h-[min(78svh,52rem)] items-end overflow-hidden bg-ink text-mist"
       >
         <Image
@@ -68,7 +71,9 @@ export default async function TripsPage() {
           <h1 id="trips-heading" className="heading-display mt-5 max-w-4xl text-white">
             {dict.trips.listingTitle}
           </h1>
-          <p className="lead mt-6 max-w-2xl text-mist/80">{dict.trips.listingSubtitle}</p>
+          <p className="lead trips-hero-lead mt-6 max-w-2xl text-mist/80">
+            {dict.trips.listingSubtitle}
+          </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4">
             <Link
@@ -88,10 +93,12 @@ export default async function TripsPage() {
       <section
         id="trips"
         aria-label={dict.trips.filterTitle}
+        data-trips-page
         className="scroll-mt-8 py-12 md:py-16"
       >
         <TripsExplorer
           trips={trips}
+          cardSummaryClassName="trips-card-summary"
           destinations={destinations.map((destination) => ({
             slug: destination.slug,
             name: destination.name,
