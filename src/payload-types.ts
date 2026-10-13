@@ -510,6 +510,15 @@ export interface Trip {
         id?: string | null;
       }[]
     | null;
+  /**
+   * List the personal gear and essentials travellers should bring for this trip.
+   */
+  packingList?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
   gallery?:
     | {
         image: number | Media;
@@ -1380,6 +1389,12 @@ export interface TripsSelect<T extends boolean = true> {
     | {
         question?: T;
         answer?: T;
+        id?: T;
+      };
+  packingList?:
+    | T
+    | {
+        item?: T;
         id?: T;
       };
   gallery?:

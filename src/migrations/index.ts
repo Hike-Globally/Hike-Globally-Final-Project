@@ -7,6 +7,7 @@ import * as migration_20261009_124959_trip_itinerary_food from './20261009_12495
 import * as migration_20261010_124847_nav_item_children from './20261010_124847_nav_item_children'
 import * as migration_20261010_180000_trip_difficulty_levels from './20261010_180000_trip_difficulty_levels'
 import * as migration_20261013_093000_trip_blog_keywords from './20261013_093000_trip_blog_keywords'
+import * as migration_20261013_100000_trip_packing_list from './20261013_100000_trip_packing_list'
 
 export const migrations = [
   {
@@ -53,5 +54,10 @@ export const migrations = [
     up: migration_20261013_093000_trip_blog_keywords.up,
     down: migration_20261013_093000_trip_blog_keywords.down,
     name: '20261013_093000_trip_blog_keywords',
+  },
+  {
+    up: migration_20261013_100000_trip_packing_list.up,
+    down: migration_20261013_100000_trip_packing_list.down,
+    name: '20261013_100000_trip_packing_list',
   },
 ]

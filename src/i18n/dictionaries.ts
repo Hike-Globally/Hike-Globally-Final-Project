@@ -106,6 +106,7 @@ const en = {
     essentialInformation: 'Essential Information You Must Know',
     included: "What's included",
     notIncluded: "What's not included",
+    packingList: 'Packing list',
     gallery: 'Gallery',
     faqs: 'Frequently Asked Questions',
     related: 'You may also like',
