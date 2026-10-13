@@ -7,24 +7,15 @@ import { sitePath } from '@/i18n/config'
 import { getAllPageSlugs, getPage, getSettings } from '@/lib/data'
 import { isLivePreviewRequest } from '@/lib/live-preview-access'
 import { breadcrumbJsonLd, buildMetadata, seoFromDoc, webPageJsonLd } from '@/lib/seo'
+import { isReservedPageSlug } from '@/lib/site-routes'
 
 export const revalidate = 3600
 
 /**
- * Route slugs owned by a dedicated route. Static segments already take precedence over this
- * catch-all, but the guard makes the intent explicit and protects against typos.
+ * Every published page is prerendered at build time; `getAllPageSlugs()` already leaves out the
+ * homepage and the slugs a dedicated route owns (`src/lib/site-routes.ts`, shared with the
+ * sitemap), because none of those has a URL under this catch-all.
  */
-const RESERVED = new Set([
-  'trips',
-  'destinations',
-  'blog',
-  'inquiry',
-  'preview',
-  'admin',
-  'api',
-  'home',
-])
-
 export async function generateStaticParams() {
   const slugs = await getAllPageSlugs()
   return slugs.map((slug) => ({ slug }))
@@ -36,7 +27,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  if (RESERVED.has(slug)) return {}
+  if (isReservedPageSlug(slug)) return {}
 
   const includeDraft = await isLivePreviewRequest()
   const [page, settings] = await Promise.all([getPage(slug, includeDraft), getSettings()])
@@ -60,10 +51,14 @@ export async function generateMetadata({
  *
  * Any page created in Payload's Pages collection automatically gets its own URL here
  * (e.g. /about-us, /our-guides, /responsible-travel), rendered from its blocks.
+ *
+ * A slug a dedicated route owns (`home`, `trips`, `blog`, …) is not a URL of its own: static
+ * segments already take precedence over this catch-all, and the guard below makes that explicit
+ * (and keeps the sitemap, which uses the same list, honest).
  */
 export default async function FlexiblePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  if (RESERVED.has(slug)) notFound()
+  if (isReservedPageSlug(slug)) notFound()
 
   const includeDraft = await isLivePreviewRequest()
   const page = await getPage(slug, includeDraft)

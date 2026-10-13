@@ -103,6 +103,23 @@ exist) and is `noindex`.
 `src/app/(frontend)` does not: `src/lib/canonical-coverage.test.ts` audits the route tree, so the
 rule holds for pages written later, not just the ones written today.
 
+### Sitemap and robots
+
+`/sitemap.xml` is served by `src/app/sitemap.ts`, which reads the published content and hands it to
+`buildSitemap()` in `src/lib/sitemap.ts`. The list covers the homepage, the three listing pages,
+`/inquiry` and every published trip, destination, post and CMS page — each URL **exactly once**:
+
+| Rule                                             | Why                                                                                                                                                                                                                              |
+| ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| URLs come from `canonicalUrl()`                  | A sitemap entry and the canonical of the page it points at are the identical string, so a crawler can never be sent to a spelling the page disavows.                                                                             |
+| `<lastmod>` is the document's `updatedAt`        | A lastmod that always says "now" is noise crawlers learn to ignore; the homepage and the listing pages use the newest update of what they actually render. A URL with no real date carries no `<lastmod>` at all.                |
+| `meta.noIndex` documents are skipped             | A page told to stay out of the index must not be advertised in the sitemap — that contradiction is what Search Console reports as an error.                                                                                      |
+| A CMS page whose slug a route owns is not listed | `home` is served at `/`, `trips` at `/trips`, and so on (`src/lib/site-routes.ts`, shared with `[slug]/page.tsx`). Listing the page anyway would print a URL the sitemap already contains.                                       |
+| Publishing rebuilds it immediately               | Payload's revalidation hooks purge `/sitemap.xml` next to the page they changed, so a trip published now is in the sitemap now — not after the 1-hour fallback window. `npm test` covers the rules in `src/lib/sitemap.test.ts`. |
+
+`/robots.txt` (`src/app/robots.ts`) is the other half: it allows everything except `/admin`, `/api/`
+and `/preview/`, sets `Host`, and points crawlers at the sitemap.
+
 ### Keywords
 
 Trips and Blog posts have a **Keywords** panel — a chip input where the editor types the phrases

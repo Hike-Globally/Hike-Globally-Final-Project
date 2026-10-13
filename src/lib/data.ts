@@ -15,6 +15,8 @@ import type {
   User,
 } from '@/payload-types'
 import { getPayloadClient, isDatabaseConfigured } from './payload'
+import { isReservedPageSlug } from './site-routes'
+import type { SitemapDocument, SitemapSources } from './sitemap'
 import { pickAutomaticTrips } from './trip-selection'
 
 /**
@@ -428,6 +430,39 @@ export type PostCard = {
 }
 
 /* -------------------------------------------------------------------------- */
+/* The `select` behind the slug readers                                        */
+/* -------------------------------------------------------------------------- */
+/* `getAll*Slugs()` feeds `generateStaticParams()` and `/sitemap.xml`, and both  */
+/* need more than a slug: the sitemap wants each document's real `updatedAt` (to */
+/* write an honest `<lastmod>`) and its `meta.noIndex` flag (a document told to  */
+/* stay out of the index must not be advertised in the sitemap either). One      */
+/* query per collection serves both, so the extra fields cost nothing.           */
+
+/** The fields the slug readers select — `meta` only for its `noIndex` flag. */
+const slugSelect = { slug: true, updatedAt: true, meta: true } as const
+
+/** Narrows a `select`ed document into the shape the sitemap consumes. */
+const toSitemapDocument = (doc: unknown): SitemapDocument => {
+  const record = doc as {
+    slug?: string | null
+    updatedAt?: string | null
+    meta?: { noIndex?: boolean | null } | null
+  }
+
+  return {
+    slug: record.slug ?? null,
+    updatedAt: record.updatedAt ?? null,
+    noIndex: record.meta?.noIndex ?? false,
+  }
+}
+
+/** The slugs of a reader's documents, dropping any that do not have one. */
+const slugsOf = (documents: SitemapDocument[]): string[] =>
+  documents
+    .map((document) => document.slug)
+    .filter((slug): slug is string => typeof slug === 'string' && slug.length > 0)
+
+/* -------------------------------------------------------------------------- */
 /* Trips                                                                       */
 /* -------------------------------------------------------------------------- */
 
@@ -604,9 +639,11 @@ export const getRelatedTrips = (trip: Trip, limit = 3): Promise<TripCard[]> =>
     [],
   )
 
-/** Every published slug — feeds generateStaticParams(). */
-/** Every published trip slug — feeds generateStaticParams(). */
-export const getAllTripSlugs = (): Promise<string[]> =>
+/**
+ * Every published trip, reduced to what the slug readers and the sitemap need.
+ * Shared by `getAllTripSlugs()` and `getSitemapSources()`, so both see one cached query.
+ */
+const getTripRecords = (): Promise<SitemapDocument[]> =>
   safeQuery(
     unstable_cache(
       async () => {
@@ -616,19 +653,20 @@ export const getAllTripSlugs = (): Promise<string[]> =>
           locale: SITE_LOCALE,
           depth: 0,
           limit: 1000,
-          select: { slug: true },
+          select: slugSelect,
           where: { _status: { equals: 'published' } },
         })
 
-        return response.docs
-          .map((doc) => (doc as { slug?: string | null }).slug)
-          .filter((slug): slug is string => Boolean(slug))
+        return response.docs.map(toSitemapDocument)
       },
-      ['trip-slugs'],
+      ['published-trips'],
       { tags: [CACHE_TAG.trips], revalidate: REVALIDATE_SECONDS },
     ),
     [],
   )
+
+/** Every published trip slug — feeds generateStaticParams() and the sitemap. */
+export const getAllTripSlugs = async (): Promise<string[]> => slugsOf(await getTripRecords())
 
 /** Lightweight list used to populate the inquiry form's "trip of interest" dropdown. */
 export const getTripOptions = (): Promise<{ id: number; title: string; slug: string }[]> =>
@@ -781,8 +819,11 @@ export const getDestination = (slug: string, includeDraft = false): Promise<Dest
     null,
   )
 
-/** Every published destination slug — feeds generateStaticParams(). */
-export const getAllDestinationSlugs = (): Promise<string[]> =>
+/**
+ * Every published destination, reduced to what the slug readers and the sitemap need.
+ * Shared by `getAllDestinationSlugs()` and `getSitemapSources()`, so both see one cached query.
+ */
+const getDestinationRecords = (): Promise<SitemapDocument[]> =>
   safeQuery(
     unstable_cache(
       async () => {
@@ -792,19 +833,21 @@ export const getAllDestinationSlugs = (): Promise<string[]> =>
           locale: SITE_LOCALE,
           depth: 0,
           limit: 1000,
-          select: { slug: true },
+          select: slugSelect,
           where: { _status: { equals: 'published' } },
         })
 
-        return response.docs
-          .map((doc) => (doc as { slug?: string | null }).slug)
-          .filter((slug): slug is string => Boolean(slug))
+        return response.docs.map(toSitemapDocument)
       },
-      ['destination-slugs'],
+      ['published-destinations'],
       { tags: [CACHE_TAG.destinations], revalidate: REVALIDATE_SECONDS },
     ),
     [],
   )
+
+/** Every published destination slug — feeds generateStaticParams() and the sitemap. */
+export const getAllDestinationSlugs = async (): Promise<string[]> =>
+  slugsOf(await getDestinationRecords())
 
 /* -------------------------------------------------------------------------- */
 /* Blog                                                                        */
@@ -923,8 +966,11 @@ export const getRelatedPosts = (post: Blog, limit = 3): Promise<PostCard[]> =>
     [],
   )
 
-/** Every published post slug — feeds generateStaticParams(). */
-export const getAllPostSlugs = (): Promise<string[]> =>
+/**
+ * Every published post, reduced to what the slug readers and the sitemap need.
+ * Shared by `getAllPostSlugs()` and `getSitemapSources()`, so both see one cached query.
+ */
+const getPostRecords = (): Promise<SitemapDocument[]> =>
   safeQuery(
     unstable_cache(
       async () => {
@@ -934,19 +980,20 @@ export const getAllPostSlugs = (): Promise<string[]> =>
           locale: SITE_LOCALE,
           depth: 0,
           limit: 1000,
-          select: { slug: true },
+          select: slugSelect,
           where: { _status: { equals: 'published' } },
         })
 
-        return response.docs
-          .map((doc) => (doc as { slug?: string | null }).slug)
-          .filter((slug): slug is string => Boolean(slug))
+        return response.docs.map(toSitemapDocument)
       },
-      ['post-slugs'],
+      ['published-posts'],
       { tags: [CACHE_TAG.posts], revalidate: REVALIDATE_SECONDS },
     ),
     [],
   )
+
+/** Every published post slug — feeds generateStaticParams() and the sitemap. */
+export const getAllPostSlugs = async (): Promise<string[]> => slugsOf(await getPostRecords())
 
 /* -------------------------------------------------------------------------- */
 /* Flexible pages                                                              */
@@ -963,9 +1010,13 @@ export const getPage = (slug: string, includeDraft = false): Promise<Page | null
     null,
   )
 
-/** Slugs of every published page except the homepage (which lives at /). */
-/** Slugs of every published page except the homepage (which lives at /). */
-export const getAllPageSlugs = (): Promise<string[]> =>
+/**
+ * Every published page, reduced to what the slug readers and the sitemap need.
+ *
+ * The `home` document is included: it is served at `/`, so the sitemap uses its `updatedAt` as the
+ * homepage's `<lastmod>` even though it never becomes an entry of its own.
+ */
+const getPageRecords = (): Promise<SitemapDocument[]> =>
   safeQuery(
     unstable_cache(
       async () => {
@@ -975,20 +1026,48 @@ export const getAllPageSlugs = (): Promise<string[]> =>
           locale: SITE_LOCALE,
           depth: 0,
           limit: 1000,
-          select: { slug: true },
+          select: slugSelect,
           where: { _status: { equals: 'published' } },
         })
 
-        return response.docs
-          .map((doc) => (doc as { slug?: string | null }).slug)
-          .filter((slug): slug is string => Boolean(slug))
-          .filter((slug): slug is string => slug !== 'home')
+        return response.docs.map(toSitemapDocument)
       },
-      ['page-slugs'],
+      ['published-pages'],
       { tags: [CACHE_TAG.pages], revalidate: REVALIDATE_SECONDS },
     ),
     [],
   )
+
+/**
+ * Slugs of every published page that has a URL of its own — i.e. every page except the homepage
+ * (served at `/`) and the handful a dedicated route owns (see `src/lib/site-routes.ts`).
+ */
+export const getAllPageSlugs = async (): Promise<string[]> =>
+  slugsOf(await getPageRecords()).filter((slug) => !isReservedPageSlug(slug))
+
+/* -------------------------------------------------------------------------- */
+/* Sitemap                                                                     */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Everything `/sitemap.xml` lists: each published trip, destination, post and page with its
+ * `updatedAt` (the entry's `<lastmod>`) and its `noIndex` flag (which keeps it out of the file —
+ * advertising a URL the page tells crawlers to skip is the contradiction Search Console reports
+ * as an error).
+ *
+ * The four queries run in parallel and are the same cached ones `generateStaticParams()` already
+ * uses, so the sitemap costs one extra database round trip per revalidation, not four.
+ */
+export const getSitemapSources = async (): Promise<SitemapSources> => {
+  const [trips, destinations, posts, pages] = await Promise.all([
+    getTripRecords(),
+    getDestinationRecords(),
+    getPostRecords(),
+    getPageRecords(),
+  ])
+
+  return { trips, destinations, posts, pages }
+}
 
 /* -------------------------------------------------------------------------- */
 /* Globals                                                                     */

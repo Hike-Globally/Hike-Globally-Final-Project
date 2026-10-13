@@ -1,61 +1,24 @@
 import type { MetadataRoute } from 'next'
 
-import { sitePath } from '@/i18n/config'
-import {
-  getAllDestinationSlugs,
-  getAllPageSlugs,
-  getAllPostSlugs,
-  getAllTripSlugs,
-} from '@/lib/data'
-import { canonicalUrl } from '@/lib/seo'
-
-export const revalidate = 3600
+import { getSitemapSources } from '@/lib/data'
+import { buildSitemap } from '@/lib/sitemap'
 
 /**
- * Sitemap for the English-only site.
+ * /sitemap.xml — Next's sitemap file convention, so this route is the file crawlers fetch.
  *
- * Every public URL appears exactly once: the homepage, the three listing pages, the inquiry
- * page, and each published trip, destination, post and CMS page. There are no `alternates`
- * blocks — with a single language there is nothing to translate between, and the canonical URL
- * on each page is all a crawler needs.
+ * It reads the published content and hands it to `buildSitemap()`
+ * (`src/lib/sitemap.ts`), which owns the rules: every public URL exactly once, built with the
+ * same `canonicalUrl()` helper as each page's `<link rel="canonical">`, `<lastmod>` from the
+ * document's own `updatedAt`, and no noindex document ever listed. The homepage, the three
+ * listing pages (`/trips`, `/destinations`, `/blog`) and `/inquiry` come from the route table
+ * there; trips, destinations, posts and CMS pages come from the database.
  *
- * URLs come from the same `canonicalUrl()` helper that renders each page's
- * `<link rel="canonical">`, so a sitemap entry and the canonical of the page it points at are
- * always the identical string.
+ * Refreshed on a schedule (`revalidate` below) and immediately on every publish: Payload's
+ * revalidation hooks purge `/sitemap.xml` alongside the page they changed (see
+ * `src/hooks/revalidate.ts`), so a new trip is in the sitemap the same second it goes live.
  */
+export const revalidate = 3600
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [trips, destinations, posts, pages] = await Promise.all([
-    getAllTripSlugs(),
-    getAllDestinationSlugs(),
-    getAllPostSlugs(),
-    getAllPageSlugs(),
-  ])
-
-  const lastModified = new Date()
-
-  const entry = (
-    path: string,
-    priority: number,
-    changeFrequency: 'daily' | 'weekly',
-  ): MetadataRoute.Sitemap[number] => ({
-    url: canonicalUrl(path),
-    lastModified,
-    changeFrequency,
-    priority,
-  })
-
-  const staticPaths = ['/', '/trips', '/destinations', '/blog', '/inquiry']
-
-  return [
-    ...staticPaths.map((path) =>
-      entry(path, path === '/' ? 1 : 0.8, path === '/' ? 'weekly' : 'daily'),
-    ),
-    ...trips.map((slug) => entry(sitePath(`/trips/${slug}`), 0.9, 'weekly')),
-    ...destinations.map((slug) => entry(sitePath(`/destinations/${slug}`), 0.8, 'weekly')),
-    ...posts.map((slug) => entry(sitePath(`/blog/${slug}`), 0.7, 'weekly')),
-    // A CMS page with the reserved `home` slug is the homepage, which is already listed above.
-    ...pages
-      .filter((slug) => slug !== 'home')
-      .map((slug) => entry(sitePath(`/${slug}`), 0.6, 'weekly')),
-  ]
+  return buildSitemap(await getSitemapSources())
 }

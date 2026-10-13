@@ -30,7 +30,8 @@ const ALL_TAGS: string[] = [
  *        -d '{"tags":["trips"],"paths":["/trips"]}'
  *
  * Send no body (or `{}`) to purge the whole site: every data-cache tag, including the header,
- * footer and settings globals, plus the rendered HTML of every route under the root layout.
+ * footer and settings globals, plus the rendered HTML of every route under the root layout and
+ * the generated `/sitemap.xml`.
  */
 export async function POST(request: NextRequest) {
   const secret = process.env.REVALIDATE_SECRET
@@ -59,9 +60,13 @@ export async function POST(request: NextRequest) {
   const paths = body.paths?.length ? body.paths : ['/']
 
   for (const tag of tags) revalidateTag(tag, { expire: 0 })
-  // `'layout'` on `/` purges every page that shares the root layout, i.e. the whole site.
-  if (purgeEverything) revalidatePath('/', 'layout')
-  else for (const path of paths) revalidatePath(path)
+  if (purgeEverything) {
+    // `'layout'` on `/` purges every page that shares the root layout, i.e. the whole site…
+    revalidatePath('/', 'layout')
+    // …but `/sitemap.xml` is a route handler at the app root, outside every layout, so the URL
+    // list crawlers get would otherwise keep serving the old slugs.
+    revalidatePath('/sitemap.xml')
+  } else for (const path of paths) revalidatePath(path)
 
   return Response.json({ revalidated: true, tags, paths, now: Date.now() })
 }
