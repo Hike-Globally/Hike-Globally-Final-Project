@@ -387,6 +387,28 @@ export function TripDetail({
             </Reveal>
           ) : null}
 
+          {/* ---------------- Packing list ---------------- */}
+          {trip.packingList?.length ? (
+            <Reveal as="section" className="py-16 md:py-24">
+              <SectionTitle title={dict.trip.packingList} />
+              <ul className="grid gap-3 sm:grid-cols-2">
+                {trip.packingList.map((item, index) => (
+                  <li
+                    key={item.id ?? `${item.item}-${index}`}
+                    className={cn(surface, 'flex items-start gap-4 p-5')}
+                  >
+                    <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-sage text-ink">
+                      <Check className="size-3.5" strokeWidth={3} aria-hidden />
+                    </span>
+                    <span className="text-[0.9375rem] leading-relaxed text-ink-80">
+                      {item.item}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
+          ) : null}
+
           {/* ---------------- FAQs ---------------- */}
           {faqs.length ? (
             <section id="faqs" className="scroll-mt-24 py-16 md:py-24">

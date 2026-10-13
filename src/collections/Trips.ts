@@ -388,6 +388,24 @@ export const Trips: CollectionConfig = {
     },
     {
       type: 'collapsible',
+      label: 'Packing list',
+      admin: { initCollapsed: true },
+      fields: [
+        {
+          name: 'packingList',
+          type: 'array',
+          localized: true,
+          labels: { singular: 'Packing item', plural: 'Packing list items' },
+          admin: {
+            description:
+              'List the personal gear and essentials travellers should bring for this trip.',
+          },
+          fields: [{ name: 'item', type: 'text', required: true }],
+        },
+      ],
+    },
+    {
+      type: 'collapsible',
       label: 'Gallery & related trips',
       admin: { initCollapsed: true },
       fields: [
