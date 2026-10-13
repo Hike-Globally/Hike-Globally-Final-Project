@@ -1,0 +1,27 @@
+/* ============================================================================
+   TRIPS LISTING — copy sizes on `/trips`
+   ----------------------------------------------------------------------------
+     .trips-hero-lead      16px  hero description under the "Trips" headline
+     .trips-card-summary   16px  description on every trip card in the grid
+
+   The scope is `[data-trips-page]`, set once in `src/app/(frontend)/trips/page.tsx`,
+   so no other surface that renders the shared `TripCard` (homepage, destination and
+   trip detail pages) or the `lead` utility picks these sizes up.
+
+   These rules are intentionally *unlayered* plain CSS: real (unlayered) rules beat
+   anything inside `@layer`, which includes the Tailwind v4 `lead` and
+   `card-description-copy` utilities in `globals.css` and the responsive
+   `--font-size-description` scale they read — so these fixed sizes win at every
+   viewport without `!important`. The same technique `homepage.css` and
+   `curated-trips-section.css` rely on.
+   ========================================================================== */
+
+/* Hero description — 16px, all viewports. */
+[data-trips-page] .trips-hero-lead {
+  font-size: 16px;
+}
+
+/* Trip card description — 16px, all viewports. */
+[data-trips-page] .trips-card-summary {
+  font-size: 16px;
+}
