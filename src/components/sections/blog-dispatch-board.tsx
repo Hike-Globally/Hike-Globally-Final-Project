@@ -224,7 +224,9 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
               {lead.title}
             </h3>
 
-            <p className="mt-4 max-w-[36rem] line-clamp-3 card-description-copy leading-relaxed text-white/80">
+            <p
+              className="home-blog-description mt-4 max-w-[36rem] line-clamp-3 card-description-copy leading-relaxed text-white/80"
+            >
               {lead.excerpt}
             </p>
 
@@ -312,7 +314,9 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
                             `hidden`/`block` switch, the inner one the `-webkit-box`
                             display `line-clamp` needs — one element cannot carry both. */}
                         <div className="mt-2 hidden sm:block">
-                          <p className="line-clamp-2 card-description-copy leading-relaxed text-ink-60">
+                          <p
+                            className="home-blog-description line-clamp-2 card-description-copy leading-relaxed text-ink-60"
+                          >
                             {post.excerpt}
                           </p>
                         </div>
