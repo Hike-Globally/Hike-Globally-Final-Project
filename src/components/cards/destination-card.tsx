@@ -30,7 +30,7 @@ export function DestinationCard({
   priority?: boolean
   className?: string
 }) {
-  const href = sitePath(`/destinations/${destination.slug}`)
+  const href = sitePath(destination.href ?? `/destinations/${destination.slug}`)
 
   return (
     <article

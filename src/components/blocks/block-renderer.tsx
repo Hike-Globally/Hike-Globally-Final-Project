@@ -9,6 +9,7 @@ import { LatestBlogsSection } from '@/components/sections/latest-blogs-section'
 import { Cta } from './cta'
 import { Faq } from './faq'
 import { FeaturedDestinations } from './featured-destinations'
+import { HomepageDestinations } from './homepage-destinations'
 import { FeaturedTrips } from './featured-trips'
 import { Gallery } from './gallery'
 import { Hero } from './hero'
@@ -129,9 +130,15 @@ export async function BlockRenderer({
         )
 
         // One CMS block → the nodes it renders on the homepage, policy sections included.
+        // The homepage's destination sliders are fixed (Nepal regions + continents), so a CMS
+        // `featuredDestinations` block renders them instead of its own card list.
         const nodesFor = (block: Block, index: number): ReactNode[] => [
           ...(block.blockType === 'inquiry' ? [journalElement] : []),
-          renderBlock(block, index, false),
+          block.blockType === 'featuredDestinations' ? (
+            <HomepageDestinations key={`${block.blockType}-${index}`} />
+          ) : (
+            renderBlock(block, index, false)
+          ),
           ...(block.blockType === 'featuredTrips' ? [aboutElement] : []),
         ]
 

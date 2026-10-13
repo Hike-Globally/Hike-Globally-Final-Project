@@ -414,6 +414,8 @@ export type DestinationCard = {
   country: string
   region: Destination['region']
   featured?: boolean | null
+  /** Fixed link for cards that are not a destination page (homepage region cards). */
+  href?: string
 }
 
 export type PostCard = {

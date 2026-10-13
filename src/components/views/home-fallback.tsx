@@ -2,22 +2,19 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 
 import { HomepageHeroBackground } from '@/components/blocks/hero-background'
-import { DestinationCard } from '@/components/cards/destination-card'
-import { DestinationCarousel } from '@/components/cards/destination-carousel'
+import { HomepageDestinations } from '@/components/blocks/homepage-destinations'
 import { AboutHikeGlobally } from '@/components/sections/about-hike-globally'
 import {
   CuratedTripsSection,
   HOMEPAGE_TRIP_LIMIT,
 } from '@/components/sections/curated-trips-section'
 import { HeroScrollCover } from '@/components/motion/hero-scroll-cover'
-import { Reveal } from '@/components/motion/reveal'
 import { DifficultyLevels } from '@/components/sections/difficulty-levels'
 import { LatestBlogsSection } from '@/components/sections/latest-blogs-section'
-import { SectionHeading } from '@/components/sections/section-heading'
 import { Button } from '@/components/ui/button'
 import { dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
-import { getDestinationSlider, getHomepageTrips, getSettings } from '@/lib/data'
+import { getHomepageTrips, getSettings } from '@/lib/data'
 
 /**
  * Rendered when no page with the slug `home` exists in Payload yet.
@@ -26,13 +23,11 @@ import { getDestinationSlider, getHomepageTrips, getSettings } from '@/lib/data'
  */
 export async function HomeFallback() {
   const dict = dictionary
-  const [settings, trips, destinations] = await Promise.all([
+  const [settings, trips] = await Promise.all([
     getSettings(),
     // Same rules as the CMS block: featured trips first, newest published ones if nothing is
     // flagged, so the homepage never loses this section over a missing checkbox.
     getHomepageTrips(HOMEPAGE_TRIP_LIMIT),
-    // Three destination cards are visible at a time; the rest are reached with the arrows.
-    getDestinationSlider(6),
   ])
   const heroEyebrow = settings.tagline?.trim()
   const showHeroEyebrow = Boolean(heroEyebrow && heroEyebrow.toLowerCase() !== 'home')
@@ -79,36 +74,8 @@ export async function HomeFallback() {
     </>
   )
 
-  const destinationsSection =
-    destinations.length === 0 ? null : destinations.length > 3 ? (
-      <DestinationCarousel
-        destinations={destinations}
-        title={dict.destinations.homeSectionTitle}
-        description={dict.destinations.listingSubtitle}
-        action={{ href: sitePath('/destinations'), label: dict.common.viewAll }}
-        titleClassName="home-section-title"
-        descriptionClassName="home-section-intro"
-      />
-    ) : (
-      <section className="py-16 md:py-24">
-        <div className="container-content">
-          <SectionHeading
-            title={dict.destinations.homeSectionTitle}
-            description={dict.destinations.listingSubtitle}
-            action={{ href: sitePath('/destinations'), label: dict.common.viewAll }}
-            titleClassName="home-section-title"
-            descriptionClassName="home-section-intro"
-          />
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
-            {destinations.map((destination, index) => (
-              <Reveal key={destination.id} delay={index * 80}>
-                <DestinationCard destination={destination} />
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-    )
+  // Both destination sliders (Nepal regions, then the continents) — fixed lists.
+  const destinationsSection = <HomepageDestinations />
 
   // The homepage ends at the "Plan your trip" section — nothing after it. The journal
   // board always sits immediately before it, so reading the latest field notes is the
@@ -140,17 +107,12 @@ export async function HomeFallback() {
     </>
   )
 
-  const firstSection =
-    trips.length > 0
-      ? tripsSection
-      : destinations.length > 0
-        ? destinationsSection
-        : closingSections
+  const firstSection = trips.length > 0 ? tripsSection : destinationsSection
 
   const subsequentSections = (
     <>
       {trips.length > 0 ? destinationsSection : null}
-      {trips.length > 0 || destinations.length > 0 ? closingSections : null}
+      {closingSections}
     </>
   )
 
