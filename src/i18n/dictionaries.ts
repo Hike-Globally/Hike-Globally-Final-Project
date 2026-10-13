@@ -167,6 +167,10 @@ const en = {
     listingTitle: 'The Hike Globally journal',
     listingSubtitle:
       'Trip reports, packing lists, and hard-won advice from guides who spend 200 days a year on the trail.',
+    /** Eyebrow of the `/blog` hero band, above the display headline. */
+    heroEyebrow: 'Dispatches from the Himalaya',
+    /** Side note beside the hero's jump link, as on `/trips` and `/destinations`. */
+    heroNote: 'Written by the guides who lead the way.',
     featured: 'Featured story',
     latest: 'Latest stories',
     readTime: '{minutes} min read',
