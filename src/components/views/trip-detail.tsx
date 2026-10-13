@@ -314,7 +314,7 @@ export function TripDetail({
           {trip.contentSections?.length ? (
             <section id="essential-information" className="scroll-mt-24 py-16 md:py-24">
               <Reveal>
-                <SectionTitle title={dict.trip.essentialInformation} level="h3" />
+                <SectionTitle title={dict.trip.essentialInformation} level="h2" />
 
                 <Accordion type="multiple" className="space-y-4">
                   {trip.contentSections.map((contentSection, index) => (
@@ -391,7 +391,7 @@ export function TripDetail({
           {faqs.length ? (
             <section id="faqs" className="scroll-mt-24 py-16 md:py-24">
               <Reveal>
-                <SectionTitle title={dict.trip.faqs} level="h3" />
+                <SectionTitle title={dict.trip.faqs} level="h2" />
 
                 <Accordion type="multiple" className="space-y-4">
                   {faqs.map((faq, index) => (
