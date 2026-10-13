@@ -104,10 +104,6 @@ export default async function DestinationsPage() {
               <p className="eyebrow">A closer look</p>
               <h2 className="heading-xl mt-3 max-w-2xl">Find the Nepal that feels like yours.</h2>
             </div>
-            <p className="max-w-xl description-copy leading-relaxed text-ink-60 md:justify-self-end">
-              From well-loved trails to quieter corners beyond the usual route, each region has a
-              character all its own. Start with a place; we will help with the rest.
-            </p>
           </div>
 
           {destinations.length === 0 ? (
