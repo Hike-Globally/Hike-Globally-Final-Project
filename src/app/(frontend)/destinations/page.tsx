@@ -9,8 +9,8 @@ import { PayloadImageFill } from '@/components/ui/payload-image'
 import { JsonLd } from '@/components/seo/json-ld'
 import { dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
-import { getDestinations, type DestinationCard } from '@/lib/data'
-import { breadcrumbJsonLd, buildMetadata } from '@/lib/seo'
+import { getDestinations, getSettings, type DestinationCard } from '@/lib/data'
+import { breadcrumbJsonLd, buildMetadata, webPageJsonLd } from '@/lib/seo'
 
 export const revalidate = 3600
 
@@ -25,11 +25,14 @@ const DESTINATIONS_HERO_IMAGE = '/images/destinations/hero.jpg'
 
 export async function generateMetadata(): Promise<Metadata> {
   const dict = dictionary
+  const settings = await getSettings()
 
   return buildMetadata({
     title: dict.destinations.listingTitle,
     description: dict.destinations.listingSubtitle,
+    image: settings.defaultOgImage,
     path: sitePath('/destinations'),
+    siteName: settings.siteName,
   })
 }
 
@@ -157,10 +160,24 @@ export default async function DestinationsPage() {
       </section>
 
       <JsonLd
-        data={breadcrumbJsonLd([
-          { name: dict.nav.home, url: sitePath('/') },
-          { name: dict.nav.destinations, url: sitePath('/destinations') },
-        ])}
+        data={[
+          breadcrumbJsonLd([
+            { name: dict.nav.home, url: sitePath('/') },
+            { name: dict.nav.destinations, url: sitePath('/destinations') },
+          ]),
+          // A CollectionPage whose ItemList is exactly the atlas cards above.
+          webPageJsonLd({
+            type: 'CollectionPage',
+            name: dict.destinations.listingTitle,
+            description: dict.destinations.listingSubtitle,
+            url: sitePath('/destinations'),
+            siteName: dict.structuredData.organization,
+            items: destinations.map((destination) => ({
+              name: destination.name,
+              url: sitePath(`/destinations/${destination.slug}`),
+            })),
+          }),
+        ]}
       />
     </>
   )

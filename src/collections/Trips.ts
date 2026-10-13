@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { adminOrEditor, publishedOrSignedIn } from '../access'
+import { keywordsSection } from '../fields/keywords'
 import { linkField } from '../fields/link'
 import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
@@ -436,6 +437,12 @@ export const Trips: CollectionConfig = {
       ],
     },
 
+    /* --------------------------------------------------------------------------
+       Keywords & SEO — the keywords panel sits directly above the SEO group and
+       opens by default (it is one short chip input), so the terms a trip is
+       targeting are filled in while the page is being written, not after.
+       -------------------------------------------------------------------------- */
+    keywordsSection(),
     metaField(),
     viewLiveField(),
   ],

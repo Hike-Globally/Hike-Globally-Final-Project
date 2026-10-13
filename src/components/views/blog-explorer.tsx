@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 
 import { PostCard } from '@/components/cards/post-card'
-import { dictionary } from '@/i18n/dictionaries'
+import { blogCategoryLabel, dictionary } from '@/i18n/dictionaries'
 import type { PostCard as PostCardData } from '@/lib/data'
 import { cn } from '@/lib/utils'
 
@@ -31,13 +31,7 @@ export function BlogExplorer({ posts }: { posts: PostCardData[] }) {
     [posts, category],
   )
 
-  const label = (value: string) =>
-    dict.blog[
-      `category${value
-        .split('-')
-        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-        .join('')}` as keyof typeof dict.blog
-    ] ?? value
+  const label = blogCategoryLabel
 
   const [lead, ...rest] = filtered
 

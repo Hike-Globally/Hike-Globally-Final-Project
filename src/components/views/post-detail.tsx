@@ -9,7 +9,7 @@ import { JsonLd } from '@/components/seo/json-ld'
 import { Breadcrumbs } from '@/components/sections/breadcrumbs'
 import { Button } from '@/components/ui/button'
 import { PayloadImage, PayloadImageFill } from '@/components/ui/payload-image'
-import { dictionary } from '@/i18n/dictionaries'
+import { blogCategoryLabel, dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
 import type { PostCard as PostCardData } from '@/lib/data'
 import { getArticleHeadings } from '@/lib/article-headings'
@@ -361,11 +361,11 @@ export function PostDetail({
             post,
             url: sitePath(`/blog/${post.slug}`),
             authorName,
-            image:
-              typeof post.featuredImage === 'object' && post.featuredImage?.url
-                ? post.featuredImage.url
-                : undefined,
+            // The Media document, not its `url`: `schemaImageUrl()` turns it into the absolute URL
+            // structured data requires (a relative one is dropped from the rich result).
+            image: post.featuredImage,
             siteName,
+            categories: (post.categories ?? []).map(blogCategoryLabel),
           }),
         ]}
       />

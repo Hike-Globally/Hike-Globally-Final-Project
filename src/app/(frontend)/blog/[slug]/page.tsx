@@ -35,6 +35,9 @@ export async function generateMetadata({
     title: seo.title,
     description: seo.description,
     image: seo.image,
+    // From the post's "Keywords" section — published as <meta name="keywords">, as `article:tag`
+    // Open Graph tags and as `keywords` in the BlogPosting markup (see PostDetail).
+    keywords: seo.keywords,
     path: sitePath(`/blog/${slug}`),
     type: 'article',
     noIndex: seo.noIndex,

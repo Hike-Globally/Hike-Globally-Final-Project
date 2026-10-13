@@ -55,6 +55,7 @@ export default async function HomePage() {
             name: settings.legalName || settings.siteName,
             url: siteUrl,
             logo: `${siteUrl}/images/logo.svg`,
+            description: settings.tagline ?? undefined,
             email: settings.email,
             phone: settings.phone,
             address: settings.address,

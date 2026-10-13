@@ -5,18 +5,21 @@ import { JsonLd } from '@/components/seo/json-ld'
 import { BlogExplorer } from '@/components/views/blog-explorer'
 import { dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
-import { getPosts } from '@/lib/data'
-import { breadcrumbJsonLd, buildMetadata } from '@/lib/seo'
+import { getPosts, getSettings } from '@/lib/data'
+import { breadcrumbJsonLd, buildMetadata, webPageJsonLd } from '@/lib/seo'
 
 export const revalidate = 3600
 
 export async function generateMetadata(): Promise<Metadata> {
   const dict = dictionary
+  const settings = await getSettings()
 
   return buildMetadata({
     title: dict.blog.listingTitle,
     description: dict.blog.listingSubtitle,
+    image: settings.defaultOgImage,
     path: sitePath('/blog'),
+    siteName: settings.siteName,
   })
 }
 
@@ -48,10 +51,24 @@ export default async function BlogPage() {
       </section>
 
       <JsonLd
-        data={breadcrumbJsonLd([
-          { name: dict.nav.home, url: sitePath('/') },
-          { name: dict.nav.blog, url: sitePath('/blog') },
-        ])}
+        data={[
+          breadcrumbJsonLd([
+            { name: dict.nav.home, url: sitePath('/') },
+            { name: dict.nav.blog, url: sitePath('/blog') },
+          ]),
+          // A CollectionPage whose ItemList is exactly the posts above.
+          webPageJsonLd({
+            type: 'CollectionPage',
+            name: dict.blog.listingTitle,
+            description: dict.blog.listingSubtitle,
+            url: sitePath('/blog'),
+            siteName: dict.structuredData.organization,
+            items: posts.map((post) => ({
+              name: post.title,
+              url: sitePath(`/blog/${post.slug}`),
+            })),
+          }),
+        ]}
       />
     </>
   )

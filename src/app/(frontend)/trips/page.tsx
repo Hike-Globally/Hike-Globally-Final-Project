@@ -8,8 +8,8 @@ import { JsonLd } from '@/components/seo/json-ld'
 import { TripsExplorer } from '@/components/views/trips-explorer'
 import { dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
-import { getDestinations, getTrips } from '@/lib/data'
-import { breadcrumbJsonLd, buildMetadata } from '@/lib/seo'
+import { getDestinations, getSettings, getTrips } from '@/lib/data'
+import { breadcrumbJsonLd, buildMetadata, webPageJsonLd } from '@/lib/seo'
 
 export const revalidate = 3600
 
@@ -17,11 +17,14 @@ const TRIPS_HERO_IMAGE = '/images/trips/hero.jpg'
 
 export async function generateMetadata(): Promise<Metadata> {
   const dict = dictionary
+  const settings = await getSettings()
 
   return buildMetadata({
     title: dict.trips.listingTitle,
     description: dict.trips.listingSubtitle,
+    image: settings.defaultOgImage,
     path: sitePath('/trips'),
+    siteName: settings.siteName,
   })
 }
 
@@ -97,10 +100,25 @@ export default async function TripsPage() {
       </section>
 
       <JsonLd
-        data={breadcrumbJsonLd([
-          { name: dict.nav.home, url: sitePath('/') },
-          { name: dict.nav.trips, url: sitePath('/trips') },
-        ])}
+        data={[
+          breadcrumbJsonLd([
+            { name: dict.nav.home, url: sitePath('/') },
+            { name: dict.nav.trips, url: sitePath('/trips') },
+          ]),
+          // A CollectionPage whose ItemList is exactly the cards above: the same titles and the
+          // same canonical URLs, so the listing hands Google the site structure behind /trips.
+          webPageJsonLd({
+            type: 'CollectionPage',
+            name: dict.trips.listingTitle,
+            description: dict.trips.listingSubtitle,
+            url: sitePath('/trips'),
+            siteName: dict.structuredData.organization,
+            items: trips.map((trip) => ({
+              name: trip.title,
+              url: sitePath(`/trips/${trip.slug}`),
+            })),
+          }),
+        ]}
       />
     </>
   )

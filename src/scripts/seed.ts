@@ -452,7 +452,15 @@ const run = async () => {
   const tripData = [
     {
       destinationIndex: 0,
+      // The "Keywords" section: the phrases this page targets. Published as
+      // <meta name="keywords">, article:tag and the JSON-LD keywords.
       title: 'Everest Base Camp Trek',
+      keywords: [
+        'everest base camp trek',
+        'everest base camp trek cost',
+        'ebc trek itinerary',
+        'everest base camp trek difficulty',
+      ],
       summary:
         'The classic 14-day walk to the foot of the world’s highest mountain, with Kala Patthar sunrise and three acclimatisation days built in.',
       durationDays: 14,
@@ -621,6 +629,12 @@ const run = async () => {
     {
       destinationIndex: 1,
       title: 'Annapurna Base Camp Trek',
+      keywords: [
+        'annapurna base camp trek',
+        'annapurna sanctuary trek',
+        'abc trek itinerary',
+        'annapurna base camp trek cost',
+      ],
       summary:
         'Eleven days from Pokhara’s lakeside into the Sanctuary — a glacial amphitheatre ringed by 7,000-metre walls.',
       durationDays: 11,
@@ -750,6 +764,12 @@ const run = async () => {
     {
       destinationIndex: 2,
       title: 'Langtang Valley & Kyanjin Ri',
+      keywords: [
+        'langtang valley trek',
+        'kyanjin ri trek',
+        'langtang trek itinerary',
+        'langtang trek from kathmandu',
+      ],
       summary:
         'Nine days in Tamang country — the closest true wilderness to Kathmandu, with two 5,000-metre viewpoints.',
       durationDays: 9,
@@ -865,6 +885,12 @@ const run = async () => {
     {
       destinationIndex: 0,
       title: 'Everest Three High Passes',
+      keywords: [
+        'everest three passes trek',
+        'three high passes trek',
+        'everest three passes itinerary',
+        'khumbu three passes trek',
+      ],
       summary:
         'Eighteen days, three 5,300-metre passes and every major viewpoint in the Khumbu. For trekkers who want the whole thing.',
       durationDays: 18,
@@ -1039,6 +1065,12 @@ const run = async () => {
     {
       destinationIndex: 3,
       title: 'Upper Mustang & Lo Manthang',
+      keywords: [
+        'upper mustang trek',
+        'lo manthang trek',
+        'upper mustang trek permit',
+        'mustang trek itinerary',
+      ],
       summary:
         'Thirteen days inside a restricted Tibetan kingdom — cave monasteries, ochre canyons and a walled city closed to outsiders until 1992.',
       durationDays: 13,
@@ -1180,6 +1212,12 @@ const run = async () => {
     {
       destinationIndex: 1,
       title: 'Mardi Himal & Khopra Ridge',
+      keywords: [
+        'mardi himal trek',
+        'khopra ridge trek',
+        'mardi himal trek itinerary',
+        'off the beaten path treks nepal',
+      ],
       summary:
         'Eight quiet days on the ridges opposite Machhapuchhre — the best-value-view trek in the Annapurna range.',
       durationDays: 8,
@@ -1319,6 +1357,12 @@ const run = async () => {
   const postData = [
     {
       title: 'How to train for a 5,500 m trek (without a gym membership)',
+      keywords: [
+        'trekking training plan',
+        'how to train for everest base camp',
+        'altitude training without a gym',
+        'trek fitness plan',
+      ],
       excerpt:
         'Eight weeks, two sessions a day, no equipment. The plan we send every Everest Base Camp client — published here because it works for everyone.',
       categories: ['health-safety', 'trekking-guides'],
@@ -1350,6 +1394,12 @@ const run = async () => {
     },
     {
       title: 'The honest packing list for the Khumbu in autumn',
+      keywords: [
+        'everest base camp packing list',
+        'khumbu packing list',
+        'what to pack for trekking in nepal',
+        'autumn trekking gear',
+      ],
       excerpt:
         'Eleven kilograms, four layers, no cotton. What our guides actually carry after fifteen seasons on the same trail.',
       categories: ['gear', 'trekking-guides'],
@@ -1380,6 +1430,12 @@ const run = async () => {
     },
     {
       title: 'Altitude sickness: what the guide is watching for',
+      keywords: [
+        'altitude sickness symptoms',
+        'acute mountain sickness prevention',
+        'ams while trekking',
+        'how to avoid altitude sickness',
+      ],
       excerpt:
         'Every evening on trek, someone takes your pulse and blood oxygen. Here is what we are looking for — and why the answer is sometimes to go down.',
       categories: ['health-safety'],
@@ -1404,6 +1460,12 @@ const run = async () => {
     },
     {
       title: 'Langtang, eight years on: a valley that rebuilt itself',
+      keywords: [
+        'langtang valley recovery',
+        'langtang trek after the earthquake',
+        'langtang village tourism',
+        'responsible trekking langtang',
+      ],
       excerpt:
         'In 2015 the avalanche buried the village. What happened next is the most encouraging story in Nepali tourism.',
       categories: ['culture', 'trip-reports'],
@@ -1424,6 +1486,12 @@ const run = async () => {
     },
     {
       title: 'What a porter’s job actually involves',
+      keywords: [
+        'trekking porter nepal',
+        'porter weight limits trekking',
+        'ethical trekking nepal',
+        'porter wages nepal',
+      ],
       excerpt:
         'Twenty-five kilos, twelve days, one pair of sandals. The people who make trekking possible deserve more than a footnote.',
       categories: ['culture', 'sustainability'],
