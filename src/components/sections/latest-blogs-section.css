@@ -1,0 +1,375 @@
+/* ============================================================================
+   Latest Blogs and Stories — the homepage journal board.
+   ----------------------------------------------------------------------------
+   Deliberately *not* another card grid: the newest story is a full-bleed
+   photographic plate, and the ones behind it are a numbered index of
+   "waypoints" running down a hairline route beside it — the way an expedition
+   briefing sheet reads. The two columns are cut from the same 12-column
+   measure the rest of the homepage uses (6 + 6 at `lg`, 7 + 5 from `xl` up),
+   so the board lines up with the trip and destination grids above it.
+
+   Headline and card *sizes* are not in here: they come from the homepage type
+   scale (`home-section-title` / `home-blog-lead-title` / `home-blog-row-title`
+   in `src/app/(frontend)/homepage.css`), the same split `curated-trips-section`
+   uses. What lives here is everything CSS has to own — keyframes, pseudo-element
+   wipes, the cursor-following preview plate and the reduced-motion opt-outs.
+
+   Everything is scoped to `[data-blog-dispatch]` (set once in
+   `latest-blogs-section.tsx`), so no other surface picks these rules up.
+   Square corners, the five brand colours only, and every animation stops under
+   `prefers-reduced-motion` — the house rules.
+
+   The motion budget goes to four things, and only four:
+     1. the lead plate breathes on a slow 30s Ken Burns loop, and zooms a little
+        further when the card is hovered;
+     2. an index row wipes a sage wash behind itself, fills its waypoint, lights
+        up its stretch of the route line and slides its copy 6px to the right;
+     3. a spring-driven preview plate follows the cursor down the index and
+        cross-fades to the hovered story (desktop + fine pointer only — the
+        gating lives in `blog-dispatch-board.tsx`);
+     4. a sage rule draws across the foot of the lead plate on hover.
+
+   Hover choreography is gated behind `(hover: hover) and (pointer: fine)` so a
+   thumb tap never leaves a card stuck in its hovered state; `:focus-within`
+   states are *not* gated, because keyboard focus has to work on every device.
+   ========================================================================== */
+
+[data-blog-dispatch] {
+  /* Cursor-following preview plate. One variable, so the plate, its frames and
+     the clamping maths in `blog-dispatch-board.tsx` all read the same width. */
+  --lb-preview-w: clamp(12.5rem, 15vw, 17.5rem);
+  --lb-ease: var(--ease-brand, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+/* ---------------------------------------------------------------------------
+   Topographic wash — contour lines behind the section (see the `<svg>` in
+   `latest-blogs-section.tsx`). Faded out with a radial mask so it reads as
+   paper texture in the corner rather than as an illustration.
+   --------------------------------------------------------------------------- */
+[data-blog-dispatch] .lb-topo {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  color: var(--color-sage);
+  pointer-events: none;
+}
+
+[data-blog-dispatch] .lb-topo-svg {
+  position: absolute;
+  top: -8%;
+  right: -6%;
+  width: min(84rem, 96%);
+  height: auto;
+  opacity: 0.5;
+  -webkit-mask-image: radial-gradient(
+    56% 64% at 72% 24%,
+    #000 0%,
+    rgb(0 0 0 / 55%) 44%,
+    transparent 76%
+  );
+  mask-image: radial-gradient(56% 64% at 72% 24%, #000 0%, rgb(0 0 0 / 55%) 44%, transparent 76%);
+}
+
+/* ---------------------------------------------------------------------------
+   Lead plate
+   --------------------------------------------------------------------------- */
+/* The slow, always-on Ken Burns. It sits on a *wrapper* and the hover zoom sits
+   on the image inside it, so the two transforms compose instead of fighting
+   over the same property. */
+[data-blog-dispatch] .lb-breath {
+  animation: lb-breathe 30s ease-in-out infinite alternate;
+}
+
+@keyframes lb-breathe {
+  from {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.07) translate3d(0, -1.4%, 0);
+  }
+}
+
+/* Sage rule drawn across the foot of the plate on hover/focus. */
+[data-blog-dispatch] .lb-lead-rule {
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.9s var(--lb-ease);
+}
+
+[data-blog-dispatch] .lb-lead:focus-within .lb-lead-rule {
+  transform: scaleX(1);
+}
+
+/* Oversized "01" — Instrument Serif italic, the same accent face the hero's
+   second line uses, so the plate ties back to the top of the page. */
+[data-blog-dispatch] .lb-numeral {
+  font-family: var(--font-serif-accent);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 0.8;
+}
+
+/* Pulsing "fresh" marker inside the category flag. */
+[data-blog-dispatch] .lb-live {
+  position: relative;
+  display: block;
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+[data-blog-dispatch] .lb-live::after {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: currentColor;
+  animation: lb-ping 2.8s var(--lb-ease) infinite;
+  content: '';
+}
+
+@keyframes lb-ping {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  60% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Index rows — the waypoint stack
+   --------------------------------------------------------------------------- */
+/* Sage wash behind the row. `z-index: -1` inside the row's own isolated
+   stacking context puts it under the copy but over the section background,
+   without ever escaping the row. */
+[data-blog-dispatch] .lb-row {
+  position: relative;
+  isolation: isolate;
+}
+
+[data-blog-dispatch] .lb-row::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    90deg,
+    var(--color-sage-20) 0%,
+    rgb(232 239 230 / 45%) 58%,
+    rgb(232 239 230 / 0%) 100%
+  );
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.6s var(--lb-ease);
+  content: '';
+}
+
+[data-blog-dispatch] .lb-row:focus-within::before {
+  transform: scaleX(1);
+}
+
+/* The route line each waypoint sits on. It is drawn per row (rather than once
+   down the whole stack) so it stays above the row's own hover wash, and the
+   first/last rows trim it back to the centre of their waypoint — the line runs
+   *between* markers, not past them.
+
+   A solid `background-color` faded with a mask, rather than a gradient: the
+   colour can then transition when a row is hovered, which a gradient cannot. */
+[data-blog-dispatch] .lb-row-rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0.9375rem; /* half of the 1.875rem waypoint box */
+  width: 1px;
+  background-color: var(--color-slate-20);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
+  transition: background-color 0.45s var(--lb-ease);
+}
+
+/* The route lights up under the story being pointed at — the waypoint fills and
+   its stretch of the line turns deep, so the row reads as "you are here" without
+   a second vertical bar appearing down its leading edge. */
+[data-blog-dispatch] .lb-row:hover .lb-row-rail,
+[data-blog-dispatch] .lb-row:focus-within .lb-row-rail {
+  width: 2px;
+  margin-left: -0.5px;
+  background-color: var(--color-deep);
+}
+
+[data-blog-dispatch] .lb-row:first-child .lb-row-rail {
+  top: 50%;
+}
+
+[data-blog-dispatch] .lb-row:last-child .lb-row-rail {
+  bottom: 50%;
+}
+
+/* One row only: no line to draw between two waypoints. */
+[data-blog-dispatch] .lb-row:only-child .lb-row-rail {
+  display: none;
+}
+
+[data-blog-dispatch] .lb-node {
+  transition:
+    background-color 0.4s var(--lb-ease),
+    border-color 0.4s var(--lb-ease),
+    color 0.4s var(--lb-ease);
+}
+
+[data-blog-dispatch] .lb-row-body {
+  transition: transform 0.55s var(--lb-ease);
+}
+
+[data-blog-dispatch] .lb-row:focus-within .lb-row-body {
+  transform: translateX(6px);
+}
+
+[data-blog-dispatch] .lb-row:focus-within .lb-node {
+  background: var(--color-deep);
+  border-color: var(--color-deep);
+  color: var(--color-mist);
+}
+
+/* Thumbnail zoom + sage hairline on hover/focus. */
+[data-blog-dispatch] .lb-row-thumb {
+  border: 1px solid rgb(1 22 30 / 10%);
+  transition: border-color 0.4s var(--lb-ease);
+}
+
+[data-blog-dispatch] .lb-row:focus-within .lb-row-thumb {
+  border-color: var(--color-sage);
+}
+
+/* ---------------------------------------------------------------------------
+   Cursor-following preview plate (desktop, fine pointer)
+   --------------------------------------------------------------------------- */
+/* Position is written by `motion` as `x`/`y` on this element (springs, so the
+   plate glides a beat behind the cursor); the centring + tilt is plain CSS on
+   the inner box, so the two never overwrite one transform. */
+[data-blog-dispatch] .lb-preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 30;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+[data-blog-dispatch] .lb-preview[data-active='true'] {
+  opacity: 1;
+}
+
+[data-blog-dispatch] .lb-preview-inner {
+  position: relative;
+  width: var(--lb-preview-w);
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--color-ink);
+  box-shadow:
+    0 26px 60px -26px rgb(1 22 30 / 55%),
+    0 3px 10px rgb(1 22 30 / 18%),
+    inset 0 0 0 1px rgb(255 255 255 / 14%);
+  transform: translate(-50%, -50%) scale(0.9) rotate(0deg);
+  transition: transform 0.65s var(--lb-ease);
+}
+
+[data-blog-dispatch] .lb-preview[data-active='true'] .lb-preview-inner {
+  transform: translate(-50%, -50%) scale(1) rotate(-3.2deg);
+}
+
+/* Every row's plate is mounted at once and cross-faded, so the preview never
+   waits on a decode when the cursor jumps down the index. */
+[data-blog-dispatch] .lb-preview-frame {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+[data-blog-dispatch] .lb-preview-frame[data-active='true'] {
+  opacity: 1;
+}
+
+[data-blog-dispatch] .lb-preview-caption {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  padding: 0.5rem 0.75rem;
+  background: linear-gradient(to top, rgb(1 22 30 / 92%), rgb(1 22 30 / 0%));
+  color: var(--color-sage);
+  font-family: var(--font-heading);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------------------------
+   Hover choreography — fine pointers only
+   --------------------------------------------------------------------------- */
+@media (hover: hover) and (pointer: fine) {
+  [data-blog-dispatch] .lb-lead:hover .lb-lead-rule {
+    transform: scaleX(1);
+  }
+
+  [data-blog-dispatch] .lb-row:hover::before {
+    transform: scaleX(1);
+  }
+
+  [data-blog-dispatch] .lb-row:hover .lb-row-body {
+    transform: translateX(6px);
+  }
+
+  [data-blog-dispatch] .lb-row:hover .lb-node {
+    background: var(--color-deep);
+    border-color: var(--color-deep);
+    color: var(--color-mist);
+  }
+
+  [data-blog-dispatch] .lb-row:hover .lb-row-thumb {
+    border-color: var(--color-sage);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Reduced motion — the board stays exactly as legible, it simply stops moving.
+   The preview plate is never mounted at all in this case (see the component),
+   so nothing here has to hide it.
+   --------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  [data-blog-dispatch] .lb-breath,
+  [data-blog-dispatch] .lb-live::after {
+    animation: none !important;
+  }
+
+  [data-blog-dispatch] .lb-lead-rule,
+  [data-blog-dispatch] .lb-row::before,
+  [data-blog-dispatch] .lb-row-rail,
+  [data-blog-dispatch] .lb-row-body,
+  [data-blog-dispatch] .lb-node,
+  [data-blog-dispatch] .lb-row-thumb,
+  [data-blog-dispatch] .lb-preview,
+  [data-blog-dispatch] .lb-preview-inner,
+  [data-blog-dispatch] .lb-preview-frame {
+    transition: none !important;
+  }
+
+  /* The wipes still happen — instantly, with no slide and no Ken Burns — so a
+     hovered or focused row keeps its state feedback without any movement. */
+  [data-blog-dispatch] .lb-row:hover::before,
+  [data-blog-dispatch] .lb-row:focus-within::before {
+    transform: scaleX(1);
+  }
+
+  /* …but the copy never slides. */
+  [data-blog-dispatch] .lb-row:hover .lb-row-body,
+  [data-blog-dispatch] .lb-row:focus-within .lb-row-body {
+    transform: none !important;
+  }
+}

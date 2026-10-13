@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 export function SectionHeading({
   eyebrow,
   title,
+  titleId,
   description,
   action,
   controls,
@@ -19,6 +20,8 @@ export function SectionHeading({
 }: {
   eyebrow?: string | null
   title: string
+  /** `id` for the heading — lets a section wire itself up with `aria-labelledby`. */
+  titleId?: string
   description?: string | null
   action?: { href: string; label: string } | null
   /** Extra controls rendered next to the "view all" link — e.g. carousel arrows. */
@@ -50,6 +53,7 @@ export function SectionHeading({
           </p>
         ) : null}
         <Title
+          id={titleId}
           className={cn(
             'heading-lg',
             variant === 'light' ? 'text-white' : 'text-ink',

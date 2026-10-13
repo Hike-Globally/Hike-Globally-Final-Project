@@ -273,6 +273,15 @@ export const defaultFeaturedDestinations: DestinationCard[] = [
 ]
 
 export const defaultPosts: PostCard[] = [
+  /* Newest-first, exactly like the `-publishedAt` sort `getPosts()` runs against
+     the database — the fallback has to keep that promise, or every "latest
+     stories" surface leads with the oldest post when no database is connected.
+
+     The five entries mirror the five journal posts the seed script creates
+     (`npm run seed`), so a site with no database connected shows the same
+     journal a seeded one does — and the homepage board renders as designed: one
+     lead plate plus three index rows. Only three photos ship in
+     `public/images/admin`, so the covers cycle. */
   {
     id: 1,
     title: 'How to train for a 5,500 m trek (without a gym membership)',
@@ -288,8 +297,8 @@ export const defaultPosts: PostCard[] = [
     } as Media,
     author: { id: 1, name: 'Dawa Sherpa' },
     categories: ['trekking-guides'],
-    publishedAt: '2026-01-15T00:00:00.000Z',
-    createdAt: '2026-01-15T00:00:00.000Z',
+    publishedAt: '2026-03-24T00:00:00.000Z',
+    createdAt: '2026-03-24T00:00:00.000Z',
     featured: true,
   },
   {
@@ -302,13 +311,13 @@ export const defaultPosts: PostCard[] = [
       id: 302,
       url: '/images/admin/himalaya-02.jpg',
       alt: 'Backpack and trekking boots laid out on a lodge floor',
-      updatedAt: '2026-02-01T00:00:00.000Z',
-      createdAt: '2026-02-01T00:00:00.000Z',
+      updatedAt: '2026-03-06T00:00:00.000Z',
+      createdAt: '2026-03-06T00:00:00.000Z',
     } as Media,
     author: { id: 2, name: 'Pasang Lhamu' },
     categories: ['gear'],
-    publishedAt: '2026-02-01T00:00:00.000Z',
-    createdAt: '2026-02-01T00:00:00.000Z',
+    publishedAt: '2026-03-06T00:00:00.000Z',
+    createdAt: '2026-03-06T00:00:00.000Z',
     featured: true,
   },
   {
@@ -329,6 +338,44 @@ export const defaultPosts: PostCard[] = [
     publishedAt: '2026-02-18T00:00:00.000Z',
     createdAt: '2026-02-18T00:00:00.000Z',
     featured: true,
+  },
+  {
+    id: 4,
+    title: 'Langtang, eight years on: a valley that rebuilt itself',
+    slug: 'langtang-eight-years-on',
+    excerpt:
+      'In 2015 the avalanche buried the village. What happened next is the most encouraging story in Nepali tourism.',
+    featuredImage: {
+      id: 304,
+      url: '/images/admin/himalaya-02.jpg',
+      alt: 'Langtang valley below a snow-covered ridge',
+      updatedAt: '2026-02-01T00:00:00.000Z',
+      createdAt: '2026-02-01T00:00:00.000Z',
+    } as Media,
+    author: { id: 2, name: 'Pasang Lhamu' },
+    categories: ['culture', 'trip-reports'],
+    publishedAt: '2026-02-01T00:00:00.000Z',
+    createdAt: '2026-02-01T00:00:00.000Z',
+    featured: false,
+  },
+  {
+    id: 5,
+    title: 'What a porter’s job actually involves',
+    slug: 'what-a-porter-does',
+    excerpt:
+      'Twenty-five kilos, twelve days, one pair of sandals. The people who make trekking possible deserve more than a footnote.',
+    featuredImage: {
+      id: 305,
+      url: '/images/admin/himalaya-01.jpg',
+      alt: 'Trekking crew carrying loads up a mountain trail',
+      updatedAt: '2026-01-15T00:00:00.000Z',
+      createdAt: '2026-01-15T00:00:00.000Z',
+    } as Media,
+    author: { id: 1, name: 'Dawa Sherpa' },
+    categories: ['culture', 'sustainability'],
+    publishedAt: '2026-01-15T00:00:00.000Z',
+    createdAt: '2026-01-15T00:00:00.000Z',
+    featured: false,
   },
 ]
 

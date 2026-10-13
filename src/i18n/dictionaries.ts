@@ -171,6 +171,8 @@ const en = {
     latest: 'Latest stories',
     readTime: '{minutes} min read',
     readStory: 'Read story',
+    /** Foot of the homepage journal index — the column-level link to `/blog`. */
+    browseJournal: 'Browse the journal',
     by: 'By',
     publishedOn: 'Published',
     related: 'Keep reading',

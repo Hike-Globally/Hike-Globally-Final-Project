@@ -16,6 +16,9 @@
      .home-section-intro          16px  every other section intro
      .destination-card-title      23px  destination card heading
      .destination-card-description 16px destination card description
+     .home-blog-lead-title        40px  the lead story of the journal board
+     .home-blog-row-title         23px  journal board index-row titles — the same
+                                        card tier as `.destination-card-title`
 
    The scope is `[data-homepage]`, set once in `src/app/(frontend)/page.tsx`, so
    nothing outside the homepage can pick these sizes up — the shared
@@ -81,6 +84,25 @@
   /* Fixed homepage destination-card sizes. */
   --home-destination-card-title-size: 23px;
   --home-destination-card-description-size: 16px;
+
+  /* 40px — the lead story of the "Latest Blogs and Stories" board. One step
+     below the section headline (50px) and one above a card title (23px), so
+     the board reads as headline → lead story → index without any of the three
+     competing. Grows again from the 3xl canvas up, where the column is 108rem
+     wide — the same move `heading-lg` makes in `globals.css`. */
+  --home-blog-lead-title-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.5rem);
+
+  /* 23px — the journal board's index-row titles: the card tier of the scale,
+     matching `.destination-card-title` exactly so every card-level heading on
+     the homepage is the same size. */
+  --home-blog-row-title-size: clamp(1.125rem, 1rem + 0.5vw, 1.4375rem);
+}
+
+@media (width >= 120rem) {
+  [data-homepage] {
+    --home-blog-lead-title-size: clamp(2.5rem, 1.4rem + 1.1vw, 3.25rem);
+    --home-blog-row-title-size: clamp(1.4375rem, 1.1rem + 0.35vw, 1.75rem);
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -143,6 +165,18 @@
 
 [data-homepage] .destination-card-description {
   font-size: var(--home-destination-card-description-size);
+}
+
+/* ---------------------------------------------------------------------------
+   Journal board — 40px lead story / 23px index rows
+   --------------------------------------------------------------------------- */
+[data-homepage] .home-blog-lead-title {
+  font-size: var(--home-blog-lead-title-size);
+  line-height: 1.14;
+}
+
+[data-homepage] .home-blog-row-title {
+  font-size: var(--home-blog-row-title-size);
 }
 
 /* Short landscape phones (5–6" rotated): keep the hero headline inside the

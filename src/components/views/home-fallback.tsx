@@ -12,6 +12,7 @@ import {
 import { HeroScrollCover } from '@/components/motion/hero-scroll-cover'
 import { Reveal } from '@/components/motion/reveal'
 import { DifficultyLevels } from '@/components/sections/difficulty-levels'
+import { LatestBlogsSection } from '@/components/sections/latest-blogs-section'
 import { SectionHeading } from '@/components/sections/section-heading'
 import { Button } from '@/components/ui/button'
 import { dictionary } from '@/i18n/dictionaries'
@@ -109,7 +110,9 @@ export async function HomeFallback() {
       </section>
     )
 
-  // The homepage ends at the "Plan your trip" section — no journal/blog tiles and nothing after it.
+  // The homepage ends at the "Plan your trip" section — nothing after it. The journal
+  // board always sits immediately before it, so reading the latest field notes is the
+  // last thing a visitor does before being asked to plan a trip.
   const inquirySection = (
     <section className="py-16 md:py-24">
       <div className="container-content">
@@ -129,13 +132,25 @@ export async function HomeFallback() {
     </section>
   )
 
+  // Journal board + "Plan your trip", in that order, whichever branch renders them.
+  const closingSections = (
+    <>
+      <LatestBlogsSection />
+      {inquirySection}
+    </>
+  )
+
   const firstSection =
-    trips.length > 0 ? tripsSection : destinations.length > 0 ? destinationsSection : inquirySection
+    trips.length > 0
+      ? tripsSection
+      : destinations.length > 0
+        ? destinationsSection
+        : closingSections
 
   const subsequentSections = (
     <>
       {trips.length > 0 ? destinationsSection : null}
-      {trips.length > 0 || destinations.length > 0 ? inquirySection : null}
+      {trips.length > 0 || destinations.length > 0 ? closingSections : null}
     </>
   )
 
