@@ -1,0 +1,437 @@
+/* ============================================================================
+   CTA CARD — the closing card that sits immediately before the footer
+   ----------------------------------------------------------------------------
+   Kept in a dedicated stylesheet (the pattern `footer.css`,
+   `about-hike-globally.css` and `latest-posts.css` already use) because the
+   card's signature details — a slow Ken Burns drift on the photograph,
+   animated topographic contours, a rotating expedition stamp and a shine
+   sweep on the button — are paired keyframes that read far better as plain
+   CSS than as Tailwind utility soup.
+
+   These rules are intentionally *unlayered*: real (unlayered) rules beat
+   anything inside `@layer`, which includes every Tailwind v4 `@utility`
+   (`heading-lg`, `lead`, `eyebrow`…), so the sizes declared here win without
+   `!important`. The same technique `homepage.css` relies on. Everything is
+   scoped under `[data-cta-card]`, so nothing outside this card can pick the
+   styles up, and the three CMS variants (`dark` / `sage` / `light`) are
+   expressed as CSS variables over one shared layout — the photograph and the
+   composition never change, only the light does.
+
+   The site is square-cornered (see the radius scale in `globals.css`), and
+   the card honours that: the only circles are the genuinely round details —
+   the stamp, the pulse dot and the blurred glow.
+   ========================================================================== */
+
+[data-cta-card] {
+  /* Dark (default): a dusk photograph of the Khumbu under an ink → deep
+     scrim, sage accents, mist copy. */
+  --cta-fg: #f8f9fa;
+  --cta-muted: rgb(248 249 250 / 0.78);
+  --cta-faint: rgb(248 249 250 / 0.55);
+  --cta-accent: #aec3b0;
+  --cta-line: rgb(248 249 250 / 0.18);
+  --cta-scrim:
+    linear-gradient(
+      100deg,
+      rgb(1 22 30 / 0.95) 0%,
+      rgb(1 22 30 / 0.82) 42%,
+      rgb(18 69 89 / 0.42) 74%,
+      rgb(18 69 89 / 0.2) 100%
+    ),
+    linear-gradient(to top, rgb(1 22 30 / 0.75) 0%, transparent 55%);
+  --cta-glow: rgb(174 195 176 / 0.22);
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: var(--cta-fg);
+  background-color: #01161e;
+  border: 1px solid rgb(1 22 30 / 0.12);
+  box-shadow:
+    0 32px 70px -30px rgb(1 22 30 / 0.55),
+    0 6px 20px rgb(1 22 30 / 0.12);
+}
+
+/* Sage: the same photograph washed in the brand green, ink copy, deep accents. */
+[data-cta-card][data-variant='sage'] {
+  --cta-fg: #01161e;
+  --cta-muted: rgb(1 22 30 / 0.74);
+  --cta-faint: rgb(1 22 30 / 0.52);
+  --cta-accent: #124559;
+  --cta-line: rgb(1 22 30 / 0.18);
+  --cta-scrim:
+    linear-gradient(
+      100deg,
+      rgb(174 195 176 / 0.97) 0%,
+      rgb(174 195 176 / 0.9) 44%,
+      rgb(174 195 176 / 0.42) 76%,
+      rgb(174 195 176 / 0.2) 100%
+    ),
+    linear-gradient(to top, rgb(174 195 176 / 0.82) 0%, transparent 62%);
+  --cta-glow: rgb(248 249 250 / 0.35);
+  background-color: #aec3b0;
+}
+
+/* Light: the photograph under morning mist, ink copy, deep accents. */
+[data-cta-card][data-variant='light'] {
+  --cta-fg: #01161e;
+  --cta-muted: rgb(1 22 30 / 0.72);
+  --cta-faint: rgb(1 22 30 / 0.5);
+  --cta-accent: #124559;
+  --cta-line: rgb(1 22 30 / 0.14);
+  --cta-scrim:
+    linear-gradient(
+      100deg,
+      rgb(248 249 250 / 0.97) 0%,
+      rgb(248 249 250 / 0.9) 44%,
+      rgb(248 249 250 / 0.45) 76%,
+      rgb(248 249 250 / 0.22) 100%
+    ),
+    linear-gradient(to top, rgb(248 249 250 / 0.82) 0%, transparent 62%);
+  --cta-glow: rgb(174 195 176 / 0.4);
+  background-color: #f8f9fa;
+}
+
+/* Offset sage frame behind the card — an editorial “second sheet” peeking out
+   at the top-right. It is a sibling of the card, not a pseudo-element: the
+   card's own `overflow: hidden` would clip a translated pseudo to the card's
+   bounds. Desktop only: in the phone gutter it would read as a layout bug
+   rather than a frame. */
+.cta-card__frame {
+  display: none;
+}
+
+@media (width >= 768px) {
+  .cta-card__frame {
+    display: block;
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgb(174 195 176 / 0.75);
+    transform: translate(14px, -14px);
+    pointer-events: none;
+  }
+}
+
+/* Film grain — an SVG turbulence tile at whisper opacity, so flat gradient
+   areas feel printed rather than rendered. `overlay` keeps it off the type. */
+[data-cta-card]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0.09;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------------------------------------------------------------------------
+   Photograph, scrims and contours
+   --------------------------------------------------------------------------- */
+[data-cta-card] .cta-card__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* The drift itself: 30 seconds from end to end and back, so the movement is
+   felt rather than watched. A second, hover-driven zoom lives on the same
+   element's wrapper in the markup (nested transforms compose). */
+[data-cta-card] .cta-card__img {
+  object-fit: cover;
+  object-position: 68% 42%;
+  animation: cta-kenburns 30s var(--ease-brand, ease-in-out) infinite alternate;
+}
+
+@keyframes cta-kenburns {
+  from {
+    transform: scale(1.03);
+  }
+  to {
+    transform: scale(1.15) translate(-1.6%, 1.2%);
+  }
+}
+
+[data-cta-card] .cta-card__zoom {
+  position: absolute;
+  inset: 0;
+  transition: transform 1.4s var(--ease-brand, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-cta-card]:hover .cta-card__zoom {
+    transform: scale(1.035);
+  }
+}
+
+[data-cta-card] .cta-card__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--cta-scrim);
+}
+
+/* Soft brand glow pooling in the top-right corner, behind the stamp. */
+[data-cta-card] .cta-card__glow {
+  position: absolute;
+  z-index: 1;
+  top: -9rem;
+  right: -6rem;
+  width: 26rem;
+  height: 26rem;
+  border-radius: 9999px;
+  background: var(--cta-glow);
+  filter: blur(70px);
+  pointer-events: none;
+}
+
+/* Topographic contours — survey lines drifting a few pixels over a minute,
+   the cartographic echo of the “map runs out of names” headline above them. */
+[data-cta-card] .cta-card__topo {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: -8%;
+  width: min(62%, 44rem);
+  height: 100%;
+  color: var(--cta-fg);
+  opacity: 0.13;
+  pointer-events: none;
+  animation: cta-topo-drift 26s ease-in-out infinite alternate;
+}
+
+@keyframes cta-topo-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-14px, 10px, 0);
+  }
+}
+
+/* The 3px brand rule across the very top edge: deep → sage → slate. */
+[data-cta-card] .cta-card__topline {
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(to right, #124559 0%, #aec3b0 55%, #598392 100%);
+}
+
+/* ---------------------------------------------------------------------------
+   Copy
+   --------------------------------------------------------------------------- */
+[data-cta-card] .cta-card__inner {
+  position: relative;
+  z-index: 2;
+}
+
+[data-cta-card] .cta-card__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--cta-accent);
+}
+
+/* The eyebrow's leading rule grows in once the card is on screen (the card
+   arrives via `Reveal`, so the animation starts as it fades up). */
+[data-cta-card] .cta-card__eyebrow::before {
+  content: '';
+  width: 2.25rem;
+  height: 1px;
+  background: currentColor;
+  transform-origin: left;
+  animation: cta-rule-grow 1.1s var(--ease-brand, cubic-bezier(0.22, 1, 0.36, 1)) 0.25s both;
+}
+
+@keyframes cta-rule-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Live pulse dot — the “we're here, send the enquiry” signal. */
+[data-cta-card] .cta-card__dot {
+  position: relative;
+  width: 0.5rem;
+  height: 0.5rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: var(--cta-accent);
+}
+
+[data-cta-card] .cta-card__dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: var(--cta-accent);
+  animation: cta-pulse 2.4s ease-out infinite;
+}
+
+@keyframes cta-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.65;
+  }
+  70%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+/* The headline: one confident Google Sans statement, with any `<i>…</i>` the
+   editor wrote set as a second, quieter line in Instrument Serif italic —
+   the same two-voice treatment as the homepage hero (see homepage.css). */
+[data-cta-card] .cta-card__title {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 1.25rem + 3vw, 3.5rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+  color: var(--cta-fg);
+  text-wrap: balance;
+}
+
+[data-cta-card] .cta-card__title i {
+  display: block;
+  margin-top: 0.12em;
+  font-family: var(--font-serif-accent);
+  font-size: 0.86em;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1.12;
+  color: var(--cta-accent);
+}
+
+[data-cta-card] .cta-card__text {
+  color: var(--cta-muted);
+}
+
+/* ---------------------------------------------------------------------------
+   Rotating expedition stamp (desktop only — see the markup)
+   --------------------------------------------------------------------------- */
+[data-cta-card] .cta-card__stamp-ring {
+  width: 8.5rem;
+  height: 8.5rem;
+  animation: cta-stamp-spin 32s linear infinite;
+}
+
+[data-cta-card] .cta-card__stamp-ring text {
+  font-family: var(--font-heading);
+  /* Sized so the brand line exactly fills the r=45 ring (circumference ≈ 283
+     units): at 9.5px with this spacing the string ends where it begins. */
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 2.2px;
+  fill: var(--cta-fg);
+}
+
+@keyframes cta-stamp-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* A frosted disc filed behind the stamp, so its white ring lettering stays
+   legible where it crosses snowfields in the photograph. The sage and light
+   variants (ink lettering) get the same disc in mist instead. */
+[data-cta-card] .cta-card__stamp-disc {
+  position: absolute;
+  inset: 0.4rem;
+  border-radius: 9999px;
+  background: rgb(1 22 30 / 0.32);
+  backdrop-filter: blur(6px);
+}
+
+[data-cta-card][data-variant='sage'] .cta-card__stamp-disc,
+[data-cta-card][data-variant='light'] .cta-card__stamp-disc {
+  background: rgb(248 249 250 / 0.38);
+}
+
+[data-cta-card] .cta-card__coords {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  color: var(--cta-faint);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------------------
+   Button — a light sweep crosses on hover while the arrow steps forward.
+   The base look (sage on dark, deep on sage/light) still comes from the
+   shared `Button` variants; this layer only adds the theatre.
+   --------------------------------------------------------------------------- */
+[data-cta-card] .cta-card__button {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+[data-cta-card] .cta-card__button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgb(255 255 255 / 0.38) 50%,
+    transparent 65%
+  );
+  transform: translateX(-110%);
+  transition: transform 0.7s var(--ease-brand, cubic-bezier(0.22, 1, 0.36, 1));
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-cta-card] .cta-card__button:hover::after {
+    transform: translateX(110%);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Trust row — the three quiet proofs under the button, ruled off from the
+   copy above. Wraps to two rows, then one, as the card narrows.
+   --------------------------------------------------------------------------- */
+[data-cta-card] .cta-card__trust {
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid var(--cta-line);
+  color: var(--cta-muted);
+}
+
+[data-cta-card] .cta-card__trust svg {
+  color: var(--cta-accent);
+}
+
+/* ---------------------------------------------------------------------------
+   Reduced motion — every animation in this file stops; the card is a still
+   photograph with the same composition, contrast and copy.
+   --------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  [data-cta-card] .cta-card__img,
+  [data-cta-card] .cta-card__topo,
+  [data-cta-card] .cta-card__stamp-ring,
+  [data-cta-card] .cta-card__dot::after,
+  [data-cta-card] .cta-card__eyebrow::before {
+    animation: none !important;
+  }
+
+  [data-cta-card] .cta-card__zoom,
+  [data-cta-card] .cta-card__button::after {
+    transition: none !important;
+  }
+}
