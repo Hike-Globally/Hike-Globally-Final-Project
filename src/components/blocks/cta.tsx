@@ -1,49 +1,252 @@
+import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
+import { useId } from 'react'
+import { ArrowRight, Clock, Mountain, Users } from 'lucide-react'
 
+import { Reveal } from '@/components/motion/reveal'
 import { Button } from '@/components/ui/button'
-import type { CtaBlock } from '@/payload-types'
+import { dictionary } from '@/i18n/dictionaries'
+import { splitInlineEmphasis } from '@/lib/inline-emphasis'
 import { resolveLink } from '@/lib/links'
+import type { CtaBlock } from '@/payload-types'
 
-const variants: Record<string, string> = {
-  dark: 'bg-ink text-mist',
-  sage: 'bg-sage text-ink',
-  light: 'bg-mist-60 text-ink',
+import './cta.css'
+
+/**
+ * ============================================================================
+ * CTA CARD — the closing card immediately before the footer
+ * ============================================================================
+ * A cinematic, photographic card: a lone trekker crossing the Khumbu at dusk
+ * under a slow Ken Burns drift, topographic contours, film grain and a
+ * rotating expedition stamp — with the CMS copy (eyebrow, heading, text,
+ * button) set over the top. All of the theatre lives in `cta.css`, scoped
+ * under `[data-cta-card]`; this file only composes it.
+ *
+ * Two callers share the card so the homepage looks identical whichever way
+ * it renders:
+ *   · `Cta` below — the Payload `cta` block (About page today, and any page
+ *     an editor adds it to, the homepage included);
+ *   · `HomeFallback` — the homepage's closing “Plan your trip” card when no
+ *     CMS `home` page exists yet.
+ *
+ * The CMS `variant` still chooses the light: `dark` (default) is the dusk
+ * photograph, `sage` washes it in brand green, `light` in morning mist.
+ */
+
+export type CtaCardLink = {
+  href: string
+  label: string
+  newTab?: boolean
 }
 
-export function Cta({ block }: { block: CtaBlock }) {
-  const link = resolveLink(block.link)
-  const variant = variants[block.variant ?? 'dark'] ?? variants.dark!
+/* Survey contours of an unnamed ridge — decorative, drawn once. */
+function TopoContours() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="cta-card__topo"
+      viewBox="0 0 800 520"
+      fill="none"
+      preserveAspectRatio="xMidYMid slice"
+    >
+      <g stroke="currentColor" strokeWidth="1">
+        <path d="M-20 420 C140 340 260 470 430 390 S700 300 830 360" />
+        <path d="M-20 360 C150 285 280 410 450 330 S710 245 830 300" opacity="0.85" />
+        <path d="M-20 300 C160 230 300 350 470 272 S720 190 830 242" opacity="0.7" />
+        <path d="M-20 242 C170 178 320 292 490 216 S730 138 830 186" opacity="0.55" />
+        <path d="M-20 186 C185 128 340 236 510 162 S740 88 830 132" opacity="0.4" />
+        <path d="M-20 132 C200 82 360 182 530 110 S750 42 830 80" opacity="0.28" />
+        <path d="M-20 82 C215 40 380 130 550 62 S760 4 830 34" opacity="0.18" />
+      </g>
+    </svg>
+  )
+}
+
+/* Circular “expedition stamp”: the brand line set on a rotating ring around a
+   mountain mark, with the Everest-region coordinates filed underneath —
+   the journal-stamp detail the rest of the site hints at with its compass
+   rings (blog article footer, About orbit). Desktop only. */
+function ExpeditionStamp({ pathId }: { pathId: string }) {
+  const dict = dictionary
+
+  return (
+    <div aria-hidden="true" className="hidden shrink-0 flex-col items-center gap-4 lg:flex">
+      <div className="relative grid size-[8.5rem] place-items-center">
+        <span className="cta-card__stamp-disc" aria-hidden="true" />
+        <svg viewBox="0 0 120 120" className="cta-card__stamp-ring relative">
+          <defs>
+            <path
+              id={pathId}
+              d="M 60,60 m -45,0 a 45,45 0 1,1 90,0 a 45,45 0 1,1 -90,0"
+              fill="none"
+            />
+          </defs>
+          <text>
+            <textPath href={`#${pathId}`}>{dict.cta.stamp}</textPath>
+          </text>
+        </svg>
+        <span className="absolute inset-0 grid place-items-center">
+          <Mountain className="size-8" strokeWidth={1.25} style={{ color: 'var(--cta-accent)' }} />
+        </span>
+        <span
+          className="absolute inset-[1.35rem] rounded-full border"
+          style={{ borderColor: 'var(--cta-line)' }}
+        />
+      </div>
+      <p className="cta-card__coords">
+        {dict.cta.coordinates}
+        <span className="mt-1 block text-center">{dict.cta.region}</span>
+      </p>
+    </div>
+  )
+}
+
+export function CtaCard({
+  eyebrow,
+  heading,
+  text,
+  link,
+  variant = 'dark',
+}: {
+  eyebrow?: string | null
+  heading: string
+  text?: string | null
+  link?: CtaCardLink | null
+  variant?: 'dark' | 'sage' | 'light'
+}) {
+  const dict = dictionary
+  const titleId = useId()
+  const stampPathId = `${useId().replace(/:/g, '')}-stamp`
+  const headingSegments = splitInlineEmphasis(heading)
+  const external = link ? /^https?:\/\//.test(link.href) : false
+
+  const trustItems = [
+    { icon: Clock, label: dict.cta.replyTime },
+    { icon: Mountain, label: dict.cta.localGuides },
+    { icon: Users, label: dict.cta.smallGroups },
+  ]
 
   return (
     <section className="py-16 md:py-24">
       <div className="container-content">
-        <div className={`relative overflow-hidden px-5 py-10 sm:px-8 sm:py-14 md:px-16 md:py-20 3xl:px-20 3xl:py-24 ${variant}`}>
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -top-24 -right-16 size-72 rounded-full bg-white/10 blur-2xl"
-          />
-          <div className="relative max-w-2xl min-w-0 3xl:max-w-3xl">
-            {block.eyebrow ? <p className="eyebrow mb-4 text-sage">{block.eyebrow}</p> : null}
-            <h2 className="heading-lg">{block.heading}</h2>
-            {block.text ? <p className="lead mt-5 opacity-80">{block.text}</p> : null}
+        <Reveal>
+          <div className="relative">
+            <span className="cta-card__frame" aria-hidden="true" />
+            <article
+              data-cta-card
+              data-variant={variant}
+              aria-labelledby={titleId}
+              className="relative"
+            >
+              {/* Photograph + light. The zoom wrapper and the drifting image are
+                nested on purpose: their transforms compose into one motion. */}
+              <div className="cta-card__media" aria-hidden="true">
+                <div className="cta-card__zoom">
+                  <Image
+                    src="/images/trips/hero.jpg"
+                    alt=""
+                    fill
+                    sizes="(min-width: 1280px) 1216px, 100vw"
+                    className="cta-card__img"
+                  />
+                </div>
+              </div>
+              <div className="cta-card__scrim" aria-hidden="true" />
+              <div className="cta-card__glow" aria-hidden="true" />
+              <TopoContours />
+              <span className="cta-card__topline" aria-hidden="true" />
 
-            {link ? (
-              <Button
-                asChild
-                size="lg"
-                variant={block.variant === 'light' ? 'default' : 'sage'}
-                className="mt-9"
-              >
-                <Link href={link.href}>
-                  {link.label}
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
-            ) : null}
+              <div className="cta-card__inner px-5 pt-10 pb-8 sm:px-8 sm:pt-12 sm:pb-10 md:px-12 md:pt-16 lg:px-16 lg:pt-[4.5rem] 3xl:px-20">
+                <div className="flex items-start justify-between gap-10">
+                  <div className="max-w-2xl min-w-0 3xl:max-w-3xl">
+                    {eyebrow ? (
+                      <p className="cta-card__eyebrow eyebrow mb-5">
+                        <span className="cta-card__dot" aria-hidden="true" />
+                        {eyebrow}
+                      </p>
+                    ) : null}
+
+                    {/* An `<i>…</i>` in the heading field becomes the serif
+                      italic second line (see lib/inline-emphasis.ts) — the
+                      same two-voice treatment as the homepage hero. */}
+                    <h2 id={titleId} className="cta-card__title">
+                      {headingSegments.length
+                        ? headingSegments.map((segment, index) =>
+                            segment.emphasized ? (
+                              <i key={index}>{segment.text}</i>
+                            ) : (
+                              <span key={index}>{segment.text}</span>
+                            ),
+                          )
+                        : heading}
+                    </h2>
+
+                    {text ? <p className="cta-card__text lead mt-5 max-w-xl">{text}</p> : null}
+
+                    {link ? (
+                      <div className="mt-9 flex flex-wrap items-center gap-x-5 gap-y-3">
+                        <Button
+                          asChild
+                          size="lg"
+                          variant={variant === 'dark' ? 'sage' : 'default'}
+                          className="cta-card__button group h-[3.25rem] px-8 text-base"
+                        >
+                          {external || link.newTab ? (
+                            <a href={link.href} target="_blank" rel="noopener noreferrer">
+                              {link.label}
+                              <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+                            </a>
+                          ) : (
+                            <Link href={link.href}>
+                              {link.label}
+                              <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+                            </Link>
+                          )}
+                        </Button>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <ExpeditionStamp pathId={stampPathId} />
+                </div>
+
+                {/* The three quiet proofs, ruled off beneath the copy. */}
+                <ul className="cta-card__trust mt-12 flex flex-wrap gap-x-10 gap-y-3 pt-6 md:mt-14">
+                  {trustItems.map((item) => (
+                    <li
+                      key={item.label}
+                      className="flex items-center gap-2.5 text-[0.875rem] font-medium"
+                    >
+                      <item.icon className="size-4 shrink-0" aria-hidden="true" />
+                      {item.label}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </article>
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   )
+}
+
+export function Cta({ block }: { block: CtaBlock }) {
+  const link = resolveLink(block.link)
+  const variant = (block.variant ?? 'dark') as 'dark' | 'sage' | 'light'
+
+  return (
+    <CtaCard
+      eyebrow={block.eyebrow}
+      heading={block.heading}
+      text={block.text}
+      link={link ? { href: link.href, label: link.label, newTab: link.newTab } : null}
+      variant={variantsGuard(variant)}
+    />
+  )
+}
+
+/** The CMS only ever stores the three known variants — this just satisfies the type. */
+function variantsGuard(variant: string): 'dark' | 'sage' | 'light' {
+  return variant === 'sage' || variant === 'light' ? variant : 'dark'
 }

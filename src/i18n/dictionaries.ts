@@ -235,6 +235,21 @@ const en = {
     callUs: 'Call us',
     contact: 'Contact',
   },
+  cta: {
+    /** Eyebrow of the homepage's closing card (the fallback render path). */
+    eyebrow: 'Plan your trip',
+    /** Headline of the homepage's closing card — the `<i>…</i>` becomes its serif italic line. */
+    heading: 'Ready to walk where the <i>map runs out of names?</i>',
+    /** Button of the homepage's closing card. */
+    action: 'Start your enquiry',
+    replyTime: 'Replies within 24 hours',
+    localGuides: 'Led by local Sherpa guides',
+    smallGroups: 'Small groups, tailored to you',
+    /** Rotating stamp around the closing card's mountain mark. */
+    stamp: 'HIKE GLOBALLY · NEPAL · EST. 2012 · ',
+    coordinates: '27.9881° N · 86.9250° E',
+    region: 'Khumbu, Nepal',
+  },
   notFound: {
     title: 'This trail runs out here',
     text: 'The page you were looking for has moved or never existed. Let us point you back to the good stuff.',

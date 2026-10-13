@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
 
+import { CtaCard } from '@/components/blocks/cta'
 import { HomepageHeroBackground } from '@/components/blocks/hero-background'
 import { HomepageDestinations } from '@/components/blocks/homepage-destinations'
 import { AboutHikeGlobally } from '@/components/sections/about-hike-globally'
@@ -77,26 +77,19 @@ export async function HomeFallback() {
   // Both destination sliders (Nepal regions, then the continents) — fixed lists.
   const destinationsSection = <HomepageDestinations />
 
-  // The homepage ends at the "Plan your trip" section — nothing after it. The journal
+  // The homepage ends at the "Plan your trip" card — nothing after it. The journal
   // board always sits immediately before it, so reading the latest field notes is the
-  // last thing a visitor does before being asked to plan a trip.
+  // last thing a visitor does before being asked to plan a trip. The card is the
+  // shared `CtaCard` (see blocks/cta.tsx), so this fallback closing moment is the
+  // same cinematic card a CMS `cta` block renders.
   const inquirySection = (
-    <section className="py-16 md:py-24">
-      <div className="container-content">
-        <div className="relative overflow-hidden bg-sage px-5 py-10 sm:px-8 sm:py-14 md:px-16 md:py-20 3xl:px-20 3xl:py-24">
-          <div className="relative max-w-2xl min-w-0 3xl:max-w-3xl">
-            <h2 className="heading-lg text-ink">{dict.inquiry.title}</h2>
-            <p className="lead mt-5 text-ink-70">{dict.inquiry.subtitle}</p>
-            <Button asChild size="lg" className="mt-9">
-              <Link href={sitePath('/inquiry')}>
-                {dict.inquiry.submit}
-                <ArrowRight className="size-4" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </div>
-    </section>
+    <CtaCard
+      eyebrow={dict.cta.eyebrow}
+      heading={dict.cta.heading}
+      text={dict.inquiry.subtitle}
+      link={{ href: sitePath('/inquiry'), label: dict.cta.action }}
+      variant="dark"
+    />
   )
 
   // Journal board + "Plan your trip", in that order, whichever branch renders them.
