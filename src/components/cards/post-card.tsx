@@ -82,7 +82,10 @@ export function PostCard({
 
         <p
           className={cn(
-            'mt-3 card-description-copy leading-relaxed text-ink-60',
+            // `post-card-description` is the size hook page-level type scales pin
+            // (see `blog.css`); untouched here so every other surface keeps the
+            // shared fluid `card-description-copy` size.
+            'post-card-description mt-3 card-description-copy leading-relaxed text-ink-60',
             featured ? '' : 'line-clamp-3',
           )}
         >

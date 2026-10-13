@@ -1,0 +1,50 @@
+/* ============================================================================
+   BLOG TYPE SCALE — one place for the pinned description sizes on `/blog`
+   ----------------------------------------------------------------------------
+   The journal page asks for one legible description size per surface, at every
+   canvas, instead of the fluid `card-description-copy` / `lead` clamps the
+   shared components ship with:
+
+     .blog-hero-lead         16px  the hero standfirst under the display headline
+     .post-card-description  16px  the excerpt on every journal card — the lead
+                                   plate and the grid cards alike
+
+   The scope is `[data-blog-page]`, set once in `src/app/(frontend)/blog/page.tsx`,
+   so nothing outside `/blog` picks these sizes up: the shared `PostCard` keeps
+   its own responsive type on the "Keep reading" rail of article pages, and the
+   `lead` utility keeps its scale on every other hero.
+
+   These rules are intentionally *unlayered* plain CSS: real (unlayered) rules
+   beat anything inside `@layer`, which includes every Tailwind v4 `@utility`
+   in `globals.css` (`lead`, `card-description-copy`) and their own media
+   queries — so a class here overrides a utility's `font-size` without
+   `!important` and without fighting source order. The same technique
+   `homepage.css` and `curated-trips-section.css` already rely on.
+
+   Fixed, not fluid: 16px is the *specified* size, so unlike the homepage hero
+   clamps there is no ceiling to grow towards — a 5" phone and a 100" TV both
+   read the journal's descriptions at exactly 16px, matching the pinned card
+   copy on the homepage journal board (`.home-blog-description`).
+   ==========================================================================*/
+
+[data-blog-page] {
+  /* 16px — hero standfirst under the display headline. */
+  --blog-hero-lead-size: 16px;
+
+  /* 16px — excerpt on every journal card (lead plate + grid). */
+  --blog-card-description-size: 16px;
+}
+
+/* ---------------------------------------------------------------------------
+   Hero — standfirst at 16px
+   --------------------------------------------------------------------------- */
+[data-blog-page] .blog-hero-lead {
+  font-size: var(--blog-hero-lead-size);
+}
+
+/* ---------------------------------------------------------------------------
+   Journal cards — excerpt at 16px, lead plate and grid cards alike
+   --------------------------------------------------------------------------- */
+[data-blog-page] .post-card-description {
+  font-size: var(--blog-card-description-size);
+}
