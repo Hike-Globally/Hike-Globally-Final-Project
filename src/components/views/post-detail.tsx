@@ -61,6 +61,11 @@ export function PostDetail({
   const allHeadings = getArticleHeadings(post.content)
   const headings = allHeadings.filter((heading) => heading.label)
   const headingIds = allHeadings.map((heading) => heading.id)
+  // Keep the masthead and article on the same left edge, with or without an outline.
+  const contentWidthClassName = cn(
+    'mx-auto max-w-[44rem]',
+    headings.length > 0 && 'lg:max-w-[65rem]',
+  )
 
   const category = post.categories?.[0]
   const categoryLabel = category
@@ -118,84 +123,86 @@ export function PostDetail({
           />
 
           <div className="container-content relative z-10 w-full pt-28 pb-10 sm:pb-12 md:pt-32 md:pb-16">
-            <Breadcrumbs
-              className="mb-8 [&_a]:text-mist/65 [&_a:hover]:text-white [&_span]:text-white [&_svg]:text-mist/35"
-              items={[
-                { label: dict.nav.home, href: sitePath('/') },
-                { label: dict.nav.blog, href: sitePath('/blog') },
-                { label: post.title },
-              ]}
-            />
-
-            <p className="eyebrow flex flex-wrap items-center gap-x-3 gap-y-2 text-sage">
-              <span className="size-1.5 bg-sage" aria-hidden="true" />
-              <span>{dict.blog.fieldNotes}</span>
-              <span className="text-white/30" aria-hidden="true">
-                /
-              </span>
-              <span className="text-mist/70">{categoryLabel ?? dict.nav.blog}</span>
-            </p>
-
-            <div className="mt-6 max-w-[34rem] lg:max-w-[42rem]">
-              <h1
-                id="post-title"
-                className="font-heading text-[clamp(2.1rem,6vw,4.9rem)] leading-[0.98] font-semibold tracking-[-0.045em] text-white 3xl:text-[clamp(4.9rem,3vw,6.5rem)]"
-              >
-                {post.title}
-              </h1>
-              <p className="mt-6 max-w-2xl description-copy leading-relaxed text-mist/80 md:leading-[1.75]">
-                {post.excerpt}
-              </p>
-            </div>
-
-            <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3 text-[0.8125rem] text-mist/75">
-              <span className="inline-flex items-center gap-2">
-                <CalendarDays className="size-4 text-sage" aria-hidden="true" />
-                <time dateTime={publishedAt}>{formatDate(publishedAt)}</time>
-              </span>
-              <span className="hidden h-4 w-px bg-white/20 sm:block" aria-hidden="true" />
-              <span className="inline-flex items-center gap-2">
-                <Clock className="size-4 text-sage" aria-hidden="true" />
-                {dict.blog.readTime.replace('{minutes}', String(minutes))}
-              </span>
-            </div>
-
-            <div className="mt-8 flex flex-wrap items-center justify-between gap-5 border-t border-white/15 pt-5">
-              {authorName ? (
-                <div className="flex min-w-0 items-center gap-3">
-                  {author?.avatar && typeof author.avatar !== 'number' ? (
-                    <PayloadImage
-                      media={author.avatar}
-                      size="thumbnail"
-                      sizes="44px"
-                      className="size-11 shrink-0 rounded-full ring-2 ring-sage/45"
-                    />
-                  ) : (
-                    <span className="grid size-11 shrink-0 place-items-center rounded-full bg-sage/15 font-heading text-base font-semibold text-sage ring-1 ring-sage/30">
-                      {authorName.slice(0, 1)}
-                    </span>
-                  )}
-                  <div className="min-w-0">
-                    <p className="text-[0.6875rem] tracking-[0.14em] text-mist/50 uppercase">
-                      {dict.blog.by}
-                    </p>
-                    <p className="mt-0.5 truncate font-heading text-[0.9375rem] font-semibold text-white">
-                      {authorName}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-[0.75rem] tracking-[0.13em] text-mist/60 uppercase">
-                  {siteName} <span className="px-1 text-sage/70">/</span> {dict.nav.blog}
-                </p>
-              )}
-
-              <ArticleShareButton
-                title={post.title}
-                shareLabel={dict.common.share}
-                copiedLabel={dict.common.copied}
-                errorLabel={dict.common.shareError}
+            <div className={contentWidthClassName}>
+              <Breadcrumbs
+                className="mb-8 [&_a]:text-mist/65 [&_a:hover]:text-white [&_span]:text-white [&_svg]:text-mist/35"
+                items={[
+                  { label: dict.nav.home, href: sitePath('/') },
+                  { label: dict.nav.blog, href: sitePath('/blog') },
+                  { label: post.title },
+                ]}
               />
+
+              <p className="eyebrow flex flex-wrap items-center gap-x-3 gap-y-2 text-sage">
+                <span className="size-1.5 bg-sage" aria-hidden="true" />
+                <span>{dict.blog.fieldNotes}</span>
+                <span className="text-white/30" aria-hidden="true">
+                  /
+                </span>
+                <span className="text-mist/70">{categoryLabel ?? dict.nav.blog}</span>
+              </p>
+
+              <div className="mt-6 max-w-[34rem] lg:max-w-[42rem]">
+                <h1
+                  id="post-title"
+                  className="font-heading text-[clamp(2.1rem,6vw,4.9rem)] leading-[0.98] font-semibold tracking-[-0.045em] text-white 3xl:text-[clamp(4.9rem,3vw,6.5rem)]"
+                >
+                  {post.title}
+                </h1>
+                <p className="mt-6 max-w-2xl description-copy leading-relaxed text-mist/80 md:leading-[1.75]">
+                  {post.excerpt}
+                </p>
+              </div>
+
+              <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3 text-[0.8125rem] text-mist/75">
+                <span className="inline-flex items-center gap-2">
+                  <CalendarDays className="size-4 text-sage" aria-hidden="true" />
+                  <time dateTime={publishedAt}>{formatDate(publishedAt)}</time>
+                </span>
+                <span className="hidden h-4 w-px bg-white/20 sm:block" aria-hidden="true" />
+                <span className="inline-flex items-center gap-2">
+                  <Clock className="size-4 text-sage" aria-hidden="true" />
+                  {dict.blog.readTime.replace('{minutes}', String(minutes))}
+                </span>
+              </div>
+
+              <div className="mt-8 flex flex-wrap items-center justify-between gap-5 border-t border-white/15 pt-5">
+                {authorName ? (
+                  <div className="flex min-w-0 items-center gap-3">
+                    {author?.avatar && typeof author.avatar !== 'number' ? (
+                      <PayloadImage
+                        media={author.avatar}
+                        size="thumbnail"
+                        sizes="44px"
+                        className="size-11 shrink-0 rounded-full ring-2 ring-sage/45"
+                      />
+                    ) : (
+                      <span className="grid size-11 shrink-0 place-items-center rounded-full bg-sage/15 font-heading text-base font-semibold text-sage ring-1 ring-sage/30">
+                        {authorName.slice(0, 1)}
+                      </span>
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-[0.6875rem] tracking-[0.14em] text-mist/50 uppercase">
+                        {dict.blog.by}
+                      </p>
+                      <p className="mt-0.5 truncate font-heading text-[0.9375rem] font-semibold text-white">
+                        {authorName}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-[0.75rem] tracking-[0.13em] text-mist/60 uppercase">
+                    {siteName} <span className="px-1 text-sage/70">/</span> {dict.nav.blog}
+                  </p>
+                )}
+
+                <ArticleShareButton
+                  title={post.title}
+                  shareLabel={dict.common.share}
+                  copiedLabel={dict.common.copied}
+                  errorLabel={dict.common.shareError}
+                />
+              </div>
             </div>
           </div>
         </header>
@@ -207,9 +214,9 @@ export function PostDetail({
                 44rem reading measure instead of stretching to the wider grid. */}
             <div
               className={cn(
-                'mx-auto max-w-[44rem]',
+                contentWidthClassName,
                 headings.length > 0 &&
-                  'lg:grid lg:max-w-[65rem] lg:grid-cols-[minmax(0,44rem)_16rem] lg:gap-x-20 lg:gap-y-0',
+                  'lg:grid lg:grid-cols-[minmax(0,44rem)_16rem] lg:gap-x-20 lg:gap-y-0',
               )}
             >
               {/* "In this story" is deliberately hidden on mobile and tablet (`< lg`): a
