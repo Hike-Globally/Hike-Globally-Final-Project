@@ -22,7 +22,7 @@ export function Faq({ block }: { block: FaqBlock }) {
   return (
     <section className="py-16 md:py-24">
       <div className="container-content">
-        <SectionHeading title={block.heading} description={block.subheading} />
+        <SectionHeading title={block.heading} description={block.subheading} titleLevel="h3" />
 
         <div className="grid gap-10 lg:grid-cols-[1fr_1.6fr]">
           <div className="hidden lg:block">

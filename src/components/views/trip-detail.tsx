@@ -46,10 +46,20 @@ import type { Trip } from '@/payload-types'
 const eyebrowOnDark =
   'font-heading text-[0.75rem] font-semibold tracking-[0.18em] text-sage uppercase'
 
-function SectionTitle({ title, className }: { title: string; className?: string }) {
+function SectionTitle({
+  title,
+  className,
+  level = 'h2',
+}: {
+  title: string
+  className?: string
+  level?: 'h2' | 'h3'
+}) {
+  const Heading = level
+
   return (
     <div className={cn('mb-10', className)}>
-      <h2 className="heading-lg">{title}</h2>
+      <Heading className="heading-lg">{title}</Heading>
     </div>
   )
 }
@@ -304,7 +314,7 @@ export function TripDetail({
           {trip.contentSections?.length ? (
             <section id="essential-information" className="scroll-mt-24 py-16 md:py-24">
               <Reveal>
-                <SectionTitle title={dict.trip.essentialInformation} />
+                <SectionTitle title={dict.trip.essentialInformation} level="h3" />
 
                 <Accordion type="multiple" className="space-y-4">
                   {trip.contentSections.map((contentSection, index) => (
@@ -381,7 +391,7 @@ export function TripDetail({
           {faqs.length ? (
             <section id="faqs" className="scroll-mt-24 py-16 md:py-24">
               <Reveal>
-                <SectionTitle title={dict.trip.faqs} />
+                <SectionTitle title={dict.trip.faqs} level="h3" />
 
                 <Accordion type="multiple" className="space-y-4">
                   {faqs.map((faq, index) => (
