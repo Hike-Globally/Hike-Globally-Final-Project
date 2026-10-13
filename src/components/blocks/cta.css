@@ -312,7 +312,11 @@
   color: var(--cta-accent);
 }
 
+/* The description under the headline — fixed at 16px, overriding the fluid
+   `lead` scale (15–20px) the class would otherwise apply. Unlayered, so it
+   wins over the Tailwind utility without `!important`. */
 [data-cta-card] .cta-card__text {
+  font-size: 16px;
   color: var(--cta-muted);
 }
 
