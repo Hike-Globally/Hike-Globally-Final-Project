@@ -83,7 +83,7 @@ export async function HomeFallback() {
     destinations.length === 0 ? null : destinations.length > 3 ? (
       <DestinationCarousel
         destinations={destinations}
-        title={dict.nav.destinations}
+        title={dict.destinations.homeSectionTitle}
         description={dict.destinations.listingSubtitle}
         action={{ href: sitePath('/destinations'), label: dict.common.viewAll }}
         titleClassName="home-section-title"
@@ -93,7 +93,7 @@ export async function HomeFallback() {
       <section className="py-16 md:py-24">
         <div className="container-content">
           <SectionHeading
-            title={dict.nav.destinations}
+            title={dict.destinations.homeSectionTitle}
             description={dict.destinations.listingSubtitle}
             action={{ href: sitePath('/destinations'), label: dict.common.viewAll }}
             titleClassName="home-section-title"

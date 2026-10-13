@@ -137,6 +137,7 @@ const en = {
   },
   destinations: {
     listingTitle: 'Destinations',
+    homeSectionTitle: 'Destinations in Nepal',
     listingSubtitle:
       'Eight mountain regions, one country that rearranges your sense of scale. Start with the classics or go looking for the quiet ones.',
     tripsCount_one: '{count} trip',
