@@ -471,7 +471,7 @@ export interface Trip {
          */
         heading: string;
         /**
-         * Write the section content using the same rich-text editor and formatting options as the Overview.
+         * Write the section content using the same rich-text editor and formatting options as the Overview — including tables. Use the toolbar’s “+” menu (or type /table) to insert one: rows and columns first, then the hover handles to add, remove, merge or resize. Handy for cost breakdowns, gear lists and season comparisons.
          */
         content: {
           root: {
@@ -730,6 +730,9 @@ export interface Blog {
    */
   excerpt: string;
   featuredImage: number | Media;
+  /**
+   * The post body. Tables are available from the toolbar’s “+” menu (or type /table): pick rows and columns, then use the hover handles to add, remove, merge or resize. Handy for gear comparisons, cost breakdowns and at-a-glance facts.
+   */
   content?: {
     root: {
       type: string;

@@ -3,7 +3,11 @@ import { tmpdir } from 'os'
 import { fileURLToPath } from 'url'
 
 import { postgresAdapter } from '@payloadcms/db-postgres'
-import { FixedToolbarFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
+import {
+  EXPERIMENTAL_TableFeature,
+  FixedToolbarFeature,
+  lexicalEditor,
+} from '@payloadcms/richtext-lexical'
 import { buildConfig } from 'payload'
 import sharp from 'sharp'
 
@@ -105,8 +109,25 @@ export default buildConfig({
   // links, quotes, images — always on screen, the way MS Word and the WordPress editor behave.
   // Every standard feature already registers its own fixed-toolbar group, so enabling this one
   // feature surfaces the whole set; nothing is added to the stored document shape.
+  //
+  // `EXPERIMENTAL_TableFeature` is the one thing the default set does not include, and the reason
+  // is worth knowing: tables are not a formatting flag but three extra node types (`table`,
+  // `tablerow`, `tablecell`), so anything that renders rich text has to understand them. Payload
+  // names the feature "experimental" (it is the only table implementation it ships in this
+  // version), and the frontend renderer here does — see `src/components/content/rich-text.tsx`,
+  // styled by the `.prose-hg table` rules in `src/app/(frontend)/globals.css`.
+  //
+  // What an editor gets: a **Table** item in the ribbon's `+` dropdown (and `/table` in the slash
+  // menu) that opens a rows × columns dialog, then hover controls on the inserted table for
+  // adding/removing rows and columns, merging cells, marking a header row or column and dragging
+  // column widths. It is enabled on the shared editor, so every rich-text field has it — the
+  // trip's post-itinerary content sections and a blog post's body included.
   editor: lexicalEditor({
-    features: ({ defaultFeatures }) => [...defaultFeatures, FixedToolbarFeature()],
+    features: ({ defaultFeatures }) => [
+      ...defaultFeatures,
+      FixedToolbarFeature(),
+      EXPERIMENTAL_TableFeature(),
+    ],
     admin: {
       placeholder: 'Start writing…',
     },

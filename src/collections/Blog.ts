@@ -61,6 +61,10 @@ export const Blog: CollectionConfig = {
       name: 'content',
       type: 'richText',
       localized: true,
+      admin: {
+        description:
+          'The post body. Tables are available from the toolbar’s “+” menu (or type /table): pick rows and columns, then use the hover handles to add, remove, merge or resize. Handy for gear comparisons, cost breakdowns and at-a-glance facts.',
+      },
     },
     {
       type: 'row',

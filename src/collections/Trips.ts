@@ -336,7 +336,7 @@ export const Trips: CollectionConfig = {
               required: true,
               admin: {
                 description:
-                  'Write the section content using the same rich-text editor and formatting options as the Overview.',
+                  'Write the section content using the same rich-text editor and formatting options as the Overview — including tables. Use the toolbar’s “+” menu (or type /table) to insert one: rows and columns first, then the hover handles to add, remove, merge or resize. Handy for cost breakdowns, gear lists and season comparisons.',
               },
             },
           ],

@@ -535,10 +535,59 @@
   .prose-hg strong {
     @apply font-semibold text-ink;
   }
-  .prose-hg table {
-    display: block;
+  /* Tables — inserted from the ribbon's `+ → Table` dialog (Payload's Lexical table feature)
+     and rendered by src/components/content/rich-text.tsx. The wrapper scrolls a grid that is
+     wider than the column sideways, so a 6-column price table can never blow out the layout;
+     the table itself fills whatever width is left, with the editor's column ratios preserved
+     as percentages. */
+  .prose-hg .table-scroll {
     max-width: 100%;
     overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+  .prose-hg table {
+    /* A cell reads its own background from here, so a pinned column can stay opaque with one
+       rule instead of one per combination of header / striped / plain. */
+    --table-cell-bg: var(--background);
+    width: 100%;
+    border-collapse: collapse;
+    /* A shade under the running copy, so wide grids fit without the editor having to fight. */
+    font-size: 0.9375rem;
+  }
+  .prose-hg :is(th, td) {
+    border: 1px solid var(--color-slate-20);
+    padding: 0.65rem 0.85rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  /* Header rows and columns are the editor's choice (cell menu → “Toggle Row/Column Header”),
+     and an inline `vertical-align` or `background-color` it sets still wins over these. */
+  .prose-hg th {
+    @apply font-semibold text-ink;
+    --table-cell-bg: var(--color-sage-20);
+    background-color: var(--table-cell-bg);
+  }
+  .prose-hg table.is-striped tbody tr:nth-of-type(even) {
+    --table-cell-bg: var(--color-mist);
+    background-color: var(--table-cell-bg);
+  }
+  /* “Toggle First Column Freeze” in the cell menu pins the leading column, so a grid wide
+     enough to scroll keeps its row labels in view. Collapsed borders belong to the table and do
+     not travel with a sticky cell — the shadow redraws the one edge that matters. */
+  .prose-hg table[data-frozen-columns] :is(th, td):first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background-color: var(--table-cell-bg);
+    box-shadow: 1px 0 0 var(--color-slate-20);
+  }
+  /* Cell copy is written with the same rich-text editor, so it arrives as paragraphs and lists
+     that need a tighter rhythm inside a cell than in the section around it. */
+  .prose-hg :is(th, td) > * + * {
+    margin-top: 0.4em;
+  }
+  .prose-hg :is(th, td) :is(p, li) {
+    @apply leading-[1.6];
   }
   .prose-hg figure {
     @apply my-10;

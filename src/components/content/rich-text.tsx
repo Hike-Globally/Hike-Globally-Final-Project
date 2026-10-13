@@ -124,8 +124,69 @@ type RenderContext = {
   headingIndex: number
 }
 
-const renderNodes = (nodes: RichTextNode[] | undefined, context: RenderContext): ReactNode =>
+const renderNodes = (nodes: RichTextNode[] | undefined, context: RenderContext): ReactNode[] =>
   (nodes ?? []).map((node, index) => renderNode(node, index, context))
+
+/**
+ * Table support — Payload's Lexical table feature stores a grid as `table` → `tablerow` →
+ * `tablecell` nodes, and marks header cells with a bitmask instead of grouping rows:
+ * `1` = the cell sits in the table's header row, `2` = in its header column, `3` = the corner
+ * where the two meet, `0` = an ordinary body cell.
+ */
+const HEADER = { row: 1, column: 2 } as const
+
+const headerState = (node: RichTextNode): number =>
+  typeof node.headerState === 'number' ? node.headerState : 0
+
+/**
+ * Which cells a header cell heads, as the `scope` attribute screen readers use. A cell in the
+ * header row heads its column; a cell in the header column heads its row; the corner cell carries
+ * both bits and reads as a column head.
+ */
+const cellScope = (state: number): 'col' | 'row' | undefined => {
+  if ((state & HEADER.row) === HEADER.row) return 'col'
+  if ((state & HEADER.column) === HEADER.column) return 'row'
+  return undefined
+}
+
+/** Merged cells are only worth emitting when they actually span something. */
+const cellSpan = (value: unknown): number | undefined =>
+  typeof value === 'number' && value > 1 ? value : undefined
+
+/** Per-cell presentation the editor can set: alignment inside the cell and a highlight colour. */
+const cellStyle = (node: RichTextNode): CSSProperties | undefined => {
+  const style: CSSProperties = {}
+  if (typeof node.verticalAlign === 'string' && node.verticalAlign) {
+    style.verticalAlign = node.verticalAlign as CSSProperties['verticalAlign']
+  }
+  if (typeof node.backgroundColor === 'string' && node.backgroundColor) {
+    style.backgroundColor = node.backgroundColor
+  }
+  return Object.keys(style).length ? style : undefined
+}
+
+/**
+ * Column widths as percentages, or `null` when the editor never sized a column.
+ *
+ * Dragging a column border in the admin writes absolute pixels measured inside the editor's own
+ * ~700px pane. Emitting those pixels here would strand a table at that width (or overflow the page
+ * column on a narrow screen), so they are normalised to a share of their total: the relative
+ * sizing an editor dragged out survives, the table still fills the space it is rendered in, and
+ * only content that genuinely cannot shrink needs the scroll wrapper below. A column nobody
+ * resized keeps the 75px default Lexical shows for it in the editor, so one widened column still
+ * reads as wider rather than being averaged back into equality.
+ */
+const DEFAULT_COLUMN_WIDTH = 75
+
+const columnWidths = (node: RichTextNode): number[] | null => {
+  if (!Array.isArray(node.colWidths) || !node.colWidths.length) return null
+
+  const widths = node.colWidths.map((width) =>
+    typeof width === 'number' && width > 0 ? width : DEFAULT_COLUMN_WIDTH,
+  )
+  const total = widths.reduce((sum, width) => sum + width, 0)
+  return widths.map((width) => Math.round((width / total) * 1000) / 10)
+}
 
 const renderNode = (node: RichTextNode, index: number, context: RenderContext): ReactNode => {
   if (!node) return null
@@ -190,6 +251,60 @@ const renderNode = (node: RichTextNode, index: number, context: RenderContext): 
 
     case 'horizontalrule':
       return <hr key={key} />
+
+    /* -------------------------- Tables — editor ribbon: + → Table -------------------------- */
+    case 'table': {
+      // Header cells are flagged individually rather than grouped into a header row, so a table
+      // whose first row is entirely header cells is promoted into a real <thead>: assistive tech
+      // announces the column headings, and `.prose-hg thead` has something to style.
+      const firstRowCells = node.children?.[0]?.children ?? []
+      const hasHeaderRow =
+        firstRowCells.length > 0 &&
+        firstRowCells.every((cell) => (headerState(cell) & HEADER.row) === HEADER.row)
+      const widths = columnWidths(node)
+      // "Toggle First Column Freeze" in the cell menu keeps row labels in view while a grid wide
+      // enough to scroll slides past them (the editor only ever freezes 0 or 1 columns).
+      const frozenColumns = typeof node.frozenColumnCount === 'number' && node.frozenColumnCount > 0
+
+      return (
+        // Wide grids scroll sideways inside their own wrapper instead of stretching the page.
+        <div key={key} className="table-scroll">
+          <table
+            className={node.rowStriping ? 'is-striped' : undefined}
+            data-frozen-columns={frozenColumns ? 'true' : undefined}
+          >
+            {widths ? (
+              <colgroup>
+                {widths.map((width, columnIndex) => (
+                  <col key={`col-${columnIndex}`} style={{ width: `${width}%` }} />
+                ))}
+              </colgroup>
+            ) : null}
+            {hasHeaderRow ? <thead>{children[0]}</thead> : null}
+            <tbody>{hasHeaderRow ? children.slice(1) : children}</tbody>
+          </table>
+        </div>
+      )
+    }
+
+    case 'tablerow':
+      return <tr key={key}>{children}</tr>
+
+    case 'tablecell': {
+      const state = headerState(node)
+      const CellTag = state === 0 ? 'td' : 'th'
+      return (
+        <CellTag
+          key={key}
+          scope={cellScope(state)}
+          colSpan={cellSpan(node.colSpan)}
+          rowSpan={cellSpan(node.rowSpan)}
+          style={cellStyle(node)}
+        >
+          {children}
+        </CellTag>
+      )
+    }
 
     case 'link': {
       const internal = node.linkType === 'internal' ? docHref(node.relationTo, node.doc) : null
