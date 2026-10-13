@@ -270,3 +270,19 @@ export const plural = (
   const other = group[keys.find((key) => key.endsWith('_other')) ?? keys[0]!]!
   return t(count === 1 ? one : other, { count, ...values })
 }
+
+/**
+ * Human label for a blog category value.
+ *
+ * The category filter on `/blog` and the `articleSection` of a post's BlogPosting markup both need
+ * the same readable name for `'health-safety'`, so the lookup lives here instead of being
+ * re-implemented in a component (and silently missing the structured data).
+ */
+export const blogCategoryLabel = (value: string): string => {
+  const key = `category${value
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join('')}`
+
+  return dictionary.blog[key as keyof Dictionary['blog']] ?? value
+}

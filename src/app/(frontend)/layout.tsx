@@ -7,8 +7,9 @@ import { Header } from '@/components/layout/header'
 import { LivePreviewRefresh } from '@/components/live-preview-refresh'
 import { SmoothScroll } from '@/components/providers/smooth-scroll'
 import { dictionary } from '@/i18n/dictionaries'
-import { htmlLang } from '@/i18n/config'
+import { htmlLang, ogLocale } from '@/i18n/config'
 import { getSettings } from '@/lib/data'
+import { imageUrl } from '@/lib/seo'
 import { resolveSiteUrlObject } from '@/lib/site-url'
 import './globals.css'
 
@@ -56,6 +57,9 @@ export async function generateMetadata(): Promise<Metadata> {
   // var must degrade the metadata, not fail the build.
   const siteUrlObject = resolveSiteUrlObject()
 
+  // Absolute URL of the fallback share image, when the site settings define one.
+  const defaultOgImage = imageUrl(settings.defaultOgImage)
+
   return {
     metadataBase: siteUrlObject,
     title: {
@@ -64,6 +68,28 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: settings.tagline ?? undefined,
     applicationName: settings.siteName,
+    /**
+     * Site-wide Open Graph / Twitter defaults.
+     *
+     * Every route that exports its own `generateMetadata` replaces these with a complete block
+     * (see `buildMetadata()`), so this is the safety net underneath them: a page that forgets, or
+     * one that deliberately returns `{}` for a reserved slug, still shares with the site name,
+     * locale and the default 1200×630 image instead of a bare title.
+     */
+    openGraph: {
+      type: 'website',
+      siteName: settings.siteName,
+      locale: ogLocale,
+      title: `${settings.siteName} — ${settings.tagline ?? 'Trekking & expeditions in Nepal'}`,
+      description: settings.tagline ?? undefined,
+      images: defaultOgImage ? [{ url: defaultOgImage, width: 1200, height: 630 }] : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${settings.siteName} — ${settings.tagline ?? 'Trekking & expeditions in Nepal'}`,
+      description: settings.tagline ?? undefined,
+      images: defaultOgImage ? [defaultOgImage] : undefined,
+    },
     icons: { icon: '/images/logo.svg' },
     formatDetection: { telephone: false },
     other: {

@@ -4,20 +4,24 @@ import { Mail, MessageCircle, Phone } from 'lucide-react'
 
 import { InquiryForm } from '@/components/forms/inquiry-form'
 import { PageHeader } from '@/components/sections/page-header'
+import { JsonLd } from '@/components/seo/json-ld'
 import { dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
 import { getSettings, getTripOptions } from '@/lib/data'
-import { buildMetadata } from '@/lib/seo'
+import { breadcrumbJsonLd, buildMetadata, webPageJsonLd } from '@/lib/seo'
 
 export const revalidate = 3600
 
 export async function generateMetadata(): Promise<Metadata> {
   const dict = dictionary
+  const settings = await getSettings()
 
   return buildMetadata({
     title: dict.inquiry.title,
     description: dict.inquiry.subtitle,
+    image: settings.defaultOgImage,
     path: sitePath('/inquiry'),
+    siteName: settings.siteName,
   })
 }
 
@@ -101,6 +105,23 @@ export default async function InquiryPage() {
           </div>
         </div>
       </section>
+
+      <JsonLd
+        data={[
+          breadcrumbJsonLd([
+            { name: dict.nav.home, url: sitePath('/') },
+            { name: dict.nav.inquiry, url: sitePath('/inquiry') },
+          ]),
+          // A ContactPage: the node Google uses for "contact" sitelinks and the address panel.
+          webPageJsonLd({
+            type: 'ContactPage',
+            name: dict.inquiry.title,
+            description: dict.inquiry.subtitle,
+            url: sitePath('/inquiry'),
+            siteName: settings.legalName || settings.siteName,
+          }),
+        ]}
+      />
     </>
   )
 }

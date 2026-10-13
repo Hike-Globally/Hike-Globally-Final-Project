@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { adminOrEditor, publishedOrSignedIn } from '../access'
+import { keywordsSection } from '../fields/keywords'
 import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
 import { viewLiveField } from '../fields/view-live'
@@ -110,6 +111,9 @@ export const Blog: CollectionConfig = {
       defaultValue: false,
       admin: { description: 'Featured posts are pinned on /blog and can be highlighted on the homepage.' },
     },
+    /* Keywords — the phrases this post is targeting. Its own panel, directly above the SEO
+       group, so the list is written while the post is written. See src/fields/keywords.ts. */
+    keywordsSection(),
     metaField(),
     viewLiveField(),
   ],

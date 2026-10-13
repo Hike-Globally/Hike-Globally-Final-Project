@@ -103,6 +103,50 @@ exist) and is `noindex`.
 `src/app/(frontend)` does not: `src/lib/canonical-coverage.test.ts` audits the route tree, so the
 rule holds for pages written later, not just the ones written today.
 
+### Keywords
+
+Trips and Blog posts have a **Keywords** panel — a chip input where the editor types the phrases
+the page is trying to rank for (press Enter after each one, up to 20). The list lives on the
+document (`trip.keywords`, `post.keywords`, per language) and is published in three places:
+
+| Where | What it becomes |
+| ----- | --------------- |
+| `<head>` | `<meta name="keywords" content="…">` |
+| Open Graph | `article:tag` on blog posts (`og:type=article` only — the tag is not valid elsewhere) |
+| JSON-LD | `keywords` on the `TouristTrip` / `BlogPosting` node |
+
+`normalizeKeywords()` in `src/lib/seo.ts` trims, collapses whitespace, splits a pasted
+comma/newline list, de-duplicates case-insensitively and caps the result at `MAX_KEYWORDS`, so the
+output is the same whether an editor used the chip input or pasted a spreadsheet column. Google has
+ignored the meta tag as a ranking signal for years; treat the list as a record of intent that keeps
+the title, the copy, Bing/Yandex and internal search pointed at the same terms.
+
+### Open Graph and structured data
+
+Every page builds its metadata with `buildMetadata()` — canonical, `og:*`, `twitter:*`, robots — and
+renders JSON-LD from the builders in `src/lib/seo.ts`. Images always go through `imageUrl()` /
+`schemaImageUrl()`, which turn a Media document into an **absolute** URL: schema.org drops relative
+ones.
+
+| Page | Open Graph | JSON-LD |
+| ---- | ---------- | ------- |
+| `/` | `website` + default share image | `Organization`, `WebSite` (with `SearchAction`), `FAQPage` when the block is used |
+| `/trips`, `/blog`, `/destinations` | `website` | `BreadcrumbList` + `CollectionPage` whose `ItemList` is the cards the page renders |
+| `/trips/[slug]` | `website` + trip hero | `BreadcrumbList`, `TouristTrip` (offer, itinerary, duration, keywords), `FAQPage` |
+| `/blog/[slug]` | `article` + `article:published_time` / `modified_time` / `tag` | `BreadcrumbList`, `BlogPosting` (author, `articleSection`, `wordCount`, keywords) |
+| `/destinations/[slug]` | `website` + region hero | `BreadcrumbList`, `TouristDestination` (geo, country) |
+| `/inquiry` | `website` | `BreadcrumbList`, `ContactPage` |
+| any CMS page (`/[slug]`) | `website` + page image | `BreadcrumbList`, `WebPage` |
+| `/inquiry/thank-you`, 404 | — | — (both `noindex`, so nothing is offered to the index) |
+
+The root layout adds site-wide `og:site_name`, `og:locale` and a default share image for routes that
+return no metadata of their own. Note that a route returning its own `openGraph` block replaces that
+one wholesale — Next.js does not merge it key by key — so pages that want the site default pass
+`settings.defaultOgImage` explicitly.
+
+`src/lib/structured-data.test.ts` audits the route tree: add a page without JSON-LD, or hand a
+relative image URL to a builder, and `npm test` fails with the file name.
+
 Every URL is built from `NEXT_PUBLIC_SITE_URL`, so point it at the production origin before
 deploying.
 

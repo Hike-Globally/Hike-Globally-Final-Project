@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { MAX_KEYWORDS } from '@/fields/keywords'
 import { htmlLang, ogLocale } from '@/i18n/config'
 import type { Blog, Destination, Media, Trip } from '@/payload-types'
 import { lexicalToPlainText, truncate } from './format'
@@ -100,6 +101,53 @@ type MetaGroup = {
   noIndex?: boolean | null
 } | null
 
+/* ==========================================================================
+   Keywords
+   ==========================================================================
+   Trips and Blog documents carry a "Keywords" section (src/fields/keywords.ts):
+   the phrases the page is targeting. They are published as
+   `<meta name="keywords">`, as `article:tag` Open Graph tags on posts, and as
+   `keywords` in the page's JSON-LD.
+
+   Google has ignored the meta tag as a ranking signal for well over a decade,
+   so this list is documentation as much as markup — it records the intent
+   behind the page and keeps Bing, Yandex, internal search and the editor's own
+   copy aligned. That is also why it is normalized hard below: a bloated or
+   duplicated list is the one thing that makes the tag look like stuffing.
+   ========================================================================== */
+
+/**
+ * Turns whatever an editor typed into the keyword list into a clean array.
+ *
+ * Handles the two ways the list arrives — Payload's chip input (`['everest base camp trek', …]`)
+ * and a paste into any text field (`'everest trek, gokyo lakes\nkala patthar'`) — by splitting on
+ * commas, semicolons and newlines, then trimming, dropping empties, de-duplicating
+ * case-insensitively and capping the result. The cap is the same one the CMS field enforces, so a
+ * value that arrives through the API cannot exceed it.
+ */
+export const normalizeKeywords = (
+  keywords?: (string | null | undefined)[] | string | null,
+): string[] => {
+  const source = Array.isArray(keywords) ? keywords.join(',') : (keywords ?? '')
+
+  const seen = new Set<string>()
+  const result: string[] = []
+
+  for (const part of source.split(/[,;\n\r]+/)) {
+    const keyword = part.replace(/\s+/g, ' ').trim()
+    if (!keyword) continue
+
+    const key = keyword.toLowerCase()
+    if (seen.has(key)) continue
+    seen.add(key)
+
+    result.push(keyword)
+    if (result.length >= MAX_KEYWORDS) break
+  }
+
+  return result
+}
+
 /** Picks the best available image URL: the dedicated 1200×630 OG size, else the original. */
 export const imageUrl = (image: number | Media | null | undefined): string | undefined => {
   if (!image || typeof image === 'number') return undefined
@@ -118,10 +166,40 @@ export const imageDimensions = (
   return undefined
 }
 
+/**
+ * The absolute image URL for structured data.
+ *
+ * schema.org images must be full URLs — JSON-LD is not resolved against the page's origin by
+ * Google's parsers, so a relative `/api/media/file/x.jpg` is dropped from the rich result (and
+ * flagged by the Rich Results Test). This is the one place that turns a Media document into that
+ * URL, so no page can hand a relative path to a `*JsonLd()` builder by accident.
+ *
+ * Preference order is the large sizes first: a 1920px hero over the 1200×630 social crop, because
+ * image rich results want resolution, not the social aspect ratio.
+ */
+export const schemaImageUrl = (
+  image: number | Media | string | null | undefined,
+): string | undefined => {
+  if (!image) return undefined
+  if (typeof image === 'string') return image.startsWith('http') ? image : absoluteUrl(image)
+  if (typeof image === 'number') return undefined
+
+  const url =
+    image.sizes?.hero?.url || image.sizes?.og?.url || image.sizes?.tablet?.url || image.url
+  return url ? absoluteUrl(url) : undefined
+}
+
 type BuildMetadataArgs = {
   title: string
   description?: string | null
   image?: number | Media | null
+  /**
+   * Target keywords for this page — the list from the document's "Keywords" section.
+   *
+   * Published as `<meta name="keywords">` and, on article pages, as `article:tag` Open Graph
+   * tags. Normalized by `normalizeKeywords()`, so a page can pass the raw CMS value.
+   */
+  keywords?: (string | null | undefined)[] | string | null
   /**
    * Path of THIS page, e.g. '/trips/everest-base-camp'.
    *
@@ -152,6 +230,7 @@ export const buildMetadata = ({
   title,
   description,
   image,
+  keywords,
   path,
   type = 'website',
   noIndex = false,
@@ -164,10 +243,14 @@ export const buildMetadata = ({
   const url = canonicalUrl(path)
   const ogImage = imageUrl(image)
   const dimensions = imageDimensions(image)
+  const cleanKeywords = normalizeKeywords(keywords)
 
   return {
     title,
     description: cleanDescription,
+    // `undefined` (not `[]`) when there is no list: an empty `<meta name="keywords">` is worse than
+    // no tag at all.
+    keywords: cleanKeywords.length > 0 ? cleanKeywords : undefined,
     applicationName: siteName,
     authors: authorName ? [{ name: authorName }] : undefined,
     alternates: {
@@ -189,34 +272,51 @@ export const buildMetadata = ({
       locale: ogLocale,
       publishedTime: type === 'article' ? (publishedTime ?? undefined) : undefined,
       modifiedTime: type === 'article' ? (modifiedTime ?? undefined) : undefined,
-      images: ogImage
-        ? [
-            {
-              url: ogImage,
-              width: dimensions?.width ?? 1200,
-              height: dimensions?.height ?? 630,
-              alt: typeof image === 'object' && image?.alt ? image.alt : title,
-            },
-          ]
-        : undefined,
+      // `article:tag` is only valid on the article type, so it is spread in for posts alone —
+      // sharing a post to Facebook/LinkedIn then carries the terms it targets.
+      ...(type === 'article' && cleanKeywords.length > 0 ? { tags: cleanKeywords } : {}),
+      /**
+       * `images` is present only when this page has an image of its own, so the block never
+       * carries an empty key. Note that this does *not* fall back to the layout's default share
+       * image: when a route returns an `openGraph` object Next.js uses it wholesale, so pages that
+       * want the site default have to ask for it (`settings.defaultOgImage`).
+       */
+      ...(ogImage
+        ? {
+            images: [
+              {
+                url: ogImage,
+                width: dimensions?.width ?? 1200,
+                height: dimensions?.height ?? 630,
+                alt: typeof image === 'object' && image?.alt ? image.alt : title,
+              },
+            ],
+          }
+        : {}),
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description: cleanDescription,
-      images: ogImage ? [ogImage] : undefined,
+      ...(ogImage ? { images: [ogImage] } : {}),
     },
   }
 }
 
-/** Merges a document's optional SEO overrides with its fallback content. */
+/**
+ * Merges a document's optional SEO overrides with its fallback content.
+ *
+ * `keywords` comes from the document's "Keywords" section (Trips and Blog — see
+ * `src/fields/keywords.ts`); documents without one simply yield an empty list.
+ */
 export const seoFromDoc = (
-  doc: { meta?: MetaGroup },
+  doc: { meta?: MetaGroup; keywords?: (string | null)[] | null },
   fallback: { title: string; description?: string | null; image?: number | Media | null },
 ) => ({
   title: doc.meta?.title || fallback.title,
   description: doc.meta?.description || fallback.description || undefined,
   image: doc.meta?.image ?? fallback.image,
+  keywords: normalizeKeywords(doc.keywords),
   noIndex: doc.meta?.noIndex ?? false,
 })
 
@@ -233,6 +333,7 @@ export const organizationJsonLd = ({
   name,
   url,
   logo,
+  description,
   email,
   phone,
   address,
@@ -241,6 +342,7 @@ export const organizationJsonLd = ({
   name: string
   url: string
   logo?: string
+  description?: string | null
   email?: string | null
   phone?: string | null
   address?: string | null
@@ -251,11 +353,24 @@ export const organizationJsonLd = ({
   name,
   url,
   logo,
+  description: description ?? undefined,
   email: email ?? undefined,
   telephone: phone ?? undefined,
   address: address
     ? { '@type': 'PostalAddress', streetAddress: address.replace(/\n/g, ', ') }
     : undefined,
+  // A contact point is what the Knowledge Panel and "customer support" rich results read; without
+  // it the organization node describes a name and nothing a traveller can act on.
+  contactPoint:
+    email || phone
+      ? {
+          '@type': 'ContactPoint',
+          contactType: 'customer service',
+          email: email ?? undefined,
+          telephone: phone ?? undefined,
+          availableLanguage: htmlLang,
+        }
+      : undefined,
   sameAs: socials?.length ? socials.map((social) => social.url) : undefined,
 })
 
@@ -288,31 +403,44 @@ export const blogPostingJsonLd = ({
   authorName,
   image,
   siteName,
+  categories,
 }: {
   post: Blog
   url: string
   authorName?: string | null
-  image?: string
+  /** Media document, media id or an already-absolute URL — resolved by `schemaImageUrl()`. */
+  image?: number | Media | string | null
   siteName: string
-}): JsonLdInput => ({
-  '@context': 'https://schema.org',
-  '@type': 'BlogPosting',
-  headline: post.meta?.title || post.title,
-  description: post.meta?.description || post.excerpt,
-  url: canonicalUrl(url),
-  mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl(url) },
-  image: image ? [image] : undefined,
-  datePublished: post.publishedAt ?? post.createdAt,
-  dateModified: post.updatedAt,
-  inLanguage: htmlLang,
-  author: authorName ? { '@type': 'Person', name: authorName } : undefined,
-  publisher: {
-    '@type': 'Organization',
-    name: siteName,
-    url: siteUrl,
-  },
-  articleBody: truncate(lexicalToPlainText(post.content), 4000),
-})
+  /** Human-readable category names, published as `articleSection`. */
+  categories?: string[]
+}): JsonLdInput => {
+  const articleImage = schemaImageUrl(image)
+  const body = lexicalToPlainText(post.content)
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: truncate(post.meta?.title || post.title, 110),
+    description: post.meta?.description || post.excerpt,
+    url: canonicalUrl(url),
+    mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl(url) },
+    image: articleImage ? [articleImage] : undefined,
+    datePublished: post.publishedAt ?? post.createdAt,
+    dateModified: post.updatedAt,
+    inLanguage: htmlLang,
+    // The "Keywords" section of the post, in the order the editor wrote it.
+    keywords: normalizeKeywords(post.keywords).join(', ') || undefined,
+    articleSection: categories?.length ? categories : undefined,
+    wordCount: body ? body.split(/\s+/).length : undefined,
+    author: authorName ? { '@type': 'Person', name: authorName } : undefined,
+    publisher: {
+      '@type': 'Organization',
+      name: siteName,
+      url: siteUrl,
+    },
+    articleBody: truncate(body, 4000),
+  }
+}
 
 export const touristTripJsonLd = ({
   trip,
@@ -323,46 +451,106 @@ export const touristTripJsonLd = ({
 }: {
   trip: Trip
   url: string
-  image?: string
+  /** Media document, media id or an already-absolute URL — resolved by `schemaImageUrl()`. */
+  image?: number | Media | string | null
   destinationName?: string
   siteName: string
-}): JsonLdInput => ({
-  '@context': 'https://schema.org',
-  '@type': 'TouristTrip',
-  name: trip.meta?.title || trip.title,
-  description: trip.meta?.description || trip.summary,
-  url: canonicalUrl(url),
-  image: image ? [image] : undefined,
-  inLanguage: htmlLang,
-  touristType: trip.difficulty,
-  itinerary: Array.isArray(trip.itinerary)
-    ? {
-        '@type': 'ItemList',
-        numberOfItems: trip.itinerary.length,
-        itemListElement: trip.itinerary.map((day, index) => ({
-          '@type': 'ListItem',
-          position: index + 1,
-          name: day.title,
-        })),
-      }
-    : undefined,
-  provider: { '@type': 'Organization', name: siteName, url: siteUrl },
-  offers: {
-    '@type': 'Offer',
-    price: trip.priceFrom,
-    priceCurrency: trip.priceCurrency,
-    availability: 'https://schema.org/InStock',
+}): JsonLdInput => {
+  const tripImage = schemaImageUrl(image)
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'TouristTrip',
+    name: trip.meta?.title || trip.title,
+    description: trip.meta?.description || trip.summary,
     url: canonicalUrl(url),
-  },
-  ...(destinationName
-    ? {
-        touristDestination: {
-          '@type': 'TouristDestination',
-          name: destinationName,
-        },
-      }
-    : {}),
-})
+    image: tripImage ? [tripImage] : undefined,
+    inLanguage: htmlLang,
+    // The "Keywords" section of the trip, in the order the editor wrote it.
+    keywords: normalizeKeywords(trip.keywords).join(', ') || undefined,
+    touristType: trip.difficulty,
+    duration: trip.durationDays ? `P${trip.durationDays}D` : undefined,
+    itinerary: Array.isArray(trip.itinerary)
+      ? {
+          '@type': 'ItemList',
+          numberOfItems: trip.itinerary.length,
+          itemListElement: trip.itinerary.map((day, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: day.title,
+          })),
+        }
+      : undefined,
+    provider: { '@type': 'Organization', name: siteName, url: siteUrl },
+    offers: {
+      '@type': 'Offer',
+      price: trip.priceFrom,
+      priceCurrency: trip.priceCurrency,
+      availability: 'https://schema.org/InStock',
+      url: canonicalUrl(url),
+    },
+    ...(destinationName
+      ? {
+          touristDestination: {
+            '@type': 'TouristDestination',
+            name: destinationName,
+          },
+        }
+      : {}),
+  }
+}
+
+/**
+ * The page-level node for every route that is not a trip, a post or a destination: the flexible
+ * CMS pages (`WebPage`), the three listings (`CollectionPage`) and `/inquiry` (`ContactPage`).
+ *
+ * `items` is what turns a listing into real structure for Google: an `ItemList` of the cards the
+ * page actually links to, each with the exact URL those cards point at — the same URLs the
+ * sitemap and the canonicals use.
+ */
+export const webPageJsonLd = ({
+  type = 'WebPage',
+  name,
+  description,
+  url,
+  siteName = 'Hike Globally',
+  image,
+  items,
+}: {
+  type?: 'WebPage' | 'CollectionPage' | 'ContactPage' | 'AboutPage'
+  name: string
+  description?: string | null
+  url: string
+  siteName?: string
+  image?: number | Media | string | null
+  items?: { name: string; url: string }[]
+}): JsonLdInput => {
+  const pageImage = schemaImageUrl(image)
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': type,
+    name,
+    description: description ?? undefined,
+    url: canonicalUrl(url),
+    image: pageImage ? [pageImage] : undefined,
+    inLanguage: htmlLang,
+    isPartOf: { '@type': 'WebSite', name: siteName, url: siteUrl },
+    publisher: { '@type': 'Organization', name: siteName, url: siteUrl },
+    mainEntity: items?.length
+      ? {
+          '@type': 'ItemList',
+          numberOfItems: items.length,
+          itemListElement: items.map((item, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: item.name,
+            url: canonicalUrl(item.url),
+          })),
+        }
+      : undefined,
+  }
+}
 
 export const touristDestinationJsonLd = ({
   destination,
@@ -371,14 +559,15 @@ export const touristDestinationJsonLd = ({
 }: {
   destination: Destination
   url: string
-  image?: string
+  /** Media document, media id or an already-absolute URL — resolved by `schemaImageUrl()`. */
+  image?: number | Media | string | null
 }): JsonLdInput => ({
   '@context': 'https://schema.org',
   '@type': 'TouristDestination',
   name: destination.meta?.title || destination.name,
   description: destination.meta?.description || destination.tagline,
   url: canonicalUrl(url),
-  image: image ? [image] : undefined,
+  image: schemaImageUrl(image) ? [schemaImageUrl(image)] : undefined,
   inLanguage: htmlLang,
   address: {
     '@type': 'PostalAddress',

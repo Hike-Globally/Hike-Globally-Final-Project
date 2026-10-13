@@ -491,12 +491,11 @@ export function TripDetail({
           touristTripJsonLd({
             trip,
             url: sitePath(`/trips/${trip.slug}`),
-            image:
-              typeof trip.heroImage === 'object' && trip.heroImage?.url
-                ? trip.heroImage.url
-                : undefined,
+            // The Media document, not its `url`: `schemaImageUrl()` turns it into the absolute URL
+            // structured data requires (a relative one is dropped from the rich result).
+            image: trip.heroImage,
             destinationName: destination?.name,
-            siteName: 'Hike Globally',
+            siteName: dict.structuredData.organization,
           }),
           ...(faqs.length
             ? [faqJsonLd(faqs.map((faq) => ({ question: faq.question, answer: faq.answer ?? '' })))]

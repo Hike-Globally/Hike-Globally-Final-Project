@@ -40,6 +40,9 @@ export async function generateMetadata({
     title: seo.title,
     description: seo.description,
     image: seo.image,
+    // From the trip's "Keywords" section — published as <meta name="keywords"> and as
+    // `keywords` in the TouristTrip markup (see TripDetail).
+    keywords: seo.keywords,
     path: sitePath(`/trips/${slug}`),
     noIndex: seo.noIndex,
   })

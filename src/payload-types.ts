@@ -555,6 +555,10 @@ export interface Trip {
    */
   featured?: boolean | null;
   /**
+   * The phrases you want this page to rank for. Type one, press Enter, repeat — up to 20. Write them the way a traveller would search ("everest base camp trek cost"), lead with the most important, and use the same wording in the title and copy. They are published as meta keywords, as Open Graph article tags and in the structured data.
+   */
+  keywords?: string[] | null;
+  /**
    * Override the automatically generated title/description and social preview.
    */
   meta?: {
@@ -757,6 +761,10 @@ export interface Blog {
    * Featured posts are pinned on /blog and can be highlighted on the homepage.
    */
   featured?: boolean | null;
+  /**
+   * The phrases you want this page to rank for. Type one, press Enter, repeat — up to 20. Write them the way a traveller would search ("everest base camp trek cost"), lead with the most important, and use the same wording in the title and copy. They are published as meta keywords, as Open Graph article tags and in the structured data.
+   */
+  keywords?: string[] | null;
   /**
    * Override the automatically generated title/description and social preview.
    */
@@ -1394,6 +1402,7 @@ export interface TripsSelect<T extends boolean = true> {
             };
       };
   featured?: T;
+  keywords?: T;
   meta?:
     | T
     | {
@@ -1421,6 +1430,7 @@ export interface BlogSelect<T extends boolean = true> {
   categories?: T;
   relatedPosts?: T;
   featured?: T;
+  keywords?: T;
   meta?:
     | T
     | {

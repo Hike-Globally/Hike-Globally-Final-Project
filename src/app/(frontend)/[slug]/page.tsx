@@ -4,9 +4,9 @@ import { notFound } from 'next/navigation'
 import { BlockRenderer } from '@/components/blocks/block-renderer'
 import { JsonLd } from '@/components/seo/json-ld'
 import { sitePath } from '@/i18n/config'
-import { getAllPageSlugs, getPage } from '@/lib/data'
+import { getAllPageSlugs, getPage, getSettings } from '@/lib/data'
 import { isLivePreviewRequest } from '@/lib/live-preview-access'
-import { breadcrumbJsonLd, buildMetadata, seoFromDoc } from '@/lib/seo'
+import { breadcrumbJsonLd, buildMetadata, seoFromDoc, webPageJsonLd } from '@/lib/seo'
 
 export const revalidate = 3600
 
@@ -39,7 +39,7 @@ export async function generateMetadata({
   if (RESERVED.has(slug)) return {}
 
   const includeDraft = await isLivePreviewRequest()
-  const page = await getPage(slug, includeDraft)
+  const [page, settings] = await Promise.all([getPage(slug, includeDraft), getSettings()])
   if (!page) return {}
 
   const seo = seoFromDoc(page, { title: page.title })
@@ -47,9 +47,11 @@ export async function generateMetadata({
   return buildMetadata({
     title: seo.title,
     description: seo.description,
-    image: seo.image,
+    // The page's own social image, else the site default from the settings global.
+    image: seo.image ?? settings.defaultOgImage,
     path: sitePath(`/${slug}`),
     noIndex: seo.noIndex,
+    siteName: settings.siteName,
   })
 }
 
@@ -68,14 +70,25 @@ export default async function FlexiblePage({ params }: { params: Promise<{ slug:
 
   if (!page) notFound()
 
+  const seo = seoFromDoc(page, { title: page.title })
+
   return (
     <>
       <BlockRenderer blocks={page.blocks} singlePage />
       <JsonLd
-        data={breadcrumbJsonLd([
-          { name: 'Home', url: sitePath('/') },
-          { name: page.title, url: sitePath(`/${slug}`) },
-        ])}
+        data={[
+          breadcrumbJsonLd([
+            { name: 'Home', url: sitePath('/') },
+            { name: page.title, url: sitePath(`/${slug}`) },
+          ]),
+          // Every CMS page describes itself to Google as a WebPage tied to the site node.
+          webPageJsonLd({
+            name: page.title,
+            description: seo.description,
+            url: sitePath(`/${slug}`),
+            image: seo.image,
+          }),
+        ]}
       />
     </>
   )

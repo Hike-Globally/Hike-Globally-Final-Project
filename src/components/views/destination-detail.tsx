@@ -209,10 +209,8 @@ export function DestinationDetail({
           touristDestinationJsonLd({
             destination,
             url: sitePath(`/destinations/${destination.slug}`),
-            image:
-              typeof destination.heroImage === 'object' && destination.heroImage?.url
-                ? destination.heroImage.url
-                : undefined,
+            // The Media document, not its `url` — `schemaImageUrl()` resolves the absolute URL.
+            image: destination.heroImage,
           }),
         ]}
       />
