@@ -12,6 +12,8 @@ import { sitePath } from '@/i18n/config'
 import { getDestinations, getSettings, type DestinationCard } from '@/lib/data'
 import { breadcrumbJsonLd, buildMetadata, webPageJsonLd } from '@/lib/seo'
 
+import './destinations.css'
+
 export const revalidate = 3600
 
 /**
@@ -42,7 +44,11 @@ export default async function DestinationsPage() {
   const destinations = await getDestinations()
 
   return (
-    <>
+    /* `data-destinations-page` scopes this page's fixed description sizes (see
+       `destinations.css`): the hero standfirst and every atlas-card description are pinned
+       to 16px here, while the same shared classes and utilities keep their own type
+       everywhere else on the site. */
+    <div data-destinations-page="">
       {/* HERO — full-width banner. Every destination (the featured one included) now appears in
           the atlas grid below, so the hero stands on its own image rather than on a card.
           Marked as the hero region: the global header stays pinned for as long as it is on
@@ -77,7 +83,9 @@ export default async function DestinationsPage() {
           <h1 className="heading-display mt-5 max-w-3xl text-white">
             The Himalaya, <span className="text-sage">in all its scale.</span>
           </h1>
-          <p className="lead mt-6 max-w-2xl text-mist/80">{dict.destinations.listingSubtitle}</p>
+          <p className="destinations-hero-description lead mt-6 max-w-2xl text-mist/80">
+            {dict.destinations.listingSubtitle}
+          </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4">
             <Link
@@ -175,7 +183,7 @@ export default async function DestinationsPage() {
           }),
         ]}
       />
-    </>
+    </div>
   )
 }
 
@@ -212,7 +220,7 @@ function AtlasCard({ destination, index }: { destination: DestinationCard; index
                 {destination.name}
               </h3>
               {destination.tagline ? (
-                <p className="mt-2 max-w-sm card-description-copy leading-relaxed text-white/75">
+                <p className="destination-card-description mt-2 max-w-sm card-description-copy leading-relaxed text-white/75">
                   {destination.tagline}
                 </p>
               ) : null}
