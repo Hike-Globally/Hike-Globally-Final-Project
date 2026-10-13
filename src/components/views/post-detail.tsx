@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight, CalendarDays, Clock, Compass } fro
 
 import { ArticleReadingProgress } from '@/components/blog/article-reading-progress'
 import { ArticleShareButton } from '@/components/blog/article-share-button'
+import { ArticleTableOfContents } from '@/components/blog/article-table-of-contents'
 import { RichText } from '@/components/content/rich-text'
 import { PostCard } from '@/components/cards/post-card'
 import { JsonLd } from '@/components/seo/json-ld'
@@ -209,34 +210,18 @@ export function PostDetail({
               className={cn(
                 'mx-auto max-w-[44rem]',
                 headings.length > 0 &&
-                  'lg:grid lg:max-w-[65rem] lg:grid-cols-[minmax(0,44rem)_16rem] lg:gap-x-20 lg:gap-y-0',
+                  'lg:grid lg:max-w-[68rem] lg:grid-cols-[minmax(0,44rem)_18rem] lg:gap-x-12 lg:gap-y-0',
               )}
             >
-              {/* "In this story" is deliberately hidden on mobile and tablet (`< lg`): a
-                  numbered index of the article is only useful next to a sticky column, and on
-                  a phone it just pushes the story down. `lg:block` re-enables it. */}
+              {/* Keep the reading outline beside the story on desktop, not above it on mobile. */}
               {headings.length > 0 ? (
                 <aside className="hidden lg:sticky lg:top-32 lg:col-start-2 lg:row-start-1 lg:block lg:self-start">
-                  <nav aria-label={dict.blog.inThisStory} className="border-l border-sage pl-6">
-                    <p className="eyebrow text-slate">{dict.blog.inThisStory}</p>
-                    <ol className="mt-4 max-h-[calc(100svh-11rem)] space-y-2 overflow-y-auto pr-2">
-                      {headings.map((heading, index) => (
-                        <li key={heading.id} className={heading.level === 3 ? 'pl-4' : ''}>
-                          <a
-                            href={`#${heading.id}`}
-                            className="group flex items-start gap-3 py-1 text-[0.8125rem] leading-snug text-ink-60 transition-colors hover:text-deep"
-                          >
-                            <span className="mt-px font-heading text-[0.6875rem] tracking-[0.08em] text-slate/70 tabular-nums">
-                              {String(index + 1).padStart(2, '0')}
-                            </span>
-                            <span className="group-hover:underline group-hover:decoration-sage group-hover:underline-offset-4">
-                              {heading.label}
-                            </span>
-                          </a>
-                        </li>
-                      ))}
-                    </ol>
-                  </nav>
+                  <ArticleTableOfContents
+                    headings={headings}
+                    label={dict.blog.inThisStory}
+                    eyebrow={dict.blog.fieldNotes}
+                    readingTime={dict.blog.readTime.replace('{minutes}', String(minutes))}
+                  />
                 </aside>
               ) : null}
 
