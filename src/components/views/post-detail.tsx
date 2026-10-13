@@ -150,7 +150,10 @@ export function PostDetail({
                 >
                   {post.title}
                 </h1>
-                <p className="mt-6 max-w-2xl description-copy leading-relaxed text-mist/80 md:leading-[1.75]">
+                {/* The excerpt is pinned to 16px instead of riding the fluid
+                    `description-copy` scale — supporting copy under a hero title should hold
+                    its size on every viewport, TVs included. */}
+                <p className="mt-6 max-w-2xl text-base leading-relaxed text-mist/80 md:leading-[1.75]">
                   {post.excerpt}
                 </p>
               </div>
