@@ -14,6 +14,7 @@ export function SectionHeading({
   variant = 'dark',
   className,
   titleClassName,
+  titleLevel = 'h2',
   descriptionClassName,
 }: {
   eyebrow?: string | null
@@ -25,11 +26,15 @@ export function SectionHeading({
   align?: 'left' | 'center'
   variant?: 'dark' | 'light'
   className?: string
-  /** Extra classes for the `<h2>` — lets a section retune the title without forking the heading. */
+  /** Extra classes for the heading — lets a section retune the title without forking it. */
   titleClassName?: string
+  /** Semantic heading level. Defaults to h2; FAQ sections use h3. */
+  titleLevel?: 'h2' | 'h3'
   /** Extra classes for the description paragraph. */
   descriptionClassName?: string
 }) {
+  const Title = titleLevel
+
   return (
     <div
       className={cn(
@@ -44,7 +49,7 @@ export function SectionHeading({
             {eyebrow}
           </p>
         ) : null}
-        <h2
+        <Title
           className={cn(
             'heading-lg',
             variant === 'light' ? 'text-white' : 'text-ink',
@@ -52,7 +57,7 @@ export function SectionHeading({
           )}
         >
           {title}
-        </h2>
+        </Title>
         {description ? (
           <p
             className={cn(
