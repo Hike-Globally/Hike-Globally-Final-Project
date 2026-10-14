@@ -1785,9 +1785,9 @@ const run = async () => {
         slug: 'home',
         blocks: homeBlocks(),
         meta: {
-          title: 'Hike Globally — treks and expeditions in the Himalaya',
+          title: 'Hike Globally | Family Tours, Trekking & Travel Guides',
           description:
-            'Small-group treks and expeditions across Nepal, led by guides who grew up on these trails. Everest, Annapurna, Langtang and Mustang.',
+            'Explore family tours, Himalayan treks and worldwide destinations with Hike Globally. Find travel guides, trip ideas and practical tips for your next adventure.',
         },
         _status: 'published',
       },
