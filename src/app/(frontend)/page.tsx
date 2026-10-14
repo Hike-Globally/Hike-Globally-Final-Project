@@ -10,15 +10,6 @@ import { buildMetadata, organizationJsonLd, seoFromDoc, siteUrl, websiteJsonLd }
 import './homepage.css'
 
 /**
- * ============================================================================
- * HOMEPAGE — `/`
- * ============================================================================
- * Driven by the Payload page whose slug is `home`, so the entire homepage is
- * editable from the CMS (hero, featured trips, testimonials, FAQ, form…).
- * If no such page exists yet, a curated fallback composed of real CMS content
- * renders instead — the site never shows an empty shell.
- */
-/**
  * Default search-engine title and description for the homepage.
  *
  * They are used whenever the CMS `home` page has no SEO override of its own. An editor can still
@@ -28,6 +19,15 @@ const HOMEPAGE_META_TITLE = 'Hike Globally | Family Tours, Trekking & Travel Gui
 const HOMEPAGE_META_DESCRIPTION =
   'Explore family tours, Himalayan treks and worldwide destinations with Hike Globally. Find travel guides, trip ideas and practical tips for your next adventure.'
 
+/**
+ * ============================================================================
+ * HOMEPAGE — `/`
+ * ============================================================================
+ * Driven by the Payload page whose slug is `home`, so the entire homepage is
+ * editable from the CMS (hero, featured trips, testimonials, FAQ, form…).
+ * If no such page exists yet, a curated fallback composed of real CMS content
+ * renders instead — the site never shows an empty shell.
+ */
 export async function generateMetadata(): Promise<Metadata> {
   const includeDraft = await isLivePreviewRequest()
   const [page, settings] = await Promise.all([getPage('home', includeDraft), getSettings()])
