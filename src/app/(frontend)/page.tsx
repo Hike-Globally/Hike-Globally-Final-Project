@@ -10,6 +10,16 @@ import { buildMetadata, organizationJsonLd, seoFromDoc, siteUrl, websiteJsonLd }
 import './homepage.css'
 
 /**
+ * Default search-engine title and description for the homepage.
+ *
+ * They are used whenever the CMS `home` page has no SEO override of its own. An editor can still
+ * replace them from the admin (Pages → Home → "SEO & social sharing"), and that value wins.
+ */
+const HOMEPAGE_META_TITLE = 'Hike Globally | Family Tours, Trekking & Travel Guides'
+const HOMEPAGE_META_DESCRIPTION =
+  'Explore family tours, Himalayan treks and worldwide destinations with Hike Globally. Find travel guides, trip ideas and practical tips for your next adventure.'
+
+/**
  * ============================================================================
  * HOMEPAGE — `/`
  * ============================================================================
@@ -21,20 +31,26 @@ import './homepage.css'
 export async function generateMetadata(): Promise<Metadata> {
   const includeDraft = await isLivePreviewRequest()
   const [page, settings] = await Promise.all([getPage('home', includeDraft), getSettings()])
-  const seo = page
-    ? seoFromDoc(page, { title: settings.siteName, description: settings.tagline })
-    : null
+  const seo = seoFromDoc(page ?? {}, {
+    title: HOMEPAGE_META_TITLE,
+    description: HOMEPAGE_META_DESCRIPTION,
+  })
 
-  return buildMetadata({
-    title:
-      seo?.title ??
-      `${settings.siteName} — ${settings.tagline ?? 'Trekking & expeditions in Nepal'}`,
-    description: seo?.description ?? settings.tagline ?? undefined,
-    image: seo?.image ?? settings.defaultOgImage,
+  const metadata = buildMetadata({
+    title: seo.title,
+    description: seo.description,
+    image: seo.image ?? settings.defaultOgImage,
     path: '/',
-    noIndex: seo?.noIndex ?? false,
+    noIndex: seo.noIndex,
     siteName: settings.siteName,
   })
+
+  return {
+    ...metadata,
+    // The homepage title is the full, final title. `absolute` stops the root layout's
+    // "%s · Hike Globally" template from appending the brand a second time.
+    title: { absolute: seo.title },
+  }
 }
 
 export default async function HomePage() {
