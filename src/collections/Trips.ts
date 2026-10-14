@@ -255,7 +255,10 @@ export const Trips: CollectionConfig = {
           type: 'array',
           localized: true,
           labels: { singular: 'Highlight', plural: 'Highlights' },
-          admin: { description: 'Short punchy bullets shown near the top of the trip page.' },
+          admin: {
+            description: 'Short punchy bullets shown near the top of the trip page.',
+            components: { Field: '@/components/admin/instant-trip-array' },
+          },
           fields: [{ name: 'text', type: 'text', required: true }],
         },
         {
@@ -265,6 +268,7 @@ export const Trips: CollectionConfig = {
           labels: { singular: 'Day', plural: 'Itinerary' },
           admin: {
             description: 'One entry per day. Day-level content is translated per language.',
+            components: { Field: '@/components/admin/instant-trip-array' },
             initCollapsed: true,
           },
           fields: [
@@ -321,6 +325,7 @@ export const Trips: CollectionConfig = {
           admin: {
             description:
               'Add extra headed sections to the trip page. These appear after the itinerary.',
+            components: { Field: '@/components/admin/instant-trip-array' },
             initCollapsed: true,
           },
           fields: [
