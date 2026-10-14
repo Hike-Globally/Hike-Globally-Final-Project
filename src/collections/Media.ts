@@ -29,6 +29,11 @@ export const Media: CollectionConfig = {
     useAsTitle: 'alt',
     defaultColumns: ['filename', 'alt', 'updatedAt'],
     group: 'Library',
+    // The rich text editor's upload feature (the "+" menu, `/upload` in the slash menu, and
+    // drag-and-drop) only offers collections that opt in here. Without this, the editor shows no
+    // media library at all, so images and video could not be placed inside page, blog, trip, or
+    // destination content.
+    enableRichTextRelationship: true,
   },
   upload: {
     // Lets editors choose what part of a photo survives cropping (a summit, not the sky).
