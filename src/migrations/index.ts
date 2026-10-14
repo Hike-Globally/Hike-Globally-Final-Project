@@ -8,6 +8,7 @@ import * as migration_20261010_124847_nav_item_children from './20261010_124847_
 import * as migration_20261010_180000_trip_difficulty_levels from './20261010_180000_trip_difficulty_levels'
 import * as migration_20261013_093000_trip_blog_keywords from './20261013_093000_trip_blog_keywords'
 import * as migration_20261013_100000_trip_packing_list from './20261013_100000_trip_packing_list'
+import * as migration_20261014_142919_page_sections from './20261014_142919_page_sections'
 
 export const migrations = [
   {
@@ -59,5 +60,10 @@ export const migrations = [
     up: migration_20261013_100000_trip_packing_list.up,
     down: migration_20261013_100000_trip_packing_list.down,
     name: '20261013_100000_trip_packing_list',
+  },
+  {
+    up: migration_20261014_142919_page_sections.up,
+    down: migration_20261014_142919_page_sections.down,
+    name: '20261014_142919_page_sections',
   },
 ]

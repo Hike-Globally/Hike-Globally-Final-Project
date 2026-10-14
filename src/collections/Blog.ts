@@ -1,6 +1,8 @@
 import type { CollectionConfig } from 'payload'
 
 import { adminOrEditor, publishedOrSignedIn } from '../access'
+import { pageSectionsField } from '../fields/page-sections'
+import { blogSectionOptions } from '../lib/page-sections'
 import { keywordsSection } from '../fields/keywords'
 import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
@@ -43,6 +45,7 @@ export const Blog: CollectionConfig = {
   fields: [
     { name: 'title', type: 'text', localized: true, required: true },
     slugField('title'),
+    pageSectionsField(blogSectionOptions),
     {
       name: 'excerpt',
       type: 'textarea',

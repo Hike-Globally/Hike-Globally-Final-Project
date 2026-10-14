@@ -371,6 +371,32 @@ export interface Trip {
    */
   slug?: string | null;
   /**
+   * Drag the row handles to set the order on this page, or use each row’s Move Up / Move Down controls. Add a Custom HTML row anywhere. Existing section content is edited in the fields below; empty sections do not display. Removing a row hides that section without deleting its content. The booking card and article outline stay beside their content.
+   */
+  pageSections?:
+    | {
+        kind:
+          | 'hero'
+          | 'overview'
+          | 'highlights'
+          | 'itinerary'
+          | 'information'
+          | 'inclusions'
+          | 'packing'
+          | 'faqs'
+          | 'gallery'
+          | 'inquiry'
+          | 'related'
+          | 'html';
+        heading?: string | null;
+        /**
+         * Paste an HTML fragment, not a full document. Headings, text, links, images, lists, tables and safe inline styles are supported. Scripts, event handlers, forms, embeds and unsafe URLs/styles are removed when displayed.
+         */
+        html?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * 2–3 sentences. Used on cards, in search results and as the meta description fallback.
    */
   summary: string;
@@ -462,7 +488,7 @@ export interface Trip {
       }[]
     | null;
   /**
-   * Add extra headed sections to the trip page. These appear after the itinerary.
+   * Add extra headed sections to the trip page. Their position is controlled by the Essential information row in Page sections; drag the entries here to reorder them within that section.
    */
   contentSections?:
     | {
@@ -650,7 +676,7 @@ export interface HeroBlock {
   heading: string;
   subheading?: string | null;
   /**
-   * Landscape, at least 1920px wide. Images are served as AVIF/WebP automatically.
+   * Landscape, at least 1920px wide. The original upload is served without recompression.
    */
   backgroundImage?: (number | null) | Media;
   primaryLink?: {
@@ -725,6 +751,20 @@ export interface Blog {
    * Auto-generated from the title. Edit carefully — changing it changes the live URL.
    */
   slug?: string | null;
+  /**
+   * Drag the row handles to set the order on this page, or use each row’s Move Up / Move Down controls. Add a Custom HTML row anywhere. Existing section content is edited in the fields below; empty sections do not display. Removing a row hides that section without deleting its content. The booking card and article outline stay beside their content.
+   */
+  pageSections?:
+    | {
+        kind: 'hero' | 'content' | 'author' | 'navigation' | 'planning' | 'related' | 'html';
+        heading?: string | null;
+        /**
+         * Paste an HTML fragment, not a full document. Headings, text, links, images, lists, tables and safe inline styles are supported. Scripts, event handlers, forms, embeds and unsafe URLs/styles are removed when displayed.
+         */
+        html?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Shown on cards and used as the meta description fallback.
    */
@@ -1336,6 +1376,14 @@ export interface DestinationsSelect<T extends boolean = true> {
 export interface TripsSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
+  pageSections?:
+    | T
+    | {
+        kind?: T;
+        heading?: T;
+        html?: T;
+        id?: T;
+      };
   summary?: T;
   heroImage?: T;
   description?: T;
@@ -1440,6 +1488,14 @@ export interface TripsSelect<T extends boolean = true> {
 export interface BlogSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
+  pageSections?:
+    | T
+    | {
+        kind?: T;
+        heading?: T;
+        html?: T;
+        id?: T;
+      };
   excerpt?: T;
   featuredImage?: T;
   content?: T;

@@ -1,3 +1,6 @@
+import { Fragment, type ReactNode } from 'react'
+import { CustomHtmlSection } from '@/components/content/custom-html-section'
+import { blogSectionOptions, groupPageSections, resolvePageSections } from '@/lib/page-sections'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, ArrowUpRight, CalendarDays, Clock, Compass } from 'lucide-react'
 
@@ -78,19 +81,9 @@ export function PostDetail({
       ] ?? category)
     : null
 
-  return (
-    <>
-      <ArticleReadingProgress articleId="blog-post" label={dict.blog.readingProgress} />
-
-      <article id="blog-post" className="blog-post">
-        {/* Hero region: the header stays pinned while this masthead is on screen
-            (see header-frame.tsx).
-
-            The featured image is ALWAYS the backdrop of this band — never a framed
-            thumbnail next to the title. It covers the whole hero edge to edge (the `hero`
-            upload size, `object-cover`, and the focal point the editor chose in the admin),
-            so every post opens on its own photograph regardless of how that photograph was
-            cropped on upload. */}
+  const sectionContent: Record<string, ReactNode> = {
+    hero: (
+      <>
         <header
           data-header-hero
           className="relative isolate flex min-h-[min(68svh,46rem)] items-end overflow-hidden bg-ink text-mist md:min-h-[min(76svh,52rem)] lg:min-h-[min(86svh,58rem)]"
@@ -208,139 +201,182 @@ export function PostDetail({
             </div>
           </div>
         </header>
+      </>
+    ),
+    content: (
+      <>
+        <RichText content={post.content} className="blog-prose" headingIds={headingIds} />
+      </>
+    ),
+    author: (
+      <>
+        {authorName && author?.bio ? (
+          <div className="mt-16 flex items-start gap-4 border-t border-slate-20 pt-7">
+            {author.avatar && typeof author.avatar !== 'number' ? (
+              <PayloadImage
+                media={author.avatar}
+                sizes="64px"
+                className="size-16 shrink-0 rounded-full ring-4 ring-sage-20"
+              />
+            ) : (
+              <span className="grid size-16 shrink-0 place-items-center rounded-full bg-sage-20 font-heading text-xl font-semibold text-deep">
+                {authorName.slice(0, 1)}
+              </span>
+            )}
+            <div className="min-w-0 pt-1">
+              <p className="eyebrow text-slate">{dict.blog.aboutAuthor}</p>
+              <p className="mt-1 font-heading text-xl font-semibold text-ink">{authorName}</p>
+              <p className="mt-2 description-copy leading-relaxed text-ink-60">{author.bio}</p>
+            </div>
+          </div>
+        ) : null}
+      </>
+    ),
+    navigation: (
+      <>
+        <div className="mt-10 border-t border-slate-20 pt-6">
+          <Link
+            href={sitePath('/blog')}
+            className="group inline-flex items-center gap-2 text-[0.9375rem] font-medium text-deep transition-colors hover:text-ink"
+          >
+            <ArrowLeft
+              className="size-4 transition-transform group-hover:-translate-x-1"
+              aria-hidden="true"
+            />
+            {dict.blog.backToJournal}
+          </Link>
+        </div>
+      </>
+    ),
+    planning: (
+      <>
+        <section className="container-content pb-16 md:pb-24" aria-labelledby="next-trail-title">
+          <div className="relative isolate overflow-hidden bg-sage-20 p-7 sm:p-9 md:p-12">
+            <div className="grid items-center gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:gap-12">
+              <div className="max-w-2xl">
+                <p className="eyebrow text-deep">{dict.blog.planningEyebrow}</p>
+                <h2 id="next-trail-title" className="heading-lg mt-3">
+                  {dict.blog.planningTitle}
+                </h2>
+                <p className="mt-4 max-w-xl description-copy leading-relaxed text-ink-60">
+                  {dict.blog.planningText}
+                </p>
+                <Button asChild size="lg" className="mt-7">
+                  <Link href={sitePath('/inquiry')}>
+                    {dict.blog.planningLink}
+                    <ArrowRight aria-hidden="true" />
+                  </Link>
+                </Button>
+              </div>
 
-        <section className="bg-white py-12 md:py-20" aria-labelledby="post-title">
-          <div className="container-content">
-            {/* Two columns only from `lg` up, because the outline that occupies the right-hand
+              <div
+                aria-hidden="true"
+                className="relative hidden size-36 shrink-0 place-items-center rounded-full border border-deep/20 text-deep/75 md:grid lg:mr-5"
+              >
+                <span className="absolute inset-3 rounded-full border border-deep/15" />
+                <span className="absolute inset-7 rounded-full border border-deep/10" />
+                <Compass className="size-12" strokeWidth={1} />
+              </div>
+            </div>
+          </div>
+        </section>
+      </>
+    ),
+    related: (
+      <>
+        {related.length ? (
+          <section className="bg-mist py-16 md:py-24">
+            <div className="container-content">
+              <div className="mb-10 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="eyebrow text-slate">{dict.blog.fieldNotes}</p>
+                  <h2 className="heading-lg mt-2">{dict.blog.related}</h2>
+                  <p className="mt-3 max-w-xl description-copy leading-relaxed text-ink-60">
+                    {dict.blog.relatedSubtitle}
+                  </p>
+                </div>
+                <Link
+                  href={sitePath('/blog')}
+                  className="group inline-flex shrink-0 items-center gap-2 text-[0.875rem] font-medium text-deep transition-colors hover:text-ink"
+                >
+                  {dict.common.viewAll}
+                  <ArrowUpRight
+                    className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    aria-hidden="true"
+                  />
+                </Link>
+              </div>
+              <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
+                {related.map((item) => (
+                  <PostCard key={item.id} post={item} />
+                ))}
+              </div>
+            </div>
+          </section>
+        ) : null}
+      </>
+    ),
+  }
+  const groups = groupPageSections(resolvePageSections(post.pageSections, blogSectionOptions), [
+    'hero',
+    'planning',
+    'related',
+  ])
+
+  return (
+    <>
+      <ArticleReadingProgress articleId="blog-post" label={dict.blog.readingProgress} />
+      <article id="blog-post" className="blog-post">
+        {groups.map((group, groupIndex) => {
+          const content = group.sections.map((section, index) => (
+            <Fragment key={section.id ?? `${section.kind}-${index}`}>
+              {section.kind === 'html' ? (
+                <CustomHtmlSection section={section} />
+              ) : (
+                sectionContent[section.kind]
+              )}
+            </Fragment>
+          ))
+          if (group.fullWidth) return <Fragment key={groupIndex}>{content}</Fragment>
+          const hasOutline =
+            headings.length > 0 && group.sections.some(({ kind }) => kind === 'content')
+          return (
+            <Fragment key={groupIndex}>
+              <section className="bg-white py-12 md:py-20" aria-labelledby="post-title">
+                <div className="container-content">
+                  {/* Two columns only from `lg` up, because the outline that occupies the right-hand
                 column is a desktop affordance. Below that the article keeps its single
                 44rem reading measure instead of stretching to the wider grid. */}
-            <div
-              className={cn(
-                contentWidthClassName,
-                headings.length > 0 &&
-                  'lg:grid lg:grid-cols-[minmax(0,44rem)_18rem] lg:gap-x-12 lg:gap-y-0',
-              )}
-            >
-              {/* Keep the reading outline beside the story on desktop, not above it on mobile. */}
-              {headings.length > 0 ? (
-                <aside className="hidden lg:sticky lg:top-32 lg:col-start-2 lg:row-start-1 lg:block lg:self-start">
-                  <ArticleTableOfContents
-                    headings={headings}
-                    label={dict.blog.inThisStory}
-                    eyebrow={dict.blog.fieldNotes}
-                    readingTime={dict.blog.readTime.replace('{minutes}', String(minutes))}
-                  />
-                </aside>
-              ) : null}
-
-              {/* The article body — 17px pure-black running copy (see `.single-page-body`). */}
-              <div className="single-page-body min-w-0 lg:col-start-1 lg:row-start-1">
-                <RichText content={post.content} className="blog-prose" headingIds={headingIds} />
-
-                {authorName && author?.bio ? (
-                  <div className="mt-16 flex items-start gap-4 border-t border-slate-20 pt-7">
-                    {author.avatar && typeof author.avatar !== 'number' ? (
-                      <PayloadImage
-                        media={author.avatar}
-                        sizes="64px"
-                        className="size-16 shrink-0 rounded-full ring-4 ring-sage-20"
-                      />
-                    ) : (
-                      <span className="grid size-16 shrink-0 place-items-center rounded-full bg-sage-20 font-heading text-xl font-semibold text-deep">
-                        {authorName.slice(0, 1)}
-                      </span>
+                  <div
+                    className={cn(
+                      hasOutline ? contentWidthClassName : 'mx-auto max-w-[44rem]',
+                      hasOutline &&
+                        'lg:grid lg:grid-cols-[minmax(0,44rem)_18rem] lg:gap-x-12 lg:gap-y-0',
                     )}
-                    <div className="min-w-0 pt-1">
-                      <p className="eyebrow text-slate">{dict.blog.aboutAuthor}</p>
-                      <p className="mt-1 font-heading text-xl font-semibold text-ink">
-                        {authorName}
-                      </p>
-                      <p className="mt-2 description-copy leading-relaxed text-ink-60">
-                        {author.bio}
-                      </p>
+                  >
+                    {/* Keep the reading outline beside the story on desktop, not above it on mobile. */}
+                    {hasOutline ? (
+                      <aside className="hidden lg:sticky lg:top-32 lg:col-start-2 lg:row-start-1 lg:block lg:self-start">
+                        <ArticleTableOfContents
+                          headings={headings}
+                          label={dict.blog.inThisStory}
+                          eyebrow={dict.blog.fieldNotes}
+                          readingTime={dict.blog.readTime.replace('{minutes}', String(minutes))}
+                        />
+                      </aside>
+                    ) : null}
+
+                    {/* The article body — 17px pure-black running copy (see `.single-page-body`). */}
+                    <div className="single-page-body min-w-0 lg:col-start-1 lg:row-start-1">
+                      {content}
                     </div>
                   </div>
-                ) : null}
-
-                <div className="mt-10 border-t border-slate-20 pt-6">
-                  <Link
-                    href={sitePath('/blog')}
-                    className="group inline-flex items-center gap-2 text-[0.9375rem] font-medium text-deep transition-colors hover:text-ink"
-                  >
-                    <ArrowLeft
-                      className="size-4 transition-transform group-hover:-translate-x-1"
-                      aria-hidden="true"
-                    />
-                    {dict.blog.backToJournal}
-                  </Link>
                 </div>
-              </div>
-            </div>
-          </div>
-        </section>
+              </section>
+            </Fragment>
+          )
+        })}
       </article>
-
-      <section className="container-content pb-16 md:pb-24" aria-labelledby="next-trail-title">
-        <div className="relative isolate overflow-hidden bg-sage-20 p-7 sm:p-9 md:p-12">
-          <div className="grid items-center gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:gap-12">
-            <div className="max-w-2xl">
-              <p className="eyebrow text-deep">{dict.blog.planningEyebrow}</p>
-              <h2 id="next-trail-title" className="heading-lg mt-3">
-                {dict.blog.planningTitle}
-              </h2>
-              <p className="mt-4 max-w-xl description-copy leading-relaxed text-ink-60">
-                {dict.blog.planningText}
-              </p>
-              <Button asChild size="lg" className="mt-7">
-                <Link href={sitePath('/inquiry')}>
-                  {dict.blog.planningLink}
-                  <ArrowRight aria-hidden="true" />
-                </Link>
-              </Button>
-            </div>
-
-            <div
-              aria-hidden="true"
-              className="relative hidden size-36 shrink-0 place-items-center rounded-full border border-deep/20 text-deep/75 md:grid lg:mr-5"
-            >
-              <span className="absolute inset-3 rounded-full border border-deep/15" />
-              <span className="absolute inset-7 rounded-full border border-deep/10" />
-              <Compass className="size-12" strokeWidth={1} />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {related.length ? (
-        <section className="bg-mist py-16 md:py-24">
-          <div className="container-content">
-            <div className="mb-10 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="eyebrow text-slate">{dict.blog.fieldNotes}</p>
-                <h2 className="heading-lg mt-2">{dict.blog.related}</h2>
-                <p className="mt-3 max-w-xl description-copy leading-relaxed text-ink-60">
-                  {dict.blog.relatedSubtitle}
-                </p>
-              </div>
-              <Link
-                href={sitePath('/blog')}
-                className="group inline-flex shrink-0 items-center gap-2 text-[0.875rem] font-medium text-deep transition-colors hover:text-ink"
-              >
-                {dict.common.viewAll}
-                <ArrowUpRight
-                  className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                  aria-hidden="true"
-                />
-              </Link>
-            </div>
-            <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
-              {related.map((item) => (
-                <PostCard key={item.id} post={item} />
-              ))}
-            </div>
-          </div>
-        </section>
-      ) : null}
 
       <JsonLd
         data={[
