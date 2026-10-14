@@ -1,3 +1,6 @@
+import { Fragment, type ReactNode } from 'react'
+import { CustomHtmlSection } from '@/components/content/custom-html-section'
+import { groupPageSections, resolvePageSections, tripSectionOptions } from '@/lib/page-sections'
 import Link from 'next/link'
 import {
   ArrowRight,
@@ -184,332 +187,368 @@ export function TripDetail({
     { icon: MapPin, label: dict.trip.destination, value: destination?.name ?? '—' },
   ].filter((fact): fact is NonNullable<typeof fact> => fact !== null)
 
+  const sections = resolvePageSections(trip.pageSections, tripSectionOptions)
+  const hasInquiry = sections.some(({ kind }) => kind === 'inquiry')
+  const inquiryHref = hasInquiry ? '#inquiry' : sitePath('/inquiry')
   const bookingLink = resolveLink(trip.bookingLink?.link)
-  const bookingHref = bookingLink?.href ?? '#inquiry'
+  const bookingHref = bookingLink?.href ?? inquiryHref
   const faqs = (trip.faqs ?? []).filter((faq) => faq.question?.trim())
 
-  return (
-    <>
-      {/* ---------------- Hero + trip dashboard ---------------- */}
-      {/* Hero region: the header stays pinned until this band has scrolled past
-          (see header-frame.tsx). */}
-      <section data-header-hero className="relative isolate overflow-hidden bg-ink text-mist">
-        <PayloadImageFill
-          media={trip.heroImage}
-          sizes="100vw"
-          priority
-          className="-z-10"
-          imageClassName="object-cover"
-        />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-ink/95 via-ink/70 to-ink/25" />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/30 to-ink/40" />
-
-        <div className="container-content pt-28 pb-12 sm:pb-14 md:pt-36 md:pb-16">
-          <Breadcrumbs
-            className="mb-8"
-            items={[
-              { label: dict.nav.home, href: sitePath('/') },
-              { label: dict.nav.trips, href: sitePath('/trips') },
-              { label: trip.title },
-            ]}
+  const sectionContent: Record<string, ReactNode> = {
+    hero: (
+      <>
+        <section data-header-hero className="relative isolate overflow-hidden bg-ink text-mist">
+          <PayloadImageFill
+            media={trip.heroImage}
+            sizes="100vw"
+            priority
+            className="-z-10"
+            imageClassName="object-cover"
           />
+          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-ink/95 via-ink/70 to-ink/25" />
+          <div className="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/30 to-ink/40" />
 
-          <div className="flex flex-wrap items-center gap-3">
-            {destination ? (
-              <Link
-                href={sitePath(`/destinations/${destination.slug}`)}
-                className="bg-white/10 px-3.5 py-1.5 text-[0.75rem] tracking-[0.14em] text-sage uppercase ring-1 ring-white/15 backdrop-blur transition-colors hover:bg-white/20"
-              >
-                {destination.name}
-              </Link>
-            ) : null}
-            <Badge variant="sage">{dict.trip.factsTitle}</Badge>
-          </div>
+          <div className="container-content pt-28 pb-12 sm:pb-14 md:pt-36 md:pb-16">
+            <Breadcrumbs
+              className="mb-8"
+              items={[
+                { label: dict.nav.home, href: sitePath('/') },
+                { label: dict.nav.trips, href: sitePath('/trips') },
+                { label: trip.title },
+              ]}
+            />
 
-          <h1 className="heading-xl mt-6 max-w-4xl text-white">{trip.title}</h1>
-          <p className="lead mt-6 max-w-2xl text-mist/80">{trip.summary}</p>
+            <div className="flex flex-wrap items-center gap-3">
+              {destination ? (
+                <Link
+                  href={sitePath(`/destinations/${destination.slug}`)}
+                  className="bg-white/10 px-3.5 py-1.5 text-[0.75rem] tracking-[0.14em] text-sage uppercase ring-1 ring-white/15 backdrop-blur transition-colors hover:bg-white/20"
+                >
+                  {destination.name}
+                </Link>
+              ) : null}
+              <Badge variant="sage">{dict.trip.factsTitle}</Badge>
+            </div>
 
-          <div className="mt-9 flex flex-wrap items-center gap-3">
-            <Button asChild size="lg" variant="sage">
-              <Link href="#inquiry">{dict.trip.enquire}</Link>
-            </Button>
-            {bookingLink ? (
-              <Button asChild size="lg" variant="outline-light">
-                <Link href={bookingLink.href}>{bookingLink.label}</Link>
+            <h1 className="heading-xl mt-6 max-w-4xl text-white">{trip.title}</h1>
+            <p className="lead mt-6 max-w-2xl text-mist/80">{trip.summary}</p>
+
+            <div className="mt-9 flex flex-wrap items-center gap-3">
+              <Button asChild size="lg" variant="sage">
+                <Link href={inquiryHref}>{dict.trip.enquire}</Link>
               </Button>
-            ) : null}
-          </div>
+              {bookingLink ? (
+                <Button asChild size="lg" variant="outline-light">
+                  <Link href={bookingLink.href}>{bookingLink.label}</Link>
+                </Button>
+              ) : null}
+            </div>
 
-          {/* Glass dashboard. A 1px gap over a tinted background draws the grid lines. */}
-          <dl className="mt-10 grid grid-cols-1 gap-px overflow-hidden bg-white/10 ring-1 ring-white/10 backdrop-blur-xl xs:grid-cols-2 md:mt-14 md:grid-cols-4">
-            {facts.map((fact) => (
-              <div
-                key={fact.label}
-                className="flex items-center gap-4 bg-ink/60 p-5 backdrop-blur md:p-6"
-              >
-                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-sage/15 text-sage">
-                  <fact.icon className="size-4" aria-hidden />
-                </span>
-                <div className="min-w-0">
-                  <dt className="text-[0.6875rem] tracking-[0.14em] text-mist/55 uppercase">
-                    {fact.label}
-                  </dt>
-                  <dd className="mt-1 truncate font-heading text-[0.9375rem] font-semibold text-white">
-                    {fact.value}
-                  </dd>
+            {/* Glass dashboard. A 1px gap over a tinted background draws the grid lines. */}
+            <dl className="mt-10 grid grid-cols-1 gap-px overflow-hidden bg-white/10 ring-1 ring-white/10 backdrop-blur-xl xs:grid-cols-2 md:mt-14 md:grid-cols-4">
+              {facts.map((fact) => (
+                <div
+                  key={fact.label}
+                  className="flex items-center gap-4 bg-ink/60 p-5 backdrop-blur md:p-6"
+                >
+                  <span className="grid size-10 shrink-0 place-items-center rounded-full bg-sage/15 text-sage">
+                    <fact.icon className="size-4" aria-hidden />
+                  </span>
+                  <div className="min-w-0">
+                    <dt className="text-[0.6875rem] tracking-[0.14em] text-mist/55 uppercase">
+                      {fact.label}
+                    </dt>
+                    <dd className="mt-1 truncate font-heading text-[0.9375rem] font-semibold text-white">
+                      {fact.value}
+                    </dd>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </dl>
-        </div>
-      </section>
-
-      {/* ---------------- Trip content + sticky booking card ---------------- */}
-      {/* A sticky element can only travel as far as its grid area, so ending this grid right
-          before the full-width inquiry panel is what releases the booking card. */}
-      <div className="container-content grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14 3xl:grid-cols-[minmax(0,1fr)_26rem]">
-        {/* Trip content — 17px pure-black running copy (see `.single-page-body`). */}
-        <div className="single-page-body min-w-0">
-          {/* ---------------- Overview + highlights ---------------- */}
-          <Reveal as="section" className="py-16 md:py-24">
-            <SectionTitle title={dict.trip.overview} />
-            <div className="prose-hg max-w-none leading-[1.8]">
-              <RichText content={trip.description} />
-            </div>
-
-            {trip.highlights?.length ? (
-              <div className="mt-14">
-                <h3 className="heading-md mb-6">{dict.trip.highlights}</h3>
-                <ul className="grid gap-3 sm:grid-cols-2">
-                  {trip.highlights.map((highlight) => (
-                    <li
-                      key={highlight.id ?? highlight.text}
-                      className={cn(surface, 'flex items-start gap-4 p-5')}
-                    >
-                      <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-sage text-ink">
-                        <Check className="size-3.5" strokeWidth={3} aria-hidden />
-                      </span>
-                      <span className="text-[0.9375rem] leading-relaxed text-ink-80">
-                        {highlight.text}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
+              ))}
+            </dl>
+          </div>
+        </section>
+      </>
+    ),
+    overview: (
+      <>
+        <Reveal as="section" className="py-16 md:py-24">
+          <SectionTitle title={dict.trip.overview} />
+          <div className="prose-hg max-w-none leading-[1.8]">
+            <RichText content={trip.description} />
+          </div>
+        </Reveal>
+      </>
+    ),
+    highlights: (
+      <>
+        {trip.highlights?.length ? (
+          <Reveal as="section" className="pb-16 md:pb-24">
+            <h2 className="heading-md mb-6">{dict.trip.highlights}</h2>
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {trip.highlights.map((highlight) => (
+                <li
+                  key={highlight.id ?? highlight.text}
+                  className={cn(surface, 'flex items-start gap-4 p-5')}
+                >
+                  <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-sage text-ink">
+                    <Check className="size-3.5" strokeWidth={3} aria-hidden />
+                  </span>
+                  <span className="text-[0.9375rem] leading-relaxed text-ink-80">
+                    {highlight.text}
+                  </span>
+                </li>
+              ))}
+            </ul>
           </Reveal>
+        ) : null}
+      </>
+    ),
+    itinerary: <>{trip.itinerary?.length ? <ItinerarySection days={trip.itinerary} /> : null}</>,
+    information: (
+      <>
+        {trip.contentSections?.length ? (
+          <section id="essential-information" className="scroll-mt-24 py-16 md:py-24">
+            <Reveal>
+              <SectionTitle title={dict.trip.essentialInformation} level="h2" />
 
-          {/* Keep the booking card near the trip summary on small screens. */}
-          <div className="mb-16 lg:hidden">
-            <TripBookingCard trip={trip} dict={dict} bookingHref={bookingHref} />
-          </div>
-
-          {/* ---------------- Detailed itinerary — full-width day cards ----------------
-              The heading row carries the "Expand all" switch, so heading, switch and day
-              list share one piece of client state (see itinerary-section.tsx). */}
-          {trip.itinerary?.length ? <ItinerarySection days={trip.itinerary} /> : null}
-
-          {/* ------- Essential information ------- */}
-          {trip.contentSections?.length ? (
-            <section id="essential-information" className="scroll-mt-24 py-16 md:py-24">
-              <Reveal>
-                <SectionTitle title={dict.trip.essentialInformation} level="h2" />
-
-                <Accordion type="multiple" className="space-y-4">
-                  {trip.contentSections.map((contentSection, index) => (
-                    <AccordionItem
-                      key={contentSection.id ?? index}
-                      value={`section-${contentSection.id ?? index}`}
-                      className={cn(surface, 'overflow-hidden px-4 sm:px-6 md:px-8')}
-                    >
-                      <AccordionTrigger
-                        indicator="chevron"
-                        className="items-center py-6 hover:no-underline md:py-7"
-                      >
-                        <span className="min-w-0 text-left font-heading text-base font-semibold text-ink md:text-lg">
-                          {contentSection.heading}
-                        </span>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <RichText
-                          content={contentSection.content}
-                          className="w-full min-w-0 break-words text-[1.0625rem]"
-                        />
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
-              </Reveal>
-            </section>
-          ) : null}
-
-          {/* ---------------- Included / not included ---------------- */}
-          {trip.included?.length || trip.notIncluded?.length ? (
-            <Reveal as="section" className="py-16 md:py-24">
-              <div className="grid gap-6 md:grid-cols-2">
-                {trip.included?.length ? (
-                  <div className="bg-sage-20 p-5 ring-1 ring-sage/30 sm:p-8 md:p-10">
-                    <h2 className="heading-md mb-7">{dict.trip.included}</h2>
-                    <ul className="space-y-4">
-                      {trip.included.map((item) => (
-                        <li key={item.id ?? item.item} className="flex items-start gap-3.5">
-                          <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-deep text-mist">
-                            <Check className="size-3.5" strokeWidth={3} aria-hidden />
-                          </span>
-                          <span className="text-[0.9375rem] leading-relaxed text-ink-80">
-                            {item.item}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-
-                {trip.notIncluded?.length ? (
-                  <div className={cn(surface, 'p-5 sm:p-8 md:p-10')}>
-                    <h2 className="heading-md mb-7">{dict.trip.notIncluded}</h2>
-                    <ul className="space-y-4">
-                      {trip.notIncluded.map((item) => (
-                        <li key={item.id ?? item.item} className="flex items-start gap-3.5">
-                          <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-mist-60 text-slate">
-                            <X className="size-3.5" strokeWidth={3} aria-hidden />
-                          </span>
-                          <span className="text-[0.9375rem] leading-relaxed text-ink-60">
-                            {item.item}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-              </div>
-            </Reveal>
-          ) : null}
-
-          {/* ---------------- Packing list ---------------- */}
-          {trip.packingList?.length ? (
-            <Reveal as="section" className="py-16 md:py-24">
-              <SectionTitle title={dict.trip.packingList} />
-              <ul className="grid gap-3 sm:grid-cols-2">
-                {trip.packingList.map((item, index) => (
-                  <li
-                    key={item.id ?? `${item.item}-${index}`}
-                    className={cn(surface, 'flex items-start gap-4 p-5')}
+              <Accordion type="multiple" className="space-y-4">
+                {trip.contentSections.map((contentSection, index) => (
+                  <AccordionItem
+                    key={contentSection.id ?? index}
+                    value={`section-${contentSection.id ?? index}`}
+                    className={cn(surface, 'overflow-hidden px-4 sm:px-6 md:px-8')}
                   >
-                    <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-sage text-ink">
-                      <Check className="size-3.5" strokeWidth={3} aria-hidden />
-                    </span>
-                    <span className="text-[0.9375rem] leading-relaxed text-ink-80">
-                      {item.item}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </Reveal>
-          ) : null}
-
-          {/* ---------------- FAQs ---------------- */}
-          {faqs.length ? (
-            <section id="faqs" className="scroll-mt-24 py-16 md:py-24">
-              <Reveal>
-                <SectionTitle title={dict.trip.faqs} level="h2" />
-
-                <Accordion type="multiple" className="space-y-4">
-                  {faqs.map((faq, index) => (
-                    <AccordionItem
-                      key={faq.id ?? index}
-                      value={`faq-${faq.id ?? index}`}
-                      className={cn(surface, 'overflow-hidden px-6 md:px-8')}
+                    <AccordionTrigger
+                      indicator="chevron"
+                      className="items-center py-6 hover:no-underline md:py-7"
                     >
-                      <AccordionTrigger className="items-center py-6 hover:no-underline md:py-7">
-                        <span className="min-w-0 text-left font-heading text-base font-semibold text-ink md:text-lg">
-                          {faq.question}
-                        </span>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <p className="max-w-3xl text-[1.0625rem] leading-relaxed whitespace-pre-line text-ink-70">
-                          {faq.answer}
-                        </p>
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
-              </Reveal>
-            </section>
-          ) : null}
-
-          {/* ---------------- Gallery ---------------- */}
-          {trip.gallery?.length ? (
-            <Reveal as="section" className="py-16 md:py-24">
-              <SectionTitle title={dict.trip.gallery} />
-              <div className="grid gap-5 sm:grid-cols-2">
-                {trip.gallery.map((item, index) => (
-                  <Reveal key={item.id ?? index} delay={index * 60}>
-                    <div className="group overflow-hidden bg-mist-60 ring-1 ring-black/5">
-                      <PayloadImage
-                        media={item.image}
-                        sizes="(min-width: 1280px) 30vw, (min-width: 640px) 45vw, 92vw"
-                        className="aspect-[4/3] w-full transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+                      <span className="min-w-0 text-left font-heading text-base font-semibold text-ink md:text-lg">
+                        {contentSection.heading}
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <RichText
+                        content={contentSection.content}
+                        className="w-full min-w-0 break-words text-[1.0625rem]"
                       />
-                    </div>
-                  </Reveal>
+                    </AccordionContent>
+                  </AccordionItem>
                 ))}
-              </div>
+              </Accordion>
             </Reveal>
-          ) : null}
-        </div>
+          </section>
+        ) : null}
+      </>
+    ),
+    inclusions: (
+      <>
+        {trip.included?.length || trip.notIncluded?.length ? (
+          <Reveal as="section" className="py-16 md:py-24">
+            <div className="grid gap-6 md:grid-cols-2">
+              {trip.included?.length ? (
+                <div className="bg-sage-20 p-5 ring-1 ring-sage/30 sm:p-8 md:p-10">
+                  <h2 className="heading-md mb-7">{dict.trip.included}</h2>
+                  <ul className="space-y-4">
+                    {trip.included.map((item) => (
+                      <li key={item.id ?? item.item} className="flex items-start gap-3.5">
+                        <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-deep text-mist">
+                          <Check className="size-3.5" strokeWidth={3} aria-hidden />
+                        </span>
+                        <span className="text-[0.9375rem] leading-relaxed text-ink-80">
+                          {item.item}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
 
-        {/* The card stays in this grid so it can stick beside the trip content. */}
-        <aside className="hidden lg:sticky lg:top-28 lg:mt-16 lg:block lg:self-start">
-          <TripBookingCard trip={trip} dict={dict} bookingHref={bookingHref} />
-        </aside>
-      </div>
-
-      {/* ---------------- Inquiry — full width, dark panel ---------------- */}
-      <section id="inquiry" className="scroll-mt-24 py-16 md:py-24">
-        <div className="container-content">
-          <div className="relative isolate overflow-hidden bg-ink p-5 text-mist ring-1 ring-white/10 sm:p-8 md:p-14">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -top-40 -right-32 -z-10 size-[28rem] rounded-full bg-sage/15 blur-3xl"
-            />
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -bottom-40 -left-32 -z-10 size-[24rem] rounded-full bg-deep blur-3xl"
-            />
-
-            <div className="grid gap-10 xl:grid-cols-[0.85fr_1.15fr] xl:gap-16">
-              <div>
-                <p className={eyebrowOnDark}>{dict.inquiry.formTitle}</p>
-                <h2 className="heading-lg mt-3 text-white">{dict.inquiry.title}</h2>
-                <p className="lead mt-5 text-mist/70">{dict.inquiry.subtitle}</p>
-              </div>
-              <InquiryForm
-                trips={tripOptions}
-                email={formEmail}
-                defaultTripSlug={trip.slug}
-                variant="dark"
-              />
+              {trip.notIncluded?.length ? (
+                <div className={cn(surface, 'p-5 sm:p-8 md:p-10')}>
+                  <h2 className="heading-md mb-7">{dict.trip.notIncluded}</h2>
+                  <ul className="space-y-4">
+                    {trip.notIncluded.map((item) => (
+                      <li key={item.id ?? item.item} className="flex items-start gap-3.5">
+                        <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-mist-60 text-slate">
+                          <X className="size-3.5" strokeWidth={3} aria-hidden />
+                        </span>
+                        <span className="text-[0.9375rem] leading-relaxed text-ink-60">
+                          {item.item}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
             </div>
-          </div>
-        </div>
-      </section>
+          </Reveal>
+        ) : null}
+      </>
+    ),
+    packing: (
+      <>
+        {trip.packingList?.length ? (
+          <Reveal as="section" className="py-16 md:py-24">
+            <SectionTitle title={dict.trip.packingList} />
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {trip.packingList.map((item, index) => (
+                <li
+                  key={item.id ?? `${item.item}-${index}`}
+                  className={cn(surface, 'flex items-start gap-4 p-5')}
+                >
+                  <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-sage text-ink">
+                    <Check className="size-3.5" strokeWidth={3} aria-hidden />
+                  </span>
+                  <span className="text-[0.9375rem] leading-relaxed text-ink-80">{item.item}</span>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        ) : null}
+      </>
+    ),
+    faqs: (
+      <>
+        {faqs.length ? (
+          <section id="faqs" className="scroll-mt-24 py-16 md:py-24">
+            <Reveal>
+              <SectionTitle title={dict.trip.faqs} level="h2" />
 
-      {/* ---------------- Related ---------------- */}
-      {related.length ? (
-        <section className="py-16 md:py-24">
-          <div className="container-content">
-            <SectionTitle title={dict.trip.related} />
-            <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
-              {related.map((item, index) => (
-                <Reveal key={item.id} delay={index * 70}>
-                  <TripCard trip={item} />
+              <Accordion type="multiple" className="space-y-4">
+                {faqs.map((faq, index) => (
+                  <AccordionItem
+                    key={faq.id ?? index}
+                    value={`faq-${faq.id ?? index}`}
+                    className={cn(surface, 'overflow-hidden px-6 md:px-8')}
+                  >
+                    <AccordionTrigger className="items-center py-6 hover:no-underline md:py-7">
+                      <span className="min-w-0 text-left font-heading text-base font-semibold text-ink md:text-lg">
+                        {faq.question}
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <p className="max-w-3xl text-[1.0625rem] leading-relaxed whitespace-pre-line text-ink-70">
+                        {faq.answer}
+                      </p>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </Reveal>
+          </section>
+        ) : null}
+      </>
+    ),
+    gallery: (
+      <>
+        {trip.gallery?.length ? (
+          <Reveal as="section" className="py-16 md:py-24">
+            <SectionTitle title={dict.trip.gallery} />
+            <div className="grid gap-5 sm:grid-cols-2">
+              {trip.gallery.map((item, index) => (
+                <Reveal key={item.id ?? index} delay={index * 60}>
+                  <div className="group overflow-hidden bg-mist-60 ring-1 ring-black/5">
+                    <PayloadImage
+                      media={item.image}
+                      sizes="(min-width: 1280px) 30vw, (min-width: 640px) 45vw, 92vw"
+                      className="aspect-[4/3] w-full transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+                    />
+                  </div>
                 </Reveal>
               ))}
             </div>
+          </Reveal>
+        ) : null}
+      </>
+    ),
+    inquiry: (
+      <>
+        <section id="inquiry" className="scroll-mt-24 py-16 md:py-24">
+          <div className="container-content">
+            <div className="relative isolate overflow-hidden bg-ink p-5 text-mist ring-1 ring-white/10 sm:p-8 md:p-14">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -top-40 -right-32 -z-10 size-[28rem] rounded-full bg-sage/15 blur-3xl"
+              />
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -bottom-40 -left-32 -z-10 size-[24rem] rounded-full bg-deep blur-3xl"
+              />
+
+              <div className="grid gap-10 xl:grid-cols-[0.85fr_1.15fr] xl:gap-16">
+                <div>
+                  <p className={eyebrowOnDark}>{dict.inquiry.formTitle}</p>
+                  <h2 className="heading-lg mt-3 text-white">{dict.inquiry.title}</h2>
+                  <p className="lead mt-5 text-mist/70">{dict.inquiry.subtitle}</p>
+                </div>
+                <InquiryForm
+                  trips={tripOptions}
+                  email={formEmail}
+                  defaultTripSlug={trip.slug}
+                  variant="dark"
+                />
+              </div>
+            </div>
           </div>
         </section>
-      ) : null}
+      </>
+    ),
+    related: (
+      <>
+        {related.length ? (
+          <section className="py-16 md:py-24">
+            <div className="container-content">
+              <SectionTitle title={dict.trip.related} />
+              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
+                {related.map((item, index) => (
+                  <Reveal key={item.id} delay={index * 70}>
+                    <TripCard trip={item} />
+                  </Reveal>
+                ))}
+              </div>
+            </div>
+          </section>
+        ) : null}
+      </>
+    ),
+  }
+  const groups = groupPageSections(sections, ['hero', 'inquiry', 'related'])
+
+  const bookingAnchor =
+    sections.find(({ kind }) => kind === 'highlights') ??
+    sections.find(({ kind }) => kind === 'overview') ??
+    groups.find((group) => !group.fullWidth)?.sections[0]
+
+  return (
+    <>
+      {groups.map((group, groupIndex) => {
+        const content = group.sections.map((section, index) => (
+          <Fragment key={section.id ?? `${section.kind}-${index}`}>
+            {section.kind === 'html' ? (
+              <CustomHtmlSection section={section} />
+            ) : (
+              sectionContent[section.kind]
+            )}
+            {section === bookingAnchor ? (
+              <div className="mb-16 lg:hidden">
+                <TripBookingCard trip={trip} dict={dict} bookingHref={bookingHref} />
+              </div>
+            ) : null}
+          </Fragment>
+        ))
+        if (group.fullWidth) return <Fragment key={groupIndex}>{content}</Fragment>
+        return (
+          <div
+            key={groupIndex}
+            className="container-content grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14 3xl:grid-cols-[minmax(0,1fr)_26rem]"
+          >
+            <div className="single-page-body min-w-0">{content}</div>
+            <aside className="hidden lg:sticky lg:top-28 lg:mt-16 lg:block lg:self-start">
+              <TripBookingCard trip={trip} dict={dict} bookingHref={bookingHref} />
+            </aside>
+          </div>
+        )
+      })}
 
       <JsonLd
         data={[
@@ -527,7 +566,7 @@ export function TripDetail({
             destinationName: destination?.name,
             siteName: dict.structuredData.organization,
           }),
-          ...(faqs.length
+          ...(faqs.length && sections.some(({ kind }) => kind === 'faqs')
             ? [faqJsonLd(faqs.map((faq) => ({ question: faq.question, answer: faq.answer ?? '' })))]
             : []),
         ]}

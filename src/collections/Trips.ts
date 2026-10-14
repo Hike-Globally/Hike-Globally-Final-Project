@@ -1,6 +1,8 @@
 import type { CollectionConfig } from 'payload'
 
 import { adminOrEditor, publishedOrSignedIn } from '../access'
+import { pageSectionsField } from '../fields/page-sections'
+import { tripSectionOptions } from '../lib/page-sections'
 import { keywordsSection } from '../fields/keywords'
 import { linkField } from '../fields/link'
 import { metaField } from '../fields/meta'
@@ -61,6 +63,7 @@ export const Trips: CollectionConfig = {
     { name: 'title', type: 'text', localized: true, required: true },
     // Rendered in the document sidebar, not here (see `slugField`).
     slugField('title'),
+    pageSectionsField(tripSectionOptions),
     {
       name: 'summary',
       type: 'textarea',
@@ -324,7 +327,7 @@ export const Trips: CollectionConfig = {
           labels: { singular: 'Content section', plural: 'Content sections' },
           admin: {
             description:
-              'Add extra headed sections to the trip page. These appear after the itinerary.',
+              'Add extra headed sections to the trip page. Their position is controlled by the Essential information row in Page sections; drag the entries here to reorder them within that section.',
             components: { Field: '@/components/admin/instant-trip-array' },
             initCollapsed: true,
           },
