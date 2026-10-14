@@ -374,7 +374,6 @@ const renderNode = (node: RichTextNode, index: number, context: RenderContext): 
           <div className="overflow-hidden bg-mist-60">
             <PayloadImage
               media={media}
-              size="tablet"
               sizes="(min-width: 1024px) 768px, 100vw"
               className="aspect-[16/10] w-full"
             />

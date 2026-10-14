@@ -49,7 +49,6 @@ export function PostCard({
       >
         <PayloadImageFill
           media={post.featuredImage}
-          size={featured ? 'tablet' : 'card'}
           sizes={
             featured
               ? '(min-width: 1024px) 55vw, 92vw'

@@ -97,7 +97,6 @@ export function PostDetail({
         >
           <PayloadImageFill
             media={post.featuredImage}
-            size="hero"
             sizes="100vw"
             priority
             className="-z-10"
@@ -176,7 +175,6 @@ export function PostDetail({
                     {author?.avatar && typeof author.avatar !== 'number' ? (
                       <PayloadImage
                         media={author.avatar}
-                        size="thumbnail"
                         sizes="44px"
                         className="size-11 shrink-0 rounded-full ring-2 ring-sage/45"
                       />
@@ -244,7 +242,6 @@ export function PostDetail({
                     {author.avatar && typeof author.avatar !== 'number' ? (
                       <PayloadImage
                         media={author.avatar}
-                        size="thumbnail"
                         sizes="64px"
                         className="size-16 shrink-0 rounded-full ring-4 ring-sage-20"
                       />

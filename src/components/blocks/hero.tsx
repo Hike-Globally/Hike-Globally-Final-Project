@@ -66,7 +66,6 @@ export function Hero({
         <>
           <PayloadImageFill
             media={block.backgroundImage}
-            size="hero"
             sizes="100vw"
             priority
             className="-z-10"

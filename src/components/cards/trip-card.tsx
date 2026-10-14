@@ -41,7 +41,6 @@ export function TripCard({
       <Link href={href} className="relative block aspect-[4/3] overflow-hidden bg-mist-60">
         <PayloadImageFill
           media={trip.heroImage}
-          size="card"
           sizes="(min-width: 1280px) 33vw, (min-width: 768px) 45vw, 92vw"
           priority={priority}
           imageClassName="transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"

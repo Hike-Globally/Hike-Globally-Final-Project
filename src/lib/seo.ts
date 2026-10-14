@@ -148,10 +148,10 @@ export const normalizeKeywords = (
   return result
 }
 
-/** Picks the best available image URL: the dedicated 1200×630 OG size, else the original. */
+/** Social previews use the original upload, not a cropped or compressed derivative. */
 export const imageUrl = (image: number | Media | null | undefined): string | undefined => {
   if (!image || typeof image === 'number') return undefined
-  const url = image.sizes?.og?.url || image.sizes?.tablet?.url || image.url
+  const url = image.url
   if (!url) return undefined
   return absoluteUrl(url)
 }
@@ -160,8 +160,6 @@ export const imageDimensions = (
   image: number | Media | null | undefined,
 ): { width: number; height: number } | undefined => {
   if (!image || typeof image === 'number') return undefined
-  const og = image.sizes?.og
-  if (og?.width && og?.height) return { width: og.width, height: og.height }
   if (image.width && image.height) return { width: image.width, height: image.height }
   return undefined
 }
@@ -174,8 +172,7 @@ export const imageDimensions = (
  * flagged by the Rich Results Test). This is the one place that turns a Media document into that
  * URL, so no page can hand a relative path to a `*JsonLd()` builder by accident.
  *
- * Preference order is the large sizes first: a 1920px hero over the 1200×630 social crop, because
- * image rich results want resolution, not the social aspect ratio.
+ * Use the original upload for image rich results too, without an artificial size limit.
  */
 export const schemaImageUrl = (
   image: number | Media | string | null | undefined,
@@ -184,8 +181,7 @@ export const schemaImageUrl = (
   if (typeof image === 'string') return image.startsWith('http') ? image : absoluteUrl(image)
   if (typeof image === 'number') return undefined
 
-  const url =
-    image.sizes?.hero?.url || image.sizes?.og?.url || image.sizes?.tablet?.url || image.url
+  const url = image.url
   return url ? absoluteUrl(url) : undefined
 }
 

@@ -198,7 +198,6 @@ function AtlasCard({ destination, index }: { destination: DestinationCard; index
         <div className="relative isolate aspect-[4/5] overflow-hidden bg-ink">
           <PayloadImageFill
             media={destination.heroImage}
-            size="hero"
             sizes="(min-width: 1024px) 30vw, (min-width: 640px) 46vw, 92vw"
             className="-z-20 object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.045]"
           />

@@ -65,7 +65,6 @@ export function StoryTiles({ posts }: { posts: PostCard[] }) {
               <div className="st-media">
                 <PayloadImageFill
                   media={post.featuredImage}
-                  size="card"
                   sizes="(min-width: 1200px) 380px, (min-width: 810px) 30vw, 88vw"
                   priority={index === 0}
                   className="st-image"

@@ -24,7 +24,7 @@ export const Hero: Block = {
       relationTo: 'media',
       admin: {
         description:
-          'Landscape, at least 1920px wide. Images are served as AVIF/WebP automatically.',
+          'Landscape, at least 1920px wide. The original upload is served without recompression.',
       },
     },
     linkField({ name: 'primaryLink', label: 'Primary button' }),

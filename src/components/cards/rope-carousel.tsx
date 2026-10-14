@@ -567,8 +567,8 @@ export function RopeCarousel({
           >
             {item.image ? (
               // A plain <img> on purpose: the cards are transformed at 60fps by the
-              // physics loop, Payload already serves pre-sized images (see
-              // resolveMediaImage), and the reference build animates plain imgs too.
+              // physics loop; resolveMediaImage serves the original upload, and
+              // the reference build animates plain imgs too.
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={item.image.src}
