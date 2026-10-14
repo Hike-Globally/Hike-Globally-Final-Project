@@ -942,9 +942,9 @@ body {
   --hg-rail-bg-bottom: #0c3546;
   --hg-rail-line: rgb(255 255 255 / 9%);
   --hg-rail-line-strong: rgb(255 255 255 / 16%);
-  --hg-rail-ink: rgb(219 237 242 / 72%);
+  --hg-rail-ink: #e0eef2;
   --hg-rail-ink-strong: #f3f9fb;
-  --hg-rail-muted: rgb(186 213 222 / 62%);
+  --hg-rail-muted: #bcd6df;
   --hg-rail-accent: #86d3cb;
   --hg-rail-danger: #f2a08d;
   --hg-rail-font: 'Archivo Variable', 'Archivo', Arial, sans-serif;
@@ -1123,7 +1123,7 @@ body {
   color: #f2f9fb;
   font-family: 'Google Sans Flex Variable', 'Google Sans Flex', var(--hg-rail-font);
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.021em;
   line-height: 1.05;
   text-overflow: ellipsis;
@@ -1134,7 +1134,7 @@ body {
   overflow: hidden;
   color: var(--hg-rail-muted);
   font-size: 8px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.16em;
   line-height: 1;
   text-overflow: ellipsis;
@@ -1158,7 +1158,7 @@ body {
   border: 1px solid transparent;
   border-radius: 9px;
   background: transparent;
-  color: rgb(219 237 242 / 62%);
+  color: #dbeaf0;
   cursor: pointer;
   text-decoration: none;
   transition:
@@ -1209,7 +1209,7 @@ body {
   width: 15px;
   height: 15px;
   flex: 0 0 15px;
-  color: rgb(219 237 242 / 58%);
+  color: #bcd6df;
 }
 
 .template-default .hg-rail__search:focus-within .hg-rail__search-icon {
@@ -1236,7 +1236,7 @@ body {
 }
 
 .template-default .hg-rail__search input::placeholder {
-  color: rgb(186 213 222 / 52%);
+  color: #bcd6df;
 }
 
 .template-default .hg-rail__kbd {
@@ -1245,10 +1245,10 @@ body {
   border: 1px solid rgb(255 255 255 / 10%);
   border-radius: 6px;
   background: rgb(255 255 255 / 5%);
-  color: rgb(186 213 222 / 60%);
+  color: #bcd6df;
   font-family: inherit;
   font-size: 9.5px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1.5;
 }
@@ -1327,7 +1327,7 @@ body {
 
 .template-default .hg-rail__section-label {
   flex: 0 0 auto;
-  color: rgb(186 213 222 / 52%);
+  color: #bcd6df;
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.19em;
@@ -1360,7 +1360,7 @@ body {
   border-radius: 11px;
   color: var(--hg-rail-ink);
   font-size: 13.5px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: -0.004em;
   text-decoration: none;
   transition:
@@ -1381,7 +1381,7 @@ body {
   height: 20px;
   flex: 0 0 20px;
   place-items: center;
-  color: rgb(186 213 222 / 62%);
+  color: #bcd6df;
   transition:
     color 150ms ease,
     transform 150ms ease;
@@ -1409,7 +1409,7 @@ body {
     inset 0 0 0 1px rgb(134 211 203 / 16%),
     0 8px 20px rgb(1 22 30 / 28%);
   color: #ffffff;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .template-default .hg-rail__item--active::before {
@@ -1438,7 +1438,7 @@ body {
 
 .template-default .hg-rail__empty strong {
   color: rgb(238 248 250 / 84%);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* -- Account footer ------------------------------------------------------- */
@@ -1507,7 +1507,7 @@ body {
   overflow: hidden;
   color: #f1f8fa;
   font-size: 12.5px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.009em;
   line-height: 1.2;
   text-overflow: ellipsis;
@@ -1577,7 +1577,7 @@ body {
   cursor: pointer;
   font-family: inherit;
   font-size: 12.5px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.004em;
   text-align: left;
   transition:
@@ -1648,7 +1648,7 @@ body {
   width: 34px;
   height: 34px;
   place-items: center;
-  border: 1px solid #dde3e4;
+  border: 1px solid #8ba5ae;
   border-radius: 11px;
   background: #ffffff;
   box-shadow: 0 5px 14px rgb(1 22 30 / 10%);
@@ -1793,7 +1793,7 @@ body {
 /* Main content area — Payload owns the grid column that follows the rail. */
 
 .template-default .app-header {
-  border-bottom: 1px solid #dde3e4;
+  border-bottom: 1px solid #8ba5ae;
   background: rgb(255 255 255 / 92%);
   box-shadow: 0 1px 3px rgb(1 22 30 / 4%);
   backdrop-filter: blur(16px);
@@ -1848,7 +1848,7 @@ body {
     background-color 160ms ease;
   padding: 10px 18px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   border: none;
   cursor: pointer;
   display: inline-flex;
@@ -1867,8 +1867,8 @@ body {
   border-radius: 10px;
   padding: 10px 18px;
   font-size: 13px;
-  font-weight: 500;
-  border: 1px solid #dde3e4;
+  font-weight: 600;
+  border: 1px solid #8ba5ae;
   background: #ffffff;
   color: #01161e;
   cursor: pointer;
@@ -2088,7 +2088,7 @@ body {
   flex-direction: column;
   align-items: flex-start;
   padding: 20px 21px 19px;
-  border: 1px solid #a8bec5;
+  border: 1px solid #8ba5ae;
   border-radius: 16px;
   background: #ffffff;
   box-shadow: 0 4px 14px rgb(1 22 30 / 10%);
@@ -2148,7 +2148,7 @@ body {
   width: 30px;
   height: 30px;
   place-items: center;
-  border: 1px solid #b6c8ce;
+  border: 1px solid #9ab0b8;
   border-radius: 50%;
   color: #3e5963;
   transition:
@@ -2252,7 +2252,7 @@ body {
   align-items: center;
   gap: 15px;
   padding: 17px 49px 17px 17px;
-  border: 1px solid #a8bec5;
+  border: 1px solid #8ba5ae;
   border-radius: 15px;
   background: #ffffff;
   color: #01161e;
@@ -2313,7 +2313,7 @@ body {
 .hg-dashboard__panel {
   min-width: 0;
   padding: 23px 23px 19px;
-  border: 1px solid #a8bec5;
+  border: 1px solid #8ba5ae;
   border-radius: 17px;
   background: #ffffff;
   box-shadow: 0 4px 14px rgb(1 22 30 / 10%);
@@ -2322,7 +2322,7 @@ body {
 .hg-dashboard__panel-heading {
   align-items: center;
   padding-bottom: 16px;
-  border-bottom: 1px solid #b6c8ce;
+  border-bottom: 1px solid #9ab0b8;
 }
 
 .hg-dashboard__panel-heading h2 {
@@ -2334,7 +2334,7 @@ body {
   width: 34px;
   height: 34px;
   place-items: center;
-  border: 1px solid #b6c8ce;
+  border: 1px solid #9ab0b8;
   border-radius: 50%;
   color: #124559;
   transition:
@@ -2354,7 +2354,7 @@ body {
 }
 
 .hg-dashboard__activity-list li + li {
-  border-top: 1px solid #cedbdf;
+  border-top: 1px solid #b3c6cd;
 }
 
 .hg-dashboard__activity-link {
@@ -2452,7 +2452,7 @@ body {
   align-items: flex-start;
   overflow: hidden;
   padding: 23px;
-  border: 1px solid #a8bec5;
+  border: 1px solid #8ba5ae;
   border-radius: 17px;
   background:
     radial-gradient(ellipse at 100% 0%, rgb(139 178 155 / 65%), transparent 43%),
@@ -2517,7 +2517,7 @@ body {
   max-width: 460px;
   margin: 40px auto;
   padding: 26px;
-  border: 1px solid #a8bec5;
+  border: 1px solid #8ba5ae;
   border-radius: 16px;
   background: #ffffff;
   color: #344f59;
@@ -2805,7 +2805,7 @@ body {
   color: var(--theme-elevation-800);
   font: inherit;
   font-size: 0.8125rem;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.2;
   white-space: nowrap;
   cursor: pointer;
@@ -2842,7 +2842,7 @@ body {
   color: var(--theme-elevation-800);
   font: inherit;
   font-size: 0.8125rem;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.2;
   white-space: nowrap;
   text-decoration: none;
@@ -2888,4 +2888,243 @@ body {
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   Shared admin contrast — collection lists, editors, globals and their portals.
+   The authenticated shell gates these tokens at the root so portalled selects,
+   drawers and dialogs inherit them too. Login and the public site are untouched.
+   Keep geometry, content formatting and all interactive behaviour unchanged.
+   -------------------------------------------------------------------------- */
+html[data-theme='light']:has(.template-default) {
+  --theme-elevation-50: #f0f5f6;
+  --theme-elevation-100: #e1ebee;
+  --theme-elevation-150: #cbdce1;
+  --theme-elevation-200: #9ab0b8;
+  --theme-elevation-250: #8ba5ae;
+  --theme-elevation-300: #78959f;
+  --theme-elevation-350: #637f89;
+  --theme-elevation-400: #526d76;
+  --theme-elevation-450: #48636d;
+  --theme-elevation-500: #3e5963;
+  --theme-elevation-550: #36515c;
+  --theme-elevation-600: #2e4a55;
+  --theme-elevation-650: #26424d;
+  --theme-elevation-700: #1e3945;
+  --theme-elevation-750: #16313e;
+  --theme-elevation-800: #122d39;
+  --theme-success-500: #246344;
+  --theme-warning-500: #865c17;
+  --theme-error-500: #a52d32;
+  --theme-info-500: #12627f;
+  --accessibility-outline: 2px solid #12627f;
+
+  .hg-dashboard {
+    font-weight: 500;
+  }
+
+  /* Labels and actions are bold; authored rich text retains its own formatting. */
+  :is(.collection-list, .collection-edit, .global-edit, .drawer, .account)
+    :is(h1, h2, h3):not(.ContentEditable__root *),
+  .field-label:not(.unstyled),
+  .row-label,
+  .status__value,
+  .sort-column__label {
+    font-weight: 700;
+  }
+
+  .field-description,
+  .status__label,
+  .app-header__breadcrumbs {
+    color: var(--theme-elevation-500);
+    font-weight: 500;
+  }
+
+  .btn {
+    --btn-font-weight: 700;
+    font-weight: 700;
+  }
+
+  .btn--style-primary {
+    --bg-color: #124559;
+    --color: #ffffff;
+    --hover-bg: #0a3040;
+    --hover-color: #ffffff;
+    background-color: var(--bg-color);
+    color: var(--color);
+  }
+
+  .btn--style-primary:not(.btn--disabled):not(:disabled):hover {
+    background-color: var(--hover-bg);
+  }
+
+  .btn--style-secondary {
+    --btn-border: 1px solid #78959f;
+    --hover-btn-border: 1px solid #124559;
+    --color: #124559;
+    --hover-color: #0a3040;
+    border-color: #78959f;
+    color: var(--color);
+    background-color: #f0f5f6;
+  }
+
+  .btn--style-secondary:not(.btn--disabled):not(:disabled):hover {
+    border-color: #124559;
+    background-color: #e1ebee;
+  }
+
+  .btn--style-dashed:not(.btn--disabled) {
+    --color: #124559;
+    --btn-border: 1px dashed #78959f;
+    --hover-btn-border: 1px dashed #124559;
+    --hover-bg: #e1ebee;
+  }
+
+  /* Override the older custom primary styles without disguising disabled actions. */
+  .btn:is(.btn--disabled, :disabled) {
+    --bg-color: #e1ebee;
+    --color: #526d76;
+    --hover-bg: var(--bg-color);
+    --hover-color: var(--color);
+    background-color: var(--bg-color);
+    border-color: #9ab0b8;
+    color: var(--color);
+    box-shadow: none;
+  }
+
+  .pill,
+  .popup-button-list__button,
+  .paginator__page,
+  .rs__option,
+  .rs__single-value,
+  .rs__multi-value-label {
+    font-weight: 600;
+  }
+
+  /* Strong table headings, readable metadata and distinct hover/selection washes. */
+  .table thead {
+    background-color: #d7e5ea;
+    color: #123747;
+  }
+
+  .table thead th {
+    font-weight: 700;
+  }
+
+  .table tbody td {
+    color: #19333e;
+    font-weight: 500;
+  }
+
+  .table tbody td a:not(.pill):not(.btn):not(.hg-view-live--none) {
+    color: #124559;
+    font-weight: 700;
+  }
+
+  .table tbody tr:hover {
+    background-color: #e1ebee;
+  }
+
+  .table tbody tr:has(input[type='checkbox']:checked) {
+    background-color: #cbdfe6;
+  }
+
+  .sort-column__button {
+    opacity: 0.65;
+  }
+
+  .sort-column__button:is(:hover, .sort-column--active) {
+    opacity: 1;
+  }
+
+  .paginator__page--is-current {
+    background-color: #124559;
+    color: #ffffff;
+    font-weight: 700;
+  }
+
+  /* Do not override error borders, read-only fields or rich-text content styles. */
+  .field-type :is(input:not([type='checkbox']):not([type='radio']), textarea),
+  .search-filter__input {
+    font-weight: 500;
+  }
+
+  .field-type :is(input, textarea)::placeholder,
+  .search-filter__input::placeholder,
+  .rs__placeholder {
+    color: #526d76;
+    opacity: 1;
+  }
+
+  .react-select .rs__option--is-selected {
+    background-color: #124559;
+    color: #ffffff;
+  }
+
+  .tabs-field__tab-button {
+    font-weight: 700;
+    opacity: 1;
+  }
+
+  .tabs-field__tab-button:not(.tabs-field__tab-button--has-error) {
+    color: #526d76;
+  }
+
+  .tabs-field__tab-button:not(.tabs-field__tab-button--has-error):is(:hover, .tabs-field__tab-button--active) {
+    color: #124559;
+  }
+
+  .tabs-field__tab-button--active:not(.tabs-field__tab-button--has-error)::after {
+    background-color: #124559;
+  }
+
+  .collapsible--style-default > .collapsible__toggle-wrap,
+  .field-type.rich-text-lexical .fixed-toolbar {
+    background-color: #e1ebee;
+  }
+
+  .collapsible--style-default > .collapsible__toggle-wrap:not(.toggle-disabled):hover {
+    background-color: #cbdce1;
+  }
+
+  .field-type.rich-text-lexical .fixed-toolbar {
+    border-bottom-color: #9ab0b8;
+    color: #124559;
+  }
+
+  .hg-live-preview-toggle,
+  .hg-view-live:not(.hg-view-live--none) {
+    border-color: #78959f;
+    background-color: #f0f5f6;
+    color: #124559;
+    font-weight: 700;
+  }
+
+  .hg-live-preview-toggle:hover,
+  .hg-view-live:not(.hg-view-live--none):hover {
+    border-color: #124559;
+    background-color: #e1ebee;
+  }
+
+  .hg-view-live--none {
+    color: #526d76;
+  }
+
+  .hg-dashboard__status--published {
+    background-color: #246344;
+    color: #ffffff;
+  }
+
+  .hg-dashboard__status--draft {
+    background-color: #865c17;
+    color: #ffffff;
+  }
+
+  .hg-dashboard__metric-detail,
+  .hg-dashboard__action-copy > span,
+  .hg-dashboard__activity-copy > span,
+  .hg-dashboard__site-description,
+  .hg-dashboard__site-footer {
+    font-weight: 500;
+  }
 }
