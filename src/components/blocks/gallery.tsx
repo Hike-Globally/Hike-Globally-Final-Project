@@ -45,7 +45,6 @@ export function Gallery({ block }: { block: GalleryBlock }) {
                 >
                   <PayloadImageFill
                     media={item.image}
-                    size="tablet"
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 45vw, 92vw"
                     imageClassName="transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
                   />

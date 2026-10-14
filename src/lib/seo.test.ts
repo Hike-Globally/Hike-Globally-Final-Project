@@ -256,7 +256,7 @@ test('schemaImageUrl resolves a Media document to an absolute URL', () => {
   // schema.org drops relative image URLs, so nothing may reach JSON-LD un-prefixed.
   assert.equal(
     schemaImageUrl(media),
-    'https://hikeglobally.com/api/media/file/everest-1920x1080.webp',
+    'https://hikeglobally.com/api/media/file/everest.jpg',
   )
   assert.equal(
     schemaImageUrl({ ...media, sizes: {} } as unknown as Media),
@@ -289,7 +289,7 @@ test('blogPostingJsonLd carries the keyword list and an absolute image', () => {
   })
 
   assert.equal(jsonLd.keywords, 'nepal trekking permits, timS card')
-  assert.deepEqual(jsonLd.image, ['https://hikeglobally.com/api/media/file/everest-1920x1080.webp'])
+  assert.deepEqual(jsonLd.image, ['https://hikeglobally.com/api/media/file/everest.jpg'])
   assert.deepEqual(jsonLd.articleSection, ['Trekking guides'])
   assert.equal(jsonLd.url, 'https://hikeglobally.com/blog/trekking-permits')
   assert.equal(jsonLd.wordCount, 3)
@@ -320,7 +320,7 @@ test('touristTripJsonLd carries the keyword list, duration and an absolute image
 
   assert.equal(jsonLd.keywords, 'everest base camp trek, ebc trek')
   assert.equal(jsonLd.duration, 'P14D')
-  assert.deepEqual(jsonLd.image, ['https://hikeglobally.com/api/media/file/everest-1920x1080.webp'])
+  assert.deepEqual(jsonLd.image, ['https://hikeglobally.com/api/media/file/everest.jpg'])
   assert.deepEqual((jsonLd.offers as Record<string, unknown>).price, 1850)
 })
 

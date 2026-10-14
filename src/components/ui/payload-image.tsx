@@ -3,37 +3,23 @@ import Image from 'next/image'
 import type { Media } from '@/payload-types'
 import { cn } from '@/lib/utils'
 
-type ImageSize = 'thumbnail' | 'card' | 'tablet' | 'hero' | 'og'
-
 type PayloadImageProps = {
   media: number | Media | null | undefined
   /** Overrides the CMS alt text (only when the image is purely decorative). */
   alt?: string
-  /** Which of Payload's generated sizes to request. Defaults to the best fit for large art. */
-  size?: ImageSize
-  /**
-   * REQUIRED on purpose: `sizes` is what tells the browser how wide the image will actually
-   * be on screen. Without it next/image downloads a much larger file than necessary.
-   */
+  /** The layout hint is kept at call sites, but the original upload is never resized or re-encoded. */
   sizes: string
   className?: string
   imageClassName?: string
   priority?: boolean
-  /** Set for images above the fold only — everything else should lazy-load. */
   loading?: 'lazy' | 'eager'
 }
 
-const sizeOrder: ImageSize[] = ['thumbnail', 'card', 'tablet', 'hero', 'og']
-
 /**
- * Payload returns absolute media URLs as soon as `serverURL` is configured (which we want for
- * emails, OG tags and sitemaps). next/image, however, only optimises same-origin paths — an
- * absolute URL for our own host would be rejected as an unconfigured remote. Turning those
- * back into site-relative URLs keeps the optimisation pipeline working in every environment
- * (local, preview, production) with no per-host `remotePatterns` entry. URLs that point at a
- * real external CDN (Vercel Blob, S3) are left untouched.
+ * Payload may return an absolute URL for media served by this site. Use a relative URL so
+ * images still work behind preview domains; leave external storage URLs untouched.
  */
-const localMediaUrl = (url: string): string => {
+export const localMediaUrl = (url: string): string => {
   if (!/^https?:\/\//.test(url)) return url
   try {
     const parsed = new URL(url)
@@ -43,48 +29,25 @@ const localMediaUrl = (url: string): string => {
   }
 }
 
-/**
- * Resolves a Media document to a plain `{ src, alt }` pair for contexts that
- * render their own `<img>` (e.g. the rope carousel, whose cards are animated
- * outside of next/image). Uses the same "smallest size that still fits"
- * selection as the components above.
- */
-export function resolveMediaImage(
-  media: number | Media | null | undefined,
-  size: ImageSize = 'tablet',
-): { src: string; alt: string } | null {
-  if (!media || typeof media === 'number') return null
-
-  const generated = media.sizes ?? {}
-  const candidates: ImageSize[] = [size, ...sizeOrder.filter((entry) => entry !== size)]
-  let url: string | null | undefined
-
-  for (const candidate of candidates) {
-    const entry = generated[candidate]
-    if (entry?.url) {
-      url = entry.url
-      break
-    }
-  }
-
-  url = url ?? media.url
-  if (!url) return null
-
-  return { src: localMediaUrl(url), alt: media.alt ?? '' }
+/** The only frontend source for uploaded images is the original file, never a Payload crop. */
+export function originalMediaUrl(media: number | Media | null | undefined): string | null {
+  if (!media || typeof media === 'number' || !media.url) return null
+  return localMediaUrl(media.url)
 }
 
-/**
- * Renders a Payload Media document with next/image.
- *
- * - picks the smallest generated size that is still large enough for the requested slot
- * - honours the editor's focal point (object-position) so crops keep the subject
- * - always carries the CMS alt text, so accessibility can never be forgotten
- * - renders nothing (instead of crashing) if the image was deleted or never populated
- */
+/** Resolve media for contexts that render their own <img> (e.g. the rope carousel). */
+export function resolveMediaImage(
+  media: number | Media | null | undefined,
+): { src: string; alt: string } | null {
+  if (!media || typeof media === 'number' || media.mimeType?.startsWith('video/')) return null
+  const src = originalMediaUrl(media)
+  return src ? { src, alt: media.alt ?? '' } : null
+}
+
+/** Render the uploaded image bytes, with no Payload derivative or Next image transformation. */
 export function PayloadImage({
   media,
   alt,
-  size = 'tablet',
   sizes,
   className,
   imageClassName,
@@ -92,38 +55,35 @@ export function PayloadImage({
   loading,
 }: PayloadImageProps) {
   if (!media || typeof media === 'number') return null
+  const src = originalMediaUrl(media)
+  if (!src) return null
 
-  const generated = media.sizes ?? {}
-
-  // Fall back to any available size, then to the original upload.
-  const candidates: ImageSize[] = [size, ...sizeOrder.filter((entry) => entry !== size)]
-  let chosen: { url?: string | null; width?: number | null; height?: number | null } | undefined
-
-  for (const candidate of candidates) {
-    const entry = generated[candidate]
-    if (entry?.url) {
-      chosen = entry
-      break
-    }
-  }
-
-  const url = chosen?.url ?? media.url
-  if (!url) return null
-
-  const width = chosen?.width ?? media.width ?? 1200
-  const height = chosen?.height ?? media.height ?? 800
-
-  // Payload stores focal point as percentages (0–100). Default to centre.
   const objectPosition = `${media.focalX ?? 50}% ${media.focalY ?? 50}%`
+
+  if (media.mimeType?.startsWith('video/')) {
+    return (
+      <div className={cn('relative overflow-hidden', className)}>
+        <video
+          src={src}
+          controls
+          playsInline
+          preload="metadata"
+          aria-label={alt ?? media.alt ?? 'Video'}
+          className={cn('h-full w-full object-contain', imageClassName)}
+        />
+      </div>
+    )
+  }
 
   return (
     <div className={cn('relative overflow-hidden', className)}>
       <Image
-        src={localMediaUrl(url)}
+        src={src}
         alt={alt ?? media.alt ?? ''}
-        width={width}
-        height={height}
+        width={media.width ?? 1200}
+        height={media.height ?? 800}
         sizes={sizes}
+        unoptimized
         priority={priority}
         loading={loading ?? (priority ? 'eager' : 'lazy')}
         style={{ objectPosition }}
@@ -137,37 +97,40 @@ export function PayloadImage({
 export function PayloadImageFill({
   media,
   alt,
-  size = 'tablet',
   sizes,
   className,
   imageClassName,
   priority = false,
-}: Omit<PayloadImageProps, 'className'> & { className?: string }) {
+}: PayloadImageProps) {
   if (!media || typeof media === 'number') return null
-
-  const generated = media.sizes ?? {}
-  const candidates: ImageSize[] = [size, ...sizeOrder.filter((entry) => entry !== size)]
-  let chosen: { url?: string | null; width?: number | null; height?: number | null } | undefined
-
-  for (const candidate of candidates) {
-    const entry = generated[candidate]
-    if (entry?.url) {
-      chosen = entry
-      break
-    }
-  }
-
-  const url = chosen?.url ?? media.url
-  if (!url) return null
+  const src = originalMediaUrl(media)
+  if (!src) return null
 
   const objectPosition = `${media.focalX ?? 50}% ${media.focalY ?? 50}%`
 
+  if (media.mimeType?.startsWith('video/')) {
+    return (
+      <video
+        src={src}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        aria-label={alt ?? media.alt ?? 'Video'}
+        style={{ objectPosition }}
+        className={cn('absolute inset-0 h-full w-full object-cover', imageClassName, className)}
+      />
+    )
+  }
+
   return (
     <Image
-      src={localMediaUrl(url)}
+      src={src}
       alt={alt ?? media.alt ?? ''}
       fill
       sizes={sizes}
+      unoptimized
       priority={priority}
       style={{ objectPosition }}
       className={cn('object-cover', imageClassName, className)}

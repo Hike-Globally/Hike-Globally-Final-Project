@@ -181,7 +181,6 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
             <div className="lb-breath absolute inset-0 overflow-hidden">
               <PayloadImageFill
                 media={lead.featuredImage}
-                size="tablet"
                 sizes="(min-width: 1920px) 44vw, (min-width: 1024px) 56vw, 92vw"
                 className="transition-transform duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05] group-focus-within:scale-[1.05]"
               />
@@ -335,7 +334,6 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
                         <PayloadImageFill
                           media={post.featuredImage}
                           alt=""
-                          size="thumbnail"
                           sizes="80px"
                           className="transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.08] group-focus-within:scale-[1.08]"
                         />
@@ -394,7 +392,6 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
                 <PayloadImageFill
                   media={post.featuredImage}
                   alt=""
-                  size="card"
                   sizes="(min-width: 120rem) 320px, 280px"
                 />
                 <span className="lb-preview-caption">{postCategory(post) ?? dict.nav.blog}</span>

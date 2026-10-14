@@ -25,7 +25,7 @@ export function TripsRopeCarousel({ trips, label }: { trips: TripCard[]; label?:
       href: sitePath(`/trips/${trip.slug}`),
       title: trip.title,
       caption: trip.summary,
-      image: resolveMediaImage(trip.heroImage, 'card'),
+      image: resolveMediaImage(trip.heroImage),
     }))
 
   if (items.length < 3) {

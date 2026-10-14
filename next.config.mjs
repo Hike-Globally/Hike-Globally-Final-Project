@@ -33,12 +33,9 @@ const nextConfig = {
   },
 
   images: {
-    // AVIF first — roughly 50% smaller than WebP at the same visual quality.
-    formats: ['image/avif', 'image/webp'],
-    // How long an optimised `/_next/image` response may be reused by browsers/CDNs. The URL
-    // encodes the source + dimensions, and Payload media filenames are unique per upload, so a
-    // long TTL is safe and removes repeat optimisation work for returning visitors.
-    minimumCacheTTL: 60 * 60 * 24 * 30,
+    // Serve original bytes everywhere (including bundled design assets), not a resized or
+    // re-encoded /_next/image variant. CMS uploads also use their original media.url.
+    unoptimized: true,
     remotePatterns: [
       // Vercel Blob storage in production
       { protocol: 'https', hostname: '*.public.blob.vercel-storage.com' },

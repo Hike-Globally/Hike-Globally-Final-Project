@@ -54,7 +54,6 @@ export function DestinationDetail({
       >
         <PayloadImageFill
           media={destination.heroImage}
-          size="hero"
           sizes="100vw"
           priority
           className="-z-10"
@@ -151,7 +150,6 @@ export function DestinationDetail({
                   <div key={item.id ?? index} className="overflow-hidden bg-mist-60">
                     <PayloadImage
                       media={item.image}
-                      size="card"
                       sizes="(min-width: 1024px) 20vw, 45vw"
                       className="aspect-square w-full"
                     />

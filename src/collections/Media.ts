@@ -11,11 +11,9 @@ const dirname = path.dirname(filename)
 /**
  * Media library.
  *
- * TRADE-OFF on image sizes: Payload generates every size once, at upload time, with sharp.
- * That is the single biggest performance win available to an image-heavy travel site — the
- * browser downloads a 640px card image instead of a 4MB original, and the CPU cost is paid
- * once per upload instead of once per request. The flip side is disk/Blob usage, so the list
- * below is deliberately short (5 sizes) and tuned to the actual breakpoints of this design.
+ * Payload's generated sizes remain available for admin thumbnails and existing CMS records.
+ * The public site always uses the original upload URL instead, without cropping or recompression.
+ * Retaining these size definitions also avoids a schema change for existing installations.
  */
 export const Media: CollectionConfig = {
   slug: 'media',

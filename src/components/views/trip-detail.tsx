@@ -196,7 +196,6 @@ export function TripDetail({
       <section data-header-hero className="relative isolate overflow-hidden bg-ink text-mist">
         <PayloadImageFill
           media={trip.heroImage}
-          size="hero"
           sizes="100vw"
           priority
           className="-z-10"
@@ -449,7 +448,6 @@ export function TripDetail({
                     <div className="group overflow-hidden bg-mist-60 ring-1 ring-black/5">
                       <PayloadImage
                         media={item.image}
-                        size="tablet"
                         sizes="(min-width: 1280px) 30vw, (min-width: 640px) 45vw, 92vw"
                         className="aspect-[4/3] w-full transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
                       />

@@ -70,7 +70,6 @@ export function Testimonials({ block }: { block: TestimonialsBlock }) {
                     {item.avatar && typeof item.avatar !== 'number' ? (
                       <PayloadImage
                         media={item.avatar}
-                        size="thumbnail"
                         sizes="44px"
                         className="size-11 shrink-0 rounded-full"
                       />

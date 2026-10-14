@@ -43,7 +43,6 @@ export function PageHeader({
         <>
           <PayloadImageFill
             media={background}
-            size="hero"
             sizes="100vw"
             priority
             className="-z-10"
