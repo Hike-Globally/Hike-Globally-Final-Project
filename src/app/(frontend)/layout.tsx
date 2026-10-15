@@ -130,9 +130,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang={htmlLang}
       className={`${headingFont.variable} ${bodyFont.variable} overflow-x-clip`}
     >
-      {/* Google tag (gtag.js) — verbatim from gtag.txt at the repo root. This root layout wraps
-          every public page, so placing the snippet right after <head> is the Next.js equivalent
-          of pasting the GA4 global tag immediately after the opening <head> tag of each page. */}
+      {/* Google tag (gtag.js) & Google AdSense — verbatim from gtag.txt and ads.txt at the repo
+          root. This root layout wraps every public page, so placing the snippets inside <head> is
+          the Next.js equivalent of pasting them between <head></head> of each page. */}
       <head>
         {/* Google tag (gtag.js) */}
         {/* eslint-disable-next-line @next/next/next-script-for-ga -- gtag.txt is pasted verbatim as requested, rather than the @next/third-parties wrapper */}
@@ -147,6 +147,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   gtag('config', 'G-WWQBTLKKBW');
 `,
           }}
+        ></script>
+        {/* Google AdSense (from ads.txt) */}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2988608851561676"
+          crossOrigin="anonymous"
         ></script>
       </head>
       <body className="flex min-h-dvh min-w-0 flex-col overflow-x-clip bg-background text-foreground">
