@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, Field } from 'payload'
 
 import { adminOrEditor, publishedOrSignedIn } from '../access'
 import { pageSectionsField } from '../fields/page-sections'
@@ -11,6 +11,20 @@ import { viewLiveField } from '../fields/view-live'
 import { revalidateTrip, revalidateTripDelete } from '../hooks/revalidate'
 import { difficultySelectOptions } from '../lib/difficulty'
 import { siteLivePreviewURL } from '../lib/live-preview-url'
+import { tripFaqCategories } from '../lib/trip-faqs'
+
+const tripFaqFields: Field[] = tripFaqCategories.map(({ field, heading }) => ({
+  name: field,
+  type: 'array',
+  localized: true,
+  label: heading,
+  labels: { singular: 'FAQ', plural: 'FAQs' },
+  admin: { initCollapsed: true },
+  fields: [
+    { name: 'question', type: 'text', required: true },
+    { name: 'answer', type: 'textarea', required: true },
+  ],
+}))
 
 /**
  * Trips — the longest form in the CMS.
@@ -381,17 +395,7 @@ export const Trips: CollectionConfig = {
             },
           ],
         },
-        {
-          name: 'faqs',
-          type: 'array',
-          localized: true,
-          labels: { singular: 'FAQ', plural: 'FAQs' },
-          admin: { initCollapsed: true },
-          fields: [
-            { name: 'question', type: 'text', required: true },
-            { name: 'answer', type: 'textarea', required: true },
-          ],
-        },
+        ...tripFaqFields,
       ],
     },
     {

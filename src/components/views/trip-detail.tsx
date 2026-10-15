@@ -36,6 +36,7 @@ import { sitePath } from '@/i18n/config'
 import type { TripCard as TripCardData } from '@/lib/data'
 import { difficultyLabel } from '@/lib/difficulty'
 import { formatNumber, formatPrice } from '@/lib/format'
+import { getTripFaqGroups } from '@/lib/trip-faqs'
 import { resolveLink } from '@/lib/links'
 import { cn } from '@/lib/utils'
 import { breadcrumbJsonLd, faqJsonLd, touristTripJsonLd } from '@/lib/seo'
@@ -192,7 +193,8 @@ export function TripDetail({
   const inquiryHref = hasInquiry ? '#inquiry' : sitePath('/inquiry')
   const bookingLink = resolveLink(trip.bookingLink?.link)
   const bookingHref = bookingLink?.href ?? inquiryHref
-  const faqs = (trip.faqs ?? []).filter((faq) => faq.question?.trim())
+  const faqGroups = getTripFaqGroups(trip)
+  const faqs = faqGroups.flatMap(({ faqs: items }) => items)
 
   const sectionContent: Record<string, ReactNode> = {
     hero: (
@@ -409,31 +411,41 @@ export function TripDetail({
     ),
     faqs: (
       <>
-        {faqs.length ? (
+        {faqGroups.length ? (
           <section id="faqs" className="scroll-mt-24 py-16 md:py-24">
             <Reveal>
               <SectionTitle title={dict.trip.faqs} level="h2" />
 
-              <Accordion type="multiple" className="space-y-4">
-                {faqs.map((faq, index) => (
-                  <AccordionItem
-                    key={faq.id ?? index}
-                    value={`faq-${faq.id ?? index}`}
-                    className={cn(surface, 'overflow-hidden px-6 md:px-8')}
-                  >
-                    <AccordionTrigger className="items-center py-6 hover:no-underline md:py-7">
-                      <span className="min-w-0 text-left font-heading text-base font-semibold text-ink md:text-lg">
-                        {faq.question}
-                      </span>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <p className="max-w-3xl text-[1.0625rem] leading-relaxed whitespace-pre-line text-ink-70">
-                        {faq.answer}
-                      </p>
-                    </AccordionContent>
-                  </AccordionItem>
+              <div className="space-y-10">
+                {faqGroups.map(({ field, heading, faqs: items }) => (
+                  <div key={field}>
+                    <h3 className="heading-md mb-4">{heading}</h3>
+                    <Accordion type="multiple" className="space-y-4">
+                      {items.map((faq, index) => (
+                        <AccordionItem
+                          key={faq.id ?? index}
+                          value={`${field}-${faq.id ?? index}`}
+                          className={cn(surface, 'overflow-hidden px-6 md:px-8')}
+                        >
+                          <AccordionTrigger
+                            headingLevel="h4"
+                            className="items-center py-6 hover:no-underline md:py-7"
+                          >
+                            <span className="min-w-0 text-left font-heading text-base font-semibold text-ink md:text-lg">
+                              {faq.question}
+                            </span>
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            <p className="max-w-3xl text-[1.0625rem] leading-relaxed whitespace-pre-line text-ink-70">
+                              {faq.answer}
+                            </p>
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
+                  </div>
                 ))}
-              </Accordion>
+              </div>
             </Reveal>
           </section>
         ) : null}

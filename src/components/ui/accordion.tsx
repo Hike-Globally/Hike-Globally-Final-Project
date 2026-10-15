@@ -27,6 +27,7 @@ function AccordionTrigger({
   className,
   children,
   indicator = 'plus',
+  headingLevel = 'h3',
   ...props
 }: React.ComponentProps<typeof AccordionPrimitive.Trigger> & {
   /**
@@ -34,28 +35,34 @@ function AccordionTrigger({
    * `chevron` is the circular chevron button used by the trip-page section cards.
    */
   indicator?: 'plus' | 'chevron'
+  /** Semantic heading tag for the accordion question. */
+  headingLevel?: 'h3' | 'h4'
 }) {
+  const Heading = headingLevel
+
   return (
-    <AccordionPrimitive.Header className="flex">
-      <AccordionPrimitive.Trigger
-        data-slot="accordion-trigger"
-        className={cn(
-          'focus-visible:ring-ring/50 flex flex-1 items-start justify-between gap-4 py-5 text-left font-heading text-base font-semibold text-ink transition-all outline-none hover:text-deep focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 md:text-lg',
-          className,
-        )}
-        {...props}
-      >
-        {children}
-        {indicator === 'chevron' ? (
-          <span className="grid size-10 shrink-0 place-items-center rounded-full border border-slate-200 bg-white text-slate transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] [&>svg]:size-4 [[data-state=open]>span>&]:rotate-180">
-            <ChevronDownIcon aria-hidden />
-          </span>
-        ) : (
-          <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full border border-ink/10 text-deep transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] [&>svg]:size-3.5 [[data-state=open]>span>&]:rotate-45">
-            <PlusIcon className="transition-transform duration-300" aria-hidden />
-          </span>
-        )}
-      </AccordionPrimitive.Trigger>
+    <AccordionPrimitive.Header asChild>
+      <Heading className="flex">
+        <AccordionPrimitive.Trigger
+          data-slot="accordion-trigger"
+          className={cn(
+            'focus-visible:ring-ring/50 flex flex-1 items-start justify-between gap-4 py-5 text-left font-heading text-base font-semibold text-ink transition-all outline-none hover:text-deep focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 md:text-lg',
+            className,
+          )}
+          {...props}
+        >
+          {children}
+          {indicator === 'chevron' ? (
+            <span className="grid size-10 shrink-0 place-items-center rounded-full border border-slate-200 bg-white text-slate transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] [&>svg]:size-4 [[data-state=open]>span>&]:rotate-180">
+              <ChevronDownIcon aria-hidden />
+            </span>
+          ) : (
+            <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full border border-ink/10 text-deep transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] [&>svg]:size-3.5 [[data-state=open]>span>&]:rotate-45">
+              <PlusIcon className="transition-transform duration-300" aria-hidden />
+            </span>
+          )}
+        </AccordionPrimitive.Trigger>
+      </Heading>
     </AccordionPrimitive.Header>
   )
 }
