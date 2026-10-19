@@ -798,7 +798,7 @@ export interface Blog {
    */
   pageSections?:
     | {
-        kind: 'hero' | 'content' | 'author' | 'navigation' | 'planning' | 'related' | 'html';
+        kind: 'hero' | 'content' | 'faqs' | 'author' | 'navigation' | 'planning' | 'related' | 'html';
         heading?: string | null;
         /**
          * Paste an HTML fragment, not a full document. Headings, text, links, images, lists, tables and safe inline styles are supported. Scripts, event handlers, forms, embeds and unsafe URLs/styles are removed when displayed.
@@ -830,6 +830,55 @@ export interface Blog {
     };
     [k: string]: unknown;
   } | null;
+  faqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  bestTimeToTrekFaqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  requiredPermitsFaqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  trekkerSafetyFaqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  packingListFaqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  altitudeSicknessFaqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  accommodationFaqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
   author: number | User;
   publishedAt?: string | null;
   /**
@@ -1583,6 +1632,55 @@ export interface BlogSelect<T extends boolean = true> {
   excerpt?: T;
   featuredImage?: T;
   content?: T;
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  bestTimeToTrekFaqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  requiredPermitsFaqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  trekkerSafetyFaqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  packingListFaqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  altitudeSicknessFaqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  accommodationFaqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
   author?: T;
   publishedAt?: T;
   categories?: T;

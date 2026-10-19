@@ -16,6 +16,9 @@ export const tripSectionOptions = [
 export const blogSectionOptions = [
   { label: 'Hero & post details', value: 'hero' },
   { label: 'Article body & table of contents', value: 'content' },
+  // Added after page layouts shipped: migration 20261019_045205_blog_faqs inserts this row
+  // after the article body in every layout saved before it existed, so older posts get it too.
+  { label: 'FAQs', value: 'faqs' },
   { label: 'About the author', value: 'author' },
   { label: 'Back to journal', value: 'navigation' },
   { label: 'Planning call to action', value: 'planning' },

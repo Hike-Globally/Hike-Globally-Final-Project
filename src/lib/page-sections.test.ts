@@ -56,6 +56,15 @@ for (const [name, options] of [
   })
 }
 
+test('blog: the FAQs section follows the article body by default', () => {
+  // Layouts saved before the row existed get it in the same place (migration
+  // 20261019_045205_blog_faqs); never-saved layouts get it from these defaults.
+  assert.deepEqual(
+    defaultPageSections(blogSectionOptions).map(({ kind }) => kind),
+    ['hero', 'content', 'faqs', 'author', 'navigation', 'planning', 'related'],
+  )
+})
+
 test('rejects duplicate built-ins, allows any number of distinct HTML sections', () => {
   assert.equal(typeof validatePageSections([{ kind: 'hero' }, { kind: 'hero' }]), 'string')
   assert.equal(validatePageSections([{ kind: 'html' }, { kind: 'html' }]), true)

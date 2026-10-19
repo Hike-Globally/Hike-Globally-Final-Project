@@ -1,3 +1,8 @@
+/**
+ * FAQ categories, in display order. Named for trips, where they started, but blog posts use the
+ * same set: both collections get their fields from `faqFields()` (src/fields/faqs.ts) and both
+ * pages render `getTripFaqGroups()` through `FaqSection`.
+ */
 export const tripFaqCategories = [
   { field: 'faqs', heading: 'General Questions' },
   { field: 'bestTimeToTrekFaqs', heading: 'Best Time To Trek' },
@@ -18,7 +23,10 @@ export type TripFaqItem = {
 
 export type TripFaqData = Partial<Record<TripFaqCategoryField, TripFaqItem[] | null>>
 
-/** Keep category order and labels consistent between the CMS and rendered trip pages. */
+/**
+ * A trip's or post's non-empty FAQ categories, in order, with blank questions dropped. Keeps
+ * category order and labels consistent between the CMS and the rendered page.
+ */
 export function getTripFaqGroups(trip: TripFaqData) {
   return tripFaqCategories
     .map(({ field, heading }) => ({

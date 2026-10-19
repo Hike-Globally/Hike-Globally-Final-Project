@@ -192,6 +192,8 @@ const en = {
     planningText:
       'Dreaming beyond the page? Our local guides will help you find the route that feels like yours.',
     planningLink: 'Plan your trip',
+    /** Heading of the post's FAQ section — the same wording as on trip pages. */
+    faqs: 'Frequently Asked Questions',
     notFound: 'That article no longer exists.',
     allCategories: 'All topics',
     categoryTrekkingGuides: 'Trekking guides',

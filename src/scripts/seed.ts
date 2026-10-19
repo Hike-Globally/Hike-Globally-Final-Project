@@ -1427,6 +1427,19 @@ const run = async () => {
           'Cotton anything, a sleeping bag rated below −10 °C, crampons (unless you are doing the passes in shoulder season), and more than one book. You will not read it.',
         ),
       ),
+      // Rendered by the same FAQ section as trip pages, under the matching category heading.
+      packingListFaqs: [
+        {
+          question: 'How heavy should my bag be?',
+          answer:
+            'Aim for about 11 kg in the duffel a porter carries (the domestic flight to Lukla allows 15 kg including your daypack) and 5–6 kg in your daypack: water, layers, snacks and anything you need before the porter arrives at the lodge.',
+        },
+        {
+          question: 'Can I rent or buy gear in Kathmandu?',
+          answer:
+            'Yes. Thamel has down jackets and sleeping bags to rent for a few dollars a day, and plenty of shops selling the rest. Bring your own boots, already broken in — that is the one thing that should never be new on day one.',
+        },
+      ],
     },
     {
       title: 'Altitude sickness: what the guide is watching for',
@@ -1457,6 +1470,25 @@ const run = async () => {
           'Acetazolamide (Diamox) helps with acclimatisation and sleep at altitude; it does not replace a sensible ascent profile. Dexamethasone is for treatment, not prevention, and is carried by our guides for emergencies only. Talk to a doctor before you travel.',
         ),
       ),
+      faqs: [
+        {
+          question: 'Does being fit protect me from altitude sickness?',
+          answer:
+            'No. Fitness makes the walking easier, but it has no measurable effect on how you acclimatise. Fit trekkers are often the ones who climb too fast because they feel strong.',
+        },
+      ],
+      altitudeSicknessFaqs: [
+        {
+          question: 'At what altitude does altitude sickness start?',
+          answer:
+            'Mild symptoms can appear from about 2,500 m, and most cases on the Everest and Annapurna trails start between 3,500 m and 4,500 m, usually within a day of arriving at a new sleeping altitude.',
+        },
+        {
+          question: 'What happens if I have to descend?',
+          answer:
+            'A guide or assistant guide goes down with you while the group continues. Most people recover within a day or two at a lower lodge and many rejoin the trek. If it is serious, we arrange a helicopter evacuation — which is why travel insurance covering rescue up to 6,000 m is required.',
+        },
+      ],
     },
     {
       title: 'Langtang, eight years on: a valley that rebuilt itself',
