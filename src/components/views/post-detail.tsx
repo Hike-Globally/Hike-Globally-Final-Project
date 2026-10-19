@@ -11,6 +11,7 @@ import { RichText } from '@/components/content/rich-text'
 import { PostCard } from '@/components/cards/post-card'
 import { JsonLd } from '@/components/seo/json-ld'
 import { Breadcrumbs } from '@/components/sections/breadcrumbs'
+import { FaqSection } from '@/components/sections/faq-section'
 import { Button } from '@/components/ui/button'
 import { PayloadImage, PayloadImageFill } from '@/components/ui/payload-image'
 import { blogCategoryLabel, dictionary } from '@/i18n/dictionaries'
@@ -18,7 +19,8 @@ import { sitePath } from '@/i18n/config'
 import type { PostCard as PostCardData } from '@/lib/data'
 import { getArticleHeadings } from '@/lib/article-headings'
 import { formatDate, readingTimeMinutes } from '@/lib/format'
-import { blogPostingJsonLd, breadcrumbJsonLd } from '@/lib/seo'
+import { blogPostingJsonLd, breadcrumbJsonLd, faqJsonLd } from '@/lib/seo'
+import { getTripFaqGroups } from '@/lib/trip-faqs'
 import { cn } from '@/lib/utils'
 import type { Blog } from '@/payload-types'
 
@@ -70,6 +72,11 @@ export function PostDetail({
     'mx-auto max-w-[44rem]',
     headings.length > 0 && 'lg:max-w-[68rem]',
   )
+
+  // Blog posts use the trip FAQ categories, so this is the same grouping the trip page renders.
+  const faqGroups = getTripFaqGroups(post)
+  const faqs = faqGroups.flatMap(({ faqs: items }) => items)
+  const sections = resolvePageSections(post.pageSections, blogSectionOptions)
 
   const category = post.categories?.[0]
   const categoryLabel = category
@@ -208,6 +215,15 @@ export function PostDetail({
         <RichText content={post.content} className="blog-prose" headingIds={headingIds} />
       </>
     ),
+    // Same section as the trip page. Margins rather than the trip's padding, so the gap to the
+    // article body and author box collapses into one, whichever order the editor chooses.
+    faqs: (
+      <FaqSection
+        title={dict.blog.faqs}
+        groups={faqGroups}
+        className="my-16 first:mt-0 last:mb-0 md:my-20"
+      />
+    ),
     author: (
       <>
         {authorName && author?.bio ? (
@@ -317,11 +333,7 @@ export function PostDetail({
       </>
     ),
   }
-  const groups = groupPageSections(resolvePageSections(post.pageSections, blogSectionOptions), [
-    'hero',
-    'planning',
-    'related',
-  ])
+  const groups = groupPageSections(sections, ['hero', 'planning', 'related'])
 
   return (
     <>
@@ -395,6 +407,9 @@ export function PostDetail({
             siteName,
             categories: (post.categories ?? []).map(blogCategoryLabel),
           }),
+          ...(faqs.length && sections.some(({ kind }) => kind === 'faqs')
+            ? [faqJsonLd(faqs.map((faq) => ({ question: faq.question, answer: faq.answer ?? '' })))]
+            : []),
         ]}
       />
     </>

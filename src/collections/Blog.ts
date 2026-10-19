@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { adminOrEditor, publishedOrSignedIn } from '../access'
+import { faqFields } from '../fields/faqs'
 import { pageSectionsField } from '../fields/page-sections'
 import { blogSectionOptions } from '../lib/page-sections'
 import { keywordsSection } from '../fields/keywords'
@@ -68,6 +69,18 @@ export const Blog: CollectionConfig = {
         description:
           'The post body. Tables are available from the toolbar’s “+” menu (or type /table): pick rows and columns, then use the hover handles to add, remove, merge or resize. Handy for gear comparisons, cost breakdowns and at-a-glance facts.',
       },
+    },
+    /* FAQs — the same categorised question lists as a trip (src/fields/faqs.ts), rendered as the
+       same "Frequently Asked Questions" section. Optional, so the panel starts closed. */
+    {
+      type: 'collapsible',
+      label: 'FAQs',
+      admin: {
+        initCollapsed: true,
+        description:
+          'Shown in a Frequently Asked Questions section, grouped under these headings exactly like on trip pages. Empty groups are hidden. By default the section sits right after the post body; move it with the FAQs row in Page sections.',
+      },
+      fields: faqFields(),
     },
     {
       type: 'row',

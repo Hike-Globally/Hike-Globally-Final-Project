@@ -150,7 +150,7 @@ ones.
 | `/` | `website` + default share image | `Organization`, `WebSite` (with `SearchAction`), `FAQPage` when the block is used |
 | `/trips`, `/blog`, `/destinations` | `website` | `BreadcrumbList` + `CollectionPage` whose `ItemList` is the cards the page renders |
 | `/trips/[slug]` | `website` + trip hero | `BreadcrumbList`, `TouristTrip` (offer, itinerary, duration, keywords), `FAQPage` |
-| `/blog/[slug]` | `article` + `article:published_time` / `modified_time` / `tag` | `BreadcrumbList`, `BlogPosting` (author, `articleSection`, `wordCount`, keywords) |
+| `/blog/[slug]` | `article` + `article:published_time` / `modified_time` / `tag` | `BreadcrumbList`, `BlogPosting` (author, `articleSection`, `wordCount`, keywords), `FAQPage` when the post has FAQs |
 | `/destinations/[slug]` | `website` + region hero | `BreadcrumbList`, `TouristDestination` (geo, country) |
 | `/inquiry` | `website` | `BreadcrumbList`, `ContactPage` |
 | any CMS page (`/[slug]`) | `website` + page image | `BreadcrumbList`, `WebPage` |

@@ -28,6 +28,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
+import { FaqSection } from '@/components/sections/faq-section'
 import { ItinerarySection } from '@/components/sections/itinerary-section'
 import { surface } from '@/components/ui/surface'
 import { PayloadImageFill, PayloadImage } from '@/components/ui/payload-image'
@@ -409,48 +410,7 @@ export function TripDetail({
         ) : null}
       </>
     ),
-    faqs: (
-      <>
-        {faqGroups.length ? (
-          <section id="faqs" className="scroll-mt-24 py-16 md:py-24">
-            <Reveal>
-              <SectionTitle title={dict.trip.faqs} level="h2" />
-
-              <div className="space-y-10">
-                {faqGroups.map(({ field, heading, faqs: items }) => (
-                  <div key={field}>
-                    <h3 className="heading-md mb-4">{heading}</h3>
-                    <Accordion type="multiple" className="space-y-4">
-                      {items.map((faq, index) => (
-                        <AccordionItem
-                          key={faq.id ?? index}
-                          value={`${field}-${faq.id ?? index}`}
-                          className={cn(surface, 'overflow-hidden px-6 md:px-8')}
-                        >
-                          <AccordionTrigger
-                            headingLevel="h4"
-                            className="items-center py-6 hover:no-underline md:py-7"
-                          >
-                            <span className="min-w-0 text-left font-heading text-base font-semibold text-ink md:text-lg">
-                              {faq.question}
-                            </span>
-                          </AccordionTrigger>
-                          <AccordionContent>
-                            <p className="max-w-3xl text-[1.0625rem] leading-relaxed whitespace-pre-line text-ink-70">
-                              {faq.answer}
-                            </p>
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
-                  </div>
-                ))}
-              </div>
-            </Reveal>
-          </section>
-        ) : null}
-      </>
-    ),
+    faqs: <FaqSection title={dict.trip.faqs} groups={faqGroups} />,
     gallery: (
       <>
         {trip.gallery?.length ? (
