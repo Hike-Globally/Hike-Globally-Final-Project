@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import type { LatestPostsBlock, Page } from '@/payload-types'
+import type { Page } from '@/payload-types'
 import { HeroScrollCover } from '@/components/motion/hero-scroll-cover'
 import { AboutHikeGlobally } from '@/components/sections/about-hike-globally'
 import { DifficultyLevels } from '@/components/sections/difficulty-levels'
@@ -28,8 +28,9 @@ type Block = NonNullable<Page['blocks']>[number]
  *  - an editor's `latestPosts` block never renders as itself on the homepage. The journal
  *    section there is the bespoke board (`LatestBlogsSection`), which is injected immediately
  *    *before* the inquiry block — or last, on a page with no inquiry block at all — so the
- *    section can be neither duplicated nor dropped by a drag in the admin. The block's `limit`
- *    is still read and honoured by the board.
+ *    section can be neither duplicated nor dropped by a drag in the admin. The board is fixed
+ *    at one lead plate plus three index rows (see `latest-blogs-limits.ts`), so the block's
+ *    `limit` does not size it; that field still drives the tile grid on other pages.
  *
  * Enforced at render time so the rules hold regardless of what the CMS page contains.
  */
@@ -37,14 +38,6 @@ function homepageBlocks(blocks: Block[]): Block[] {
   const withoutBlog = blocks.filter((block) => block.blockType !== 'latestPosts')
   const inquiryIndex = withoutBlog.findIndex((block) => block.blockType === 'inquiry')
   return inquiryIndex === -1 ? withoutBlog : withoutBlog.slice(0, inquiryIndex + 1)
-}
-
-/** How many stories the homepage journal board shows — the editor's `limit` wins. */
-function homepagePostLimit(blocks: Block[]): number | undefined {
-  const journalBlock = blocks.find(
-    (block): block is LatestPostsBlock => block.blockType === 'latestPosts',
-  )
-  return journalBlock?.limit ?? undefined
 }
 
 function renderBlock(
@@ -104,10 +97,6 @@ export async function BlockRenderer({
   if (!blocks?.length) return null
 
   if (homepage) {
-    // Read before `homepageBlocks` drops the block itself — the editor's chosen story
-    // count still drives the board that replaces it.
-    const postLimit = homepagePostLimit(blocks)
-
     blocks = homepageBlocks(blocks)
     if (!blocks.length) return null
 
@@ -125,9 +114,7 @@ export async function BlockRenderer({
 
         // "Latest Blogs and Stories" always precedes the inquiry ("Plan your trip") section,
         // which is where the homepage ends.
-        const journalElement = (
-          <LatestBlogsSection key="latest-blogs-and-stories" limit={postLimit} />
-        )
+        const journalElement = <LatestBlogsSection key="latest-blogs-and-stories" />
 
         // One CMS block → the nodes it renders on the homepage, policy sections included.
         // The homepage's destination sliders are fixed (Nepal regions + continents), so a CMS

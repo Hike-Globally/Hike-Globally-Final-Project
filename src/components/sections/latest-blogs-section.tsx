@@ -1,4 +1,5 @@
 import { BlogDispatchBoard } from './blog-dispatch-board'
+import { HOMEPAGE_POST_LIMIT } from './latest-blogs-limits'
 import { SectionHeading } from './section-heading'
 import { sitePath } from '@/i18n/config'
 import { dictionary } from '@/i18n/dictionaries'
@@ -22,10 +23,12 @@ import './latest-blogs-section.css'
  * Content is real CMS content (`getPosts`, newest published first), so a fresh
  * database still renders the section from `defaultPosts` instead of showing a
  * hole in the page.
+ *
+ * The board is fixed at four stories — one lead plate plus three index rows
+ * (see `latest-blogs-limits.ts`). The count is not read from the CMS block's
+ * `limit`: a homepage saved with a larger value used to stretch the index into
+ * a long, portrait list, and the journal is meant to read as a compact split.
  */
-
-/** One lead plate + three index rows. */
-export const HOMEPAGE_POST_LIMIT = 4
 
 /** `id` of the section heading — the section is labelled by it. */
 const HEADING_ID = 'latest-blogs-and-stories'
@@ -124,12 +127,14 @@ function TopographicWash() {
 
 /* -------------------------------------------------------------------------- */
 
-export async function LatestBlogsSection({ limit = HOMEPAGE_POST_LIMIT }: { limit?: number }) {
+export async function LatestBlogsSection() {
   const dict = dictionary
 
-  // One plate and at least one index row — a board with a plate and nothing
-  // beside it would read as a missing column rather than as a design.
-  const posts = await getPosts(Math.max(2, Math.min(Math.round(limit) || HOMEPAGE_POST_LIMIT, 12)))
+  // The board's fixed measure: one lead plate plus at most three index rows.
+  // Always fetch the full four — a board with a plate and nothing beside it
+  // would read as a missing column, and the board skips the index on its own if
+  // only one story is published.
+  const posts = await getPosts(HOMEPAGE_POST_LIMIT)
 
   if (posts.length === 0) return null
 

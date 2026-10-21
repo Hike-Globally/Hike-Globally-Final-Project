@@ -19,6 +19,8 @@ import type { PostCard } from '@/lib/data'
 import { formatDate, readingTimeMinutes } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
+import { HOMEPAGE_POST_LIMIT } from './latest-blogs-limits'
+
 /**
  * ============================================================================
  * THE JOURNAL BOARD — the homepage's "Latest Blogs and Stories" cards.
@@ -30,17 +32,23 @@ import { cn } from '@/lib/utils'
  *     byline and a "Read story" cue over a slow Ken Burns breathe;
  *   • the stories behind it are an *index* of numbered waypoints (5 of 12) running
  *     down a hairline route, each one a whole-row link with its category, title,
- *     standfirst, thumbnail and byline;
+ *     thumbnail and byline;
  *   • on a desktop pointer, a preview plate glides after the cursor down that
  *     index and cross-fades to the story being hovered — the one piece of theatre
  *     in the section, and the reason the index feels like a stack of photographs
  *     rather than a list of links.
  *
- * Both columns are the same height (the plate's `min-height` sets it, the index
- * foot is pinned with `mt-auto`), so the board reads as one object at any number
- * of posts from two upwards. Everything below `lg` collapses to a single column
- * and the preview plate is never mounted — a phone gets the same board, minus the
- * cursor theatre it could never use.
+ * The index is capped at three rows (`latest-blogs-limits.ts`) — the lead plus
+ * three. Three compact rows balance the plate; more of them make the index
+ * taller than the photograph and the section reads as a long, portrait list.
+ * The rows are deliberately terse (category, title, byline, thumbnail): the
+ * standfirst belongs to the lead, where it has room.
+ *
+ * Both columns are the same height (the taller of the two sets it, the index
+ * foot is pinned with `mt-auto`), so the board reads as one object at any
+ * number of posts from two to four. Everything below `lg` collapses to a single
+ * column and the preview plate is never mounted — a phone gets the same board,
+ * minus the cursor theatre it could never use.
  *
  * The choreography itself (wipes, spine, waypoint fill, breathe, reduced-motion
  * opt-outs) lives in `latest-blogs-section.css`; the sizes come from the homepage
@@ -69,7 +77,9 @@ const readTime = (post: PostCard): string =>
 
 export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
   const dict = dictionary
-  const [lead, ...rest] = posts
+  // The section already fetches exactly the board's measure; slicing again keeps
+  // the three-row maximum a property of the board itself, whatever calls it.
+  const [lead, ...rest] = posts.slice(0, HOMEPAGE_POST_LIMIT)
 
   const boardRef = useRef<HTMLDivElement | null>(null)
   const plateRef = useRef<HTMLDivElement | null>(null)
@@ -162,8 +172,8 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
       >
         <article
           className={cn(
-            'lb-lead group relative isolate flex h-full min-h-[min(30rem,82svh)] flex-col justify-between overflow-hidden bg-ink text-mist',
-            'shadow-[0_28px_60px_-44px_rgba(1,22,30,0.75)] lg:min-h-[34rem] 3xl:min-h-[40rem]',
+            'lb-lead group relative isolate flex h-full min-h-[min(26rem,75svh)] flex-col justify-between overflow-hidden bg-ink text-mist',
+            'shadow-[0_28px_60px_-44px_rgba(1,22,30,0.75)] lg:min-h-[30rem] 3xl:min-h-[34rem]',
           )}
         >
           {/* One link for the whole plate, stretched over it and above the copy —
@@ -308,17 +318,6 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
                         >
                           {post.title}
                         </h3>
-
-                        {/* Two nested elements on purpose: the outer one owns the
-                            `hidden`/`block` switch, the inner one the `-webkit-box`
-                            display `line-clamp` needs — one element cannot carry both. */}
-                        <div className="mt-2 hidden sm:block">
-                          <p
-                            className="home-blog-description line-clamp-2 card-description-copy leading-relaxed text-ink-60"
-                          >
-                            {post.excerpt}
-                          </p>
-                        </div>
 
                         <p className="mt-2.5 flex flex-wrap items-center gap-x-2 text-[0.8125rem] text-slate">
                           {author ? <span>{`${dict.blog.by} ${author}`}</span> : null}

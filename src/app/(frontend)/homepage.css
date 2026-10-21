@@ -19,7 +19,7 @@
      .home-blog-lead-title        40px  the lead story of the journal board
      .home-blog-row-title         23px  journal board index-row titles — the same
                                         card tier as `.destination-card-title`
-     .home-blog-description       16px  descriptions on every journal-board card
+     .home-blog-description       16px  the lead story's standfirst
 
    The scope is `[data-homepage]`, set once in `src/app/(frontend)/page.tsx`, so
    nothing outside the homepage can pick these sizes up — the shared
