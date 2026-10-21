@@ -15,7 +15,13 @@ export const LatestPosts: Block = {
       defaultValue: 3,
       min: 1,
       max: 12,
-      admin: { position: 'sidebar' },
+      admin: {
+        position: 'sidebar',
+        // The homepage ignores this: its journal board is always one lead plate plus
+        // three index rows (see src/components/sections/latest-blogs-limits.ts).
+        description:
+          'Posts shown by this block on regular pages. The homepage journal is fixed at one lead story plus three index rows.',
+      },
     },
     linkField({ name: 'viewAllLink', label: '"View all" link' }),
   ],

@@ -1052,6 +1052,9 @@ export interface FeaturedDestinationsBlock {
 export interface LatestPostsBlock {
   heading: string;
   subheading?: string | null;
+  /**
+   * Posts shown by this block on regular pages. The homepage journal is fixed at one lead story plus three index rows.
+   */
   limit?: number | null;
   viewAllLink?: {
     /**
