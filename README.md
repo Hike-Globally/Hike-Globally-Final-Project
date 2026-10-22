@@ -58,12 +58,13 @@ capped at ~4.5 MB — larger originals need Blob plus `BLOB_CLIENT_UPLOADS=true`
 | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `dev` / `build` / `start`                                        | Next.js                                                                                                                     |
 | `typecheck`                                                      | `tsc --noEmit`                                                                                                              |
-| `test`                                                           | Node's built-in runner — URL/canonical helpers, media storage, and a route audit that every page declares its own canonical |
+| `test`                                                           | Node's built-in runner — URL/canonical helpers, media storage, globe projection, and a route audit that every page declares its own canonical |
 | `lint`                                                           | ESLint                                                                                                                      |
 | `migrate` / `migrate:create` / `migrate:status` / `migrate:down` | Payload migrations                                                                                                          |
 | `generate:types`                                                 | Regenerate `src/payload-types.ts` after a schema change                                                                     |
 | `generate:importmap`                                             | Regenerate the admin import map (also runs on `postinstall`)                                                                |
 | `seed`                                                           | Load the demo content                                                                                                       |
+| `generate:globe-dots`                                            | Regenerate the About globe's land-dot field from Natural Earth data (`world-atlas`)                                         |
 
 ## Design tokens
 

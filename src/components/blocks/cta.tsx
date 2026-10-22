@@ -65,7 +65,7 @@ function TopoContours() {
 /* Circular “expedition stamp”: the brand line set on a rotating ring around a
    mountain mark, with the Everest-region coordinates filed underneath —
    the journal-stamp detail the rest of the site hints at with its compass
-   rings (blog article footer, About orbit). Desktop only. */
+   rings (blog article footer, the About globe). Desktop only. */
 function ExpeditionStamp({ pathId }: { pathId: string }) {
   const dict = dictionary
 

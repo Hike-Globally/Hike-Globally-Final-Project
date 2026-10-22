@@ -12,7 +12,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test src/lib/*.test.ts src/storage/*.test.ts",
+    "test": "node --import tsx --test src/lib/*.test.ts src/storage/*.test.ts src/components/sections/globe/*.test.ts",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "generate:types": "payload generate:types",
     "generate:importmap": "payload generate:importmap",
@@ -21,7 +21,8 @@
     "migrate:status": "payload migrate:status",
     "migrate:down": "payload migrate:down",
     "seed": "tsx src/scripts/seed.ts",
-    "postinstall": "payload generate:importmap && patch-package"
+    "postinstall": "payload generate:importmap && patch-package",
+    "generate:globe-dots": "node scripts/generate-globe-dots.mjs"
   },
   "dependencies": {
     "@carrot-kpi/switzer-font": "^0.1.0",
@@ -70,13 +71,16 @@
     "@types/react-dom": "^19.2.0",
     "@types/sanitize-html": "^2.16.2",
     "cross-env": "^10.1.0",
+    "d3-geo": "^3.1.1",
     "eslint": "^9.39.0",
     "eslint-config-next": "16.3.8",
     "patch-package": "^8.0.1",
     "prettier": "^3.6.2",
     "tailwindcss": "^4.3.3",
+    "topojson-client": "^3.1.0",
     "tsx": "^4.20.6",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "world-atlas": "^2.0.2"
   },
   "engines": {
     "node": ">=20.9.0"
