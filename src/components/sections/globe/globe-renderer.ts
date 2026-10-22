@@ -6,8 +6,15 @@ import { GLOBE_DESTINATIONS, GLOBE_ROUTES, LAND_DOT_DATA } from './globe-data'
  * ============================================================================
  * A real sphere, not a flat map in a circle: every land dot and destination is a
  * 3D unit vector that is rotated by the globe's yaw/tilt, projected
- * orthographically (x, y on screen + z for depth) and drawn back-to-front. The
- * canvas is transparent; the section's ink background shows through.
+ * orthographically (x, y on screen + z for depth) and drawn back-to-front.
+ *
+ * Transparency contract: the canvas itself has NO background. Each frame is
+ * cleared to fully transparent and the only things ever painted are the
+ * sphere (ocean disc, land dots, routes, pins) and a thin amber atmosphere
+ * that hugs the limb and finishes fading to `rgba(…, 0)` well inside the
+ * canvas. Nothing is ever clipped by the square canvas edge, so the globe
+ * sits directly on whatever is behind it — here, the section's ink
+ * background — with no visible rectangle or contrasting edge line.
  *
  * Deliberately dependency-free (no three.js / globe.gl): the whole visual is a
  * dot field of ~4.5k points, five route arcs and nine markers. Canvas 2D draws
@@ -194,13 +201,23 @@ export function drawGlobe(ctx: CanvasRenderingContext2D, view: GlobeView): Proje
   const cosTilt = Math.cos(tilt)
   const sinTilt = Math.sin(tilt)
 
-  /* --- Atmosphere: amber halo bleeding into the section's ink background --- */
-  const haloRadius = radius * 1.5
-  const halo = ctx.createRadialGradient(cx, cy, radius * 0.9, cx, cy, haloRadius)
-  halo.addColorStop(0, 'rgba(247, 162, 48, 0.20)')
-  halo.addColorStop(0.32, 'rgba(247, 162, 48, 0.08)')
-  halo.addColorStop(0.66, 'rgba(29, 53, 87, 0.10)')
-  halo.addColorStop(1, 'rgba(29, 53, 87, 0)')
+  /* --- Atmosphere: a thin amber glow hugging the limb -----------------------
+     It must finish fading INSIDE the canvas. The old halo reached 1.5× the
+     sphere radius — past the edge of the square canvas (sphere diameter is
+     79% of the canvas, so 1.5× radius ≈ 59% of the width from centre) — and
+     the browser clipped it mid-gradient at ~10% alpha. That straight clipped
+     edge read as a contrasting background rectangle behind the globe.
+     Now the glow is capped at 1.22× radius (≈48% of the width) and at least
+     2px short of the nearest canvas edge, is amber-only (no deep-blue wash
+     tinting the square), and its final stop is fully transparent — so
+     outside the atmosphere the canvas is exactly transparent. */
+  const haloRadius = Math.min(radius * 1.22, Math.max(radius, Math.min(cx, cy) - 2))
+  const halo = ctx.createRadialGradient(cx, cy, radius * 0.92, cx, cy, haloRadius)
+  halo.addColorStop(0, 'rgba(247, 162, 48, 0.16)')
+  // The limb itself sits at ≈0.27 of this gradient (1.00 between 0.92…1.22).
+  halo.addColorStop(0.3, 'rgba(247, 162, 48, 0.13)')
+  halo.addColorStop(0.62, 'rgba(247, 162, 48, 0.045)')
+  halo.addColorStop(1, 'rgba(247, 162, 48, 0)')
   ctx.fillStyle = halo
   ctx.beginPath()
   ctx.arc(cx, cy, haloRadius, 0, TAU)

@@ -4,10 +4,18 @@
    The sphere is painted on a canvas (see `globe-canvas.tsx`); this file only
    styles the frame, the HTML destination labels and the pre-hydration
    placeholder. All colours stay inside the locked brand palette — the canvas
-   uses the same deep/ink values for the ocean and sage for pins and routes.
+   uses the same deep/ink values for the ocean and amber for pins and routes.
+
+   Background: NONE. The frame, the canvas and the placeholder layer are all
+   transparent — only the circular globe (and its limb-hugging atmosphere,
+   which fades to transparent inside the canvas; see `globe-renderer.ts`) is
+   painted, so the section background shows straight through with no square
+   edge or contrasting line around the globe.
    ========================================================================== */
 
 .globe-frame {
+  /* Transparent: only the globe is visible, never a backing rectangle. */
+  background: transparent;
   cursor: grab;
   touch-action: pan-y;
   -webkit-tap-highlight-color: transparent;
@@ -46,11 +54,17 @@
   will-change: transform, opacity;
 }
 
+.globe-frame canvas {
+  background: transparent;
+}
+
 .globe-placeholder {
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
+  /* Same transparency contract as the live canvas: no backing fill. */
+  background: transparent;
 }
 
 .globe-placeholder__sphere {
@@ -65,7 +79,9 @@
     #0c2236 72%,
     #04151f 100%
   );
+  /* Kept tight to match the renderer's atmosphere (≈1.22× the sphere radius,
+     fading to fully transparent) instead of a wide wash behind the globe. */
   box-shadow:
-    0 0 90px -12px rgb(247 162 48 / 45%),
+    0 0 52px -10px rgb(247 162 48 / 38%),
     inset 0 0 60px 10px rgb(4 21 31 / 35%);
 }
