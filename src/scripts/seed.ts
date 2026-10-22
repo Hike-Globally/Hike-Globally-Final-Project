@@ -124,12 +124,12 @@ const richText = (...nodes: LexicalNode[]): RichTextValue => ({
 /* -------------------------------------------------------------------------- */
 
 const PALETTES: [string, string, string][] = [
-  ['#0b2b38', '#124559', '#aec3b0'],
-  ['#01161e', '#1d4f63', '#8fb0a3'],
-  ['#123a4a', '#598392', '#cdd9cb'],
-  ['#0a2530', '#2b6b7f', '#aec3b0'],
-  ['#01161e', '#3c7286', '#d8e3d7'],
-  ['#0e303e', '#124559', '#b9d0bd'],
+  ['#04151f', '#1d3557', '#F7A230'],
+  ['#04151f', '#283618', '#F7A230'],
+  ['#1d3557', '#283618', '#fad9a3'],
+  ['#04151f', '#1d3557', '#fdf0da'],
+  ['#04151f', '#283618', '#f8f9fa'],
+  ['#102138', '#1d3557', '#F7A230'],
 ]
 
 /** Deterministic pseudo-random so the same seed always produces the same scene. */

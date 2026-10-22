@@ -89,7 +89,7 @@ function TripBookingCard({
   return (
     <div
       className={cn(
-        'relative overflow-hidden bg-ink p-5 text-mist ring-1 ring-white/10 shadow-[0_40px_80px_-30px_rgba(1,22,30,0.6)] sm:p-7',
+        'relative overflow-hidden bg-ink p-5 text-mist ring-1 ring-white/10 shadow-[0_40px_80px_-30px_rgba(4,21,31,0.6)] sm:p-7',
         className,
       )}
     >

@@ -93,7 +93,7 @@ export async function generateMetadata(): Promise<Metadata> {
     icons: { icon: '/images/logo.svg' },
     formatDetection: { telephone: false },
     other: {
-      'theme-color': '#01161e',
+      'theme-color': '#04151f',
     },
     alternates: {
       /**
@@ -115,7 +115,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#01161e',
+  themeColor: '#04151f',
   colorScheme: 'light',
   width: 'device-width',
   initialScale: 1,

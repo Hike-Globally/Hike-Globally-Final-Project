@@ -7,10 +7,10 @@
    Hike Globally — design tokens
    ==========================================================================
    Palette (locked):
-     #01161e  ink    near-black teal  — headings, dark sections, body copy
-     #124559  deep   deep teal        — primary brand, buttons, links
-     #598392  slate  muted blue       — secondary UI, rules, meta text
-     #aec3b0  sage   soft green       — accents, highlights, light sections
+     #04151f  ink    near-black teal  — headings, dark sections, body copy
+     #1d3557  deep   deep navy        — primary brand, buttons, links
+     #283618  slate  forest olive     — secondary UI, rules, meta text
+     #F7A230  sage   warm amber       — accents, highlights, light sections
      #f8f9fa  mist   off-white        — section tints, image placeholders
 
    The global page background (--background) is pure white, #ffffff — the five brand
@@ -28,21 +28,22 @@
 
 @theme {
   /* --- Brand colours (usable as bg-ink, text-sage, border-slate …) --- */
-  --color-ink: #01161e;
-  --color-deep: #124559;
-  --color-slate: #598392;
-  --color-sage: #aec3b0;
+  --color-ink: #04151f;
+  --color-deep: #1d3557;
+  --color-slate: #283618;
+  --color-sage: #F7A230;
   --color-mist: #f8f9fa;
 
   /* Tints/shades derived from the five brand colours, so gradients and hovers
      always stay inside the palette instead of drifting to arbitrary greys. */
-  --color-ink-80: #2b3b42;
-  --color-ink-60: #4a5c63;
-  --color-deep-90: #0e374a;
-  --color-deep-80: #0a2c3b;
-  --color-sage-40: #d8e3d7;
-  --color-sage-20: #e8efe6;
-  --color-slate-20: #d3dde1;
+  --color-ink-80: #2d3b43;
+  --color-ink-70: #3c4b53;
+  --color-ink-60: #4c5b63;
+  --color-deep-90: #162b47;
+  --color-deep-80: #102138;
+  --color-sage-40: #fad9a3;
+  --color-sage-20: #fdf0da;
+  --color-slate-20: #d4d7d1;
   --color-mist-60: #e7eaeb;
 
   /* --- Typography --- */
@@ -96,47 +97,47 @@
 
   /* The global site background — pure white. */
   --background: #ffffff;
-  --foreground: #01161e;
+  --foreground: #04151f;
 
   --card: #ffffff;
-  --card-foreground: #01161e;
+  --card-foreground: #04151f;
 
   --popover: #ffffff;
-  --popover-foreground: #01161e;
+  --popover-foreground: #04151f;
 
-  --primary: #124559;
+  --primary: #1d3557;
   --primary-foreground: #f8f9fa;
 
-  --secondary: #aec3b0;
-  --secondary-foreground: #01161e;
+  --secondary: #F7A230;
+  --secondary-foreground: #04151f;
 
   --muted: #eaeeee;
-  --muted-foreground: #598392;
+  --muted-foreground: #283618;
 
-  --accent: #aec3b0;
-  --accent-foreground: #01161e;
+  --accent: #F7A230;
+  --accent-foreground: #04151f;
 
   --destructive: #a4243b;
   --destructive-foreground: #f8f9fa;
 
   --border: #dde3e4;
   --input: #d5dcde;
-  --ring: #598392;
+  --ring: #283618;
 
-  --chart-1: #124559;
-  --chart-2: #598392;
-  --chart-3: #aec3b0;
-  --chart-4: #01161e;
-  --chart-5: #8fa8ad;
+  --chart-1: #1d3557;
+  --chart-2: #283618;
+  --chart-3: #F7A230;
+  --chart-4: #04151f;
+  --chart-5: #5a6b47;
 
   --sidebar: #f8f9fa;
-  --sidebar-foreground: #01161e;
-  --sidebar-primary: #124559;
+  --sidebar-foreground: #04151f;
+  --sidebar-primary: #1d3557;
   --sidebar-primary-foreground: #f8f9fa;
-  --sidebar-accent: #aec3b0;
-  --sidebar-accent-foreground: #01161e;
+  --sidebar-accent: #F7A230;
+  --sidebar-accent-foreground: #04151f;
   --sidebar-border: #dde3e4;
-  --sidebar-ring: #598392;
+  --sidebar-ring: #283618;
 
   /* Shared responsive type scale for short-form descriptions, reduced 2px from the original lead scale. */
   --font-size-description: clamp(0.9375rem, 0.82rem + 0.45vw, 1.25rem);
@@ -157,42 +158,42 @@
 /* Dark palette is defined so flipping next-themes to dark never produces an
    unreadable page, even though the shipped design is light-first. */
 .dark {
-  --background: #01161e;
+  --background: #04151f;
   --foreground: #f8f9fa;
 
-  --card: #0a222c;
+  --card: #0b202e;
   --card-foreground: #f8f9fa;
 
-  --popover: #0a222c;
+  --popover: #0b202e;
   --popover-foreground: #f8f9fa;
 
-  --primary: #aec3b0;
-  --primary-foreground: #01161e;
+  --primary: #F7A230;
+  --primary-foreground: #04151f;
 
-  --secondary: #124559;
+  --secondary: #1d3557;
   --secondary-foreground: #f8f9fa;
 
-  --muted: #12303c;
-  --muted-foreground: #a6bcc1;
+  --muted: #112838;
+  --muted-foreground: #a8b7c5;
 
-  --accent: #124559;
+  --accent: #1d3557;
   --accent-foreground: #f8f9fa;
 
   --destructive: #d2637a;
-  --destructive-foreground: #01161e;
+  --destructive-foreground: #04151f;
 
-  --border: #1d3d4a;
-  --input: #1d3d4a;
-  --ring: #aec3b0;
+  --border: #1d3557;
+  --input: #1d3557;
+  --ring: #F7A230;
 
-  --sidebar: #01161e;
+  --sidebar: #04151f;
   --sidebar-foreground: #f8f9fa;
-  --sidebar-primary: #aec3b0;
-  --sidebar-primary-foreground: #01161e;
-  --sidebar-accent: #124559;
+  --sidebar-primary: #F7A230;
+  --sidebar-primary-foreground: #04151f;
+  --sidebar-accent: #1d3557;
   --sidebar-accent-foreground: #f8f9fa;
-  --sidebar-border: #1d3d4a;
-  --sidebar-ring: #aec3b0;
+  --sidebar-border: #1d3557;
+  --sidebar-ring: #F7A230;
 }
 
 @theme inline {
@@ -669,7 +670,7 @@
   }
 
   .blog-prose figure > div {
-    box-shadow: 0 1.25rem 3rem rgb(1 22 30 / 9%);
+    box-shadow: 0 1.25rem 3rem rgb(4 21 31 / 9%);
   }
 
   .blog-prose figcaption {
