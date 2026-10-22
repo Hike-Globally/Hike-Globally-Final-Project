@@ -124,7 +124,7 @@ export function TripsExplorer({
   return (
     <div>
       <div className="container-content">
-        <div className="border border-black/[0.06] bg-card p-5 shadow-[0_1px_2px_rgba(1,22,30,0.04)] md:p-6">
+        <div className="border border-black/[0.06] bg-card p-5 shadow-[0_1px_2px_rgba(4,21,31,0.04)] md:p-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div>
               <Label className="mb-2 text-xs tracking-[0.12em] text-slate uppercase">

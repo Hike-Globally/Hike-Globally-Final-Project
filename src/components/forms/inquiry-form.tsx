@@ -77,7 +77,7 @@ export function InquiryForm({
               'grid gap-5 border p-4 sm:p-6 md:grid-cols-2 md:p-8',
               isDark
                 ? 'border-white/10 bg-white/[0.04]'
-                : 'border-black/[0.06] bg-card shadow-[0_1px_2px_rgba(1,22,30,0.04)]',
+                : 'border-black/[0.06] bg-card shadow-[0_1px_2px_rgba(4,21,31,0.04)]',
             )
       }
     >
@@ -156,7 +156,7 @@ export function InquiryForm({
           name="tripTitle"
           defaultValue={trips.find((trip) => trip.slug === defaultTripSlug)?.title ?? ''}
           className={cn(
-            'h-11 w-full border px-4 text-sm shadow-[0_1px_2px_rgba(1,22,30,0.03)] outline-none transition-[color,box-shadow,border-color] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/25',
+            'h-11 w-full border px-4 text-sm shadow-[0_1px_2px_rgba(4,21,31,0.03)] outline-none transition-[color,box-shadow,border-color] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/25',
             // A raw <select> has no shadcn primitive to inherit a surface from, so spell it out.
             isDark ? ghostClass : 'border-input bg-white text-ink',
           )}

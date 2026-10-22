@@ -6,4 +6,4 @@
  * restyled.
  */
 export const surface =
-  'border border-black/[0.06] bg-white shadow-[0_1px_2px_rgba(1,22,30,0.04),0_18px_40px_-24px_rgba(1,22,30,0.18)]'
+  'border border-black/[0.06] bg-white shadow-[0_1px_2px_rgba(4,21,31,0.04),0_18px_40px_-24px_rgba(4,21,31,0.18)]'

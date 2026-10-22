@@ -173,7 +173,7 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
         <article
           className={cn(
             'lb-lead group relative isolate flex h-full min-h-[min(26rem,75svh)] flex-col justify-between overflow-hidden bg-ink text-mist',
-            'shadow-[0_28px_60px_-44px_rgba(1,22,30,0.75)] lg:min-h-[30rem] 3xl:min-h-[34rem]',
+            'shadow-[0_28px_60px_-44px_rgba(4,21,31,0.75)] lg:min-h-[30rem] 3xl:min-h-[34rem]',
           )}
         >
           {/* One link for the whole plate, stretched over it and above the copy —

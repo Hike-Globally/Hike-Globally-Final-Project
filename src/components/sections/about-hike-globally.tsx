@@ -213,7 +213,7 @@ function GlobeVisual() {
 
         {/* Sphere */}
         <div
-          className="ahg-sphere absolute inset-[28%] overflow-hidden rounded-full shadow-[0_0_90px_-10px_rgba(174,195,176,0.5)]"
+          className="ahg-sphere absolute inset-[28%] overflow-hidden rounded-full shadow-[0_0_90px_-10px_rgba(247,162,48,0.5)]"
           style={{
             background:
               'radial-gradient(circle at 32% 28%, var(--color-slate) 0%, var(--color-deep) 48%, var(--color-ink) 100%)',

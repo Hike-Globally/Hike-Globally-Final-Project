@@ -138,7 +138,7 @@ is worse than one extra regeneration.
 
 ## 6. Design system
 
-- **Palette** — `#01161e` ink, `#124559` deep, `#598392` slate, `#aec3b0` sage, `#f8f9fa` mist,
+- **Palette** — `#04151f` ink, `#1d3557` deep, `#283618` slate, `#F7A230` sage, `#f8f9fa` mist,
   exposed as Tailwind v4 tokens (`bg-ink`, `text-slate`, `bg-sage-20`, …) plus semantic aliases
   (`card`, `border`, `ring`).
 - **Type** — headings Google Sans Flex 600, body Archivo 300; a fluid scale and utility classes

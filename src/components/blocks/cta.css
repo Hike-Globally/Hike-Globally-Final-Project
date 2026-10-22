@@ -28,57 +28,57 @@
   --cta-fg: #f8f9fa;
   --cta-muted: rgb(248 249 250 / 0.78);
   --cta-faint: rgb(248 249 250 / 0.55);
-  --cta-accent: #aec3b0;
+  --cta-accent: #F7A230;
   --cta-line: rgb(248 249 250 / 0.18);
   --cta-scrim:
     linear-gradient(
       100deg,
-      rgb(1 22 30 / 0.95) 0%,
-      rgb(1 22 30 / 0.82) 42%,
-      rgb(18 69 89 / 0.42) 74%,
-      rgb(18 69 89 / 0.2) 100%
+      rgb(4 21 31 / 0.95) 0%,
+      rgb(4 21 31 / 0.82) 42%,
+      rgb(29 53 87 / 0.42) 74%,
+      rgb(29 53 87 / 0.2) 100%
     ),
-    linear-gradient(to top, rgb(1 22 30 / 0.75) 0%, transparent 55%);
-  --cta-glow: rgb(174 195 176 / 0.22);
+    linear-gradient(to top, rgb(4 21 31 / 0.75) 0%, transparent 55%);
+  --cta-glow: rgb(247 162 48 / 0.22);
 
   position: relative;
   isolation: isolate;
   overflow: hidden;
   color: var(--cta-fg);
-  background-color: #01161e;
-  border: 1px solid rgb(1 22 30 / 0.12);
+  background-color: #04151f;
+  border: 1px solid rgb(4 21 31 / 0.12);
   box-shadow:
-    0 32px 70px -30px rgb(1 22 30 / 0.55),
-    0 6px 20px rgb(1 22 30 / 0.12);
+    0 32px 70px -30px rgb(4 21 31 / 0.55),
+    0 6px 20px rgb(4 21 31 / 0.12);
 }
 
-/* Sage: the same photograph washed in the brand green, ink copy, deep accents. */
+/* Sage: the same photograph washed in the brand accent, ink copy, deep accents. */
 [data-cta-card][data-variant='sage'] {
-  --cta-fg: #01161e;
-  --cta-muted: rgb(1 22 30 / 0.74);
-  --cta-faint: rgb(1 22 30 / 0.52);
-  --cta-accent: #124559;
-  --cta-line: rgb(1 22 30 / 0.18);
+  --cta-fg: #04151f;
+  --cta-muted: rgb(4 21 31 / 0.74);
+  --cta-faint: rgb(4 21 31 / 0.52);
+  --cta-accent: #1d3557;
+  --cta-line: rgb(4 21 31 / 0.18);
   --cta-scrim:
     linear-gradient(
       100deg,
-      rgb(174 195 176 / 0.97) 0%,
-      rgb(174 195 176 / 0.9) 44%,
-      rgb(174 195 176 / 0.42) 76%,
-      rgb(174 195 176 / 0.2) 100%
+      rgb(247 162 48 / 0.97) 0%,
+      rgb(247 162 48 / 0.9) 44%,
+      rgb(247 162 48 / 0.42) 76%,
+      rgb(247 162 48 / 0.2) 100%
     ),
-    linear-gradient(to top, rgb(174 195 176 / 0.82) 0%, transparent 62%);
+    linear-gradient(to top, rgb(247 162 48 / 0.82) 0%, transparent 62%);
   --cta-glow: rgb(248 249 250 / 0.35);
-  background-color: #aec3b0;
+  background-color: #F7A230;
 }
 
 /* Light: the photograph under morning mist, ink copy, deep accents. */
 [data-cta-card][data-variant='light'] {
-  --cta-fg: #01161e;
-  --cta-muted: rgb(1 22 30 / 0.72);
-  --cta-faint: rgb(1 22 30 / 0.5);
-  --cta-accent: #124559;
-  --cta-line: rgb(1 22 30 / 0.14);
+  --cta-fg: #04151f;
+  --cta-muted: rgb(4 21 31 / 0.72);
+  --cta-faint: rgb(4 21 31 / 0.5);
+  --cta-accent: #1d3557;
+  --cta-line: rgb(4 21 31 / 0.14);
   --cta-scrim:
     linear-gradient(
       100deg,
@@ -88,7 +88,7 @@
       rgb(248 249 250 / 0.22) 100%
     ),
     linear-gradient(to top, rgb(248 249 250 / 0.82) 0%, transparent 62%);
-  --cta-glow: rgb(174 195 176 / 0.4);
+  --cta-glow: rgb(247 162 48 / 0.4);
   background-color: #f8f9fa;
 }
 
@@ -106,7 +106,7 @@
     display: block;
     position: absolute;
     inset: 0;
-    border: 1px solid rgb(174 195 176 / 0.75);
+    border: 1px solid rgb(247 162 48 / 0.75);
     transform: translate(14px, -14px);
     pointer-events: none;
   }
@@ -218,7 +218,7 @@
   right: 0;
   left: 0;
   height: 3px;
-  background: linear-gradient(to right, #124559 0%, #aec3b0 55%, #598392 100%);
+  background: linear-gradient(to right, #1d3557 0%, #F7A230 55%, #283618 100%);
 }
 
 /* ---------------------------------------------------------------------------
@@ -355,7 +355,7 @@
   position: absolute;
   inset: 0.4rem;
   border-radius: 9999px;
-  background: rgb(1 22 30 / 0.32);
+  background: rgb(4 21 31 / 0.32);
   backdrop-filter: blur(6px);
 }
 

@@ -71,10 +71,10 @@ Headings **Google Sans Flex 600**, body **Archivo 300** (self-hosted variable fo
 
 | Token   | Hex       |
 | ------- | --------- |
-| `ink`   | `#01161e` |
-| `deep`  | `#124559` |
-| `slate` | `#598392` |
-| `sage`  | `#aec3b0` |
+| `ink`   | `#04151f` |
+| `deep`  | `#1d3557` |
+| `slate` | `#283618` |
+| `sage`  | `#F7A230` |
 | `mist`  | `#f8f9fa` |
 
 ## SEO

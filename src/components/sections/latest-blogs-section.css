@@ -159,8 +159,8 @@
   background: linear-gradient(
     90deg,
     var(--color-sage-20) 0%,
-    rgb(232 239 230 / 45%) 58%,
-    rgb(232 239 230 / 0%) 100%
+    rgb(253 240 218 / 45%) 58%,
+    rgb(253 240 218 / 0%) 100%
   );
   transform: scaleX(0);
   transform-origin: left center;
@@ -237,7 +237,7 @@
 
 /* Thumbnail zoom + sage hairline on hover/focus. */
 [data-blog-dispatch] .lb-row-thumb {
-  border: 1px solid rgb(1 22 30 / 10%);
+  border: 1px solid rgb(4 21 31 / 10%);
   transition: border-color 0.4s var(--lb-ease);
 }
 
@@ -272,8 +272,8 @@
   overflow: hidden;
   background: var(--color-ink);
   box-shadow:
-    0 26px 60px -26px rgb(1 22 30 / 55%),
-    0 3px 10px rgb(1 22 30 / 18%),
+    0 26px 60px -26px rgb(4 21 31 / 55%),
+    0 3px 10px rgb(4 21 31 / 18%),
     inset 0 0 0 1px rgb(255 255 255 / 14%);
   transform: translate(-50%, -50%) scale(0.9) rotate(0deg);
   transition: transform 0.65s var(--lb-ease);
@@ -301,7 +301,7 @@
   inset-inline: 0;
   bottom: 0;
   padding: 0.5rem 0.75rem;
-  background: linear-gradient(to top, rgb(1 22 30 / 92%), rgb(1 22 30 / 0%));
+  background: linear-gradient(to top, rgb(4 21 31 / 92%), rgb(4 21 31 / 0%));
   color: var(--color-sage);
   font-family: var(--font-heading);
   font-size: 0.625rem;

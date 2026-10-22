@@ -34,7 +34,7 @@ export function TripCard({
   return (
     <article
       className={cn(
-        'group relative flex h-full flex-col overflow-hidden border border-black/[0.06] bg-card transition-[transform,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_18px_40px_-24px_rgba(1,22,30,0.35)]',
+        'group relative flex h-full flex-col overflow-hidden border border-black/[0.06] bg-card transition-[transform,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_18px_40px_-24px_rgba(4,21,31,0.35)]',
         className,
       )}
     >
