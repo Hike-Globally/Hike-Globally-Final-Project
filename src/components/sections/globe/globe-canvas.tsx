@@ -74,7 +74,10 @@ export function GlobeCanvas() {
   useEffect(() => {
     const host = frameRef.current
     const canvas = canvasRef.current
-    const ctx = canvas?.getContext('2d')
+    // `alpha: true` (stated explicitly — it is also the default): the surface
+    // starts fully transparent and only the sphere is ever painted onto it,
+    // so no background colour can sit behind the globe.
+    const ctx = canvas?.getContext('2d', { alpha: true })
     if (!host || !canvas || !ctx) return
 
     let frame = 0
@@ -304,7 +307,11 @@ export function GlobeCanvas() {
       onKeyDown={onKeyDown}
       className="globe-frame absolute inset-0"
     >
-      <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 size-full" />
+      <canvas
+        ref={canvasRef}
+        aria-hidden="true"
+        className="absolute inset-0 size-full bg-transparent"
+      />
 
       {/* Names are painted from the canvas projection each frame; the ticker below
           already lists every destination in text, so this layer is decorative. */}
