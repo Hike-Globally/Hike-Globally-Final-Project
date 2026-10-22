@@ -2,14 +2,13 @@
 
 import Link from 'next/link'
 import { useRef, type CSSProperties, type PointerEvent } from 'react'
-import { motion, useMotionValue, useSpring, useTransform } from 'motion/react'
-import { ArrowRight, Compass, MapPin } from 'lucide-react'
+import { ArrowRight, MapPin } from 'lucide-react'
 
 import './about-hike-globally.css'
+import { Globe } from './globe/globe'
 import { Reveal } from '@/components/motion/reveal'
 import { Button } from '@/components/ui/button'
 import { sitePath } from '@/i18n/config'
-import { cn } from '@/lib/utils'
 
 const EYEBROW = 'About Hike Globally'
 const HEADING = 'One platform. Every trail on Earth.'
@@ -31,9 +30,6 @@ const TICKER_DESTINATIONS = [
   'Bhutan',
 ]
 
-const INNER_ORBIT_ANGLES = [20, 140, 260]
-const OUTER_ORBIT_ANGLES = [70, 190, 310]
-
 /**
  * "About Hike Globally" — sits right after the Curated Travel Packages section on the
  * homepage and states, in plain terms, what the brand is: a travel booking platform selling
@@ -43,14 +39,15 @@ const OUTER_ORBIT_ANGLES = [70, 190, 310]
  * reads as a deliberate pause between the two light trip/destination grids around it. The
  * interaction budget goes to three things instead of many small flourishes:
  *  1. A cursor-tracked spotlight that makes the whole section feel alive under the pointer.
- *  2. A hand-built CSS/SVG-free orbit — a glowing globe with two independently spinning rings
- *     of destination pins — that tilts toward the pointer in 3D.
+ *  2. A real 3D globe — a canvas sphere of land dots, destination pins and great-circle
+ *     routes that visitors can drag to spin (and fling, and steer with the keyboard). It
+ *     code-splits itself and only loads once the section nears the viewport.
  *  3. An infinite destination ticker that can be paused on hover.
- * The orbit visual itself is desktop-only: on phones and tablets (everything below `lg`, where
- * the section is still a single stacked column) it is taken out of the layout entirely with
- * `hidden lg:block`, so the section reads as copy + ticker without a large decorative circle
- * eating a screen of scroll. From `lg` up it renders exactly as before. Every animation also
- * collapses to a static, fully legible layout under `prefers-reduced-motion`.
+ * The globe is desktop-only: on phones and tablets (everything below `lg`, where the section
+ * is still a single stacked column) it is taken out of the layout entirely with
+ * `hidden lg:block`, so the section reads as copy + ticker without a large visual eating a
+ * screen of scroll. From `lg` up it renders a square visual beside the copy. Under
+ * `prefers-reduced-motion` the globe holds still until dragged, and the ticker stops.
  */
 export function AboutHikeGlobally() {
   const glowRef = useRef<HTMLDivElement>(null)
@@ -127,9 +124,12 @@ export function AboutHikeGlobally() {
             </Reveal>
           </div>
 
-          {/* Interactive globe visual — desktop only, hidden below `lg` (see the file header) */}
-          <Reveal delay={160} className="mx-auto hidden w-full max-w-[22rem] lg:block lg:max-w-none">
-            <GlobeVisual />
+          {/* Interactive 3D globe — desktop only, hidden below `lg` (see the file header) */}
+          <Reveal
+            delay={160}
+            className="mx-auto hidden w-full max-w-[22rem] lg:block lg:max-w-none"
+          >
+            <Globe />
           </Reveal>
         </div>
       </div>
@@ -159,114 +159,5 @@ export function AboutHikeGlobally() {
         </div>
       </Reveal>
     </section>
-  )
-}
-
-/**
- * Globe with two independently spinning orbit rings of destination pins, tilting toward the
- * pointer. Desktop-only: `lg` and up is the only place it is rendered (the visual is hidden
- * below `lg`), so the ring/sphere/pulse animations need no mobile opt-out — but they still
- * stop under `prefers-reduced-motion`.
- */
-function GlobeVisual() {
-  const wrapperRef = useRef<HTMLDivElement>(null)
-  const pointerX = useMotionValue(0.5)
-  const pointerY = useMotionValue(0.5)
-
-  const rotateX = useSpring(useTransform(pointerY, [0, 1], [12, -12]), {
-    stiffness: 140,
-    damping: 18,
-    mass: 0.6,
-  })
-  const rotateY = useSpring(useTransform(pointerX, [0, 1], [-14, 14]), {
-    stiffness: 140,
-    damping: 18,
-    mass: 0.6,
-  })
-
-  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
-    const rect = event.currentTarget.getBoundingClientRect()
-    pointerX.set((event.clientX - rect.left) / rect.width)
-    pointerY.set((event.clientY - rect.top) / rect.height)
-  }
-
-  const handlePointerLeave = () => {
-    pointerX.set(0.5)
-    pointerY.set(0.5)
-  }
-
-  return (
-    <div
-      ref={wrapperRef}
-      onPointerMove={handlePointerMove}
-      onPointerLeave={handlePointerLeave}
-      className="relative mx-auto aspect-square w-full max-w-[min(18rem,calc(100%-0.5rem))] sm:max-w-80 md:max-w-[22rem] lg:max-w-[24rem] 3xl:max-w-[28rem]"
-      style={{ perspective: '1100px' }}
-      data-about-globe
-    >
-      <motion.div
-        style={{ rotateX, rotateY }}
-        className="relative h-full w-full [transform-style:preserve-3d]"
-      >
-        {/* Pulse rings */}
-        <span className="ahg-pulse absolute inset-[30%] rounded-full border border-sage/60" aria-hidden="true" />
-
-        {/* Sphere */}
-        <div
-          className="ahg-sphere absolute inset-[28%] overflow-hidden rounded-full shadow-[0_0_90px_-10px_rgba(247,162,48,0.5)]"
-          style={{
-            background:
-              'radial-gradient(circle at 32% 28%, var(--color-slate) 0%, var(--color-deep) 48%, var(--color-ink) 100%)',
-          }}
-          aria-hidden="true"
-        >
-          <span className="absolute inset-0 rounded-full border border-white/15" />
-          <span className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-white/15" />
-          <span className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-white/10" />
-          <span className="absolute inset-[18%] rounded-full border border-white/10" />
-          <span className="absolute inset-[36%] rounded-full border border-white/10" />
-        </div>
-
-        {/* Inner orbit ring */}
-        <div
-          className="ahg-ring absolute inset-[14%] rounded-full border border-dashed border-sage/35"
-          style={{ '--orbit-duration': '26s' } as CSSProperties}
-          aria-hidden="true"
-        >
-          {INNER_ORBIT_ANGLES.map((angle) => (
-            <OrbitPin key={angle} angle={angle} icon={MapPin} />
-          ))}
-        </div>
-
-        {/* Outer orbit ring */}
-        <div
-          className="ahg-ring ahg-ring--reverse absolute inset-0 rounded-full border border-dashed border-slate/30"
-          style={{ '--orbit-duration': '38s' } as CSSProperties}
-          aria-hidden="true"
-        >
-          {OUTER_ORBIT_ANGLES.map((angle) => (
-            <OrbitPin key={angle} angle={angle} icon={Compass} />
-          ))}
-        </div>
-      </motion.div>
-    </div>
-  )
-}
-
-function OrbitPin({ angle, icon: Icon }: { angle: number; icon: typeof MapPin }) {
-  return (
-    <div className="absolute inset-0" style={{ transform: `rotate(${angle}deg)` }}>
-      <div className="absolute top-1/2 left-full -translate-x-1/2 -translate-y-1/2">
-        <div className="ahg-pin-counter">
-          <span
-            className={cn(
-              'flex size-8 items-center justify-center rounded-full border border-sage/50 bg-white text-deep shadow-[0_10px_26px_-8px_rgba(0,0,0,0.55)]',
-            )}
-          >
-            <Icon className="size-3.5" aria-hidden="true" />
-          </span>
-        </div>
-      </div>
-    </div>
   )
 }
