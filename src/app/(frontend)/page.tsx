@@ -9,6 +9,8 @@ import { buildMetadata, organizationJsonLd, seoFromDoc, siteUrl, websiteJsonLd }
 
 import './homepage.css'
 
+export const revalidate = 3600
+
 /**
  * Default search-engine title and description for the homepage.
  *

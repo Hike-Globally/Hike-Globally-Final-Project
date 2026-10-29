@@ -1,9 +1,10 @@
 /**
  * Wires the media collection to whichever storage the deployment can actually use.
  *
- * Every mode goes through `@payloadcms/plugin-cloud-storage`, so the collection behaves the same
- * way regardless of where the bytes end up: the same `url` fields, the same
- * `/api/media/file/<filename>` endpoint, the same admin thumbnails and `next/image` integration.
+ * Every mode goes through `@payloadcms/plugin-cloud-storage`. When Vercel Blob is active (`blob`),
+ * `disablePayloadAccessControl: true` hands out direct `*.public.blob.vercel-storage.com` CDN URLs
+ * instead of proxying every image and video byte stream through `/api/media/file/<filename>` on
+ * Fluid Compute CPU (`Media` read access is `anyone`, so public reads need no Payload auth gate).
  *
  * `alwaysInsertFields: true` in *all* modes is deliberate: the plugin's hidden `prefix` and
  * `_objectKey` fields then exist in the collection schema even on a developer's laptop, so the
@@ -18,13 +19,14 @@ import { resolveMediaStorage, type MediaStorageMode } from '../lib/media-storage
 import { databaseStorageAdapter, ensureMediaStorageSchema } from './database-adapter'
 
 /**
- * Blob storage, the intended production home for media. `clientUploads` is opt-in: uploading
- * straight from the browser to Blob bypasses Vercel's ~4.5 MB request-body limit but depends on the
- * store's CORS configuration, so it stays off until an operator turns it on.
+ * Blob storage, the intended production home for media. `disablePayloadAccessControl: true` serves
+ * assets straight from Vercel Blob's edge CDN (zero serverless invocations or Active CPU).
+ * `clientUploads` is opt-in (`BLOB_CLIENT_UPLOADS=true`) to bypass Vercel's ~4.5 MB function body
+ * ceiling once CORS is configured on the store.
  */
 const blobPlugin = (): Plugin =>
   vercelBlobStorage({
-    collections: { media: true },
+    collections: { media: { disablePayloadAccessControl: true } },
     clientUploads: process.env.BLOB_CLIENT_UPLOADS === 'true',
     token: process.env.BLOB_READ_WRITE_TOKEN,
     addRandomSuffix: false,

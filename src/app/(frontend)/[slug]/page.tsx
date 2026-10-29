@@ -30,8 +30,10 @@ export async function generateMetadata({
   if (isReservedPageSlug(slug)) return {}
 
   const includeDraft = await isLivePreviewRequest()
-  const [page, settings] = await Promise.all([getPage(slug, includeDraft), getSettings()])
+  const page = await getPage(slug, includeDraft)
   if (!page) return {}
+
+  const settings = await getSettings()
 
   const seo = seoFromDoc(page, { title: page.title })
 

@@ -54,6 +54,24 @@ const nextConfig = {
   // Payload + sharp must never be bundled by the Next compiler.
   serverExternalPackages: ['sharp', 'payload', '@payloadcms/db-postgres'],
 
+  async redirects() {
+    // Retire the legacy `/en`, `/de` and `/fr` locale prefixes with CDN-level 308 redirects
+    // (preserving query strings automatically) so `src/middleware.ts` does not have to run Fluid
+    // Compute CPU on every public storefront request.
+    return [
+      {
+        source: '/:locale(en|de|fr)',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/:locale(en|de|fr)/:path+',
+        destination: '/:path+',
+        permanent: true,
+      },
+    ]
+  },
+
   async headers() {
     return [
       {

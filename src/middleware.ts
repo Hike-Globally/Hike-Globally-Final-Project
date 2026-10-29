@@ -80,10 +80,8 @@ export function middleware(request: NextRequest) {
   if (pathname === '/api' || pathname.startsWith('/api/')) return trustSameOrigin(request)
   if (pathname === '/admin' || pathname.startsWith('/admin/')) return trustSameOrigin(request)
 
-  // Retire the old language prefixes: /de/trips → /trips (search params are preserved).
-  //
-  // Trailing slashes need no handling here: Next's router 308s `/trips/` → `/trips` before the
-  // proxy runs, so the URL a crawler lands on is already the same string as the page's canonical.
+  // Legacy `/en`, `/de` and `/fr` redirects are served at the CDN layer via `redirects()` in
+  // `next.config.mjs` (zero Fluid Compute CPU). Kept here as a pure fallback if matcher widens.
   const stripped = stripLocalePrefix(pathname)
   if (stripped !== null) {
     const url = request.nextUrl.clone()
@@ -95,7 +93,8 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Everything except Next internals and static files. The Payload API and admin panel are
-  // included so `trustSameOrigin()` can normalise their authentication headers.
-  matcher: ['/((?!_next/static|_next/image|media|favicon.ico|robots.txt|sitemap.xml|.*\\..*).*)'],
+  // Strictly scoped to Payload's admin panel and API (excluding `/api/media/file/*` byte streams).
+  // Public storefront pages, `<Link>` prefetches and crawler visits never invoke this proxy, so
+  // cached/ISR routes are served straight from Vercel's CDN with zero Fluid Active CPU.
+  matcher: ['/admin', '/admin/:path*', '/api', '/api/((?!media/file/).*)'],
 }

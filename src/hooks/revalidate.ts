@@ -8,6 +8,11 @@ import type {
 } from 'payload'
 
 import { CACHE_TAG, revalidationDisabled } from '../lib/cache-tags'
+import {
+  shouldRevalidateAfterChange,
+  shouldRevalidateAfterDelete,
+  slugOf,
+} from '../lib/revalidate-rules'
 
 /**
  * ============================================================================
@@ -54,13 +59,6 @@ const documentTag = (collection: RevalidateConfig['collection'], slug: string): 
         ? CACHE_TAG.post(slug)
         : CACHE_TAG.page(slug)
 
-/** The slug of a document, from either the hook payload or a fresh read of it. */
-const slugOf = (doc: unknown): string | undefined => {
-  if (!doc || typeof doc !== 'object') return undefined
-  const slug = (doc as { slug?: unknown }).slug
-  return typeof slug === 'string' && slug.length > 0 ? slug : undefined
-}
-
 const revalidateDocument = async ({
   collection,
   segment,
@@ -76,22 +74,24 @@ const revalidateDocument = async ({
   const tags: string[] = [collectionTag(collection), ...extraTags]
   const paths: string[] = []
 
-  // Read the document back so the slug is present even on a partial update.
-  let fullDoc: unknown = doc
-  try {
-    fullDoc = await req.payload.findByID({
-      id: doc.id,
-      collection,
-      depth: 0,
-      draft: true,
-      overrideAccess: true,
-      disableErrors: true,
-    })
-  } catch {
-    fullDoc = doc
+  // Only hit the database when the hook payload lacks a slug (e.g. a narrow select/partial doc).
+  let slug = slugOf(doc)
+  if (!slug) {
+    try {
+      const fullDoc = await req.payload.findByID({
+        id: doc.id,
+        collection,
+        depth: 0,
+        draft: true,
+        overrideAccess: true,
+        disableErrors: true,
+      })
+      slug = slugOf(fullDoc)
+    } catch {
+      slug = undefined
+    }
   }
 
-  const slug = slugOf(fullDoc)
   const previousSlug = slugOf(previousDoc)
 
   // Pages have no listing route — their "index" is the homepage.
@@ -125,11 +125,13 @@ const revalidateDocument = async ({
 
 const createRevalidateHooks = (config: RevalidateConfig) => {
   const afterChange: CollectionAfterChangeHook = async ({ doc, previousDoc, req }) => {
+    if (!shouldRevalidateAfterChange({ doc, previousDoc, req })) return doc
     await revalidateDocument({ ...config, doc, previousDoc, req })
     return doc
   }
 
   const afterDelete: CollectionAfterDeleteHook = async ({ doc, req }) => {
+    if (!shouldRevalidateAfterDelete({ doc })) return doc
     await revalidateDocument({ ...config, doc, req })
     return doc
   }
