@@ -24,7 +24,7 @@ export const Destinations: CollectionConfig = {
     livePreview: { url: siteLivePreviewURL },
   },
   versions: {
-    drafts: { autosave: { interval: 250 } },
+    drafts: { autosave: { interval: 1500 } },
     maxPerDoc: 25,
   },
   access: {

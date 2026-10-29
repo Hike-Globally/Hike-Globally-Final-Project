@@ -1,8 +1,8 @@
 import Link from 'next/link'
 
 import { dictionary, t } from '@/i18n/dictionaries'
-import { sitePath } from '@/i18n/config'
-import { getFooter, getSettings } from '@/lib/data'
+import { routes, sitePath } from '@/i18n/config'
+import { getAllPageSlugs, getFooter, getSettings } from '@/lib/data'
 import { resolveLink, type ResolvedLink } from '@/lib/links'
 import type { Setting } from '@/payload-types'
 
@@ -96,31 +96,74 @@ const platformLabel: Record<SocialPlatform, string> = {
   x: 'X',
 }
 
-/** External links keep the browser tab; internal ones use next/link prefetching. */
-function FooterLink({ link }: { link: ResolvedLink }) {
+const STATIC_ROUTE_ROOTS = new Set<string>(Object.values(routes))
+
+/**
+ * Only prefetch internal links whose route actually exists as a static route or a published CMS
+ * page. Prefetching unpublished fallback slugs (`/about`, `/privacy`, `/terms`) would otherwise
+ * fire three uncached serverless 404 renders on Fluid Compute every time a visitor scrolls down.
+ */
+const canPrefetchInternalHref = (href: string, publishedPageSlugs: ReadonlySet<string>): boolean => {
+  if (!href.startsWith('/')) return false
+  const [pathname = '/'] = href.split(/[?#]/, 1)
+  const segments = pathname.split('/').filter(Boolean)
+  if (segments.length === 0) return true
+  if (STATIC_ROUTE_ROOTS.has(segments[0]!)) return true
+  return segments.length === 1 && publishedPageSlugs.has(segments[0]!)
+}
+
+/** External/protocol links use plain `<a>`; internal routes use `next/link` with safe prefetching. */
+function FooterLink({
+  link,
+  publishedPageSlugs,
+}: {
+  link: ResolvedLink
+  publishedPageSlugs: ReadonlySet<string>
+}) {
   const external = /^https?:\/\//.test(link.href)
+  const nonHttpProtocol = /^(?:mailto|tel):/i.test(link.href)
   const className =
     'text-sm leading-none text-mist/90 transition-colors hover:text-white hover:underline underline-offset-4'
 
-  return external ? (
-    <a href={link.href} className={className} target="_blank" rel="noopener noreferrer">
-      {link.label}
-    </a>
-  ) : (
-    <Link href={link.href} className={className}>
+  if (external) {
+    return (
+      <a href={link.href} className={className} target="_blank" rel="noopener noreferrer">
+        {link.label}
+      </a>
+    )
+  }
+
+  if (nonHttpProtocol) {
+    return (
+      <a href={link.href} className={className}>
+        {link.label}
+      </a>
+    )
+  }
+
+  const prefetch = canPrefetchInternalHref(link.href, publishedPageSlugs) ? undefined : false
+
+  return (
+    <Link href={link.href} prefetch={prefetch} className={className}>
       {link.label}
     </Link>
   )
 }
 
-function FooterColumnBlock({ column }: { column: FooterColumn }) {
+function FooterColumnBlock({
+  column,
+  publishedPageSlugs,
+}: {
+  column: FooterColumn
+  publishedPageSlugs: ReadonlySet<string>
+}) {
   return (
     <nav aria-label={column.heading}>
       <h3 className="font-heading text-sm font-semibold text-white">{column.heading}</h3>
       <ul className="mt-4 space-y-2.5">
         {column.links.map((link) => (
           <li key={`${link.href}-${link.label}`}>
-            <FooterLink link={link} />
+            <FooterLink link={link} publishedPageSlugs={publishedPageSlugs} />
           </li>
         ))}
       </ul>
@@ -140,7 +183,13 @@ const rightGridCols: Record<number, string> = {
 }
 
 export async function Footer() {
-  const [footer, settings, dict] = [await getFooter(), await getSettings(), dictionary]
+  const [footer, settings, pageSlugs] = await Promise.all([
+    getFooter(),
+    getSettings(),
+    getAllPageSlugs(),
+  ])
+  const dict = dictionary
+  const publishedPageSlugs = new Set(pageSlugs)
 
   /* --- About column: CMS introduction + the social chips ------------------ */
   const introduction = footer.introduction ?? dict.footer.introductionFallback
@@ -259,7 +308,11 @@ export async function Footer() {
           className={`grid grid-cols-1 gap-x-8 gap-y-10 xs:grid-cols-2 sm:grid-cols-3 lg:col-span-7 lg:gap-x-6 xl:col-span-8 ${tracks}`}
         >
           {rightColumns.map((column) => (
-            <FooterColumnBlock key={column.heading} column={column} />
+            <FooterColumnBlock
+              key={column.heading}
+              column={column}
+              publishedPageSlugs={publishedPageSlugs}
+            />
           ))}
         </div>
       </div>

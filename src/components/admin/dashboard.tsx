@@ -328,7 +328,13 @@ export default async function AdminDashboard({ initPageResult, user }: AdminView
           <p className="hg-dashboard__site-description">
             Preview the public experience and make sure every detail feels right.
           </p>
-          <Link className="hg-dashboard__site-link" href="/en" target="_blank" rel="noreferrer">
+          <Link
+            className="hg-dashboard__site-link"
+            href="/"
+            prefetch={false}
+            target="_blank"
+            rel="noreferrer"
+          >
             Open website
             <ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.8} />
           </Link>

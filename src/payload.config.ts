@@ -89,9 +89,9 @@ export default buildConfig({
       robots: 'noindex, nofollow',
     },
     livePreview: {
-      // Default to a visible pane on the first visit, while keeping Payload's normal preference
-      // persistence so editors can collapse it once and reopen it whenever they need it.
-      openByDefault: true,
+      // Closed until an editor clicks "Expand preview", avoiding automatic background RSC
+      // renders on every edit screen when preview is not actively needed.
+      openByDefault: false,
       breakpoints: [
         { name: 'mobile', label: 'Mobile', width: 390, height: 844 },
         { name: 'tablet', label: 'Tablet', width: 834, height: 1112 },

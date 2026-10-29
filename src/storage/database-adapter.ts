@@ -220,9 +220,12 @@ const serveStoredFile = async (
   let headers = new Headers()
   headers.set('Content-Type', mimeType)
   headers.set('Accept-Ranges', 'bytes')
-  // A day of browser/proxy caching keeps image traffic off the database without making a replaced
-  // file stale for long.
-  headers.set('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800')
+  // Cache for 1 day in browsers and 30 days at the Vercel/CDN edge (`s-maxage`) so image and video
+  // traffic stays off Fluid Compute and Postgres without keeping a replaced file stale in browsers.
+  headers.set(
+    'Cache-Control',
+    'public, max-age=86400, s-maxage=2592000, stale-while-revalidate=604800',
+  )
   if (isXmlMimeType(mimeType)) {
     headers.set('Content-Security-Policy', UPLOAD_CONTENT_SECURITY_POLICY)
   }

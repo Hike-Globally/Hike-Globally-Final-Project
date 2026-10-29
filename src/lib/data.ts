@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { unstable_cache } from 'next/cache'
 import type { TypedLocale, Where } from 'payload'
 
@@ -580,16 +581,24 @@ export const getHomepageTrips = (limit = 3): Promise<TripCard[]> =>
     defaultFeaturedTrips.slice(0, limit),
   )
 
-export const getTrip = (slug: string, includeDraft = false): Promise<Trip | null> =>
-  safeQuery(
-    includeDraft
-      ? () => findDocumentBySlug<Trip>('trips', slug, 2, true)
-      : unstable_cache(() => findDocumentBySlug<Trip>('trips', slug, 2, false), ['trip', slug], {
-          tags: [CACHE_TAG.trips, CACHE_TAG.trip(slug)],
-          revalidate: REVALIDATE_SECONDS,
-        }),
+export const getTrip = cache(async (slug: string, includeDraft = false): Promise<Trip | null> => {
+  if (includeDraft) {
+    return safeQuery(() => findDocumentBySlug<Trip>('trips', slug, 2, true), null)
+  }
+
+  // Fast-fail unknown/bot slugs against the single cached slug list so probes never boot Payload,
+  // touch Postgres, or create one Data Cache entry per random URL.
+  const publishedSlugs = await getAllTripSlugs()
+  if (!publishedSlugs.includes(slug)) return null
+
+  return safeQuery(
+    unstable_cache(() => findDocumentBySlug<Trip>('trips', slug, 2, false), ['trip', slug], {
+      tags: [CACHE_TAG.trips, CACHE_TAG.trip(slug)],
+      revalidate: REVALIDATE_SECONDS,
+    }),
     null,
   )
+})
 
 /** Related trips: explicit picks first, otherwise other trips in the same destination. */
 export const getRelatedTrips = (trip: Trip, limit = 3): Promise<TripCard[]> =>
@@ -645,27 +654,25 @@ export const getRelatedTrips = (trip: Trip, limit = 3): Promise<TripCard[]> =>
  * Every published trip, reduced to what the slug readers and the sitemap need.
  * Shared by `getAllTripSlugs()` and `getSitemapSources()`, so both see one cached query.
  */
-const getTripRecords = (): Promise<SitemapDocument[]> =>
-  safeQuery(
-    unstable_cache(
-      async () => {
-        const payload = await getPayloadClient()
-        const response = await payload.find({
-          collection: 'trips',
-          locale: SITE_LOCALE,
-          depth: 0,
-          limit: 1000,
-          select: slugSelect,
-          where: { _status: { equals: 'published' } },
-        })
+const readTripRecords = unstable_cache(
+  async () => {
+    const payload = await getPayloadClient()
+    const response = await payload.find({
+      collection: 'trips',
+      locale: SITE_LOCALE,
+      depth: 0,
+      limit: 1000,
+      select: slugSelect,
+      where: { _status: { equals: 'published' } },
+    })
 
-        return response.docs.map(toSitemapDocument)
-      },
-      ['published-trips'],
-      { tags: [CACHE_TAG.trips], revalidate: REVALIDATE_SECONDS },
-    ),
-    [],
-  )
+    return response.docs.map(toSitemapDocument)
+  },
+  ['published-trips'],
+  { tags: [CACHE_TAG.trips], revalidate: REVALIDATE_SECONDS },
+)
+
+const getTripRecords = cache((): Promise<SitemapDocument[]> => safeQuery(readTripRecords, []))
 
 /** Every published trip slug — feeds generateStaticParams() and the sitemap. */
 export const getAllTripSlugs = async (): Promise<string[]> => slugsOf(await getTripRecords())
@@ -780,72 +787,80 @@ export const getFeaturedDestinations = (limit = 3): Promise<DestinationCard[]> =
     defaultFeaturedDestinations.slice(0, limit),
   )
 
-export const getDestination = (slug: string, includeDraft = false): Promise<Destination | null> =>
-  safeQuery(
-    includeDraft
-      ? async () => {
+export const getDestination = cache(
+  async (slug: string, includeDraft = false): Promise<Destination | null> => {
+    if (includeDraft) {
+      return safeQuery(async () => {
+        const payload = await getPayloadClient()
+        const result = await payload.find({
+          collection: 'destinations',
+          locale: SITE_LOCALE,
+          depth: 1,
+          limit: 1,
+          draft: true,
+          overrideAccess: true,
+          joins: { trips: { limit: 50, sort: '-featured' } },
+          where: { slug: { equals: slug } },
+        })
+        return (result.docs[0] as Destination | undefined) ?? null
+      }, null)
+    }
+
+    const publishedSlugs = await getAllDestinationSlugs()
+    if (!publishedSlugs.includes(slug)) return null
+
+    return safeQuery(
+      unstable_cache(
+        async () => {
           const payload = await getPayloadClient()
           const result = await payload.find({
             collection: 'destinations',
             locale: SITE_LOCALE,
             depth: 1,
             limit: 1,
-            draft: true,
-            overrideAccess: true,
+            // `joins` resolves the `trips` join field in the same round trip as the document,
+            // so the destination page needs exactly ONE database query.
             joins: { trips: { limit: 50, sort: '-featured' } },
-            where: { slug: { equals: slug } },
+            where: { and: [{ _status: { equals: 'published' } }, { slug: { equals: slug } }] },
           })
           return (result.docs[0] as Destination | undefined) ?? null
-        }
-      : unstable_cache(
-          async () => {
-            const payload = await getPayloadClient()
-            const result = await payload.find({
-              collection: 'destinations',
-              locale: SITE_LOCALE,
-              depth: 1,
-              limit: 1,
-              // `joins` resolves the `trips` join field in the same round trip as the document,
-              // so the destination page needs exactly ONE database query.
-              joins: { trips: { limit: 50, sort: '-featured' } },
-              where: { and: [{ _status: { equals: 'published' } }, { slug: { equals: slug } }] },
-            })
-            return (result.docs[0] as Destination | undefined) ?? null
-          },
-          ['destination', slug],
-          {
-            tags: [CACHE_TAG.destinations, CACHE_TAG.destination(slug), CACHE_TAG.trips],
-            revalidate: REVALIDATE_SECONDS,
-          },
-        ),
-    null,
-  )
+        },
+        ['destination', slug],
+        {
+          tags: [CACHE_TAG.destinations, CACHE_TAG.destination(slug), CACHE_TAG.trips],
+          revalidate: REVALIDATE_SECONDS,
+        },
+      ),
+      null,
+    )
+  },
+)
 
 /**
  * Every published destination, reduced to what the slug readers and the sitemap need.
  * Shared by `getAllDestinationSlugs()` and `getSitemapSources()`, so both see one cached query.
  */
-const getDestinationRecords = (): Promise<SitemapDocument[]> =>
-  safeQuery(
-    unstable_cache(
-      async () => {
-        const payload = await getPayloadClient()
-        const response = await payload.find({
-          collection: 'destinations',
-          locale: SITE_LOCALE,
-          depth: 0,
-          limit: 1000,
-          select: slugSelect,
-          where: { _status: { equals: 'published' } },
-        })
+const readDestinationRecords = unstable_cache(
+  async () => {
+    const payload = await getPayloadClient()
+    const response = await payload.find({
+      collection: 'destinations',
+      locale: SITE_LOCALE,
+      depth: 0,
+      limit: 1000,
+      select: slugSelect,
+      where: { _status: { equals: 'published' } },
+    })
 
-        return response.docs.map(toSitemapDocument)
-      },
-      ['published-destinations'],
-      { tags: [CACHE_TAG.destinations], revalidate: REVALIDATE_SECONDS },
-    ),
-    [],
-  )
+    return response.docs.map(toSitemapDocument)
+  },
+  ['published-destinations'],
+  { tags: [CACHE_TAG.destinations], revalidate: REVALIDATE_SECONDS },
+)
+
+const getDestinationRecords = cache(
+  (): Promise<SitemapDocument[]> => safeQuery(readDestinationRecords, []),
+)
 
 /** Every published destination slug — feeds generateStaticParams() and the sitemap. */
 export const getAllDestinationSlugs = async (): Promise<string[]> =>
@@ -911,16 +926,22 @@ export const getFeaturedPosts = (limit = 3): Promise<PostCard[]> =>
     defaultPosts.slice(0, limit),
   )
 
-export const getPost = (slug: string, includeDraft = false): Promise<Blog | null> =>
-  safeQuery(
-    includeDraft
-      ? () => findDocumentBySlug<Blog>('blog', slug, 2, true)
-      : unstable_cache(() => findDocumentBySlug<Blog>('blog', slug, 2, false), ['post', slug], {
-          tags: [CACHE_TAG.posts, CACHE_TAG.post(slug)],
-          revalidate: REVALIDATE_SECONDS,
-        }),
+export const getPost = cache(async (slug: string, includeDraft = false): Promise<Blog | null> => {
+  if (includeDraft) {
+    return safeQuery(() => findDocumentBySlug<Blog>('blog', slug, 2, true), null)
+  }
+
+  const publishedSlugs = await getAllPostSlugs()
+  if (!publishedSlugs.includes(slug)) return null
+
+  return safeQuery(
+    unstable_cache(() => findDocumentBySlug<Blog>('blog', slug, 2, false), ['post', slug], {
+      tags: [CACHE_TAG.posts, CACHE_TAG.post(slug)],
+      revalidate: REVALIDATE_SECONDS,
+    }),
     null,
   )
+})
 
 export const getRelatedPosts = (post: Blog, limit = 3): Promise<PostCard[]> =>
   safeQuery(
@@ -972,27 +993,25 @@ export const getRelatedPosts = (post: Blog, limit = 3): Promise<PostCard[]> =>
  * Every published post, reduced to what the slug readers and the sitemap need.
  * Shared by `getAllPostSlugs()` and `getSitemapSources()`, so both see one cached query.
  */
-const getPostRecords = (): Promise<SitemapDocument[]> =>
-  safeQuery(
-    unstable_cache(
-      async () => {
-        const payload = await getPayloadClient()
-        const response = await payload.find({
-          collection: 'blog',
-          locale: SITE_LOCALE,
-          depth: 0,
-          limit: 1000,
-          select: slugSelect,
-          where: { _status: { equals: 'published' } },
-        })
+const readPostRecords = unstable_cache(
+  async () => {
+    const payload = await getPayloadClient()
+    const response = await payload.find({
+      collection: 'blog',
+      locale: SITE_LOCALE,
+      depth: 0,
+      limit: 1000,
+      select: slugSelect,
+      where: { _status: { equals: 'published' } },
+    })
 
-        return response.docs.map(toSitemapDocument)
-      },
-      ['published-posts'],
-      { tags: [CACHE_TAG.posts], revalidate: REVALIDATE_SECONDS },
-    ),
-    [],
-  )
+    return response.docs.map(toSitemapDocument)
+  },
+  ['published-posts'],
+  { tags: [CACHE_TAG.posts], revalidate: REVALIDATE_SECONDS },
+)
+
+const getPostRecords = cache((): Promise<SitemapDocument[]> => safeQuery(readPostRecords, []))
 
 /** Every published post slug — feeds generateStaticParams() and the sitemap. */
 export const getAllPostSlugs = async (): Promise<string[]> => slugsOf(await getPostRecords())
@@ -1001,16 +1020,24 @@ export const getAllPostSlugs = async (): Promise<string[]> => slugsOf(await getP
 /* Flexible pages                                                              */
 /* -------------------------------------------------------------------------- */
 
-export const getPage = (slug: string, includeDraft = false): Promise<Page | null> =>
-  safeQuery(
-    includeDraft
-      ? () => findDocumentBySlug<Page>('pages', slug, 2, true)
-      : unstable_cache(() => findDocumentBySlug<Page>('pages', slug, 2, false), ['page', slug], {
-          tags: [CACHE_TAG.pages, CACHE_TAG.page(slug)],
-          revalidate: REVALIDATE_SECONDS,
-        }),
+export const getPage = cache(async (slug: string, includeDraft = false): Promise<Page | null> => {
+  if (includeDraft) {
+    return safeQuery(() => findDocumentBySlug<Page>('pages', slug, 2, true), null)
+  }
+
+  // `getPageRecords()` holds every published page (including `home`) under one shared Data Cache
+  // entry, so unknown/bot slugs on `/[slug]` fail fast with zero Postgres queries or cache bloat.
+  const publishedSlugs = slugsOf(await getPageRecords())
+  if (!publishedSlugs.includes(slug)) return null
+
+  return safeQuery(
+    unstable_cache(() => findDocumentBySlug<Page>('pages', slug, 2, false), ['page', slug], {
+      tags: [CACHE_TAG.pages, CACHE_TAG.page(slug)],
+      revalidate: REVALIDATE_SECONDS,
+    }),
     null,
   )
+})
 
 /**
  * Every published page, reduced to what the slug readers and the sitemap need.
@@ -1018,27 +1045,25 @@ export const getPage = (slug: string, includeDraft = false): Promise<Page | null
  * The `home` document is included: it is served at `/`, so the sitemap uses its `updatedAt` as the
  * homepage's `<lastmod>` even though it never becomes an entry of its own.
  */
-const getPageRecords = (): Promise<SitemapDocument[]> =>
-  safeQuery(
-    unstable_cache(
-      async () => {
-        const payload = await getPayloadClient()
-        const response = await payload.find({
-          collection: 'pages',
-          locale: SITE_LOCALE,
-          depth: 0,
-          limit: 1000,
-          select: slugSelect,
-          where: { _status: { equals: 'published' } },
-        })
+const readPageRecords = unstable_cache(
+  async () => {
+    const payload = await getPayloadClient()
+    const response = await payload.find({
+      collection: 'pages',
+      locale: SITE_LOCALE,
+      depth: 0,
+      limit: 1000,
+      select: slugSelect,
+      where: { _status: { equals: 'published' } },
+    })
 
-        return response.docs.map(toSitemapDocument)
-      },
-      ['published-pages'],
-      { tags: [CACHE_TAG.pages], revalidate: REVALIDATE_SECONDS },
-    ),
-    [],
-  )
+    return response.docs.map(toSitemapDocument)
+  },
+  ['published-pages'],
+  { tags: [CACHE_TAG.pages], revalidate: REVALIDATE_SECONDS },
+)
+
+const getPageRecords = cache((): Promise<SitemapDocument[]> => safeQuery(readPageRecords, []))
 
 /**
  * Slugs of every published page that has a URL of its own — i.e. every page except the homepage
@@ -1075,44 +1100,39 @@ export const getSitemapSources = async (): Promise<SitemapSources> => {
 /* Globals                                                                     */
 /* -------------------------------------------------------------------------- */
 
-export const getHeader = (): Promise<Header> =>
-  safeQuery(
-    unstable_cache(
-      async () => {
-        const payload = await getPayloadClient()
-        return payload.findGlobal({ slug: 'header', locale: SITE_LOCALE, depth: 2 })
-      },
-      ['global-header'],
-      { tags: [CACHE_TAG.header], revalidate: REVALIDATE_SECONDS },
-    ),
-    defaultHeader,
-  )
+const readHeader = unstable_cache(
+  async () => {
+    const payload = await getPayloadClient()
+    return payload.findGlobal({ slug: 'header', locale: SITE_LOCALE, depth: 2 })
+  },
+  ['global-header'],
+  { tags: [CACHE_TAG.header], revalidate: REVALIDATE_SECONDS },
+)
 
-export const getFooter = (): Promise<Footer> =>
-  safeQuery(
-    unstable_cache(
-      async () => {
-        const payload = await getPayloadClient()
-        return payload.findGlobal({ slug: 'footer', locale: SITE_LOCALE, depth: 2 })
-      },
-      ['global-footer'],
-      { tags: [CACHE_TAG.footer], revalidate: REVALIDATE_SECONDS },
-    ),
-    defaultFooter,
-  )
+export const getHeader = cache((): Promise<Header> => safeQuery(readHeader, defaultHeader))
 
-export const getSettings = async (): Promise<Setting> => {
-  const settings = await safeQuery(
-    unstable_cache(
-      async () => {
-        const payload = await getPayloadClient()
-        return payload.findGlobal({ slug: 'settings', locale: SITE_LOCALE, depth: 1 })
-      },
-      ['global-settings'],
-      { tags: [CACHE_TAG.settings], revalidate: REVALIDATE_SECONDS },
-    ),
-    defaultSettings,
-  )
+const readFooter = unstable_cache(
+  async () => {
+    const payload = await getPayloadClient()
+    return payload.findGlobal({ slug: 'footer', locale: SITE_LOCALE, depth: 2 })
+  },
+  ['global-footer'],
+  { tags: [CACHE_TAG.footer], revalidate: REVALIDATE_SECONDS },
+)
+
+export const getFooter = cache((): Promise<Footer> => safeQuery(readFooter, defaultFooter))
+
+const readSettings = unstable_cache(
+  async () => {
+    const payload = await getPayloadClient()
+    return payload.findGlobal({ slug: 'settings', locale: SITE_LOCALE, depth: 1 })
+  },
+  ['global-settings'],
+  { tags: [CACHE_TAG.settings], revalidate: REVALIDATE_SECONDS },
+)
+
+export const getSettings = cache(async (): Promise<Setting> => {
+  const settings = await safeQuery(readSettings, defaultSettings)
 
   return {
     ...defaultSettings,
@@ -1120,6 +1140,6 @@ export const getSettings = async (): Promise<Setting> => {
     siteName: settings?.siteName || defaultSettings.siteName,
     email: settings?.email || defaultSettings.email,
   }
-}
+})
 
 export type Author = Pick<User, 'id' | 'name'> & { avatar?: number | Media | null }

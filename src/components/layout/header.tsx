@@ -16,7 +16,8 @@ import { resolveLink } from '@/lib/links'
  *   • settings.siteName → the wordmark slot at the left of the track
  */
 export async function Header() {
-  const [header, settings, dict] = [await getHeader(), await getSettings(), dictionary]
+  const [header, settings] = await Promise.all([getHeader(), getSettings()])
+  const dict = dictionary
 
   const links: PillNavLink[] = (header.navItems ?? []).flatMap((item) => {
     const link = resolveLink(item.link)
