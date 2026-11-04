@@ -1,5 +1,5 @@
 import type { Trip } from '@/payload-types'
-import { KeyPointsList } from './key-points-list'
+import { KeyPointsPanel } from './key-points-panel'
 
 /** Shared by the public page and draft preview; uses the original CMS row order. */
 export function KeyTakeawaysSection({ items }: { items: Trip['keyTakeaways'] }) {
@@ -12,10 +12,7 @@ export function KeyTakeawaysSection({ items }: { items: Trip['keyTakeaways'] }) 
       aria-labelledby="key-takeaways-heading"
       className="key-points-section scroll-mt-24 pt-12 md:pt-16"
     >
-      <h2 id="key-takeaways-heading" className="heading-md mb-6">
-        Key Takeaways
-      </h2>
-      <KeyPointsList items={points} />
+      <KeyPointsPanel title="Key Takeaways" titleId="key-takeaways-heading" items={points} />
     </section>
   )
 }

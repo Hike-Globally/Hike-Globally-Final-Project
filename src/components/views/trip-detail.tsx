@@ -31,7 +31,7 @@ import {
 import { FaqSection } from '@/components/sections/faq-section'
 import { DeparturesSection } from '@/components/sections/departures-section'
 import { KeyTakeawaysSection } from '@/components/sections/key-takeaways-section'
-import { KeyPointsList } from '@/components/sections/key-points-list'
+import { KeyPointsPanel } from '@/components/sections/key-points-panel'
 import { ItinerarySection } from '@/components/sections/itinerary-section'
 import { surface } from '@/components/ui/surface'
 import { PayloadImageFill, PayloadImage } from '@/components/ui/payload-image'
@@ -200,6 +200,7 @@ export function TripDetail({
   const bookingHref = bookingLink?.href ?? inquiryHref
   const faqGroups = getTripFaqGroups(trip)
   const faqs = faqGroups.flatMap(({ faqs: items }) => items)
+  const highlights = trip.highlights?.filter(({ text }) => text.trim())
 
   const sectionContent: Record<string, ReactNode> = {
     hero: (
@@ -330,16 +331,21 @@ export function TripDetail({
         hasExternalBookingLink={Boolean(bookingLink)}
       />
     ),
-    highlights: (
-      <>
-        {trip.highlights?.length ? (
-          <Reveal as="section" className="key-points-section pb-16 md:pb-24">
-            <h2 className="heading-md mb-6">{dict.trip.highlights}</h2>
-            <KeyPointsList items={trip.highlights} />
-          </Reveal>
-        ) : null}
-      </>
-    ),
+    highlights: highlights?.length ? (
+      <section
+        id="key-highlights"
+        aria-labelledby="key-highlights-heading"
+        className="key-points-section scroll-mt-24 pb-16 md:pb-24"
+      >
+        <Reveal>
+          <KeyPointsPanel
+            title={dict.trip.highlights}
+            titleId="key-highlights-heading"
+            items={highlights}
+          />
+        </Reveal>
+      </section>
+    ) : null,
     itinerary: <>{trip.itinerary?.length ? <ItinerarySection days={trip.itinerary} /> : null}</>,
     information: (
       <>
