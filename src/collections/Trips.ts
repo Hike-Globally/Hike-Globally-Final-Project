@@ -91,6 +91,24 @@ export const Trips: CollectionConfig = {
       required: true,
     },
     {
+      type: 'collapsible',
+      label: 'Key Takeaways',
+      fields: [
+        {
+          name: 'keyTakeaways',
+          type: 'array',
+          localized: true,
+          labels: { singular: 'Takeaway', plural: 'Takeaways' },
+          admin: {
+            description:
+              'Add one concise point per row. These appear in a summary box before Overview. Drag to reorder; leave empty to hide the box.',
+            components: { Field: '@/components/admin/instant-trip-array' },
+          },
+          fields: [{ name: 'text', type: 'textarea', required: true }],
+        },
+      ],
+    },
+    {
       name: 'description',
       type: 'richText',
       localized: true,

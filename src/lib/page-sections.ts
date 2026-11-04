@@ -1,6 +1,7 @@
 /** Shared by the CMS and public/preview renderers. Order is document-specific. */
 export const tripSectionOptions = [
   { label: 'Hero & trip facts', value: 'hero' },
+  { label: 'Key Takeaways', value: 'keyTakeaways' },
   { label: 'Overview', value: 'overview' },
   { label: 'Why Choose This Trek', value: 'whyChoose' },
   { label: 'Highlights', value: 'highlights' },

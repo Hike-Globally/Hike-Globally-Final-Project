@@ -29,6 +29,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { FaqSection } from '@/components/sections/faq-section'
+import { KeyTakeawaysSection } from '@/components/sections/key-takeaways-section'
 import { ItinerarySection } from '@/components/sections/itinerary-section'
 import { surface } from '@/components/ui/surface'
 import { PayloadImageFill, PayloadImage } from '@/components/ui/payload-image'
@@ -273,6 +274,7 @@ export function TripDetail({
         </section>
       </>
     ),
+    keyTakeaways: <KeyTakeawaysSection items={trip.keyTakeaways} />,
     overview: (
       <>
         <Reveal as="section" className="py-16 md:py-24">
