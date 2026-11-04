@@ -334,24 +334,24 @@ export function TripDetail({
         {trip.highlights?.length ? (
           <Reveal as="section" className="pb-16 md:pb-24">
             <h2 className="heading-md mb-6">{dict.trip.highlights}</h2>
-            {/* Always one single vertical column — every card stacks
-                vertically at every screen size, icon above the copy. */}
-            <ul className="flex flex-col items-stretch gap-2 sm:gap-3">
+            {/* Always one single horizontal row — every card shares the width
+                equally at every screen size, icon in front of the copy. */}
+            <ul className="flex flex-row items-center gap-2 sm:gap-3">
               {trip.highlights.map((highlight) => (
-                <li
-                  key={highlight.id ?? highlight.text}
-                  className={cn(
-                    surface,
-                    'flex min-w-0 flex-1 flex-col gap-3 p-3 sm:gap-3.5 sm:p-5',
-                  )}
-                >
-                  <span className="grid size-7 shrink-0 place-items-center rounded-full bg-sage text-ink">
-                    <Check className="size-3.5" strokeWidth={3} aria-hidden />
-                  </span>
-                  <span className="min-w-0 text-[0.8125rem] leading-relaxed break-words text-ink-80 sm:text-[0.9375rem]">
-                    {highlight.text}
-                  </span>
-                </li>
+              <li
+                key={highlight.id ?? highlight.text}
+                className={cn(
+                  surface,
+                  'flex min-w-0 flex-1 items-center gap-3 p-3 sm:gap-3.5 sm:p-5',
+                )}
+              >
+                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-sage text-ink">
+                  <Check className="size-3.5" strokeWidth={3} aria-hidden />
+                </span>
+                <span className="min-w-0 text-[0.8125rem] leading-relaxed break-words text-ink-80 sm:text-[0.9375rem]">
+                  {highlight.text}
+                </span>
+              </li>
               ))}
             </ul>
           </Reveal>
