@@ -45,6 +45,13 @@ test('first highlight, itinerary day and content section have editable state wit
   const templates: Record<string, FormState> = {
     highlights: { text: emptyText },
     itinerary: { day: emptyText, title: emptyText, description: emptyText, food: emptyText },
+    departureDates: {
+      startDate: emptyText,
+      endDate: emptyText,
+      status: { initialValue: 'available', value: 'available', valid: true },
+      price: emptyText,
+      note: emptyText,
+    },
     contentSections: template,
   }
   for (const [path, row] of Object.entries(templates)) {

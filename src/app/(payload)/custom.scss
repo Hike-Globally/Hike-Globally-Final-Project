@@ -3128,3 +3128,242 @@ html[data-theme='light']:has(.template-default) {
     font-weight: 500;
   }
 }
+
+/* --------------------------------------------------------------------------
+   Trip Departures — interactive multi-date calendar above the departure rows
+   -------------------------------------------------------------------------- */
+.hg-departure-picker-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.hg-departure-picker {
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--style-radius-s);
+  background: var(--theme-elevation-0);
+  padding: 18px 20px;
+  box-shadow: 0 2px 6px rgb(4 21 31 / 6%);
+}
+
+.hg-departure-picker__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--theme-elevation-150);
+}
+
+.hg-departure-picker__intro {
+  max-width: 540px;
+}
+
+.hg-departure-picker__title {
+  margin: 0;
+  color: #04151f;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.hg-departure-picker__hint {
+  margin: 4px 0 0;
+  color: var(--theme-elevation-500);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.hg-departure-picker__controls {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.hg-departure-picker__month-input {
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--theme-elevation-250);
+  border-radius: var(--style-radius-s);
+  background: #ffffff;
+  color: #04151f;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.hg-departure-picker__nav-btn,
+.hg-departure-picker__today-btn {
+  display: inline-flex;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--theme-elevation-250);
+  border-radius: var(--style-radius-s);
+  background: var(--theme-elevation-50);
+  color: #1d3557;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease;
+}
+
+.hg-departure-picker__nav-btn {
+  width: 34px;
+  font-size: 17px;
+  line-height: 1;
+}
+
+.hg-departure-picker__today-btn {
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+.hg-departure-picker__nav-btn:hover,
+.hg-departure-picker__today-btn:hover {
+  border-color: #1d3557;
+  background: var(--theme-elevation-100);
+}
+
+.hg-departure-picker__months {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  margin-top: 16px;
+}
+
+@media (max-width: 720px) {
+  .hg-departure-picker__months {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hg-departure-picker__month-label {
+  margin: 0 0 10px;
+  color: #1d3557;
+  font-size: 13.5px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.hg-departure-picker__weekdays,
+.hg-departure-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.hg-departure-picker__weekdays {
+  margin-bottom: 6px;
+}
+
+.hg-departure-picker__weekdays span {
+  color: var(--theme-elevation-500);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.hg-departure-picker__day {
+  display: grid;
+  height: 34px;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: #04151f;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 100ms ease,
+    border-color 100ms ease,
+    color 100ms ease;
+}
+
+button.hg-departure-picker__day:hover:not(:disabled):not(.hg-departure-picker__day--selected) {
+  border-color: #F7A230;
+  background: #fdf0da;
+  color: #04151f;
+}
+
+.hg-departure-picker__day--outside {
+  color: var(--theme-elevation-300);
+  font-weight: 400;
+  cursor: default;
+}
+
+.hg-departure-picker__day--span {
+  border-color: rgb(29 53 87 / 18%);
+  background: rgb(29 53 87 / 10%);
+  color: #1d3557;
+}
+
+.hg-departure-picker__day--selected {
+  border-color: #1d3557;
+  background: #1d3557;
+  box-shadow: inset 0 -2px 0 #F7A230;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.hg-departure-picker__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--theme-elevation-150);
+  font-size: 12px;
+}
+
+.hg-departure-picker__legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  color: var(--theme-elevation-600);
+  font-weight: 600;
+}
+
+.hg-departure-picker__legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.hg-departure-picker__swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.hg-departure-picker__swatch--start {
+  background: #1d3557;
+  box-shadow: inset 0 -2px 0 #F7A230;
+}
+
+.hg-departure-picker__swatch--span {
+  border: 1px solid rgb(29 53 87 / 28%);
+  background: rgb(29 53 87 / 12%);
+}
+
+.hg-departure-picker__count {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #fdf0da;
+  border: 1px solid rgb(247 162 48 / 55%);
+  color: #04151f;
+  font-weight: 700;
+}
+

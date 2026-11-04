@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -37,6 +37,39 @@ export function InquiryForm({
   const dict: Dictionary = dictionary
   const formRef = useRef<HTMLFormElement>(null)
   const [submitting, setSubmitting] = useState(false)
+
+  useEffect(() => {
+    const applyDate = (startDate: string | null | undefined, tripSlug?: string | null) => {
+      const form = formRef.current
+      if (!form) return
+
+      if (startDate && /^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
+        const dateInput = form.elements.namedItem('startDate')
+        if (dateInput instanceof HTMLInputElement) {
+          dateInput.value = startDate
+        }
+      }
+
+      if (tripSlug) {
+        const matched = trips.find((item) => item.slug === tripSlug)
+        const select = form.elements.namedItem('tripTitle')
+        if (matched && select instanceof HTMLSelectElement) {
+          select.value = matched.title
+        }
+      }
+    }
+
+    const params = new URLSearchParams(window.location.search)
+    applyDate(params.get('startDate'), params.get('trip'))
+
+    const onSelectDeparture = (event: Event) => {
+      const detail = (event as CustomEvent<{ startDate?: string; tripSlug?: string }>).detail
+      applyDate(detail?.startDate, detail?.tripSlug)
+    }
+
+    window.addEventListener('hg:select-departure-date', onSelectDeparture)
+    return () => window.removeEventListener('hg:select-departure-date', onSelectDeparture)
+  }, [trips])
 
   const endpoint = `https://formsubmit.co/${email}`
   const successPath = process.env.NEXT_PUBLIC_FORMSUBMIT_SUCCESS_PATH || '/inquiry/thank-you'

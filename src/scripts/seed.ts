@@ -1342,6 +1342,27 @@ const run = async () => {
           { image: imageAt(index + 4) },
           { image: imageAt(index + 5) },
         ],
+        departureDates: [
+          {
+            startDate: `2026-11-${String(8 + index * 2).padStart(2, '0')}T12:00:00.000Z`,
+            status: 'guaranteed',
+            note: 'Guaranteed departure',
+          },
+          {
+            startDate: `2026-11-${String(18 + index).padStart(2, '0')}T12:00:00.000Z`,
+            status: 'limited',
+            note: '3 spots left',
+          },
+          {
+            startDate: `2027-03-${String(14 + index * 2).padStart(2, '0')}T12:00:00.000Z`,
+            status: 'available',
+          },
+          {
+            startDate: `2027-04-${String(10 + index * 2).padStart(2, '0')}T12:00:00.000Z`,
+            status: 'guaranteed',
+            note: 'Spring rhododendron bloom',
+          },
+        ],
         meta: {
           title: `${trip.title} — ${trip.durationDays} days from $${trip.priceFrom}`,
           description: trip.summary,
