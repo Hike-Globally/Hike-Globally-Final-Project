@@ -1,6 +1,4 @@
-import { Check } from 'lucide-react'
-
-import { TripSectionHeading } from './trip-section-heading'
+import { Check, Sparkles } from 'lucide-react'
 
 type HighlightItem = { id?: string | null; text: string }
 
@@ -39,12 +37,15 @@ export function TripHighlights({
   id,
   title,
   eyebrow,
+  kicker,
   items,
   className,
 }: {
   id: string
   title: string
   eyebrow?: string
+  /** Small label beside the sparkle icon on the card's header, e.g. "Field notes". */
+  kicker?: string
   items: HighlightItem[] | null | undefined
   className?: string
 }) {
@@ -53,18 +54,35 @@ export function TripHighlights({
 
   return (
     <section id={id} aria-labelledby={`${id}-heading`} className={className}>
-      <TripSectionHeading id={`${id}-heading`} eyebrow={eyebrow} title={title} />
-      <ol className="trip-tiles">
-        {points.map((item, index) => (
-          <li key={item.id ?? `${id}-${index}`} className="trip-tile">
-            <span className="trip-tile__index" aria-hidden>
-              {String(index + 1).padStart(2, '0')}
-            </span>
-            <span className="trip-tile__text">{withEmphasis(item.text)}</span>
-            <Check className="mt-0.5 size-4 shrink-0 text-sage" aria-hidden />
-          </li>
-        ))}
-      </ol>
+      {/* The framed card is the trip page's version of the shared
+          `KeyPointsPanel`: one hairline frame, a champagne rule at the top-left,
+          and the list inset inside it. */}
+      <div className="trip-points-card">
+        <div className="trip-points-card__header">
+          <span className="trip-points-card__icon" aria-hidden>
+            <Sparkles className="size-4" strokeWidth={1.7} />
+          </span>
+          <div className="min-w-0">
+            {kicker ? <p className="trip-points-card__kicker">{kicker}</p> : null}
+            <h2 id={`${id}-heading`} className="trip-points-card__title">
+              {title}
+            </h2>
+          </div>
+          {eyebrow ? <p className="trip-points-card__eyebrow">{eyebrow}</p> : null}
+        </div>
+
+        <ol className="trip-tiles">
+          {points.map((item, index) => (
+            <li key={item.id ?? `${id}-${index}`} className="trip-tile">
+              <span className="trip-tile__index" aria-hidden>
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <span className="trip-tile__text">{withEmphasis(item.text)}</span>
+              <Check className="mt-0.5 size-4 shrink-0 text-sage" aria-hidden />
+            </li>
+          ))}
+        </ol>
+      </div>
     </section>
   )
 }

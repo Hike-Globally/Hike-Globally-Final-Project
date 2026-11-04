@@ -169,6 +169,7 @@ export function TripDetail({
         id="key-takeaways"
         title={dict.trip.keyTakeawaysHeading}
         eyebrow={dict.trip.sectionGlance}
+        kicker={dict.trip.fieldNotes}
         items={trip.keyTakeaways}
         className="trip-section first:pt-0"
       />
@@ -245,6 +246,7 @@ export function TripDetail({
         id="highlights"
         title={dict.trip.highlights}
         eyebrow={dict.trip.sectionHighlights}
+        kicker={dict.trip.fieldNotes}
         items={trip.highlights}
         className="trip-section"
       />

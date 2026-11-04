@@ -110,7 +110,7 @@ const en = {
     gallery: 'Gallery',
     faqs: 'Frequently Asked Questions',
     related: 'You may also like',
-    highlights: 'Highlights',
+    highlights: 'Key Highlights',
     factsTitle: 'Trip at a glance',
     duration: 'Duration',
     groupSize: 'Group size',
@@ -178,6 +178,10 @@ const en = {
     trustBandPoint4: 'Free date changes up to 30 days out',
     tripFactsHeading: 'Trip facts',
     keyTakeawaysHeading: 'What makes this trek',
+    /** Small label on the framed highlights card ("Field notes"). */
+    fieldNotes: 'Field notes',
+    /** "View all photos" affordance on the gallery. */
+    viewAllPhotos: 'View all photos',
     whyChooseHeading: 'Why choose this trek',
     routeMapHeading: 'Route map and altitude chart',
     packingCountOne: '1 item',
