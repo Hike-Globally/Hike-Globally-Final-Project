@@ -4,6 +4,11 @@ export const tripSectionOptions = [
   { label: 'Key Takeaways', value: 'keyTakeaways' },
   { label: 'Overview', value: 'overview' },
   { label: 'Why Choose This Trek', value: 'whyChoose' },
+  // Added after Why Choose This Trek shipped: migration 20261104_155601_trip_who_for_sections
+  // inserts these rows right after it in every layout saved before they existed (or at the end
+  // when that row was removed), so older trips get them too.
+  { label: 'Who Is This Trek For', value: 'whoFor' },
+  { label: 'Who Is This Trek Not For', value: 'whoNotFor' },
   { label: 'Highlights', value: 'highlights' },
   { label: 'Original route map and altitude chart', value: 'routeMap' },
   { label: 'Itinerary', value: 'itinerary' },

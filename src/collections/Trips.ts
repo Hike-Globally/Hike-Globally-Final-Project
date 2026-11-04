@@ -396,6 +396,38 @@ export const Trips: CollectionConfig = {
     },
     {
       type: 'collapsible',
+      label: 'Who Is This Trek For',
+      admin: { initCollapsed: true },
+      fields: [
+        {
+          name: 'whoIsThisTrekFor',
+          type: 'richText',
+          localized: true,
+          admin: {
+            description:
+              'The travellers this trek suits — fitness, experience and what they want from the trail. Displayed after Why Choose This Trek.',
+          },
+        },
+      ],
+    },
+    {
+      type: 'collapsible',
+      label: 'Who Is This Trek Not For',
+      admin: { initCollapsed: true },
+      fields: [
+        {
+          name: 'whoIsThisTrekNotFor',
+          type: 'richText',
+          localized: true,
+          admin: {
+            description:
+              'Who should choose a different trip — honest limits and mismatches. Displayed after Who Is This Trek For.',
+          },
+        },
+      ],
+    },
+    {
+      type: 'collapsible',
       label: 'Original route map and altitude chart',
       admin: { initCollapsed: true },
       fields: [

@@ -14,6 +14,7 @@ import * as migration_20261019_045205_blog_faqs from './20261019_045205_blog_faq
 import * as migration_20261104_120136_trip_additional_sections from './20261104_120136_trip_additional_sections'
 import * as migration_20261104_124123_trip_key_takeaways from './20261104_124123_trip_key_takeaways'
 import * as migration_20261104_144321_trip_departure_dates from './20261104_144321_trip_departure_dates'
+import * as migration_20261104_155601_trip_who_for_sections from './20261104_155601_trip_who_for_sections'
 
 export const migrations = [
   {
@@ -95,5 +96,10 @@ export const migrations = [
     up: migration_20261104_144321_trip_departure_dates.up,
     down: migration_20261104_144321_trip_departure_dates.down,
     name: '20261104_144321_trip_departure_dates',
+  },
+  {
+    up: migration_20261104_155601_trip_who_for_sections.up,
+    down: migration_20261104_155601_trip_who_for_sections.down,
+    name: '20261104_155601_trip_who_for_sections',
   },
 ]
