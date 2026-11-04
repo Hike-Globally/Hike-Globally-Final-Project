@@ -334,22 +334,21 @@ export function TripDetail({
         {trip.highlights?.length ? (
           <Reveal as="section" className="pb-16 md:pb-24">
             <h2 className="heading-md mb-6">{dict.trip.highlights}</h2>
-            {/* One single row on desktop — every card shares the width equally
-                (icon above the copy so narrow columns stay readable); cards
-                stack vertically on phones. */}
-            <ul className="flex flex-col gap-3 md:flex-row md:items-stretch">
+            {/* Always one single horizontal row — every card shares the width
+                equally at every screen size, icon above the copy. */}
+            <ul className="flex flex-row items-stretch gap-2 sm:gap-3">
               {trip.highlights.map((highlight) => (
                 <li
                   key={highlight.id ?? highlight.text}
                   className={cn(
                     surface,
-                    'flex min-w-0 flex-1 items-start gap-4 p-5 md:flex-col md:gap-3.5',
+                    'flex min-w-0 flex-1 flex-col gap-3 p-3 sm:gap-3.5 sm:p-5',
                   )}
                 >
-                  <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-sage text-ink md:mt-0">
+                  <span className="grid size-7 shrink-0 place-items-center rounded-full bg-sage text-ink">
                     <Check className="size-3.5" strokeWidth={3} aria-hidden />
                   </span>
-                  <span className="text-[0.9375rem] leading-relaxed text-ink-80">
+                  <span className="min-w-0 text-[0.8125rem] leading-relaxed break-words text-ink-80 sm:text-[0.9375rem]">
                     {highlight.text}
                   </span>
                 </li>
