@@ -31,7 +31,15 @@ export const Trips: CollectionConfig = {
   slug: 'trips',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'destination', 'durationDays', 'priceFrom', 'featured', 'updatedAt', 'viewLive'],
+    defaultColumns: [
+      'title',
+      'destination',
+      'durationDays',
+      'priceFrom',
+      'featured',
+      'updatedAt',
+      'viewLive',
+    ],
     group: 'Content',
     components: {
       edit: {
@@ -349,6 +357,71 @@ export const Trips: CollectionConfig = {
               },
             },
           ],
+        },
+      ],
+    },
+
+    {
+      type: 'collapsible',
+      label: 'Why Choose This Trek',
+      admin: { initCollapsed: true },
+      fields: [
+        {
+          name: 'whyChooseThisTrek',
+          type: 'richText',
+          localized: true,
+          admin: { description: 'Reasons to choose this trek. Displayed before Highlights.' },
+        },
+      ],
+    },
+    {
+      type: 'collapsible',
+      label: 'Original route map and altitude chart',
+      admin: { initCollapsed: true },
+      fields: [
+        {
+          name: 'routeMapContent',
+          label: 'Route map and altitude chart content',
+          type: 'richText',
+          localized: true,
+          admin: {
+            description: 'Optional introduction or route notes. Displayed after Highlights.',
+          },
+        },
+        {
+          name: 'routeMap',
+          label: 'Original route map',
+          type: 'upload',
+          relationTo: 'media',
+          filterOptions: { mimeType: { contains: 'image/' } },
+          admin: {
+            description: 'Upload the original route map image. Add descriptive alt text in Media.',
+          },
+        },
+        {
+          name: 'altitudeChart',
+          type: 'upload',
+          relationTo: 'media',
+          filterOptions: { mimeType: { contains: 'image/' } },
+          admin: {
+            description: 'Upload the altitude chart image. Add descriptive alt text in Media.',
+          },
+        },
+      ],
+    },
+    {
+      type: 'collapsible',
+      label: 'Departures',
+      admin: { initCollapsed: true },
+      fields: [
+        {
+          name: 'departures',
+          type: 'richText',
+          localized: true,
+          admin: {
+            description:
+              'Displayed after Detailed Itinerary. Use the toolbar’s + menu to add a table with departure dates, prices and availability, or write custom departure information.',
+          },
         },
       ],
     },

@@ -98,3 +98,14 @@ test('full-width sections can be interleaved with body sections without changing
   )
   assert.deepEqual(groups[2].sections, [{ kind: 'itinerary' }, { kind: 'html' }])
 })
+
+test('trip: new content sections have the requested default positions', () => {
+  const kinds = defaultPageSections(tripSectionOptions).map(({ kind }) => kind)
+  assert.equal(kinds[kinds.indexOf('highlights') - 1], 'whyChoose')
+  assert.equal(kinds[kinds.indexOf('highlights') + 1], 'routeMap')
+  assert.equal(kinds[kinds.indexOf('itinerary') + 1], 'departures')
+  for (const kind of ['whyChoose', 'routeMap', 'departures']) {
+    const hidden = defaultPageSections(tripSectionOptions).filter((row) => row.kind !== kind)
+    assert.deepEqual(resolvePageSections(hidden, tripSectionOptions), hidden)
+  }
+})

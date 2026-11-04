@@ -2,8 +2,11 @@
 export const tripSectionOptions = [
   { label: 'Hero & trip facts', value: 'hero' },
   { label: 'Overview', value: 'overview' },
+  { label: 'Why Choose This Trek', value: 'whyChoose' },
   { label: 'Highlights', value: 'highlights' },
+  { label: 'Original route map and altitude chart', value: 'routeMap' },
   { label: 'Itinerary', value: 'itinerary' },
+  { label: 'Departures', value: 'departures' },
   { label: 'Essential information', value: 'information' },
   { label: 'Included / not included', value: 'inclusions' },
   { label: 'Packing list', value: 'packing' },

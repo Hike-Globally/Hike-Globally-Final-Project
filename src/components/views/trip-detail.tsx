@@ -40,6 +40,7 @@ import { formatNumber, formatPrice } from '@/lib/format'
 import { getTripFaqGroups } from '@/lib/trip-faqs'
 import { resolveLink } from '@/lib/links'
 import { cn } from '@/lib/utils'
+import { hasRichTextContent } from '@/lib/rich-text-content'
 import { breadcrumbJsonLd, faqJsonLd, touristTripJsonLd } from '@/lib/seo'
 import type { Trip } from '@/payload-types'
 
@@ -282,6 +283,50 @@ export function TripDetail({
         </Reveal>
       </>
     ),
+    whyChoose: hasRichTextContent(trip.whyChooseThisTrek) ? (
+      <section id="why-choose-this-trek" className="scroll-mt-24 pb-16 md:pb-24">
+        <SectionTitle title="Why Choose This Trek" />
+        <RichText content={trip.whyChooseThisTrek} />
+      </section>
+    ) : null,
+    routeMap:
+      hasRichTextContent(trip.routeMapContent) ||
+      (trip.routeMap && typeof trip.routeMap !== 'number') ||
+      (trip.altitudeChart && typeof trip.altitudeChart !== 'number') ? (
+        <section id="route-map" className="scroll-mt-24 pb-16 md:pb-24">
+          <SectionTitle title="Original route map and altitude chart" />
+          {hasRichTextContent(trip.routeMapContent) ? (
+            <RichText content={trip.routeMapContent} className="mb-8" />
+          ) : null}
+          <div className="space-y-8">
+            {[
+              { media: trip.routeMap, label: 'Original route map' },
+              { media: trip.altitudeChart, label: 'Altitude chart' },
+            ].map(({ media, label }) =>
+              media && typeof media !== 'number' ? (
+                <figure key={label} className={cn(surface, 'overflow-hidden p-4 sm:p-6')}>
+                  <figcaption className="mb-4 font-heading text-lg font-semibold">
+                    {label}
+                  </figcaption>
+                  <PayloadImage
+                    media={media}
+                    sizes="(max-width: 1024px) 100vw, 66vw"
+                    imageClassName="h-auto object-contain"
+                  />
+                </figure>
+              ) : null,
+            )}
+          </div>
+        </section>
+      ) : null,
+    departures: hasRichTextContent(trip.departures) ? (
+      <section id="departures" className="scroll-mt-24 py-16 md:py-24">
+        <SectionTitle title="Departures" />
+        <div className="overflow-x-auto">
+          <RichText content={trip.departures} />
+        </div>
+      </section>
+    ) : null,
     highlights: (
       <>
         {trip.highlights?.length ? (
