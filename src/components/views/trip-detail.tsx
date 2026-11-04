@@ -294,18 +294,6 @@ export function TripDetail({
         <RichText content={trip.whyChooseThisTrek} />
       </section>
     ) : null,
-    whoFor: hasRichTextContent(trip.whoIsThisTrekFor) ? (
-      <section id="who-is-this-trek-for" className="scroll-mt-24 pb-16 md:pb-24">
-        <SectionTitle title="Who Is This Trek For" />
-        <RichText content={trip.whoIsThisTrekFor} />
-      </section>
-    ) : null,
-    whoNotFor: hasRichTextContent(trip.whoIsThisTrekNotFor) ? (
-      <section id="who-is-this-trek-not-for" className="scroll-mt-24 pb-16 md:pb-24">
-        <SectionTitle title="Who Is This Trek Not For" />
-        <RichText content={trip.whoIsThisTrekNotFor} />
-      </section>
-    ) : null,
     routeMap:
       hasRichTextContent(trip.routeMapContent) ||
       (trip.routeMap && typeof trip.routeMap !== 'number') ||
