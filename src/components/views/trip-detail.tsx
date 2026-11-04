@@ -29,6 +29,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { FaqSection } from '@/components/sections/faq-section'
+import { DeparturesSection } from '@/components/sections/departures-section'
 import { KeyTakeawaysSection } from '@/components/sections/key-takeaways-section'
 import { KeyPointsList } from '@/components/sections/key-points-list'
 import { ItinerarySection } from '@/components/sections/itinerary-section'
@@ -322,14 +323,13 @@ export function TripDetail({
           </div>
         </section>
       ) : null,
-    departures: hasRichTextContent(trip.departures) ? (
-      <section id="departures" className="scroll-mt-24 py-16 md:py-24">
-        <SectionTitle title="Departures" />
-        <div className="overflow-x-auto">
-          <RichText content={trip.departures} />
-        </div>
-      </section>
-    ) : null,
+    departures: (
+      <DeparturesSection
+        trip={trip}
+        bookingHref={bookingHref}
+        hasExternalBookingLink={Boolean(bookingLink)}
+      />
+    ),
     highlights: (
       <>
         {trip.highlights?.length ? (

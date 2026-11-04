@@ -406,7 +406,7 @@ export interface Trip {
   summary: string;
   heroImage: number | Media;
   /**
-   * Add one concise point per row. These appear in a summary box before Overview. Drag to reorder; leave empty to hide the box.
+   * Add one point per row before Overview. Wrap a phrase in **double asterisks** to make it bold. Drag to reorder; leave empty to hide the section.
    */
   keyTakeaways?:
     | {
@@ -469,7 +469,7 @@ export interface Trip {
    */
   priceNote?: string | null;
   /**
-   * Short punchy bullets shown near the top of the trip page.
+   * One bullet per row. Wrap a phrase in **double asterisks** to make it bold.
    */
   highlights?:
     | {
@@ -575,7 +575,29 @@ export interface Trip {
    */
   altitudeChart?: (number | null) | Media;
   /**
-   * Displayed after Detailed Itinerary. Use the toolbar’s + menu to add a table with departure dates, prices and availability, or write custom departure information.
+   * Pick departure dates directly on the calendar or add rows individually. Displayed as an interactive calendar and departure schedule after Detailed Itinerary.
+   */
+  departureDates?:
+    | {
+        startDate: string;
+        /**
+         * Optional — defaults to Start date + trip duration.
+         */
+        endDate?: string | null;
+        status: 'available' | 'guaranteed' | 'limited' | 'sold-out';
+        /**
+         * Optional — uses Pricing → Price From when blank.
+         */
+        price?: number | null;
+        /**
+         * Optional short badge or note.
+         */
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional notes displayed below the calendar and departure dates (e.g. private group departures, custom dates or seasonal notes).
    */
   departures?: {
     root: {
@@ -1602,6 +1624,16 @@ export interface TripsSelect<T extends boolean = true> {
   routeMapContent?: T;
   routeMap?: T;
   altitudeChart?: T;
+  departureDates?:
+    | T
+    | {
+        startDate?: T;
+        endDate?: T;
+        status?: T;
+        price?: T;
+        note?: T;
+        id?: T;
+      };
   departures?: T;
   included?:
     | T

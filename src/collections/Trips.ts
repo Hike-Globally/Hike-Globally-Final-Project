@@ -10,6 +10,7 @@ import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
 import { viewLiveField } from '../fields/view-live'
 import { revalidateTrip, revalidateTripDelete } from '../hooks/revalidate'
+import { departureStatusOptions, toDateKey } from '../lib/departures'
 import { difficultySelectOptions } from '../lib/difficulty'
 import { siteLivePreviewURL } from '../lib/live-preview-url'
 
@@ -434,12 +435,107 @@ export const Trips: CollectionConfig = {
       admin: { initCollapsed: true },
       fields: [
         {
+          name: 'departureDates',
+          label: 'Departure dates',
+          type: 'array',
+          labels: { singular: 'Departure date', plural: 'Departure dates' },
+          admin: {
+            description:
+              'Pick departure dates directly on the calendar or add rows individually. Displayed as an interactive calendar and departure schedule after Detailed Itinerary.',
+            components: {
+              Field: '@/components/admin/departure-dates-field',
+              RowLabel: '@/components/admin/departure-row-label',
+            },
+          },
+          fields: [
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'startDate',
+                  label: 'Start date',
+                  type: 'date',
+                  required: true,
+                  admin: {
+                    width: '50%',
+                    placeholder: 'Select start date…',
+                    date: {
+                      pickerAppearance: 'dayOnly',
+                      displayFormat: 'd MMM yyyy',
+                    },
+                  },
+                },
+                {
+                  name: 'endDate',
+                  label: 'End date',
+                  type: 'date',
+                  validate: (value, { siblingData }) => {
+                    if (!value) return true
+                    const start = toDateKey(
+                      (siblingData as { startDate?: string | Date | null } | undefined)?.startDate,
+                    )
+                    const end = toDateKey(value)
+                    if (start && end && end < start) {
+                      return 'End date cannot be earlier than the start date.'
+                    }
+                    return true
+                  },
+                  admin: {
+                    width: '50%',
+                    placeholder: 'Auto-calculated from trip days',
+                    description: 'Optional — defaults to Start date + trip duration.',
+                    date: {
+                      pickerAppearance: 'dayOnly',
+                      displayFormat: 'd MMM yyyy',
+                    },
+                  },
+                },
+              ],
+            },
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'status',
+                  label: 'Availability',
+                  type: 'select',
+                  required: true,
+                  defaultValue: 'available',
+                  options: [...departureStatusOptions],
+                  admin: { width: '34%' },
+                },
+                {
+                  name: 'price',
+                  label: 'Price override',
+                  type: 'number',
+                  min: 0,
+                  admin: {
+                    width: '33%',
+                    description: 'Optional — uses Pricing → Price From when blank.',
+                  },
+                },
+                {
+                  name: 'note',
+                  label: 'Note',
+                  type: 'text',
+                  admin: {
+                    width: '33%',
+                    placeholder: 'e.g. 4 spots left',
+                    description: 'Optional short badge or note.',
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        {
           name: 'departures',
+          label: 'Additional departure notes',
           type: 'richText',
           localized: true,
           admin: {
             description:
-              'Displayed after Detailed Itinerary. Use the toolbar’s + menu to add a table with departure dates, prices and availability, or write custom departure information.',
+              'Optional notes displayed below the calendar and departure dates (e.g. private group departures, custom dates or seasonal notes).',
           },
         },
       ],
