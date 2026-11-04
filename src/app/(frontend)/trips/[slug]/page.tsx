@@ -7,6 +7,11 @@ import { getAllTripSlugs, getRelatedTrips, getSettings, getTrip, getTripOptions 
 import { isLivePreviewRequest } from '@/lib/live-preview-access'
 import { buildMetadata, seoFromDoc } from '@/lib/seo'
 
+// The trip page's visual language (hero wash, booking card, section rhythm) lives in
+// its own stylesheet rather than in the view component, so the view stays importable
+// by the unit tests under plain Node — where a `.css` import is a hard error.
+import '../trip-page.css'
+
 export const revalidate = 3600
 
 /**
@@ -69,6 +74,8 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
       formEmail={
         settings.formsubmitEmail || process.env.NEXT_PUBLIC_FORMSUBMIT_EMAIL || settings.email
       }
+      whatsapp={settings.whatsapp}
+      phone={settings.phone}
     />
   )
 }

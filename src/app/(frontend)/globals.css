@@ -46,6 +46,17 @@
   --color-slate-20: #d4d7d1;
   --color-mist-60: #e7eaeb;
 
+  /* --- Sunset accents (trip pages) ---
+     A warm, alpine-sunset end stop for the trip single page's gradients. It sits
+     between sage (#F7A230) and a rose alpenglow, so a gradient can run
+     ink → deep → sage → ember without leaving the palette's family. Used for the
+     hero's horizon line, the "limited spots" pulse and the booking card's glow. */
+  --color-ember: #e4572e;
+  --color-ember-20: #fbe4db;
+  /* Ice blue — the high-altitude counterpoint to ember: snow, glacier, sky. */
+  --color-glacier: #7fd3e8;
+  --color-glacier-20: #e2f5fa;
+
   /* --- Typography --- */
   --font-heading: var(--font-google-sans-flex), 'Google Sans Flex', system-ui, sans-serif;
   --font-sans: var(--font-archivo), 'Archivo', system-ui, sans-serif;
@@ -464,6 +475,18 @@
     height: 0;
     display: none;
   }
+}
+
+/* Hairline-to-transparent rule used to close the trip hero and open each band. */
+@utility horizon-line {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in srgb, var(--color-sage) 55%, transparent) 22%,
+    color-mix(in srgb, var(--color-ember) 55%, transparent) 78%,
+    transparent
+  );
 }
 
 /* Thin gradient rule used to separate sections. */
