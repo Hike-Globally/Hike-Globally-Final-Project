@@ -1,0 +1,69 @@
+/* ============================================================================
+   Key Takeaways — the tinted "glass" summary box on the trip page.
+
+   The box itself is styled with Tailwind utilities in the component (translucent
+   amber tint, 2px sage border). What lives here is the motion that utilities
+   can't express:
+
+     ::before            a light beam that travels around the 2px border. A
+                         conic gradient is masked down to the border ring, then
+                         its start angle is animated via a registered custom
+                         property so the interpolation is smooth.
+     kt-breathe          a slow, soft amber glow behind the box.
+
+   Both animations are killed by the global `prefers-reduced-motion` block in
+   globals.css, which leaves the static sage border fully intact.
+   ========================================================================== */
+
+/* Registered so the browser can interpolate an angle inside the gradient. */
+@property --kt-border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.key-takeaways-box {
+  animation: kt-breathe 6s var(--ease-brand) infinite alternate;
+}
+
+/* The travelling beam — a ring exactly over the box's own 2px border. */
+.key-takeaways-box::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 2px; /* matches the border width the beam rides on */
+  background: conic-gradient(
+    from var(--kt-border-angle),
+    transparent 0deg,
+    var(--color-sage-40) 30deg,
+    var(--color-sage) 60deg,
+    var(--color-sage-40) 90deg,
+    transparent 120deg
+  );
+  /* Keep only the 2px frame: fill minus the padded content box. */
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: kt-border-travel 7s linear infinite;
+}
+
+@keyframes kt-border-travel {
+  to {
+    --kt-border-angle: 360deg;
+  }
+}
+
+@keyframes kt-breathe {
+  from {
+    box-shadow: 0 20px 48px -28px rgba(247, 162, 48, 0.35);
+  }
+  to {
+    box-shadow: 0 24px 64px -24px rgba(247, 162, 48, 0.55);
+  }
+}
