@@ -1,4 +1,5 @@
 import { RichText } from '@/components/content/rich-text'
+import { TripSectionHeading } from '@/components/trip/trip-section-heading'
 import { dictionary } from '@/i18n/dictionaries'
 import { normalizeDepartures } from '@/lib/departures'
 import { hasRichTextContent } from '@/lib/rich-text-content'
@@ -18,7 +19,7 @@ export function DeparturesSection({
   trip,
   bookingHref,
   hasExternalBookingLink,
-  className = 'py-16 md:py-24',
+  className,
 }: {
   trip: Trip
   bookingHref: string
@@ -34,10 +35,17 @@ export function DeparturesSection({
   if (!departures.length && !hasNotes) return null
 
   return (
-    <section id="departures" className={cn('scroll-mt-24', className)}>
-      <div className="mb-10">
-        <h2 className="heading-lg">{dictionary.trip.departures}</h2>
-      </div>
+    <section
+      id="departures"
+      aria-labelledby="departures-heading"
+      className={cn('trip-section', className)}
+    >
+      <TripSectionHeading
+        id="departures-heading"
+        eyebrow={dictionary.trip.sectionDates}
+        title={dictionary.trip.departures}
+        description={dictionary.trip.departuresIntro}
+      />
 
       {departures.length ? (
         <DeparturesCalendar

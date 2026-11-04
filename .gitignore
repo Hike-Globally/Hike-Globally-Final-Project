@@ -37,3 +37,10 @@ debug.log*
 .vercel
 *.pem
 coverage/
+
+# Design-preview harness (preview/trip-page) — a throwaway Next app that mounts the
+# real trip view with fixture content so the design can be reviewed without a
+# database. It is not part of the deployed site.
+preview/**/node_modules/
+preview/**/.next/
+preview/**/next-env.d.ts
