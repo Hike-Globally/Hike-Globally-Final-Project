@@ -47,9 +47,9 @@ export function KeyTakeawaysSection({ items }: { items: Trip['keyTakeaways'] }) 
 
           <div aria-hidden className="my-7 h-px bg-sage/30 sm:my-8" />
 
-          {/* Always one single horizontal row — every point shares the width
-              equally at every screen size, icon above the copy. */}
-          <ul className="flex flex-row items-start gap-3 sm:gap-6 md:gap-7">
+          {/* Always one single vertical column — every point stacks
+              vertically at every screen size, icon above the copy. */}
+          <ul className="flex flex-col items-start gap-3 sm:gap-6 md:gap-7">
             {points.map((point, index) => (
               <li
                 key={point.id ?? index}

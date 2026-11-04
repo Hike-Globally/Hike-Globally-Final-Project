@@ -334,9 +334,9 @@ export function TripDetail({
         {trip.highlights?.length ? (
           <Reveal as="section" className="pb-16 md:pb-24">
             <h2 className="heading-md mb-6">{dict.trip.highlights}</h2>
-            {/* Always one single horizontal row — every card shares the width
-                equally at every screen size, icon above the copy. */}
-            <ul className="flex flex-row items-stretch gap-2 sm:gap-3">
+            {/* Always one single vertical column — every card stacks
+                vertically at every screen size, icon above the copy. */}
+            <ul className="flex flex-col items-stretch gap-2 sm:gap-3">
               {trip.highlights.map((highlight) => (
                 <li
                   key={highlight.id ?? highlight.text}
