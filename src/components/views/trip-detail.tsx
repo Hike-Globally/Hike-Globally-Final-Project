@@ -30,6 +30,7 @@ import {
 } from '@/components/ui/accordion'
 import { FaqSection } from '@/components/sections/faq-section'
 import { KeyTakeawaysSection } from '@/components/sections/key-takeaways-section'
+import { KeyPointsList } from '@/components/sections/key-points-list'
 import { ItinerarySection } from '@/components/sections/itinerary-section'
 import { surface } from '@/components/ui/surface'
 import { PayloadImageFill, PayloadImage } from '@/components/ui/payload-image'
@@ -332,28 +333,9 @@ export function TripDetail({
     highlights: (
       <>
         {trip.highlights?.length ? (
-          <Reveal as="section" className="pb-16 md:pb-24">
+          <Reveal as="section" className="key-points-section pb-16 md:pb-24">
             <h2 className="heading-md mb-6">{dict.trip.highlights}</h2>
-            {/* Always one single horizontal row — every card shares the width
-                equally at every screen size, icon in front of the copy. */}
-            <ul className="flex flex-row items-center gap-2 sm:gap-3">
-              {trip.highlights.map((highlight) => (
-              <li
-                key={highlight.id ?? highlight.text}
-                className={cn(
-                  surface,
-                  'flex min-w-0 flex-1 items-center gap-3 p-3 sm:gap-3.5 sm:p-5',
-                )}
-              >
-                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-sage text-ink">
-                  <Check className="size-3.5" strokeWidth={3} aria-hidden />
-                </span>
-                <span className="min-w-0 text-[0.8125rem] leading-relaxed break-words text-ink-80 sm:text-[0.9375rem]">
-                  {highlight.text}
-                </span>
-              </li>
-              ))}
-            </ul>
+            <KeyPointsList items={trip.highlights} />
           </Reveal>
         ) : null}
       </>

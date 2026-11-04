@@ -101,7 +101,7 @@ export const Trips: CollectionConfig = {
           labels: { singular: 'Takeaway', plural: 'Takeaways' },
           admin: {
             description:
-              'Add one concise point per row. These appear in a summary box before Overview. Drag to reorder; leave empty to hide the box.',
+              'Add one point per row before Overview. Wrap a phrase in **double asterisks** to make it bold. Drag to reorder; leave empty to hide the section.',
             components: { Field: '@/components/admin/instant-trip-array' },
           },
           fields: [{ name: 'text', type: 'textarea', required: true }],
@@ -286,7 +286,8 @@ export const Trips: CollectionConfig = {
           localized: true,
           labels: { singular: 'Highlight', plural: 'Highlights' },
           admin: {
-            description: 'Short punchy bullets shown near the top of the trip page.',
+            description:
+              'One bullet per row. Wrap a phrase in **double asterisks** to make it bold.',
             components: { Field: '@/components/admin/instant-trip-array' },
           },
           fields: [{ name: 'text', type: 'text', required: true }],
