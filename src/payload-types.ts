@@ -378,8 +378,11 @@ export interface Trip {
         kind:
           | 'hero'
           | 'overview'
+          | 'whyChoose'
           | 'highlights'
+          | 'routeMap'
           | 'itinerary'
+          | 'departures'
           | 'information'
           | 'inclusions'
           | 'packing'
@@ -517,6 +520,68 @@ export interface Trip {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Reasons to choose this trek. Displayed before Highlights.
+   */
+  whyChooseThisTrek?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Optional introduction or route notes. Displayed after Highlights.
+   */
+  routeMapContent?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Upload the original route map image. Add descriptive alt text in Media.
+   */
+  routeMap?: (number | null) | Media;
+  /**
+   * Upload the altitude chart image. Add descriptive alt text in Media.
+   */
+  altitudeChart?: (number | null) | Media;
+  /**
+   * Displayed after Detailed Itinerary. Use the toolbar’s + menu to add a table with departure dates, prices and availability, or write custom departure information.
+   */
+  departures?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   included?:
     | {
         item: string;
@@ -1517,6 +1582,11 @@ export interface TripsSelect<T extends boolean = true> {
         content?: T;
         id?: T;
       };
+  whyChooseThisTrek?: T;
+  routeMapContent?: T;
+  routeMap?: T;
+  altitudeChart?: T;
+  departures?: T;
   included?:
     | T
     | {
