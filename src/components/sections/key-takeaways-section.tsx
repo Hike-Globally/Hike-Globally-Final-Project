@@ -47,13 +47,13 @@ export function KeyTakeawaysSection({ items }: { items: Trip['keyTakeaways'] }) 
 
           <div aria-hidden className="my-7 h-px bg-sage/30 sm:my-8" />
 
-          {/* One single row on desktop — every point shares the width equally;
-              points stack vertically on phones. */}
-          <ul className="flex flex-col gap-6 md:flex-row md:items-start md:gap-7">
+          {/* Always one single horizontal row — every point shares the width
+              equally at every screen size, icon above the copy. */}
+          <ul className="flex flex-row items-start gap-3 sm:gap-6 md:gap-7">
             {points.map((point, index) => (
               <li
                 key={point.id ?? index}
-                className="flex min-w-0 flex-1 items-start gap-3.5 md:flex-col md:gap-4"
+                className="flex min-w-0 flex-1 flex-col items-start gap-3 sm:gap-4"
               >
                 <span
                   aria-hidden
@@ -61,7 +61,7 @@ export function KeyTakeawaysSection({ items }: { items: Trip['keyTakeaways'] }) 
                 >
                   <Check className="size-3.5" strokeWidth={3} />
                 </span>
-                <p className="min-w-0 text-[0.9375rem] leading-relaxed break-words whitespace-pre-line text-ink-80 sm:text-base">
+                <p className="min-w-0 text-[0.8125rem] leading-relaxed break-words whitespace-pre-line text-ink-80 sm:text-[0.9375rem] md:text-base">
                   {point.text}
                 </p>
               </li>
