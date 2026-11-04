@@ -380,6 +380,8 @@ export interface Trip {
           | 'keyTakeaways'
           | 'overview'
           | 'whyChoose'
+          | 'whoFor'
+          | 'whoNotFor'
           | 'highlights'
           | 'routeMap'
           | 'itinerary'
@@ -534,6 +536,42 @@ export interface Trip {
    * Reasons to choose this trek. Displayed before Highlights.
    */
   whyChooseThisTrek?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * The travellers this trek suits — fitness, experience and what they want from the trail. Displayed after Why Choose This Trek.
+   */
+  whoIsThisTrekFor?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Who should choose a different trip — honest limits and mismatches. Displayed after Who Is This Trek For.
+   */
+  whoIsThisTrekNotFor?: {
     root: {
       type: string;
       children: {
@@ -1621,6 +1659,8 @@ export interface TripsSelect<T extends boolean = true> {
         id?: T;
       };
   whyChooseThisTrek?: T;
+  whoIsThisTrekFor?: T;
+  whoIsThisTrekNotFor?: T;
   routeMapContent?: T;
   routeMap?: T;
   altitudeChart?: T;

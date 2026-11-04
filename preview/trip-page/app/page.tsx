@@ -92,6 +92,14 @@ const trip = {
     'We are a small Kathmandu-based team, not a booking platform. Every departure is led by a licensed guide with a minimum of eight Everest seasons, and we keep the group small enough that everyone walks at the pace they need.',
     'We also include the domestic flights and all permits in the published price, so the figure you see is close to the figure you spend.',
   ]),
+  whoIsThisTrekFor: rich([
+    'This trek is for fit walkers who can manage five to seven hours a day on rough ground, several days in a row, with a daypack. You do not need climbing experience or specialist kit — just broken-in boots, a steady pace and the patience to acclimatise properly.',
+    'It suits first-time Himalayan trekkers who want the classic route with a licensed local guide, solo travellers joining a small group, and photographers happy to trade comfort for the light at 5,000 m.',
+  ]),
+  whoIsThisTrekNotFor: rich([
+    'This is not the trek for travellers who want luxury lodges, hot showers every night or a helicopter out at the first sign of tiredness — teahouses are simple, and the nearest road is four days back.',
+    'It is also a poor fit for anyone with heart or lung conditions that make altitude risky, for families with children under about ten, or for anyone unwilling to turn around if the guides judge the weather or altitude sickness against them.',
+  ]),
   routeMapContent: null,
   destination,
   tripType: 'trekking' as const,

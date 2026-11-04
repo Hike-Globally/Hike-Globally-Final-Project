@@ -142,6 +142,45 @@ test('the in-page nav links only to sections that actually render', () => {
   for (const id of fullAnchors) assert.match(full, new RegExp(`id="${id}"`))
 })
 
+test('Who Is This Trek For / Not For render after Why Choose This Trek, and hide when empty', () => {
+  const html = render({
+    ...baseTrip,
+    whyChooseThisTrek: richText('Small groups, local guides.'),
+    whoIsThisTrekFor: richText('Fit walkers who want the classic Everest route.'),
+    whoIsThisTrekNotFor: richText('Travellers who want luxury lodges every night.'),
+    highlights: [{ id: 'hl-1', text: 'Namche Bazaar' }],
+  } as unknown as Trip)
+
+  // Both sections print their heading and their content.
+  assert.match(html, /Who is this trek for/)
+  assert.match(html, /Who is this trek not for/)
+  assert.match(html, /Fit walkers who want the classic Everest route\./)
+  assert.match(html, /Travellers who want luxury lodges every night\./)
+
+  // Order on the page: Why Choose This Trek → For → Not For → Highlights.
+  const whyChoose = html.indexOf('id="why-choose-this-trek"')
+  const whoFor = html.indexOf('id="who-is-this-trek-for"')
+  const whoNotFor = html.indexOf('id="who-is-this-trek-not-for"')
+  const highlights = html.indexOf('id="highlights"')
+  assert.ok(whyChoose > 0 && whoFor > whyChoose && whoNotFor > whoFor && highlights > whoNotFor)
+
+  // The sticky nav links to both, in the same order.
+  const anchors = anchorsIn(html)
+  assert.deepEqual(anchors, [
+    'overview',
+    'why-choose-this-trek',
+    'who-is-this-trek-for',
+    'who-is-this-trek-not-for',
+    'highlights',
+    'inquiry',
+  ])
+
+  // Empty fields render nothing — no heading, no anchor.
+  const sparse = render(baseTrip)
+  assert.doesNotMatch(sparse, /Who is this trek/)
+  assert.doesNotMatch(anchorsIn(sparse).join(','), /who-is-this-trek/)
+})
+
 test('the dark trust band breaks up the body instead of ending the page', () => {
   const html = render({
     ...baseTrip,

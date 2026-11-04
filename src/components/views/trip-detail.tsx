@@ -67,6 +67,8 @@ function visibleSectionKinds(trip: Trip, faqCount: number, departureCount: numbe
   if (departureCount > 0 || hasRichTextContent(trip.departures)) visible.add('departures')
   if (trip.keyTakeaways?.some(({ text }) => text?.trim())) visible.add('keyTakeaways')
   if (hasRichTextContent(trip.whyChooseThisTrek)) visible.add('whyChoose')
+  if (hasRichTextContent(trip.whoIsThisTrekFor)) visible.add('whoFor')
+  if (hasRichTextContent(trip.whoIsThisTrekNotFor)) visible.add('whoNotFor')
   if (trip.highlights?.some(({ text }) => text?.trim())) visible.add('highlights')
   if (
     hasRichTextContent(trip.routeMapContent) ||
@@ -194,6 +196,24 @@ export function TripDetail({
         />
         <div className="prose-hg max-w-none">
           <RichText content={trip.whyChooseThisTrek} />
+        </div>
+      </section>
+    ) : null,
+
+    whoFor: hasRichTextContent(trip.whoIsThisTrekFor) ? (
+      <section id="who-is-this-trek-for" className="trip-section">
+        <TripSectionHeading eyebrow={dict.trip.sectionFit} title={dict.trip.whoForHeading} />
+        <div className="prose-hg max-w-none">
+          <RichText content={trip.whoIsThisTrekFor} />
+        </div>
+      </section>
+    ) : null,
+
+    whoNotFor: hasRichTextContent(trip.whoIsThisTrekNotFor) ? (
+      <section id="who-is-this-trek-not-for" className="trip-section">
+        <TripSectionHeading eyebrow={dict.trip.sectionFit} title={dict.trip.whoNotForHeading} />
+        <div className="prose-hg max-w-none">
+          <RichText content={trip.whoIsThisTrekNotFor} />
         </div>
       </section>
     ) : null,

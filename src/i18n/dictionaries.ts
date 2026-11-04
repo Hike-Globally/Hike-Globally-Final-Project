@@ -157,6 +157,7 @@ const en = {
     sectionRoute: 'Route & profile',
     sectionDates: 'Choose your dates',
     sectionHighlights: 'What makes this trek',
+    sectionFit: 'The right fit',
     sectionItinerary: 'Day by day',
     sectionIncludes: 'The practical detail',
     sectionGallery: 'The trail, up close',
@@ -183,6 +184,8 @@ const en = {
     /** "View all photos" affordance on the gallery. */
     viewAllPhotos: 'View all photos',
     whyChooseHeading: 'Why choose this trek',
+    whoForHeading: 'Who is this trek for',
+    whoNotForHeading: 'Who is this trek not for',
     routeMapHeading: 'Route map and altitude chart',
     packingCountOne: '1 item',
     packingCountOther: '{count} items',
