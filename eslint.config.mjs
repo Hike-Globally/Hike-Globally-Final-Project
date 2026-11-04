@@ -17,9 +17,6 @@ const eslintConfig = [
       'out/**',
       'build/**',
       'public/media/**',
-      // Design-preview harness (preview/trip-page): its own Next app, with its own
-      // generated .next output. Not shipped.
-      'preview/**',
       // Generated files — never linted.
       'src/app/(payload)/admin/importMap.js',
       'src/payload-types.ts',
