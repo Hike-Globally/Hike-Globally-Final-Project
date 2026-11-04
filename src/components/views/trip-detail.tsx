@@ -74,8 +74,7 @@ function SectionTitle({
 }
 
 /* ----------------------------------------------------------------------------
-   Sticky booking card — price, difficulty, duration, max altitude, group size
-   and the booking CTA
+   Sticky booking card — price, difficulty, duration and the booking CTA
    ---------------------------------------------------------------------------- */
 
 function TripBookingCard({
@@ -91,93 +90,62 @@ function TripBookingCard({
 }) {
   const perGroup = trip.priceUnit === 'per-group'
 
-  /* Quick-facts snapshot — rendered as a 2 × 2 tile grid under the price. */
-  const stats: { icon: LucideIcon; label: string; value: string }[] = [
-    {
-      icon: Gauge,
-      label: dict.trip.difficultyLevel,
-      value: difficultyLabel(trip.difficulty),
-    },
-    {
-      icon: Clock,
-      label: dict.trip.duration,
-      value: `${trip.durationDays} ${dict.common.days}${
-        trip.durationNights ? ` / ${trip.durationNights} ${dict.common.nights}` : ''
-      }`,
-    },
-    {
-      icon: Mountain,
-      label: dict.trip.maxAltitude,
-      value: trip.maxAltitude ? `${formatNumber(trip.maxAltitude)} m` : '—',
-    },
-    {
-      icon: Users,
-      label: dict.trip.groupSize,
-      value: trip.groupSizeMax ? `max ${trip.groupSizeMax}` : '—',
-    },
-  ]
-
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-[7px] border border-black/[0.08] bg-white shadow-[0_1px_2px_rgba(4,21,31,0.04),0_32px_64px_-32px_rgba(4,21,31,0.3)]',
+        'relative overflow-hidden bg-ink p-5 text-mist ring-1 ring-white/10 shadow-[0_40px_80px_-30px_rgba(4,21,31,0.6)] sm:p-7',
         className,
       )}
     >
-      {/* Warm gradient cap along the top edge — purely decorative. */}
+      {/* Soft brand glows behind the content — purely decorative. */}
       <div
         aria-hidden
-        className="absolute inset-x-0 top-0 h-[5px] bg-gradient-to-r from-sage-40 via-sage to-sage-40"
+        className="pointer-events-none absolute -top-24 -right-24 size-64 rounded-full bg-sage/20 blur-3xl"
       />
-      {/* Soft brand glow behind the content — purely decorative. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-24 -right-20 size-64 rounded-full bg-sage/15 blur-3xl"
+        className="pointer-events-none absolute -bottom-28 -left-20 size-64 rounded-full bg-deep blur-3xl"
       />
 
-      <div className="relative p-6 sm:p-7">
-        <p className="eyebrow">{perGroup ? dict.trip.pricePerGroup : dict.trip.pricePerPerson}</p>
+      <div className="relative">
+        <p className={eyebrowOnDark}>
+          {perGroup ? dict.trip.pricePerGroup : dict.trip.pricePerPerson}
+        </p>
 
-        {/* Price — a dark ink panel that anchors the white card. */}
-        <div className="relative mt-3.5 overflow-hidden rounded-[7px] bg-ink px-5 py-4">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -top-16 -right-10 size-44 rounded-full bg-sage/25 blur-3xl"
-          />
-          <p className="relative font-heading text-[2.25rem] leading-none font-semibold tracking-tight text-white">
+        <div className="mt-4 border border-white/10 bg-white/[0.05] px-5 py-4">
+          <p className="font-heading text-4xl leading-none font-semibold tracking-tight text-white">
             {formatPrice(trip.priceFrom, trip.priceCurrency)}
           </p>
         </div>
 
-        {/* Quick facts — 2 × 2 tiles with icon, label and value. */}
-        <dl className="mt-5 grid grid-cols-2 gap-2.5">
-          {stats.map(({ icon: Icon, label, value }) => (
-            <div
-              key={label}
-              className="flex h-full flex-col gap-1 rounded-[7px] border border-black/[0.06] bg-mist px-3.5 py-3"
-            >
-              <div className="flex items-start gap-1.5">
-                <Icon className="mt-px size-3.5 shrink-0 text-sage" aria-hidden />
-                <dt className="text-[0.625rem] leading-tight font-semibold tracking-[0.06em] text-ink-60 uppercase">
-                  {label}
-                </dt>
-              </div>
-              <dd className="mt-auto font-heading text-[0.9375rem] leading-snug font-semibold text-ink">
-                {value}
-              </dd>
-            </div>
-          ))}
+        <dl className="mt-7 divide-y divide-white/10 border-t border-white/10">
+          <div className="flex items-center justify-between gap-4 py-4">
+            <dt className="flex items-center gap-2.5 text-[0.9375rem] text-mist/65">
+              <Gauge className="size-4 text-sage" aria-hidden />
+              {dict.trip.difficultyLevel}
+            </dt>
+            <dd>
+              <span className="bg-sage/15 px-3 py-1 text-[0.8125rem] font-medium text-sage">
+                {difficultyLabel(trip.difficulty)}
+              </span>
+            </dd>
+          </div>
+          <div className="flex items-center justify-between gap-4 py-4">
+            <dt className="flex items-center gap-2.5 text-[0.9375rem] text-mist/65">
+              <Clock className="size-4 text-sage" aria-hidden />
+              {dict.trip.duration}
+            </dt>
+            <dd className="text-right font-heading text-[0.9375rem] font-semibold text-white">
+              {trip.durationDays} {dict.common.days}
+              {trip.durationNights ? ` / ${trip.durationNights} ${dict.common.nights}` : ''}
+            </dd>
+          </div>
         </dl>
 
-        <Button
-          asChild
-          size="lg"
-          variant="sage"
-          className="group mt-5 h-13 w-full rounded-[7px] text-[0.9375rem] shadow-[0_16px_30px_-12px_rgba(247,162,48,0.6)] transition-all hover:-translate-y-0.5 hover:bg-sage hover:shadow-[0_20px_38px_-12px_rgba(247,162,48,0.7)] active:translate-y-0"
-        >
+        <Button asChild size="lg" variant="sage" className="mt-6 h-13 w-full text-[0.9375rem]">
           <Link href={bookingHref}>
             {dict.trip.bookThisTrek}
-            <ArrowRight className="transition-transform group-hover:translate-x-1" aria-hidden />
+            <ArrowRight aria-hidden />
           </Link>
         </Button>
       </div>
