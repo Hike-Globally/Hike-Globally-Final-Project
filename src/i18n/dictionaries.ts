@@ -110,7 +110,7 @@ const en = {
     gallery: 'Gallery',
     faqs: 'Frequently Asked Questions',
     related: 'You may also like',
-    highlights: 'Highlights',
+    highlights: 'Key Highlights',
     factsTitle: 'Trip at a glance',
     duration: 'Duration',
     groupSize: 'Group size',

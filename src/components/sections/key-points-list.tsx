@@ -1,7 +1,9 @@
 import './key-takeaways.css'
 
+export type KeyPointItem = { id?: string | null; text: string }
+
 /** Plain text by default; editors can emphasize a short phrase with **double asterisks**. */
-export function KeyPointsList({ items }: { items: { id?: string | null; text: string }[] }) {
+export function KeyPointsList({ items }: { items: KeyPointItem[] }) {
   return (
     <ul className="key-points-list">
       {items.map((item, index) => (
