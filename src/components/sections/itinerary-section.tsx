@@ -10,7 +10,6 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { surface } from '@/components/ui/surface'
-import { TripSectionHeading } from '@/components/trip/trip-section-heading'
 import { dictionary } from '@/i18n/dictionaries'
 import { formatNumber } from '@/lib/format'
 import { cn } from '@/lib/utils'
@@ -49,14 +48,14 @@ function DayChip({
   tone?: 'default' | 'positive' | 'muted'
 }) {
   return (
-    <div className="flex min-w-0 items-center gap-3 border border-ink/[0.06] bg-mist/70 px-3.5 py-2.5">
+    <div className="flex min-w-0 items-center gap-3 bg-mist px-4 py-3">
       <span
         className={cn(
-          'grid size-8 shrink-0 place-items-center rounded-full',
+          'grid size-9 shrink-0 place-items-center rounded-full',
           tone === 'positive' ? 'bg-sage text-ink' : 'bg-white text-deep shadow-sm',
         )}
       >
-        <Icon className="size-3.5" aria-hidden />
+        <Icon className="size-4" aria-hidden />
       </span>
       <div className="min-w-0">
         <p className="text-[0.6875rem] tracking-[0.14em] text-slate uppercase">{label}</p>
@@ -155,24 +154,21 @@ export function ItinerarySection({ days }: { days: ItineraryDay[] }) {
   const allExpanded = dayValues.length > 0 && dayValues.every((value) => openDays.includes(value))
 
   return (
-    <section id="itinerary" aria-labelledby="itinerary-heading" className="trip-section">
-      <TripSectionHeading
-        id="itinerary-heading"
-        eyebrow={dict.trip.sectionItinerary}
-        title={dict.trip.itinerary}
-        action={
-          <ExpandAllSwitch
-            checked={allExpanded}
-            onCheckedChange={(checked) => setOpenDays(checked ? dayValues : [])}
-          />
-        }
-      />
+    <section id="itinerary" className="scroll-mt-24 py-16 md:py-24">
+      <div className="mb-10 flex flex-wrap items-center gap-x-6 gap-y-4">
+        <h2 className="heading-lg">{dict.trip.itinerary}</h2>
+        <ExpandAllSwitch
+          className="ml-auto"
+          checked={allExpanded}
+          onCheckedChange={(checked) => setOpenDays(checked ? dayValues : [])}
+        />
+      </div>
 
       <Accordion
         type="multiple"
         value={openDays}
         onValueChange={setOpenDays}
-        className="w-full min-w-0 space-y-3 md:space-y-4"
+        className="w-full min-w-0 space-y-4"
       >
         {days.map((day, index) => {
           const dayNumber = day.day ?? index + 1
@@ -190,19 +186,14 @@ export function ItinerarySection({ days }: { days: ItineraryDay[] }) {
                   'w-full min-w-0 overflow-hidden px-4 sm:px-6 md:px-8 [&_[data-slot=accordion-trigger]]:motion-reduce:transition-none [&_[data-slot=accordion-trigger]_span]:motion-reduce:transition-none [&_[data-slot=accordion-content]]:motion-reduce:animate-none',
                 )}
               >
-                <AccordionTrigger className="min-w-0 items-center gap-4 py-5 hover:no-underline md:py-6">
-                  <span className="flex min-w-0 flex-1 items-center gap-4">
-                    {/* The day number as a navy disc on the itinerary rail. */}
-                    <span className="trip-day__marker" aria-hidden>
-                      {dayNumber}
+                <AccordionTrigger className="min-w-0 items-center gap-4 py-6 hover:no-underline md:py-7">
+                  <span className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-2">
+                    {/* Day number from the CMS — the label the itinerary was missing. */}
+                    <span className="inline-flex shrink-0 items-center bg-sage-20 px-2.5 py-1 font-heading text-[0.6875rem] font-semibold tracking-[0.14em] whitespace-nowrap text-deep uppercase ring-1 ring-sage/60">
+                      {dict.trip.day} {dayNumber}
                     </span>
-                    <span className="min-w-0">
-                      <span className="trip-day__label">
-                        {dict.trip.day} {dayNumber}
-                      </span>
-                      <span className="mt-1 block min-w-0 break-words text-left font-heading text-base font-semibold text-ink md:text-lg">
-                        {day.title}
-                      </span>
+                    <span className="min-w-0 break-words text-left font-heading text-base font-semibold text-ink md:text-lg">
+                      {day.title}
                     </span>
                   </span>
                 </AccordionTrigger>

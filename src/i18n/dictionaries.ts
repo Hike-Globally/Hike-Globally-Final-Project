@@ -143,56 +143,6 @@ const en = {
     noDeparturesInMonth: 'No departures scheduled in this month.',
     viewAllDates: 'View all dates',
     notFound: 'That trip no longer exists.',
-
-    /* --- Trip single page: booking card, section nav, band headings --- */
-    nextDeparture: 'Next departure',
-    seatsNote: 'Small groups fill early',
-    assuranceLocal: 'Govt-registered local agency, based in Kathmandu',
-    assuranceReply: 'A real guide replies within 24 hours',
-    assuranceFees: 'No hidden fees — permits and taxes included',
-    enquireNow: 'Enquire now',
-    /** Eyebrows above the in-page section headings. */
-    sectionGlance: 'At a glance',
-    sectionOverview: 'The trek',
-    sectionRoute: 'Route & profile',
-    sectionDates: 'Choose your dates',
-    sectionHighlights: 'What makes this trek',
-    sectionFit: 'The right fit',
-    sectionItinerary: 'Day by day',
-    sectionIncludes: 'The practical detail',
-    sectionGallery: 'The trail, up close',
-    sectionFaqs: 'Before you book',
-    sectionInquiry: 'Plan it with a local',
-    /** The sub-heading under the sticky nav / highlights band. */
-    onThisPage: 'On this page',
-    includedHeading: "What's included",
-    notIncludedHeading: "What's not included",
-    packingHeading: 'What to pack',
-    altitudeProfile: 'Altitude profile',
-    /** The dark band between the itinerary and the inquiry form. */
-    trustBandTitle: 'Walked by people who live here',
-    trustBandText:
-      'Every itinerary on this page has been walked by the guides who will lead you. No call centres, no resold bookings — you plan directly with the team in Kathmandu.',
-    trustBandPoint1: 'Local Sherpa and Gurung guides',
-    trustBandPoint2: 'Small groups, never more than you can see',
-    trustBandPoint3: 'Permits, taxes and teahouses handled',
-    trustBandPoint4: 'Free date changes up to 30 days out',
-    tripFactsHeading: 'Trip facts',
-    keyTakeawaysHeading: 'What makes this trek',
-    /** Small label on the framed highlights card ("Field notes"). */
-    fieldNotes: 'Field notes',
-    /** "View all photos" affordance on the gallery. */
-    viewAllPhotos: 'View all photos',
-    whyChooseHeading: 'Why choose this trek',
-    whoForHeading: 'Who is this trek for',
-    whoNotForHeading: 'Who is this trek not for',
-    routeMapHeading: 'Route map and altitude chart',
-    packingCountOne: '1 item',
-    packingCountOther: '{count} items',
-    galleryCountOne: '1 photo',
-    galleryCountOther: '{count} photos',
-    departuresIntro:
-      'Fixed departures below. Pick a date to hold a place — every departure runs with a licensed guide, and private dates can be arranged around your travel window.',
   },
   destinations: {
     listingTitle: 'Destinations',
