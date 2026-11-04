@@ -109,3 +109,11 @@ test('trip: new content sections have the requested default positions', () => {
     assert.deepEqual(resolvePageSections(hidden, tripSectionOptions), hidden)
   }
 })
+
+test('trip: Key Takeaways sits immediately before Overview and can be hidden', () => {
+  const layout = defaultPageSections(tripSectionOptions)
+  const overview = layout.findIndex(({ kind }) => kind === 'overview')
+  assert.equal(layout[overview - 1].kind, 'keyTakeaways')
+  const hidden = layout.filter(({ kind }) => kind !== 'keyTakeaways')
+  assert.deepEqual(resolvePageSections(hidden, tripSectionOptions), hidden)
+})

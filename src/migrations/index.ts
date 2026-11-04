@@ -12,6 +12,7 @@ import * as migration_20261014_142919_page_sections from './20261014_142919_page
 import * as migration_20261015_073000_trip_faq_categories from './20261015_073000_trip_faq_categories'
 import * as migration_20261019_045205_blog_faqs from './20261019_045205_blog_faqs'
 import * as migration_20261104_120136_trip_additional_sections from './20261104_120136_trip_additional_sections'
+import * as migration_20261104_124123_trip_key_takeaways from './20261104_124123_trip_key_takeaways'
 
 export const migrations = [
   {
@@ -83,5 +84,10 @@ export const migrations = [
     up: migration_20261104_120136_trip_additional_sections.up,
     down: migration_20261104_120136_trip_additional_sections.down,
     name: '20261104_120136_trip_additional_sections',
+  },
+  {
+    up: migration_20261104_124123_trip_key_takeaways.up,
+    down: migration_20261104_124123_trip_key_takeaways.down,
+    name: '20261104_124123_trip_key_takeaways',
   },
 ]

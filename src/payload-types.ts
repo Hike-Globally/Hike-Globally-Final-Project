@@ -377,6 +377,7 @@ export interface Trip {
     | {
         kind:
           | 'hero'
+          | 'keyTakeaways'
           | 'overview'
           | 'whyChoose'
           | 'highlights'
@@ -404,6 +405,15 @@ export interface Trip {
    */
   summary: string;
   heroImage: number | Media;
+  /**
+   * Add one concise point per row. These appear in a summary box before Overview. Drag to reorder; leave empty to hide the box.
+   */
+  keyTakeaways?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * The main body of the trip page. The toolbar across the top of the box has headings, bold, links, lists and images.
    */
@@ -1545,6 +1555,12 @@ export interface TripsSelect<T extends boolean = true> {
       };
   summary?: T;
   heroImage?: T;
+  keyTakeaways?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
   description?: T;
   destination?: T;
   tripType?: T;
