@@ -1,81 +1,12 @@
-/* ============================================================================
-   HOMEPAGE TYPE SCALE — one place for headline/body sizes on `/`
-   ----------------------------------------------------------------------------
-   Fluid sizes for the homepage's display copy are declared once, here, as
-   `clamp()`s whose ceilings are the specified pixel values. Destination card
-   titles and descriptions use their requested fixed sizes:
-
-     .home-hero-title            120px  hero headline, first line ("Walk Where The")
-     .home-hero-title i           90px  hero headline, second line ("Map Runs Out of
-                                        Names") — Instrument Serif italic, produced by
-                                        the `<i>…</i>` the editor writes in the hero
-                                        heading field (see lib/inline-emphasis.ts)
-     .home-hero-lead              17px  hero standfirst ("Small-group treks and…")
-     .home-section-title          50px  every section headline, in the display serif
-                                        and in the case the editor wrote it in
-     .home-section-lead           17px  the About Hike Globally standfirst
-     .home-section-intro          16px  every other section intro
-     .destination-card-title      23px  destination card heading
-     .destination-card-description 16px destination card description
-     .home-blog-lead-title        40px  the lead story of the journal board, display serif
-     .home-blog-row-title         23px  journal board index-row titles — the same
-                                        card tier as `.destination-card-title`
-     .home-blog-description       16px  the lead story's standfirst
-
-   The scope is `[data-homepage]`, set once in `src/app/(frontend)/page.tsx`, so
-   nothing outside the homepage can pick these sizes up — the shared
-   `SectionHeading` / `DestinationCarousel` / `FeaturedTrips` / `DestinationCard`
-   components keep their own type everywhere else.
-
-   These rules are intentionally *unlayered* plain CSS: real (unlayered) rules
-   beat anything inside `@layer`, which includes every Tailwind v4 `@utility`
-   in `globals.css` (`heading-display`, `heading-lg`, `heading-xl`, `lead`,
-   `description-copy`) and their own media queries — so a class here overrides
-   a utility's `font-size` without `!important` and without fighting source
-   order. The same technique `curated-trips-section.css` already relies on.
-
-   Fluid, not fixed: each page-copy size is the *ceiling* of a clamp, so a 5"
-   phone still gets a 40px hero (and a 30px italic accent line) and a 32px
-   section headline instead of a 120px/90px/50px wall of text, while everything
-   from the desktop column width (1280px) up renders at exactly the specified
-   pixel value. At every viewport width, destination card sizes stay fixed at
-   23px / 16px and journal-board descriptions stay fixed at 16px.
-
-   The hero headline is the one size that also answers to viewport *height*: it
-   is the tallest thing on the page and it lives inside a full-viewport
-   `overflow-hidden` sticky wrapper, so on a short window the height term of its
-   `min()` takes over and the whole composition scales down instead of losing
-   the buttons off the bottom of the screen.
-   ==========================================================================*/
+/* Homepage typography is scoped to this page so shared components elsewhere
+   retain their own scales. Headings grow fluidly, with the hero also capped by
+   viewport height to keep its controls visible on short screens. */
 
 [data-homepage] {
-  /* 120px — hero headline, first line ("Walk Where The").
-
-     Two constraints compete and the tighter one wins:
-
-       · WIDTH  — 40px on a 360px phone, climbing to the 120px ceiling exactly
-                  at the 1280px desktop column.
-       · HEIGHT — the hero is pinned inside a `h-[100svh] overflow-hidden`
-                  sticky wrapper (`motion/hero-scroll-cover.tsx`), so a
-                  headline taller than the viewport is simply cut off. The rest
-                  of the hero (paddings, eyebrow, standfirst, buttons) is
-                  ~426px, and the two headline lines together are ~1.87× the
-                  first line's size (1.02 line-height + 0.05em gap + 0.75 ×
-                  1.08), which makes `53svh - 14.25rem` the largest first line
-                  that still leaves the buttons on screen.
-
-     Any viewport at least ~657px tall — every desktop and laptop — is limited
-     by width, not height, and renders at exactly the specified 120px. */
-  --home-hero-title-size: min(var(--text-hero), 53svh - 14.25rem); /* hero role, height-capped */
-
-  /* 90px — hero headline, italic accent line ("Map Runs Out of Names"). Derived
-     as a constant 3:4 of the line above rather than sized independently, so the
-     pair can never drift apart as one composition: 30px on a 360px phone, 90px
-     from 1280px up. */
-  --home-hero-title-accent-size: var(--text-hero);
-
-  /* 50px — section headlines. */
-  --home-section-title-size: var(--text-section);
+  /* Larger responsive headlines, without changing body or card typography. */
+  --home-hero-title-size: min(clamp(2.625rem, 1.9rem + 3.2vw, 4.5rem), 53svh - 14.25rem);
+  --home-hero-title-accent-size: var(--home-hero-title-size);
+  --home-section-title-size: clamp(2rem, 1.6rem + 1.7vw, 3.125rem);
 
   /* 17px — hero standfirst + the About Hike Globally lead. */
   --home-lead-size: var(--text-lead);
@@ -111,7 +42,7 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Hero — "Walk Where The" at 120px, "Map Runs Out of Names" at 90px italic
+   Hero — a larger responsive headline with an italic accent line
    --------------------------------------------------------------------------- */
 [data-homepage] .home-hero-title {
   font-size: var(--home-hero-title-size);
@@ -143,7 +74,7 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Section headlines — 50px in the display serif, in the case they were written
+   Section headlines — responsive display serif, in the case they were written
    ---------------------------------------------------------------------------
    Unlayered, so these three declarations also win over any `font-heading`,
    `font-semibold`, `tracking-[…]` or `uppercase` utility a section still
@@ -156,6 +87,12 @@
   letter-spacing: 0.002em;
   line-height: 1.08;
   text-transform: none;
+}
+
+/* The closing CTA uses a shared card, so enlarge both lines only on home. */
+[data-homepage] [data-cta-card] .cta-card__title,
+[data-homepage] [data-cta-card] .cta-card__title i {
+  font-size: var(--home-section-title-size);
 }
 
 /* ---------------------------------------------------------------------------
