@@ -3063,9 +3063,11 @@ html[data-theme='light'] .template-default .graphic-account--active .graphic-acc
   box-shadow: var(--hg-focus-ring);
 }
 
-/* Pin Lexical's fixed toolbar cleanly below top-bar + doc-controls without blur haze */
+/* Keep the toolbar at the top of its editor. A sticky toolbar with a document-bar
+   offset can float into the writing area and leave a blank gap above it. */
 .field-type.rich-text-lexical .fixed-toolbar {
-  top: var(--hg-docbar-offset);
+  position: relative;
+  top: auto;
   min-height: var(--hg-control-height-md);
   padding: var(--hg-space-1) var(--hg-space-2);
   border: 0;
