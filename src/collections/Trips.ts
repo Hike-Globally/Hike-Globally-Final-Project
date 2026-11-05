@@ -44,10 +44,7 @@ export const Trips: CollectionConfig = {
     group: 'Content',
     components: {
       edit: {
-        beforeDocumentControls: [
-          '@/components/admin/view-live-button',
-          '@/components/admin/live-preview-toggle',
-        ],
+        beforeDocumentControls: ['@/components/admin/view-live-button'],
       },
     },
     livePreview: { url: siteLivePreviewURL },
