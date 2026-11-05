@@ -16,6 +16,7 @@ export function TripCard({
   className,
   titleClassName,
   summaryClassName,
+  showDifficulty = true,
 }: {
   trip: TripCard
   priority?: boolean
@@ -24,6 +25,8 @@ export function TripCard({
   titleClassName?: string
   /** Extra classes for the summary paragraph — lets a section retune its copy in place. */
   summaryClassName?: string
+  /** Whether to show the difficulty badge on the photo — off on the homepage and /trips cards. */
+  showDifficulty?: boolean
 }) {
   const dict = dictionary
   const href = sitePath(`/trips/${trip.slug}`)
@@ -51,12 +54,14 @@ export function TripCard({
           ) : (
             <span />
           )}
-          <Badge
-            variant={difficultyBadgeVariant(trip.difficulty)}
-            className="trip-card-difficulty max-w-[10.5rem] text-center leading-snug whitespace-normal"
-          >
-            {difficultyLabel(trip.difficulty)}
-          </Badge>
+          {showDifficulty ? (
+            <Badge
+              variant={difficultyBadgeVariant(trip.difficulty)}
+              className="trip-card-difficulty max-w-[10.5rem] text-center leading-snug whitespace-normal"
+            >
+              {difficultyLabel(trip.difficulty)}
+            </Badge>
+          ) : null}
         </div>
         {destinationName ? (
           <div className="photo-scrim absolute inset-x-0 bottom-0 p-4 pt-12">

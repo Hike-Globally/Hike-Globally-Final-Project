@@ -234,6 +234,7 @@ export function TripsExplorer({
                 trip={trip}
                 priority={index < 3}
                 summaryClassName={cardSummaryClassName}
+                showDifficulty={false}
               />
             ))}
           </div>
