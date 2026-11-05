@@ -192,7 +192,11 @@ export function TripDetail({
       <>
         <section
           data-header-hero
-          className="hero-region relative isolate overflow-hidden bg-ink text-mist"
+          // The band is a viewport tall, so the copy is bottom-aligned like
+          // every other hero on the site (see `.hero-region` in globals.css,
+          // and `Hero` / `PageHeader`): the masthead and the fact strip sit on
+          // the foot of the photo, not floating in the sky above it.
+          className="hero-region relative isolate flex items-end overflow-hidden bg-ink text-mist"
         >
           <PayloadImageFill
             media={trip.heroImage}
@@ -206,7 +210,7 @@ export function TripDetail({
           <div className="absolute inset-0 -z-10 bg-ink/72" />
           <div className="photo-scrim pointer-events-none absolute inset-0 -z-10" />
 
-          <div className="container-content pt-28 pb-12 sm:pb-14 md:pt-36 md:pb-16">
+          <div className="container-content w-full pt-28 pb-12 sm:pb-16 md:pt-36 md:pb-20">
             <Breadcrumbs
               className="mb-8"
               items={[
