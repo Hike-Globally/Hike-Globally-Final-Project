@@ -336,7 +336,7 @@ export default function AdminNavRail({
                 </span>
                 <span className="hg-rail__account-meta">
                   {role ? <span className="hg-rail__role">{role}</span> : null}
-                  {account?.email ? (
+                  {account?.name && account?.email ? (
                     <span className="hg-rail__account-email">{account.email}</span>
                   ) : null}
                 </span>

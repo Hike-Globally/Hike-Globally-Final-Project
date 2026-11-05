@@ -11,94 +11,99 @@
 
    Palette rules
    -------------
-   • 1 primary colour + 1 neutral scale + 4 semantic colours. Nothing else.
-   • Text pairings are WCAG AA (≥ 4.5:1) — see the notes beside each token.
-   • Amber (#F7A230, the storefront accent) is folded into `warning`; it is no
-     longer used as a decorative highlight anywhere in the admin.
+   • Strictly flat, single colours — zero gradients and zero outside palettes.
+   • Built exclusively on the six-colour workspace palette (plus pure white for
+     elevated card and control surfaces against the #F6F6F6 canvas):
+       #183144  Deep navy      — sidebar rail, headings, primary ink, hover anchor
+       #F6F6F6  Soft canvas    — workspace background, subtle fills, rail text
+       #87AABD  Mist steel     — rail muted ink/icons, accent borders, soft highlights
+       #79716D  Warm stone     — secondary/muted metadata, labels, neutral icons
+       #2177B5  Cerulean blue  — primary actions, active nav, links, focus
+       #CF574D  Terracotta red — destructive actions, validation errors, alerts
    ========================================================================== */
 
-:root {
+:root,
+html[data-theme='light'],
+html[data-theme='dark'] {
   /* ------------------------------------------------------------------------
-     1. COLOUR — primary brand scale (navy-teal, derived from #1D3557)
+     1. COLOUR — core six-colour palette (+ elevated white surface)
      ------------------------------------------------------------------------ */
-  --hg-primary-50: #f2f6fa;
-  --hg-primary-100: #e3ebf4;
-  --hg-primary-200: #c6d7e8;
-  --hg-primary-300: #9db9d5;
-  --hg-primary-400: #7095bd;
-  --hg-primary-500: #4d76a2;
-  --hg-primary-600: #2f5480; /* action surface — 7.9:1 on white */
-  --hg-primary-700: #234568; /* hover — 9.9:1 on white */
-  --hg-primary-800: #1d3557; /* brand ink — 12.6:1 on white */
-  --hg-primary-900: #142640;
-
-  /* ------------------------------------------------------------------------
-     2. COLOUR — neutral scale (cool gray: surfaces, borders, text)
-     ------------------------------------------------------------------------ */
-  --hg-gray-0: #ffffff;
-  --hg-gray-50: #f7f9fa; /* app canvas */
-  --hg-gray-100: #f1f4f6; /* hover wash / inset surface */
-  --hg-gray-200: #e6ebf0; /* default border */
-  --hg-gray-300: #d7dee6; /* strong border */
-  --hg-gray-400: #b3bec9; /* disabled border / icon muted */
-  --hg-gray-500: #8a96a4; /* disabled text, decorative icon */
-  --hg-gray-600: #667081; /* muted text — 5.0:1 on white */
-  --hg-gray-700: #4d5866; /* secondary text — 7.5:1 on white */
-  --hg-gray-800: #333c47;
-  --hg-gray-900: #1b2430; /* primary text — 15.8:1 on white */
+  --hg-navy: #183144; /* 13.45:1 on #FFFFFF · 12.44:1 on #F6F6F6 */
+  --hg-canvas: #f6f6f6; /* workspace canvas & subtle surface */
+  --hg-steel: #87aabd; /* 5.45:1 on #183144 · soft accent border */
+  --hg-stone: #79716d; /* 4.78:1 on #FFFFFF · muted metadata ink */
+  --hg-blue: #2177b5; /* 4.80:1 with #FFFFFF · primary interactive */
+  --hg-red: #cf574d; /* destructive & error accent */
+  --hg-surface: #ffffff; /* elevated cards, tables, inputs, modals */
 
   /* ------------------------------------------------------------------------
-     3. COLOUR — semantic families (light surface + strong text, AA on light)
+     2. COLOUR — structural surfaces, borders & text aliases
      ------------------------------------------------------------------------ */
-  --hg-success-bg: #ecfdf3;
-  --hg-success-border: #abefc6;
-  --hg-success-text: #067647; /* 5.0:1 on --hg-success-bg */
-  --hg-success-solid: #079455;
+  --hg-bg-app: var(--hg-canvas);
+  --hg-bg-surface: var(--hg-surface);
+  --hg-bg-subtle: var(--hg-canvas);
+  --hg-bg-inset: var(--hg-canvas);
+  --hg-bg-hover: var(--hg-canvas);
+  --hg-bg-selected: rgb(135 170 189 / 18%);
 
-  --hg-warning-bg: #fffaeb;
-  --hg-warning-border: #fedf89;
-  --hg-warning-text: #b54708; /* 4.9:1 on --hg-warning-bg */
-  --hg-warning-solid: #dc6803;
+  --hg-border: rgb(24 49 68 / 10%);
+  --hg-border-strong: rgb(24 49 68 / 20%);
+  --hg-border-accent: var(--hg-steel);
+  --hg-border-focus: var(--hg-blue);
 
-  --hg-danger-bg: #fef3f2;
-  --hg-danger-border: #fecdca;
-  --hg-danger-text: #b42318; /* 5.4:1 on --hg-danger-bg */
-  --hg-danger-solid: #d92d20;
+  --hg-text: var(--hg-navy);
+  --hg-text-secondary: var(--hg-navy);
+  --hg-text-muted: var(--hg-stone);
+  --hg-text-disabled: rgb(121 113 109 / 60%);
+  --hg-text-inverse: var(--hg-surface);
+  --hg-text-link: var(--hg-blue);
 
-  --hg-info-bg: #eff8ff;
-  --hg-info-border: #b2ddff;
-  --hg-info-text: #175cd3; /* 5.0:1 on --hg-info-bg */
-  --hg-info-solid: #1570ef;
+  --hg-primary: var(--hg-blue);
+  --hg-primary-hover: var(--hg-navy);
+  --hg-primary-active: var(--hg-navy);
+  --hg-primary-soft: rgb(135 170 189 / 18%);
+  --hg-primary-soft-hover: rgb(135 170 189 / 28%);
+  --hg-primary-soft-border: var(--hg-steel);
 
   /* ------------------------------------------------------------------------
-     4. COLOUR — semantic aliases (what components reference)
+     3. COLOUR — sidebar rail (#183144 dark anchor)
      ------------------------------------------------------------------------ */
-  --hg-bg-app: var(--hg-gray-50);
-  --hg-bg-surface: var(--hg-gray-0);
-  --hg-bg-subtle: var(--hg-gray-50);
-  --hg-bg-inset: var(--hg-gray-100);
-  --hg-bg-hover: var(--hg-gray-100);
-  --hg-bg-selected: var(--hg-primary-50);
+  --hg-rail-bg: var(--hg-navy);
+  --hg-rail-border: rgb(135 170 189 / 16%);
+  --hg-rail-input-bg: rgb(246 246 246 / 7%);
+  --hg-rail-hover: rgb(135 170 189 / 14%);
+  --hg-rail-text: var(--hg-canvas);
+  --hg-rail-text-muted: var(--hg-steel);
+  --hg-rail-active-bg: var(--hg-blue);
+  --hg-rail-active-text: var(--hg-surface);
 
-  --hg-border: var(--hg-gray-200);
-  --hg-border-strong: var(--hg-gray-300);
-  --hg-border-focus: var(--hg-primary-500);
+  /* ------------------------------------------------------------------------
+     4. COLOUR — semantic states (derived strictly from the 6-colour palette)
+     ------------------------------------------------------------------------ */
+  --hg-success-bg: rgb(33 119 181 / 10%);
+  --hg-success-border: var(--hg-steel);
+  --hg-success-text: var(--hg-blue);
+  --hg-success-solid: var(--hg-blue);
 
-  --hg-text: var(--hg-gray-900);
-  --hg-text-secondary: var(--hg-gray-700);
-  --hg-text-muted: var(--hg-gray-600);
-  --hg-text-disabled: var(--hg-gray-500);
-  --hg-text-inverse: var(--hg-gray-0);
-  --hg-text-link: var(--hg-primary-700);
+  --hg-warning-bg: var(--hg-canvas);
+  --hg-warning-border: rgb(121 113 109 / 32%);
+  --hg-warning-text: var(--hg-stone);
+  --hg-warning-solid: var(--hg-stone);
 
-  --hg-primary: var(--hg-primary-600);
-  --hg-primary-hover: var(--hg-primary-700);
-  --hg-primary-active: var(--hg-primary-800);
-  --hg-primary-soft: var(--hg-primary-50);
-  --hg-primary-soft-border: var(--hg-primary-200);
+  --hg-danger-bg: rgb(207 87 77 / 10%);
+  --hg-danger-border: rgb(207 87 77 / 42%);
+  --hg-danger-text: var(--hg-red);
+  --hg-danger-solid: var(--hg-red);
+  --hg-danger-hover: var(--hg-navy);
 
-  --hg-focus-ring: 0 0 0 3px rgb(47 84 128 / 18%);
-  --hg-focus-outline: 2px solid var(--hg-primary-500);
+  --hg-info-bg: rgb(135 170 189 / 16%);
+  --hg-info-border: var(--hg-steel);
+  --hg-info-text: var(--hg-navy);
+  --hg-info-solid: var(--hg-blue);
+
+  --hg-focus-ring: 0 0 0 3px rgb(33 119 181 / 18%);
+  --hg-danger-ring: 0 0 0 3px rgb(207 87 77 / 18%);
+  --hg-focus-outline: 2px solid var(--hg-blue);
   --hg-focus-outline-offset: 2px;
 
   /* ------------------------------------------------------------------------
@@ -141,22 +146,23 @@
   /* ------------------------------------------------------------------------
      7. RADII — two shapes, one pill
      ------------------------------------------------------------------------ */
-  --hg-radius-control: 6px; /* inputs, buttons, badges-square */
+  --hg-radius-control: 6px; /* inputs, buttons, compact controls */
   --hg-radius-card: 10px; /* cards, panels, tables, modals */
   --hg-radius-pill: 999px;
 
   /* ------------------------------------------------------------------------
-     8. ELEVATION — three soft, neutral shadows
+     8. ELEVATION — three soft, neutral shadows (tinted from #183144)
      ------------------------------------------------------------------------ */
-  --hg-shadow-sm: 0 1px 2px rgb(16 24 40 / 5%);
-  --hg-shadow-md: 0 1px 3px rgb(16 24 40 / 8%), 0 1px 2px rgb(16 24 40 / 4%);
-  --hg-shadow-lg: 0 8px 24px rgb(16 24 40 / 10%);
+  --hg-shadow-sm: 0 1px 2px rgb(24 49 68 / 5%);
+  --hg-shadow-md: 0 2px 6px rgb(24 49 68 / 8%), 0 1px 2px rgb(24 49 68 / 4%);
+  --hg-shadow-lg: 0 10px 28px rgb(24 49 68 / 12%);
 
   /* ------------------------------------------------------------------------
      9. LAYOUT & CONTROLS
      ------------------------------------------------------------------------ */
   --hg-sidebar-width: 260px;
   --hg-topbar-height: 56px;
+  --hg-docbar-offset: 124px; /* sticky offset below top bar + doc controls */
   --hg-content-max: 1200px;
   --hg-page-pad-x: var(--hg-space-6);
   --hg-page-pad-y: var(--hg-space-6);
@@ -164,7 +170,8 @@
 
   --hg-badge-height: 22px;
   --hg-badge-height-sm: 20px;
-  --hg-search-max-width: 420px;
+  --hg-search-max-width: 400px;
+  --hg-breadcrumb-max-width: 320px;
   --hg-textarea-min-height: 120px;
   --hg-editor-min-height: 240px;
 
@@ -181,72 +188,169 @@
      PAYLOAD BRIDGE
      --------------------------------------------------------------------------
      Payload's own components (tables, fields, drawers, popovers, toasts) are
-     driven by its `--theme-*` / `--color-*` variables. Mapping them onto the
-     tokens above is what makes native Payload UI inherit the design system
-     instead of being re-styled selector by selector.
+     driven by its `--theme-*` / `--color-*` variables. Mapping every scale
+     onto the six-colour tokens above ensures no outside hues (default greens,
+     ambers, Tailwind grays) ever leak into native Payload UI.
      ========================================================================== */
   --theme-bg: var(--hg-bg-app);
+  --theme-bg-color: var(--hg-bg-app);
   --theme-input-bg: var(--hg-bg-surface);
   --theme-text: var(--hg-text);
+  --color-text: var(--hg-text);
   --theme-border-color: var(--hg-border);
+  --theme-base-800: var(--hg-navy);
 
-  --theme-elevation-0: var(--hg-gray-0);
-  --theme-elevation-50: var(--hg-gray-50);
-  --theme-elevation-100: var(--hg-gray-100);
-  --theme-elevation-150: var(--hg-gray-200);
-  --theme-elevation-200: var(--hg-gray-300);
-  --theme-elevation-250: var(--hg-gray-400);
-  --theme-elevation-300: var(--hg-gray-400);
-  --theme-elevation-350: var(--hg-gray-500);
-  --theme-elevation-400: var(--hg-gray-600);
-  --theme-elevation-450: var(--hg-gray-600);
-  --theme-elevation-500: var(--hg-gray-600);
-  --theme-elevation-550: var(--hg-gray-700);
-  --theme-elevation-600: var(--hg-gray-700);
-  --theme-elevation-650: var(--hg-gray-700);
-  --theme-elevation-700: var(--hg-gray-800);
-  --theme-elevation-750: var(--hg-gray-800);
-  --theme-elevation-800: var(--hg-text);
-  --theme-elevation-850: var(--hg-text);
-  --theme-elevation-900: var(--hg-text);
-  --theme-elevation-950: var(--hg-text);
-  --theme-elevation-1000: var(--hg-gray-900);
+  --theme-elevation-0: var(--hg-surface);
+  --theme-elevation-50: var(--hg-canvas);
+  --theme-elevation-100: var(--hg-canvas);
+  --theme-elevation-150: var(--hg-border);
+  --theme-elevation-200: var(--hg-border-strong);
+  --theme-elevation-250: var(--hg-steel);
+  --theme-elevation-300: var(--hg-steel);
+  --theme-elevation-350: var(--hg-stone);
+  --theme-elevation-400: var(--hg-stone);
+  --theme-elvation-400: var(--hg-stone);
+  --theme-elevation-450: var(--hg-stone);
+  --theme-elevation-500: var(--hg-stone);
+  --theme-elevation-550: var(--hg-stone);
+  --theme-elevation-600: var(--hg-stone);
+  --theme-elevation-650: var(--hg-navy);
+  --theme-elevation-700: var(--hg-navy);
+  --theme-elevation-750: var(--hg-navy);
+  --theme-elevation-800: var(--hg-navy);
+  --theme-elevation-850: var(--hg-navy);
+  --theme-elevation-900: var(--hg-navy);
+  --theme-elevation-950: var(--hg-navy);
+  --theme-elevation-1000: var(--hg-navy);
 
-  --color-base-0: var(--hg-gray-0);
-  --color-base-50: var(--hg-gray-50);
-  --color-base-100: var(--hg-gray-100);
-  --color-base-150: var(--hg-gray-200);
-  --color-base-200: var(--hg-gray-300);
-  --color-base-250: var(--hg-gray-400);
-  --color-base-300: var(--hg-gray-400);
-  --color-base-350: var(--hg-gray-500);
-  --color-base-400: var(--hg-gray-600);
-  --color-base-450: var(--hg-gray-600);
-  --color-base-500: var(--hg-gray-600);
-  --color-base-550: var(--hg-gray-700);
-  --color-base-600: var(--hg-gray-700);
-  --color-base-650: var(--hg-gray-700);
-  --color-base-700: var(--hg-gray-800);
-  --color-base-750: var(--hg-gray-800);
-  --color-base-800: var(--hg-gray-900);
-  --color-base-900: var(--hg-gray-900);
-  --color-base-950: var(--hg-gray-900);
-  --color-base-1000: var(--hg-gray-900);
+  --color-base-0: var(--hg-surface);
+  --color-base-50: var(--hg-canvas);
+  --color-base-100: var(--hg-canvas);
+  --color-base-150: var(--hg-border);
+  --color-base-200: var(--hg-border-strong);
+  --color-base-250: var(--hg-steel);
+  --color-base-300: var(--hg-steel);
+  --color-base-350: var(--hg-stone);
+  --color-base-400: var(--hg-stone);
+  --color-base-450: var(--hg-stone);
+  --color-base-500: var(--hg-stone);
+  --color-base-550: var(--hg-stone);
+  --color-base-600: var(--hg-stone);
+  --color-base-650: var(--hg-navy);
+  --color-base-700: var(--hg-navy);
+  --color-base-750: var(--hg-navy);
+  --color-base-800: var(--hg-navy);
+  --color-base-850: var(--hg-navy);
+  --color-base-900: var(--hg-navy);
+  --color-base-950: var(--hg-navy);
+  --color-base-1000: var(--hg-navy);
 
+  /* Success scale → mapped to Cerulean/Steel/Navy */
   --theme-success-50: var(--hg-success-bg);
   --theme-success-100: var(--hg-success-bg);
-  --theme-success-500: var(--hg-success-text);
-  --theme-success-600: var(--hg-success-text);
+  --theme-success-150: var(--hg-success-bg);
+  --theme-success-200: var(--hg-steel);
+  --theme-success-250: var(--hg-steel);
+  --theme-success-300: var(--hg-steel);
+  --theme-success-400: var(--hg-blue);
+  --theme-success-500: var(--hg-blue);
+  --theme-success-600: var(--hg-blue);
+  --theme-success-650: var(--hg-navy);
+  --theme-success-750: var(--hg-navy);
+  --theme-success-800: var(--hg-navy);
+  --theme-success-850: var(--hg-navy);
+  --theme-success-900: var(--hg-navy);
+
+  --color-success-50: var(--hg-success-bg);
+  --color-success-100: var(--hg-success-bg);
+  --color-success-150: var(--hg-success-bg);
+  --color-success-200: var(--hg-steel);
+  --color-success-250: var(--hg-steel);
+  --color-success-300: var(--hg-steel);
+  --color-success-350: var(--hg-steel);
+  --color-success-400: var(--hg-blue);
+  --color-success-450: var(--hg-blue);
+  --color-success-500: var(--hg-blue);
+  --color-success-550: var(--hg-blue);
+  --color-success-600: var(--hg-blue);
+  --color-success-650: var(--hg-navy);
+  --color-success-700: var(--hg-navy);
+  --color-success-750: var(--hg-navy);
+  --color-success-800: var(--hg-navy);
+  --color-success-850: var(--hg-navy);
+  --color-success-900: var(--hg-navy);
+  --color-success-950: var(--hg-navy);
+
+  /* Warning scale → mapped to Warm Stone/Canvas */
   --theme-warning-50: var(--hg-warning-bg);
   --theme-warning-100: var(--hg-warning-bg);
-  --theme-warning-500: var(--hg-warning-text);
-  --theme-warning-600: var(--hg-warning-text);
+  --theme-warning-150: var(--hg-warning-bg);
+  --theme-warning-250: var(--hg-warning-border);
+  --theme-warning-300: var(--hg-warning-border);
+  --theme-warning-500: var(--hg-stone);
+  --theme-warning-600: var(--hg-stone);
+  --theme-warning-650: var(--hg-navy);
+  --theme-warning-800: var(--hg-navy);
+
+  --color-warning-50: var(--hg-warning-bg);
+  --color-warning-100: var(--hg-warning-bg);
+  --color-warning-150: var(--hg-warning-bg);
+  --color-warning-200: var(--hg-warning-border);
+  --color-warning-250: var(--hg-warning-border);
+  --color-warning-300: var(--hg-warning-border);
+  --color-warning-350: var(--hg-stone);
+  --color-warning-400: var(--hg-stone);
+  --color-warning-450: var(--hg-stone);
+  --color-warning-500: var(--hg-stone);
+  --color-warning-550: var(--hg-stone);
+  --color-warning-600: var(--hg-stone);
+  --color-warning-650: var(--hg-navy);
+  --color-warning-700: var(--hg-navy);
+  --color-warning-750: var(--hg-navy);
+  --color-warning-800: var(--hg-navy);
+  --color-warning-850: var(--hg-navy);
+  --color-warning-900: var(--hg-navy);
+  --color-warning-950: var(--hg-navy);
+
+  /* Error scale → mapped to Terracotta Red (#CF574D) */
   --theme-error-50: var(--hg-danger-bg);
   --theme-error-100: var(--hg-danger-bg);
-  --theme-error-500: var(--hg-danger-text);
-  --theme-error-600: var(--hg-danger-text);
+  --theme-error-150: var(--hg-danger-bg);
+  --theme-error-200: var(--hg-danger-border);
+  --theme-error-250: var(--hg-danger-border);
+  --theme-error-300: var(--hg-danger-border);
+  --theme-error-400: var(--hg-red);
+  --theme-error-500: var(--hg-red);
+  --theme-error-600: var(--hg-red);
+  --theme-error-650: var(--hg-red);
+  --theme-error-750: var(--hg-navy);
+  --theme-error-800: var(--hg-navy);
+  --theme-error-900: var(--hg-navy);
+  --theme-error-950: var(--hg-navy);
+
+  --color-error-50: var(--hg-danger-bg);
+  --color-error-100: var(--hg-danger-bg);
+  --color-error-150: var(--hg-danger-bg);
+  --color-error-200: var(--hg-danger-border);
+  --color-error-250: var(--hg-danger-border);
+  --color-error-300: var(--hg-danger-border);
+  --color-error-350: var(--hg-red);
+  --color-error-400: var(--hg-red);
+  --color-error-450: var(--hg-red);
+  --color-error-500: var(--hg-red);
+  --color-error-550: var(--hg-red);
+  --color-error-600: var(--hg-red);
+  --color-error-650: var(--hg-red);
+  --color-error-700: var(--hg-navy);
+  --color-error-750: var(--hg-navy);
+  --color-error-800: var(--hg-navy);
+  --color-error-850: var(--hg-navy);
+  --color-error-900: var(--hg-navy);
+  --color-error-950: var(--hg-navy);
+
+  /* Info scale → mapped to Mist Steel / Cerulean */
   --theme-info-50: var(--hg-info-bg);
-  --theme-info-500: var(--hg-info-text);
+  --theme-info-500: var(--hg-blue);
 
   --font-body: var(--hg-font-sans);
   --font-serif: var(--hg-font-sans);
@@ -279,6 +383,7 @@
   :root {
     --hg-page-pad-x: var(--hg-space-4);
     --hg-page-pad-y: var(--hg-space-4);
+    --hg-breadcrumb-max-width: 180px;
     --nav-width: 100vw;
   }
 }
