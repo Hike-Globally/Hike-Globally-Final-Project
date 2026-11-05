@@ -51,14 +51,14 @@ function DayChip({
     <div className="flex min-w-0 items-center gap-3 bg-mist px-4 py-3">
       <span
         className={cn(
-          'grid size-9 shrink-0 place-items-center rounded-full',
-          tone === 'positive' ? 'bg-sage text-ink' : 'bg-white text-deep shadow-sm',
+          'grid size-9 shrink-0 place-items-center',
+          tone === 'positive' ? 'bg-sage-90 text-white' : 'bg-white text-deep',
         )}
       >
         <Icon className="size-4" aria-hidden />
       </span>
       <div className="min-w-0">
-        <p className="text-[0.6875rem] tracking-[0.14em] text-slate uppercase">{label}</p>
+        <p className="text-[0.6875rem] tracking-[0.14em] text-slate-80 uppercase">{label}</p>
         <p
           className={cn(
             'truncate font-heading text-[0.9375rem] font-semibold',
@@ -107,13 +107,13 @@ function ExpandAllSwitch({
         aria-hidden
         className={cn(
           'flex h-6 w-11 shrink-0 items-center border p-0.5 transition-colors duration-300 ease-brand motion-reduce:transition-none',
-          checked ? 'border-deep bg-deep' : 'border-slate/40 bg-mist',
+          checked ? 'border-deep bg-deep' : 'border-slate-40 bg-mist',
         )}
       >
         <span
           className={cn(
             'block size-4 transition-transform duration-300 ease-brand motion-reduce:transition-none',
-            checked ? 'translate-x-[1.375rem] bg-mist' : 'translate-x-0 bg-slate',
+            checked ? 'translate-x-[1.375rem] bg-white' : 'translate-x-0 bg-slate',
           )}
         />
       </span>
@@ -189,7 +189,7 @@ export function ItinerarySection({ days }: { days: ItineraryDay[] }) {
                 <AccordionTrigger className="min-w-0 items-center gap-4 py-6 hover:no-underline md:py-7">
                   <span className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-2">
                     {/* Day number from the CMS — the label the itinerary was missing. */}
-                    <span className="inline-flex shrink-0 items-center bg-sage-20 px-2.5 py-1 font-heading text-[0.6875rem] font-semibold tracking-[0.14em] whitespace-nowrap text-deep uppercase ring-1 ring-sage/60">
+                    <span className="inline-flex shrink-0 items-center border border-sage-40 bg-sage-20 px-2.5 py-1 font-heading text-[0.6875rem] font-semibold tracking-[0.14em] whitespace-nowrap text-sage-80 uppercase">
                       {dict.trip.day} {dayNumber}
                     </span>
                     <span className="min-w-0 break-words text-left font-heading text-base font-semibold text-ink md:text-lg">
@@ -211,7 +211,7 @@ export function ItinerarySection({ days }: { days: ItineraryDay[] }) {
                   </div>
 
                   {day.accommodation || typeof day.altitude === 'number' || food ? (
-                    <div className="mt-6 grid gap-3 border-t border-black/[0.06] pt-6 sm:grid-cols-2 2xl:grid-cols-3">
+                    <div className="mt-6 grid gap-3 border-t border-slate-20 pt-6 sm:grid-cols-2 2xl:grid-cols-3">
                       {day.accommodation ? (
                         <DayChip
                           icon={BedDouble}

@@ -1,19 +1,26 @@
 /* ============================================================================
-   Pill dropdown nav — ported 1:1 from Header-Sample.html
-   (pill-dropdown-nav.framer.website).
+   Pill dropdown nav — geometry from Header-Sample.html, finish from the brand.
 
-   Geometry / colour / type values are copied from the sample's Framer CSS:
-     track   .framer-1m6zlyx  padding 8px 12px, radius 24px,
-             bg rgba(17,17,17,0.94), blur 14px, 1px rgba(255,255,255,0.08)
-             border, shadow rgba(0,0,0,0.45) 0 18px 40px -14px
-     links   .framer-1uf7nog  row, gap 2px, height 37px
-     pill    .framer-1biwgs4  height 37px, radius 12px, absolute in links row
-     tab     .framer-v0rh89   padding 11px 18px, radius 12px
-     label   Switzer 500 15px, -0.01em, 1em, rgba(255,255,255,0.56)
-     panel   .framer-1fmh8ov/.framer-rygpvy  top 45px, min-width 220px,
-             padding 10px, items 200px wide, padding 10px 6px
-     mobile  .framer-v-izx6qx collapsed 56×56 track, 40×40 burger,
-             bars 18×2 at top 16/22 left 11 · .framer-v-w3tplo expanded 316px
+   The interaction (sliding highlight pill, dropdown panel, mobile burger that
+   expands into a 316px column) is untouched; only the surface is redrawn:
+
+     track    solid navy (--color-ink) — no transparency, no backdrop blur, and
+              one restrained shadow from the site's elevation scale. A frosted
+              floating bar reads as a template; a solid bar reads as equipment.
+     border   a hairline of mist at 14%, so the track keeps an edge over snow.
+     labels   haze blue at rest (5.45:1 on navy), mist when active or hovered.
+     pill     a haze wash at 22% — the same cool accent, one step lighter.
+     cta      paper white with ink copy, the single high-contrast element.
+     type     the brand text face (Archivo) at 500 — the nav no longer loads a
+              third family of its own.
+
+   Radii nest inwards (track 999px → panel 16px → item 8px): the floating nav is
+   deliberately the one rounded object on an otherwise square-cornered site.
+
+     geometry kept from the sample: track padding 8px 12px · links row gap 2px,
+     height 37px · pill height 37px · tab padding 11px 18px · panel top 45px,
+     min-width 220px, padding 10px, items 200px wide · mobile collapsed 56×56
+     track, 40×40 burger, bars 18×2 at top 16/22 left 11, expanded 316px.
    ========================================================================== */
 
 /* Sitewide sticky overlay: the zero-height wrapper keeps the nav pinned above
@@ -51,17 +58,15 @@
   pointer-events: auto;
   max-width: min(100%, 72rem);
   padding: 7px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid color-mix(in srgb, var(--color-mist) 14%, transparent);
   border-radius: 999px;
-  background-color: rgba(17, 17, 17, 0.94);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  color: rgba(255, 255, 255, 0.72);
-  font-family: var(--pn-font);
+  background-color: var(--color-ink);
+  color: color-mix(in srgb, var(--color-mist) 82%, transparent);
+  font-family: var(--font-sans);
   font-size: 13px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  line-height: 1em;
+  font-weight: 400;
+  letter-spacing: 0.005em;
+  line-height: 1.2em;
   text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -86,23 +91,21 @@
   height: min-content;
   padding: 8px 12px;
   box-sizing: border-box;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
-  background-color: rgba(17, 17, 17, 0.94);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  box-shadow: rgba(0, 0, 0, 0.45) 0px 18px 40px -14px;
+  border: 1px solid color-mix(in srgb, var(--color-mist) 14%, transparent);
+  border-radius: 999px;
+  background-color: var(--color-ink);
+  box-shadow: var(--shadow-md);
 }
 
 .pn-logo {
   flex: none;
   padding: 11px 6px;
-  border-radius: 12px;
-  color: #fff;
-  font-family: var(--pn-font);
+  border-radius: 8px;
+  color: var(--color-mist);
+  font-family: var(--font-sans);
   font-size: 15px;
   font-weight: 500;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.005em;
   line-height: 1em;
   text-decoration: none;
   white-space: pre;
@@ -125,8 +128,8 @@
   top: 0;
   left: 0;
   height: 37px;
-  border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background-color: color-mix(in srgb, var(--color-haze) 22%, transparent);
   pointer-events: none;
   z-index: 0;
 }
@@ -140,8 +143,8 @@
   align-items: center;
   gap: 10px;
   padding: 11px 18px;
-  border-radius: 12px;
-  background-color: rgba(0, 0, 0, 0);
+  border-radius: 999px;
+  background-color: transparent;
   cursor: pointer;
   text-decoration: none;
 }
@@ -150,11 +153,11 @@
   -webkit-user-select: none;
   user-select: none;
   white-space: pre;
-  color: rgba(255, 255, 255, 0.56);
-  font-family: var(--pn-font);
+  color: var(--color-haze);
+  font-family: var(--font-sans);
   font-size: 15px;
   font-weight: 500;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.005em;
   line-height: 1em;
   transition: color 0.2s ease;
 }
@@ -162,7 +165,7 @@
 .pn-tab:hover .pn-label,
 .pn-tab:focus-visible .pn-label,
 .pn-tab[data-active='true'] .pn-label {
-  color: #fff;
+  color: var(--color-mist);
 }
 
 .pn-caret {
@@ -186,12 +189,10 @@
   min-width: 220px;
   height: min-content;
   padding: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid color-mix(in srgb, var(--color-mist) 12%, transparent);
   border-radius: 16px;
-  background-color: rgba(35, 35, 35, 0.98);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  box-shadow: rgba(0, 0, 0, 0.45) 0px 18px 40px -14px;
+  background-color: var(--color-ink);
+  box-shadow: var(--shadow-lg);
   transform-origin: top left;
 }
 
@@ -216,21 +217,23 @@
   display: flex;
   align-items: center;
   padding: 11px 18px;
-  border-radius: 12px;
-  background-color: #fff;
-  color: rgb(17, 17, 17);
-  font-family: var(--pn-font);
+  border-radius: 999px;
+  background-color: var(--background);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
   font-size: 15px;
   font-weight: 500;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.005em;
   line-height: 1em;
   text-decoration: none;
   white-space: pre;
-  transition: background-color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .pn-cta:hover {
-  background-color: rgba(255, 255, 255, 0.82);
+  background-color: var(--color-mist);
 }
 
 /* --- mobile burger ------------------------------------------------------ */
@@ -251,7 +254,7 @@
   width: 18px;
   height: 2px;
   border-radius: 2px;
-  background-color: #fff;
+  background-color: var(--color-mist);
 }
 
 .pn-burger-bar:first-child {
@@ -355,8 +358,6 @@
     border: 0;
     border-radius: 0;
     background: transparent;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
     box-shadow: none;
   }
 

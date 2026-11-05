@@ -27,8 +27,13 @@ export function HomepageHeroBackground() {
         <source src={HOME_HERO_VIDEO_CDN_URL} type="video/mp4" />
         <source src={HOME_HERO_VIDEO_DOWNLOAD_URL} type="video/mp4" />
       </video>
-      {/* Black overlay at a standard 50% opacity, layered above the video for legibility. */}
-      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-black/50" />
+      {/* The site's navy wash over the plate, layered above the video for
+          legibility, then the shared bottom-up scrim every other photographic
+          header carries. The hero copy is bottom-aligned, so it always sits in
+          the heaviest part of the wash — a bright frame can never wash the type
+          out, whichever video the plate ends up using. */}
+      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-ink/55" />
+      <div aria-hidden="true" className="photo-scrim absolute inset-0 -z-10" />
     </>
   )
 }

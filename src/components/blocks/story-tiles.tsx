@@ -11,12 +11,10 @@ import { PayloadImageFill } from '@/components/ui/payload-image'
  * section from blog-sample.html.
  *
  * The markup mirrors the sample's `.st-*` structure exactly and
- * `latest-posts.css` carries the sample's scoped stylesheet verbatim, so the
- * hover/focus choreography is identical to the sample, not even one
- * animation different:
- *   • card lifts `translateY(-5px)` + soft shadow (0.35s cubic-bezier(.2,.75,.25,1))
- *   • cover image zooms to `scale(1.06)` (0.56s, same curve)
- *   • CTA bar wipes to the card accent colour (`::before` scaleX 0 → 1, left origin)
+ * `latest-posts.css` carries the choreography in the brand tokens:
+ *   • card border darkens one step (0.4s, the shared brand curve) — no lift, no shadow
+ *   • cover image steps in to `scale(1.03)` (1.2s, same curve)
+ *   • CTA bar wipes to navy (`::before` scaleX 0 → 1, left origin), copy turns to paper
  *   • arrow rotates `-35deg`
  *   • identical `:focus-visible` states and `prefers-reduced-motion` opt-outs
  *
@@ -25,9 +23,6 @@ import { PayloadImageFill } from '@/components/ui/payload-image'
  *   description → excerpt · tags → category + read time ·
  *   detail → author/date · CTA → "Read story" → post page.
  */
-
-/** Accent colours cycle exactly like the sample cards do. */
-const ACCENTS = ['rgb(223, 255, 143)', 'rgb(201, 194, 255)', 'rgb(255, 200, 169)']
 
 const categoryLabel = (category: string | undefined): string | null => {
   if (!category) return null
@@ -47,7 +42,6 @@ export function StoryTiles({ posts }: { posts: PostCard[] }) {
       <div className="st-grid">
         {posts.map((post, index) => {
           const href = sitePath(`/blog/${post.slug}`)
-          const accent = ACCENTS[index % ACCENTS.length]
           const label = categoryLabel(post.categories?.[0])
           const authorName =
             post.author && typeof post.author !== 'number' ? post.author.name : null
@@ -60,7 +54,6 @@ export function StoryTiles({ posts }: { posts: PostCard[] }) {
               data-linked="true"
               href={href}
               aria-labelledby={titleId}
-              style={{ ['--st-accent' as string]: accent }}
             >
               <div className="st-media">
                 <PayloadImageFill

@@ -89,9 +89,9 @@ export function InquiryForm({
   // `color-scheme: dark` is what keeps the native widgets legible on the ink panel: without it the
   // date-picker icon and the <select> arrow stay black-on-dark, and the pickers pop open light.
   const ghostClass = isDark
-    ? '[color-scheme:dark] border-white/15 bg-white/[0.06] text-mist placeholder:text-mist/40 focus-visible:border-sage'
+    ? '[color-scheme:dark] border-white/15 bg-ink-80 text-mist placeholder:text-mist/70 focus-visible:border-sage-light'
     : ''
-  const requiredMarkClass = isDark ? 'text-sage' : 'text-slate'
+  const requiredMarkClass = isDark ? 'text-sage-light' : 'text-slate-80'
 
   return (
     <form
@@ -103,14 +103,12 @@ export function InquiryForm({
         compact
           ? 'space-y-4'
           : cn(
-              // The panel surface follows the section it sits in: a white card on light backgrounds,
-              // a translucent white film on the dark ink panels (same treatment as the testimonial
-              // cards). Hardcoding `bg-card` here made the dark-variant form a solid white block
-              // with near-white labels and inputs on top of it — i.e. unreadable.
+              // The panel surface follows the section it sits in: a white card on light
+              // backgrounds, a lifted navy panel on the dark ones (the same treatment as the
+              // testimonial cards). A solid white panel here would put near-white labels and
+              // inputs on white — i.e. unreadable.
               'grid gap-5 border p-4 sm:p-6 md:grid-cols-2 md:p-8',
-              isDark
-                ? 'border-white/10 bg-white/[0.04]'
-                : 'border-black/[0.06] bg-card shadow-[0_1px_2px_rgba(4,21,31,0.04)]',
+              isDark ? 'border-white/12 bg-ink-80' : 'border-slate-20 bg-white',
             )
       }
     >
@@ -189,7 +187,7 @@ export function InquiryForm({
           name="tripTitle"
           defaultValue={trips.find((trip) => trip.slug === defaultTripSlug)?.title ?? ''}
           className={cn(
-            'h-11 w-full border px-4 text-sm shadow-[0_1px_2px_rgba(4,21,31,0.03)] outline-none transition-[color,box-shadow,border-color] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/25',
+            'h-11 w-full border px-4 text-sm outline-none transition-[color,border-color,box-shadow] focus-visible:border-deep focus-visible:ring-[3px] focus-visible:ring-deep/20',
             // A raw <select> has no shadcn primitive to inherit a surface from, so spell it out.
             isDark ? ghostClass : 'border-input bg-white text-ink',
           )}
@@ -254,7 +252,7 @@ export function InquiryForm({
         >
           {submitting ? dict.inquiry.submitting : dict.inquiry.submit}
         </Button>
-        <p className={`mt-3 text-xs md:mt-0 ${variant === 'dark' ? 'text-mist/60' : 'text-slate'}`}>
+        <p className={`mt-3 text-xs md:mt-0 ${variant === 'dark' ? 'text-mist/80' : 'text-slate-80'}`}>
           {dict.inquiry.privacyNote}
         </p>
       </div>

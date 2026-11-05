@@ -28,7 +28,7 @@ function TopographicLines() {
   return (
     <svg
       aria-hidden="true"
-      className="pointer-events-none absolute inset-y-0 right-0 -z-10 h-full w-[78%] text-sage/[0.16]"
+      className="pointer-events-none absolute inset-y-0 right-0 -z-10 h-full w-[78%] text-haze/25"
       fill="none"
       focusable="false"
       viewBox="0 0 1000 760"
@@ -102,19 +102,12 @@ export function PostDetail({
             className="-z-10"
             imageClassName="object-cover"
           />
-          {/* Scrims do the legibility work: a flat darken so a bright sky can never swallow
-              the type, a bottom-up gradient the masthead sits in, and — from `lg` up — a
-              left-to-right one that lets the right half of the photograph read as image.
-              All three are `-z-10`, like the image itself, so DOM order is paint order. */}
-          <div className="absolute inset-0 -z-10 bg-ink/55" aria-hidden="true" />
-          <div
-            className="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/60 to-ink/10"
-            aria-hidden="true"
-          />
-          <div
-            className="absolute inset-0 -z-10 hidden lg:block lg:bg-gradient-to-r lg:from-ink/85 lg:via-ink/40 lg:to-transparent"
-            aria-hidden="true"
-          />
+          {/* Scrims do the legibility work: one flat navy wash, so a bright sky can
+              never swallow the type, plus the shared bottom-up photo scrim the
+              masthead sits in. Both are `-z-10`, like the image itself, so DOM order
+              is paint order. */}
+          <div className="absolute inset-0 -z-10 bg-ink/72" aria-hidden="true" />
+          <div className="photo-scrim absolute inset-0 -z-10" aria-hidden="true" />
           <TopographicLines />
           {/* Hairline frame, so the full-bleed photo still reads as a laid-out page. */}
           <div
@@ -125,7 +118,7 @@ export function PostDetail({
           <div className="container-content relative z-10 w-full pt-28 pb-10 sm:pb-12 md:pt-32 md:pb-16">
             <div className={contentWidthClassName}>
               <Breadcrumbs
-                className="mb-8 [&_a]:text-mist/65 [&_a:hover]:text-white [&_span]:text-white [&_svg]:text-mist/35"
+                className="mb-8 text-mist"
                 items={[
                   { label: dict.nav.home, href: sitePath('/') },
                   { label: dict.nav.blog, href: sitePath('/blog') },
@@ -133,38 +126,38 @@ export function PostDetail({
                 ]}
               />
 
-              <p className="eyebrow flex flex-wrap items-center gap-x-3 gap-y-2 text-sage">
+              <p className="eyebrow flex flex-wrap items-center gap-x-3 gap-y-2 text-mist">
                 <span className="size-1.5 bg-sage" aria-hidden="true" />
                 <span>{dict.blog.fieldNotes}</span>
-                <span className="text-white/30" aria-hidden="true">
+                <span className="text-mist/45" aria-hidden="true">
                   /
                 </span>
-                <span className="text-mist/70">{categoryLabel ?? dict.nav.blog}</span>
+                <span className="text-mist/85">{categoryLabel ?? dict.nav.blog}</span>
               </p>
 
               <div className="mt-6 max-w-[34rem] lg:max-w-[42rem]">
                 <h1
                   id="post-title"
-                  className="font-heading text-[clamp(2.1rem,6vw,4.9rem)] leading-[0.98] font-semibold tracking-[-0.045em] text-white 3xl:text-[clamp(4.9rem,3vw,6.5rem)]"
+                  className="font-display text-[clamp(2.1rem,6vw,4.9rem)] leading-[1.03] text-white 3xl:text-[clamp(4.9rem,3vw,6.5rem)]"
                 >
                   {post.title}
                 </h1>
                 {/* The excerpt is pinned to 16px instead of riding the fluid
                     `description-copy` scale — supporting copy under a hero title should hold
                     its size on every viewport, TVs included. */}
-                <p className="mt-6 max-w-2xl text-base leading-relaxed text-mist/80 md:leading-[1.75]">
+                <p className="mt-6 max-w-2xl text-base leading-relaxed text-mist md:leading-[1.75]">
                   {post.excerpt}
                 </p>
               </div>
 
-              <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3 text-[0.8125rem] text-mist/75">
+              <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3 text-[0.8125rem] text-mist/85">
                 <span className="inline-flex items-center gap-2">
-                  <CalendarDays className="size-4 text-sage" aria-hidden="true" />
+                  <CalendarDays className="size-4 text-mist" aria-hidden="true" />
                   <time dateTime={publishedAt}>{formatDate(publishedAt)}</time>
                 </span>
                 <span className="hidden h-4 w-px bg-white/20 sm:block" aria-hidden="true" />
                 <span className="inline-flex items-center gap-2">
-                  <Clock className="size-4 text-sage" aria-hidden="true" />
+                  <Clock className="size-4 text-mist" aria-hidden="true" />
                   {dict.blog.readTime.replace('{minutes}', String(minutes))}
                 </span>
               </div>
@@ -176,15 +169,15 @@ export function PostDetail({
                       <PayloadImage
                         media={author.avatar}
                         sizes="44px"
-                        className="size-11 shrink-0 rounded-full ring-2 ring-sage/45"
+                        className="size-11 shrink-0 rounded-full ring-1 ring-mist/35"
                       />
                     ) : (
-                      <span className="grid size-11 shrink-0 place-items-center rounded-full bg-sage/15 font-heading text-base font-semibold text-sage ring-1 ring-sage/30">
+                      <span className="grid size-11 shrink-0 place-items-center rounded-full bg-mist/12 font-heading text-base font-semibold text-mist ring-1 ring-mist/25">
                         {authorName.slice(0, 1)}
                       </span>
                     )}
                     <div className="min-w-0">
-                      <p className="text-[0.6875rem] tracking-[0.14em] text-mist/50 uppercase">
+                      <p className="text-[0.6875rem] tracking-[0.14em] text-mist/75 uppercase">
                         {dict.blog.by}
                       </p>
                       <p className="mt-0.5 truncate font-heading text-[0.9375rem] font-semibold text-white">
@@ -193,8 +186,8 @@ export function PostDetail({
                     </div>
                   </div>
                 ) : (
-                  <p className="text-[0.75rem] tracking-[0.13em] text-mist/60 uppercase">
-                    {siteName} <span className="px-1 text-sage/70">/</span> {dict.nav.blog}
+                  <p className="text-[0.75rem] tracking-[0.13em] text-mist/80 uppercase">
+                    {siteName} <span className="px-1 text-mist/60">/</span> {dict.nav.blog}
                   </p>
                 )}
 
@@ -232,15 +225,15 @@ export function PostDetail({
               <PayloadImage
                 media={author.avatar}
                 sizes="64px"
-                className="size-16 shrink-0 rounded-full ring-4 ring-sage-20"
+                className="size-16 shrink-0 rounded-full ring-1 ring-slate-20"
               />
             ) : (
-              <span className="grid size-16 shrink-0 place-items-center rounded-full bg-sage-20 font-heading text-xl font-semibold text-deep">
+              <span className="grid size-16 shrink-0 place-items-center rounded-full bg-mist font-heading text-xl font-semibold text-ink">
                 {authorName.slice(0, 1)}
               </span>
             )}
             <div className="min-w-0 pt-1">
-              <p className="eyebrow text-slate">{dict.blog.aboutAuthor}</p>
+              <p className="eyebrow text-slate-80">{dict.blog.aboutAuthor}</p>
               <p className="mt-1 font-heading text-xl font-semibold text-ink">{authorName}</p>
               <p className="mt-2 description-copy leading-relaxed text-ink-60">{author.bio}</p>
             </div>
@@ -270,7 +263,7 @@ export function PostDetail({
           <div className="relative isolate overflow-hidden bg-sage-20 p-7 sm:p-9 md:p-12">
             <div className="grid items-center gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:gap-12">
               <div className="max-w-2xl">
-                <p className="eyebrow text-deep">{dict.blog.planningEyebrow}</p>
+                <p className="eyebrow text-slate-80">{dict.blog.planningEyebrow}</p>
                 <h2 id="next-trail-title" className="heading-lg mt-3">
                   {dict.blog.planningTitle}
                 </h2>
@@ -287,7 +280,7 @@ export function PostDetail({
 
               <div
                 aria-hidden="true"
-                className="relative hidden size-36 shrink-0 place-items-center rounded-full border border-deep/20 text-deep/75 md:grid lg:mr-5"
+                className="relative hidden size-36 shrink-0 place-items-center rounded-full border border-deep/25 text-deep md:grid lg:mr-5"
               >
                 <span className="absolute inset-3 rounded-full border border-deep/15" />
                 <span className="absolute inset-7 rounded-full border border-deep/10" />
@@ -305,7 +298,7 @@ export function PostDetail({
             <div className="container-content">
               <div className="mb-10 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                  <p className="eyebrow text-slate">{dict.blog.fieldNotes}</p>
+                  <p className="eyebrow text-slate-80">{dict.blog.fieldNotes}</p>
                   <h2 className="heading-lg mt-2">{dict.blog.related}</h2>
                   <p className="mt-3 max-w-xl description-copy leading-relaxed text-ink-60">
                     {dict.blog.relatedSubtitle}

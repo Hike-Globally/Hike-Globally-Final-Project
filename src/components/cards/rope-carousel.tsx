@@ -33,6 +33,8 @@ import {
 
 import { cn } from '@/lib/utils'
 
+import { BRAND, ROPE, ROPE_SHADOW, ROPE_WRAP, mixHex, rgbaOf } from '@/lib/brand-colors'
+
 import './rope-carousel.css'
 
 export type RopeCarouselItem = {
@@ -46,7 +48,7 @@ export type RopeCarouselItem = {
  * Geometry — ratios measured from the reference snapshot (350px cards).
  * ------------------------------------------------------------------------- */
 const RATIO = 0.8 // card aspect ratio (w/h)
-const RADIUS = 16
+const RADIUS = 0 // square corners — the house radius, matching `globals.css`
 const GAP = 28 // gap between cards — 378px pitch at 350px cards
 const PIVOT_RATIO = 23.75 / 350 // rope → card-top distance (transform-origin)
 const SAG_RATIO = 128.7 / 350 // rope sag depth, relative to card width
@@ -221,19 +223,35 @@ function PegClip() {
     >
       <path
         d="M4 0 H14 A2 2 0 0 1 16 2 V47 A3 3 0 0 1 13 50 H5 A3 3 0 0 1 2 47 V2 A2 2 0 0 1 4 0 Z"
-        fill="rgb(208, 114, 79)"
+        fill={ROPE}
       />
-      <path d="M4 0 H6 V50 H5 A3 3 0 0 1 2 47 V2 A2 2 0 0 1 4 0 Z" fill="#fff" opacity="0.22" />
-      <path d="M13 0 H14 A2 2 0 0 1 16 2 V47 A3 3 0 0 1 13 50 Z" fill="#000" opacity="0.12" />
-      <path d="M9 30 V49.5" stroke="#000" strokeOpacity="0.22" strokeWidth="0.9" />
-      <rect x="0.5" y="19" width="17" height="6" rx="2" fill="rgb(228, 207, 166)" />
+      <path
+        d="M4 0 H6 V50 H5 A3 3 0 0 1 2 47 V2 A2 2 0 0 1 4 0 Z"
+        fill={BRAND.white}
+        opacity="0.22"
+      />
+      <path
+        d="M13 0 H14 A2 2 0 0 1 16 2 V47 A3 3 0 0 1 13 50 Z"
+        fill={BRAND.ink}
+        opacity="0.18"
+      />
+      <path d="M9 30 V49.5" stroke={BRAND.ink} strokeOpacity="0.24" strokeWidth="0.9" />
+      <rect x="0.5" y="19" width="17" height="6" rx="2" fill={ROPE_WRAP} />
       <path
         d="M4 19.6 V24.4 M7 19.6 V24.4 M10 19.6 V24.4 M13 19.6 V24.4"
-        stroke="#000"
-        strokeOpacity="0.2"
+        stroke={ROPE_SHADOW}
+        strokeOpacity="0.32"
         strokeWidth="0.7"
       />
-      <rect x="1" y="19.3" width="16" height="1.3" rx="0.65" fill="#fff" opacity="0.55" />
+      <rect
+        x="1"
+        y="19.3"
+        width="16"
+        height="1.3"
+        rx="0.65"
+        fill={BRAND.white}
+        opacity="0.5"
+      />
     </svg>
   )
 }
@@ -562,7 +580,7 @@ export function RopeCarousel({
               aspectRatio: `${RATIO}`,
               borderRadius: RADIUS,
               overflow: 'hidden',
-              background: '#ECE7E0',
+              background: 'var(--color-mist)',
             }}
           >
             {item.image ? (
@@ -590,8 +608,7 @@ export function RopeCarousel({
                 position: 'absolute',
                 inset: 0,
                 pointerEvents: 'none',
-                background:
-                  'linear-gradient(to top, rgba(14,12,10,0.620) 0%, rgba(14,12,10,0.180) 38%, rgba(14,12,10,0) 62%)',
+                background: 'var(--scrim-ink)',
               }}
             />
             <div
@@ -611,7 +628,7 @@ export function RopeCarousel({
                   letterSpacing: '-0.01em',
                   lineHeight: '1.2em',
                   fontFamily: 'var(--font-heading), sans-serif',
-                  color: 'rgb(255, 255, 255)',
+                  color: 'var(--color-paper)',
                   margin: 0,
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
@@ -626,7 +643,7 @@ export function RopeCarousel({
                   fontWeight: 400,
                   letterSpacing: '0em',
                   lineHeight: '1.4em',
-                  color: 'rgba(255, 255, 255, 0.84)',
+                  color: 'color-mix(in srgb, var(--color-paper) 86%, transparent)',
                   marginTop: 4,
                   display: '-webkit-box',
                   WebkitLineClamp: 2,
@@ -642,7 +659,7 @@ export function RopeCarousel({
                 position: 'absolute',
                 inset: 0,
                 borderRadius: 'inherit',
-                boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.05)',
+                boxShadow: 'var(--image-frame)',
                 pointerEvents: 'none',
               }}
             />
@@ -659,8 +676,10 @@ export function RopeCarousel({
             width: dims.cardW * SHADE_W_RATIO,
             height: dims.cardW * SHADE_H_RATIO,
             pointerEvents: 'none',
-            background:
-              'radial-gradient(ellipse at 50% 0%, rgba(24,18,12,0.16), rgba(24,18,12,0) 70%)',
+            background: `radial-gradient(ellipse at 50% 0%, ${rgbaOf(BRAND.ink, 0.18)}, ${rgbaOf(
+              BRAND.ink,
+              0,
+            )} 70%)`,
           }}
         />
 
@@ -754,16 +773,22 @@ export function RopeCarousel({
           <path
             d={layout.pathD}
             fill="none"
-            stroke="rgba(24,18,12,0.07)"
+            stroke={rgbaOf(BRAND.ink, 0.08)}
             strokeWidth={3}
             transform="translate(0 5)"
             strokeLinecap="round"
           />
-          <path d={layout.pathD} fill="none" stroke="rgb(168, 158, 146)" strokeWidth={1.6} strokeLinecap="round" />
           <path
             d={layout.pathD}
             fill="none"
-            stroke="rgba(255,255,255,0.38)"
+            stroke={mixHex(BRAND.white, BRAND.slate, 0.45)}
+            strokeWidth={1.6}
+            strokeLinecap="round"
+          />
+          <path
+            d={layout.pathD}
+            fill="none"
+            stroke={rgbaOf(BRAND.white, 0.45)}
             strokeWidth={0.72}
             strokeDasharray="2.24 2.88"
           />

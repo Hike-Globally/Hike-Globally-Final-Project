@@ -59,8 +59,10 @@ export function DestinationDetail({
           className="-z-10"
           imageClassName="object-cover"
         />
-        <div className="absolute inset-0 -z-10 bg-ink/58" />
-        <div className="absolute inset-x-0 bottom-0 -z-10 h-1/2 bg-gradient-to-t from-ink/85 to-transparent" />
+        {/* The shared photographic-header recipe: one flat navy wash, then the
+            common bottom-up scrim the masthead sits in. */}
+        <div className="absolute inset-0 -z-10 bg-ink/72" />
+        <div className="photo-scrim absolute inset-0 -z-10" />
 
         <div className="container-content pt-28 pb-12 sm:pb-16 md:pt-36 md:pb-20">
           <Breadcrumbs
@@ -72,12 +74,12 @@ export function DestinationDetail({
             ]}
           />
 
-          <div className="flex flex-wrap items-center gap-3 text-[0.75rem] tracking-[0.14em] text-sage uppercase">
+          <div className="flex flex-wrap items-center gap-3 text-[0.75rem] tracking-[0.14em] text-mist uppercase">
             <span className="flex items-center gap-1.5">
               <MapPin className="size-3.5" aria-hidden />
               {destination.country}
             </span>
-            <span className="text-mist/40">/</span>
+            <span className="text-mist/60">/</span>
             <span className="flex items-center gap-1.5">
               <Compass className="size-3.5" aria-hidden />
               {regionLabel(destination.region, dict)}
@@ -86,7 +88,7 @@ export function DestinationDetail({
 
           <h1 className="heading-xl mt-5 max-w-4xl text-white">{destination.name}</h1>
           {destination.tagline ? (
-            <p className="lead mt-5 max-w-2xl text-mist/85">{destination.tagline}</p>
+            <p className="lead mt-5 max-w-2xl text-mist">{destination.tagline}</p>
           ) : null}
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -131,7 +133,7 @@ export function DestinationDetail({
             {seasons.length ? (
               <div className="bg-sage-20 p-7">
                 <h2 className="heading-md mb-4 flex items-center gap-2">
-                  <Clock className="size-4 text-deep" aria-hidden />
+                  <Clock className="size-4 text-sage-90" aria-hidden />
                   {dict.destinations.bestTime}
                 </h2>
                 <ul className="flex flex-wrap gap-2">
@@ -147,7 +149,7 @@ export function DestinationDetail({
             {destination.gallery?.length ? (
               <div className="grid grid-cols-2 gap-3">
                 {destination.gallery.slice(0, 4).map((item, index) => (
-                  <div key={item.id ?? index} className="overflow-hidden bg-mist-60">
+                  <div key={item.id ?? index} className="photo-plate">
                     <PayloadImage
                       media={item.image}
                       sizes="(min-width: 1024px) 20vw, 45vw"

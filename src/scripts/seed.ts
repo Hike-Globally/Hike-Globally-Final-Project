@@ -18,6 +18,7 @@ import sharp from 'sharp'
 import { getPayload, type RequiredDataFromCollectionSlug } from 'payload'
 
 import config from '../payload.config'
+import { BRAND, mixHex } from '../lib/brand-colors'
 import type { Page } from '../payload-types'
 
 /* -------------------------------------------------------------------------- */
@@ -123,13 +124,23 @@ const richText = (...nodes: LexicalNode[]): RichTextValue => ({
 /* Image generation                                                            */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Palettes for the generated mountain scenes — `[sky top, horizon, light]`.
+ *
+ * Every entry is a brand colour or a tint mixed from one (the same source of
+ * truth the canvas and SVG chrome use, `src/lib/brand-colors.ts`), so the seeded
+ * placeholder photography sits in the same world as the interface around it
+ * instead of introducing ambers and olives the UI never uses.
+ */
+const HAZE_TINT = mixHex(BRAND.white, BRAND.haze, 0.4)
+const DUSK_BLUE = mixHex(BRAND.ink, BRAND.deep, 0.45)
 const PALETTES: [string, string, string][] = [
-  ['#04151f', '#1d3557', '#F7A230'],
-  ['#04151f', '#283618', '#F7A230'],
-  ['#1d3557', '#283618', '#fad9a3'],
-  ['#04151f', '#1d3557', '#fdf0da'],
-  ['#04151f', '#283618', '#f8f9fa'],
-  ['#102138', '#1d3557', '#F7A230'],
+  [BRAND.ink, BRAND.deep, BRAND.mist],
+  [BRAND.ink, BRAND.slate, BRAND.haze],
+  [DUSK_BLUE, BRAND.haze, HAZE_TINT],
+  [BRAND.ink, DUSK_BLUE, BRAND.mist],
+  [BRAND.ink, BRAND.slate, HAZE_TINT],
+  [BRAND.ink, BRAND.deep, BRAND.white],
 ]
 
 /** Deterministic pseudo-random so the same seed always produces the same scene. */

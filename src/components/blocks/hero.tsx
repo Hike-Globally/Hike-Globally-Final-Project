@@ -16,7 +16,7 @@ const heights: Record<string, string> = {
 }
 
 const overlays: Record<string, string> = {
-  strong: 'bg-ink/68',
+  strong: 'bg-ink/70',
   medium: 'bg-ink/45',
   none: 'bg-transparent',
 }
@@ -72,14 +72,9 @@ export function Hero({
             imageClassName="object-cover"
           />
           <div className={cn('absolute inset-0 -z-10', overlay)} />
-          <div className="absolute inset-x-0 bottom-0 -z-10 h-1/2 bg-gradient-to-t from-ink/75 via-ink/10 to-transparent" />
+          <div className="photo-scrim absolute inset-x-0 bottom-0 -z-10 h-2/3" />
         </>
-      ) : (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-40 right-[-10%] -z-10 size-[35rem] rounded-full bg-sage-20 blur-3xl"
-        />
-      )}
+      ) : null}
 
       <div
         className={cn(
@@ -95,7 +90,7 @@ export function Hero({
             mid-phrase. Individual elements below cap their own width. */}
         <div className={cn('min-w-0', homepage ? 'max-w-none' : 'max-w-3xl 3xl:max-w-4xl')}>
           {showEyebrow ? (
-            <p className={cn('eyebrow mb-5', hasImage ? 'text-sage' : 'text-slate')}>{eyebrow}</p>
+            <p className={cn('eyebrow mb-5', hasImage ? 'text-mist/85' : 'text-slate-80')}>{eyebrow}</p>
           ) : null}
 
           <h1
@@ -120,7 +115,7 @@ export function Hero({
                 /* 36rem keeps the standfirst on the same ~576px measure it had
                    when the column itself was 768px wide and this was `w-3/4`. */
                 homepage ? 'max-w-[36rem]' : 'max-w-2xl',
-                hasImage ? 'text-mist/85' : 'text-ink-60',
+                hasImage ? 'text-mist/90' : 'text-ink-60',
               )}
             >
               {block.subheading}
@@ -130,7 +125,7 @@ export function Hero({
           {primary || secondary ? (
             <div className="mt-10 flex flex-wrap items-center gap-3">
               {primary ? (
-                <Button asChild size="lg" variant={hasImage ? 'sage' : 'default'}>
+                <Button asChild size="lg" variant={hasImage ? 'paper' : 'default'}>
                   <Link href={primary.href}>{primary.label}</Link>
                 </Button>
               ) : null}

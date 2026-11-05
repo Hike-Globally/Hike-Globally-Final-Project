@@ -74,11 +74,11 @@ export function Globe() {
 
       <p
         id="about-globe-hint"
-        className="mt-1 flex items-center justify-center gap-3 text-[0.625rem] font-semibold tracking-[0.22em] text-mist/40 uppercase"
+        className="mt-1 flex items-center justify-center gap-3 text-[0.625rem] font-medium tracking-[0.18em] text-mist/70 uppercase"
       >
-        <span aria-hidden="true" className="h-px w-6 bg-white/15" />
+        <span aria-hidden="true" className="h-px w-6 bg-mist/25" />
         Drag to explore
-        <span aria-hidden="true" className="h-px w-6 bg-white/15" />
+        <span aria-hidden="true" className="h-px w-6 bg-mist/25" />
       </p>
     </div>
   )

@@ -66,10 +66,11 @@ export default async function DestinationsPage() {
           aria-hidden="true"
           className="-z-20 object-cover"
         />
-        <div
-          className="absolute inset-0 -z-10 bg-gradient-to-t from-ink/95 via-ink/55 to-ink/35"
-          aria-hidden="true"
-        />
+        {/* One flat navy wash plus the shared photo scrim — the same recipe the
+            trip and journal heroes use, so every photograph on the site sits under
+            the same amount of ink. */}
+        <div className="absolute inset-0 -z-10 bg-ink/72" aria-hidden="true" />
+        <div className="photo-scrim absolute inset-0 -z-10" aria-hidden="true" />
 
         <div className="container-content relative w-full pt-32 pb-14 md:pb-20">
           <Breadcrumbs
@@ -79,18 +80,18 @@ export default async function DestinationsPage() {
             ]}
           />
 
-          <p className="eyebrow mt-10 text-sage">The destination atlas · Nepal</p>
+          <p className="eyebrow mt-10 text-mist">The destination atlas · Nepal</p>
           <h1 className="heading-display mt-5 max-w-3xl text-white">
-            The Himalaya, <span className="text-sage">in all its scale.</span>
+            The Himalaya, <span className="text-mist">in all its scale.</span>
           </h1>
-          <p className="destinations-hero-description lead mt-6 max-w-2xl text-mist/80">
+          <p className="destinations-hero-description lead mt-6 max-w-2xl text-mist">
             {dict.destinations.listingSubtitle}
           </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4">
             <Link
               href="#regions"
-              className="group inline-flex items-center gap-3 border-b border-sage/70 pb-2 text-sm font-medium text-white transition-colors hover:border-white"
+              className="group inline-flex items-center gap-3 border-b border-mist/45 pb-2 text-sm font-medium text-white transition-colors hover:border-mist"
             >
               Explore the atlas
               <ArrowDown
@@ -98,7 +99,7 @@ export default async function DestinationsPage() {
                 aria-hidden="true"
               />
             </Link>
-            <span className="text-sm text-mist/70">
+            <span className="text-sm text-mist/85">
               Led by people who call these mountains home.
             </span>
           </div>
@@ -107,7 +108,7 @@ export default async function DestinationsPage() {
 
       <section id="regions" className="scroll-mt-8 py-16 md:py-24">
         <div className="container-content">
-          <div className="grid gap-6 border-b border-ink/10 pb-8 md:grid-cols-[1fr_0.72fr] md:items-end md:gap-12 md:pb-10">
+          <div className="grid gap-6 border-b border-slate-20 pb-8 md:grid-cols-[1fr_0.72fr] md:items-end md:gap-12 md:pb-10">
             <div>
               <p className="eyebrow">A closer look</p>
               <h2 className="heading-xl mt-3 max-w-2xl">Find the Nepal that feels like yours.</h2>
@@ -115,7 +116,7 @@ export default async function DestinationsPage() {
           </div>
 
           {destinations.length === 0 ? (
-            <div className="mt-10 border border-dashed border-ink/15 bg-mist px-6 py-14 text-center md:px-12">
+            <div className="mt-10 border border-dashed border-slate-40 bg-mist px-6 py-14 text-center md:px-12">
               <p className="eyebrow">The atlas is taking shape</p>
               <h3 className="heading-md mt-3">No destinations are published just yet.</h3>
               <p className="mx-auto mt-3 max-w-lg description-copy leading-relaxed text-ink-60">
@@ -123,7 +124,7 @@ export default async function DestinationsPage() {
               </p>
               <Link
                 href={sitePath('/inquiry')}
-                className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-deep underline decoration-sage decoration-2 underline-offset-4"
+                className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-deep-90 underline decoration-slate-40 decoration-1 underline-offset-4 transition-colors hover:text-deep-80 hover:decoration-deep"
               >
                 Plan a trip with us <ArrowRight className="size-4" aria-hidden="true" />
               </Link>
@@ -201,37 +202,37 @@ function AtlasCard({ destination, index }: { destination: DestinationCard; index
             sizes="(min-width: 1024px) 30vw, (min-width: 640px) 46vw, 92vw"
             className="-z-20 object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.045]"
           />
-          <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-t from-ink/90 via-ink/10 to-ink/10" />
+          <div className="photo-scrim pointer-events-none absolute inset-0 -z-10" />
           <div className="absolute inset-x-0 top-0 flex items-center justify-between p-5">
-            <span className="text-[0.65rem] font-semibold tracking-[0.18em] text-white/85 uppercase">
+            <span className="text-[0.65rem] font-medium tracking-[0.18em] text-mist uppercase">
               {regionName(destination.region)}
             </span>
-            <span className="text-[0.65rem] font-semibold tracking-[0.16em] text-white/75 tabular-nums">
+            <span className="text-[0.65rem] font-medium tracking-[0.16em] text-mist/85 tabular-nums">
               {String(index + 1).padStart(2, '0')}
             </span>
           </div>
           <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 sm:p-6">
             <div>
-              <p className="text-[0.7rem] font-medium tracking-[0.15em] text-sage uppercase">
+              <p className="text-[0.7rem] font-medium tracking-[0.15em] text-mist/85 uppercase">
                 {destination.country}
               </p>
-              <h3 className="mt-2 font-heading text-2xl leading-tight font-semibold text-white sm:text-[1.7rem]">
+              <h3 className="mt-2 font-display text-2xl leading-tight text-white sm:text-[1.7rem]">
                 {destination.name}
               </h3>
               {destination.tagline ? (
-                <p className="destination-card-description mt-2 max-w-sm card-description-copy leading-relaxed text-white/75">
+                <p className="destination-card-description mt-2 max-w-sm card-description-copy leading-relaxed text-mist/85">
                   {destination.tagline}
                 </p>
               ) : null}
             </div>
-            <span className="mb-0.5 inline-flex size-10 shrink-0 items-center justify-center border border-white/60 text-white transition-colors duration-300 group-hover:border-sage group-hover:bg-sage group-hover:text-ink">
+            <span className="mb-0.5 inline-flex size-10 shrink-0 items-center justify-center border border-mist/60 text-white transition-colors duration-300 group-hover:border-white group-hover:bg-white group-hover:text-ink">
               <ArrowUpRight className="size-4" aria-hidden="true" />
             </span>
           </div>
         </div>
-        <div className="mt-4 flex items-center justify-between gap-4 border-t border-ink/10 pt-3 text-[0.7rem] font-semibold tracking-[0.15em] text-slate uppercase">
+        <div className="mt-4 flex items-center justify-between gap-4 border-t border-slate-20 pt-3 text-[0.7rem] font-medium tracking-[0.15em] text-slate-80 uppercase">
           <span>{destination.country} · Himalaya</span>
-          <span className="text-ink/45">Explore region</span>
+          <span className="text-slate-80">Explore region</span>
         </div>
       </Link>
     </article>

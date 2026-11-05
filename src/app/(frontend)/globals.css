@@ -6,54 +6,117 @@
 /* ==========================================================================
    Hike Globally — design tokens
    ==========================================================================
-   Palette (locked):
-     #04151f  ink    near-black teal  — headings, dark sections, body copy
-     #1d3557  deep   deep navy        — primary brand, buttons, links
-     #283618  slate  forest olive     — secondary UI, rules, meta text
-     #F7A230  sage   warm amber       — accents, highlights, light sections
-     #f8f9fa  mist   off-white        — section tints, image placeholders
+   Palette (locked, six colours — everything else on the site is a mix of
+   these six with white, with ink, or with each other):
 
-   The global page background (--background) is pure white, #ffffff — the five brand
-   colours above are unchanged.
+     #183144  ink    deep navy    — headings, running copy, dark sections, buttons
+     #F6F6F6  mist   paper        — quiet fills, plate backgrounds, copy on dark
+     #87AABD  haze   haze blue    — illustration, on-dark secondary text, graphics
+     #79706D  slate  warm taupe   — meta copy, eyebrows, captions, hairlines
+     #2177B5  deep   expedition blue — links, focus, interactive states
+     #D0564D  sage   ember        — the one warm accent: rules, markers, fills
 
-   Typography:
-     Headings    — Google Sans Flex, 600 (variable, self-hosted)
-     Body        — Archivo, 300 (variable, self-hosted)
-     Hero accent — Instrument Serif italic, 400 (self-hosted, homepage hero only)
+   The page background (--background) is pure white, #ffffff. Sections are
+   separated by hairlines and whitespace rather than by coloured bands, so the
+   six colours above never compete inside one viewport.
 
-   Both fonts are self-hosted with next/font/local instead of loaded from
-   fonts.googleapis.com. That removes two cross-origin requests from the critical
-   path and kills layout shift (fonts are preloaded and size-adjusted by Next).
+   Derived steps (each one is a stated mix, so nothing drifts off-palette):
+
+     ink-80   #465A69  ink + 20% white    7.17:1 on white — prose paragraphs
+     ink-70   #526573  ink + 25% white    6.06:1 on white
+     ink-60   #5D6F7C  ink + 30% white    5.21:1 on white — lead & meta copy
+     deep-90  #206CA4  deep + 15% ink     5.61:1 on white — hover
+     deep-80  #1F6699  deep + 25% ink     6.14:1 on white — active
+     deep-20  #DBE9F3  white + 16% deep   cool wash
+     slate-80 #6B6767  slate + 14% ink    5.17:1 on paper — meta copy on tinted panels
+     slate-40 #C9C6C5  white + 40% slate  visible rules, dividers
+     slate-20 #EAE8E8  white + 16% slate  hairlines, borders
+     sage-90  #B4504C  sage + 15% ink     5.01:1 on white — small ember text, fills
+     sage-80  #994B4A  sage + 30% ink     6.07:1 on white — hover / active
+     sage-40  #ECBBB8  white + 40% sage   highlighter, ember hairlines
+     sage-20  #F9EBEA  white + 12% sage   ember wash
+     sage-lt  #DE8982  sage + 30% white   5.13:1 on ink — small ember text on dark
+     haze-40  #DBE6EB  white + 30% haze   cool hairlines
+     haze-20  #ECF1F4  white + 16% haze   cool wash
+     mist-60  #EFEEED  white + 12% slate  chip fills, hover fills
+
+   Contrast (WCAG 2.2, checked against #ffffff and #183144):
+     ink 13.45 · ink-80 7.17 · ink-70 6.06 · ink-60 5.21 · deep 4.80 ·
+     slate 4.83 · slate-80 5.58 · sage-90 5.01 — all AA for body copy on white.
+     On paper (`mist`, #f6f6f6) the same roles step one shade darker, because
+     taupe and blue both land a hair under 4.5:1 there: slate-80 5.17 and
+     deep-90 5.19 are the AA meta/link colours on a tinted panel.
+     Over a photograph, copy sits on `--scrim-ink` and is always mist or white
+     (6.71:1+) — haze and ember are never used as small text on an image.
+     sage (#D0564D, 4.10:1) and haze (#87AABD, 2.47:1) are therefore reserved
+     for large display type (AA-large, 3:1), icons and graphic marks (3:1),
+     rules and fills — never for small text on white. On ink, the roles flip:
+     mist 12.44 · white 13.45 · haze 5.45 · sage-light 5.13 are AA, while deep
+     and slate are not used as text on dark surfaces.
+
+   Typography — two families only:
+     Display  — Instrument Serif 400 (self-hosted): hero, section and page
+                headlines, pull quotes, oversized numerals.
+     Text/UI  — Archivo variable 300/400/500/600 (self-hosted): body copy,
+                sub-headings, card titles, eyebrows, navigation, buttons.
+     The italic cut of Instrument Serif is the accent voice inside a display
+     line (the `<i>` an editor writes into a heading).
+
+   Both families are self-hosted with next/font/local instead of loaded from
+   fonts.googleapis.com, which keeps them off the third-party critical path and
+   removes layout shift (they are preloaded and size-adjusted by Next).
+
+   Imagery — one treatment everywhere:
+     photographs are graded with `--image-grade` (a whisper of desaturation and
+     a touch of contrast, so a mixed library of uploads reads as one archive),
+     they sit on a paper (`mist`) plate while they load, they are framed with a
+     1px ink hairline rather than lifted with a drop shadow, and copy over a
+     photograph always sits on the same single navy scrim (`--scrim-ink`).
    ========================================================================== */
 
 @theme {
   /* --- Brand colours (usable as bg-ink, text-sage, border-slate …) --- */
-  --color-ink: #04151f;
-  --color-deep: #1d3557;
-  --color-slate: #283618;
-  --color-sage: #F7A230;
-  --color-mist: #f8f9fa;
+  /* `paper` is the pure white the page is drawn on — named so inline styles and
+     canvas code can reach it as a token instead of writing `#ffffff`. */
+  --color-paper: #ffffff;
+  --color-ink: #183144;
+  --color-deep: #2177b5;
+  --color-slate: #79706d;
+  --color-sage: #d0564d;
+  --color-mist: #f6f6f6;
+  --color-haze: #87aabd;
 
-  /* Tints/shades derived from the five brand colours, so gradients and hovers
-     always stay inside the palette instead of drifting to arbitrary greys. */
-  --color-ink-80: #2d3b43;
-  --color-ink-70: #3c4b53;
-  --color-ink-60: #4c5b63;
-  --color-deep-90: #162b47;
-  --color-deep-80: #102138;
-  --color-sage-40: #fad9a3;
-  --color-sage-20: #fdf0da;
-  --color-slate-20: #d4d7d1;
-  --color-mist-60: #e7eaeb;
+  /* Tints and shades derived from the six brand colours (mixes documented in
+     the header above), so hovers, rules and washes always stay inside the
+     palette instead of drifting to arbitrary greys. */
+  --color-ink-80: #465a69;
+  --color-ink-70: #526573;
+  --color-ink-60: #5d6f7c;
+  --color-deep-90: #206ca4;
+  --color-deep-80: #1f6699;
+  --color-deep-20: #dbe9f3;
+  --color-slate-80: #6b6767;
+  --color-slate-40: #c9c6c5;
+  --color-slate-20: #eae8e8;
+  --color-sage-90: #b4504c;
+  --color-sage-80: #994b4a;
+  --color-sage-40: #ecbbb8;
+  --color-sage-20: #f9ebea;
+  --color-sage-light: #de8982;
+  --color-haze-40: #dbe6eb;
+  --color-haze-20: #ecf1f4;
+  --color-mist-60: #efeeed;
+  --color-mist-40: #fbfbfb;
 
   /* --- Typography --- */
-  --font-heading: var(--font-google-sans-flex), 'Google Sans Flex', system-ui, sans-serif;
+  --font-display: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
+  --font-heading: var(--font-archivo), 'Archivo', system-ui, sans-serif;
   --font-sans: var(--font-archivo), 'Archivo', system-ui, sans-serif;
 
-  /* Display serif for emphasized headline lines — Instrument Serif, self-hosted
-     via the @fontsource imports in layout.tsx. Only ever used with
-     `font-style: italic`, where the family ships a true italic cut. */
-  --font-serif-accent: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  /* Display serif kept under its historic name as well — the component
+     stylesheets (`homepage.css`, `cta.css`, `latest-blogs-section.css`) refer
+     to it for italic accent lines. Both names resolve to the same family. */
+  --font-serif-accent: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
 
   /* --- Breakpoints (5" phones → 100" TVs) ---
      Defaults remain: sm 640, md 768, lg 1024, xl 1280, 2xl 1536.
@@ -69,15 +132,31 @@
   --container-content: 80rem; /* 1280px — overridden fluidly below for large canvases */
   --container-prose: 44rem; /* 704px — optimal line length for reading */
 
+  /* One shared rhythm: every section paddings, card padding and stack gap is a
+     multiple of these, so spacing is consistent from the hero to the footer. */
+  --spacing-card: clamp(1.25rem, 0.9rem + 1.1vw, 2rem);
+
   /* --- Motion: one shared easing curve keeps every animation feeling related --- */
   --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* --- Elevation: three shadows, all cut from ink ---
+     The site is drawn with hairlines; a shadow is reserved for the layers that
+     genuinely float (the nav panel, a dropdown, the sticky booking card). Cards
+     rest on a 1px border and never lift. */
+  --shadow-2xs: 0 1px 2px 0 color-mix(in srgb, var(--color-ink) 5%, transparent);
+  --shadow-xs: 0 1px 2px 0 color-mix(in srgb, var(--color-ink) 6%, transparent);
+  --shadow-sm: 0 2px 6px -2px color-mix(in srgb, var(--color-ink) 10%, transparent);
+  --shadow-md: 0 14px 30px -22px color-mix(in srgb, var(--color-ink) 34%, transparent);
+  --shadow-lg: 0 26px 54px -30px color-mix(in srgb, var(--color-ink) 38%, transparent);
+  --shadow-xl: 0 32px 64px -32px color-mix(in srgb, var(--color-ink) 42%, transparent);
+  --shadow-2xl: 0 40px 80px -40px color-mix(in srgb, var(--color-ink) 46%, transparent);
 
   /* --- Radius scale: the site is square-cornered ---
      Every step is pinned to 0, so `rounded-xs` … `rounded-4xl` — including the ones the
      shadcn/ui primitives and any future component emit — render with no radius at all.
      `rounded-full` is intentionally left alone: it is `calc(infinity * 1px)`, not a token, and
-     the genuinely circular elements (avatars, icon medallions, accordion +/−, list markers,
-     blurred background glows) stay round. */
+     the genuinely circular elements (avatars, icon medallions, accordion +/−, list markers)
+     stay round. */
   --radius-xs: 0px;
   --radius-sm: 0px;
   --radius-md: 0px;
@@ -96,50 +175,57 @@
   --radius: 0px;
 
   /* The global site background — pure white. */
-  --background: #ffffff;
-  --foreground: #04151f;
+  /* Every value below is one of the six brand colours or a tint already defined
+     in `@theme` — the semantic layer adds names, never new hues. */
+  --background: var(--color-paper);
+  --foreground: var(--color-ink);
 
-  --card: #ffffff;
-  --card-foreground: #04151f;
+  --card: var(--color-paper);
+  --card-foreground: var(--color-ink);
 
-  --popover: #ffffff;
-  --popover-foreground: #04151f;
+  --popover: var(--color-paper);
+  --popover-foreground: var(--color-ink);
 
-  --primary: #1d3557;
-  --primary-foreground: #f8f9fa;
+  --primary: var(--color-ink);
+  --primary-foreground: var(--color-paper);
 
-  --secondary: #F7A230;
-  --secondary-foreground: #04151f;
+  --secondary: var(--color-mist);
+  --secondary-foreground: var(--color-ink);
 
-  --muted: #eaeeee;
-  --muted-foreground: #283618;
+  --muted: var(--color-mist-60);
+  --muted-foreground: var(--color-slate-80);
 
-  --accent: #F7A230;
-  --accent-foreground: #04151f;
+  /* The accent slot is the ember wash, not the ember itself: shadcn paints
+     hover/focus fills with it, and a wash keeps ink copy at 11.59:1. */
+  --accent: var(--color-sage-20);
+  --accent-foreground: var(--color-ink);
 
-  --destructive: #a4243b;
-  --destructive-foreground: #f8f9fa;
+  --destructive: var(--color-sage-90);
+  --destructive-foreground: var(--color-paper);
 
-  --border: #dde3e4;
-  --input: #d5dcde;
-  --ring: #283618;
+  --border: var(--color-slate-20);
+  /* Form fields sit white-on-white, so the border is the only thing that draws
+     the component: `slate` (4.83:1) rather than the decorative hairline tint,
+     which would fall under the 3:1 a UI boundary needs. */
+  --input: var(--color-slate);
+  --ring: var(--color-deep);
 
-  --chart-1: #1d3557;
-  --chart-2: #283618;
-  --chart-3: #F7A230;
-  --chart-4: #04151f;
-  --chart-5: #5a6b47;
+  --chart-1: var(--color-ink);
+  --chart-2: var(--color-deep);
+  --chart-3: var(--color-haze);
+  --chart-4: var(--color-slate);
+  --chart-5: var(--color-sage);
 
-  --sidebar: #f8f9fa;
-  --sidebar-foreground: #04151f;
-  --sidebar-primary: #1d3557;
-  --sidebar-primary-foreground: #f8f9fa;
-  --sidebar-accent: #F7A230;
-  --sidebar-accent-foreground: #04151f;
-  --sidebar-border: #dde3e4;
-  --sidebar-ring: #283618;
+  --sidebar: var(--color-mist);
+  --sidebar-foreground: var(--color-ink);
+  --sidebar-primary: var(--color-ink);
+  --sidebar-primary-foreground: var(--color-paper);
+  --sidebar-accent: var(--color-sage-20);
+  --sidebar-accent-foreground: var(--color-ink);
+  --sidebar-border: var(--color-slate-20);
+  --sidebar-ring: var(--color-deep);
 
-  /* Shared responsive type scale for short-form descriptions, reduced 2px from the original lead scale. */
+  /* Shared responsive type scale for short-form descriptions. */
   --font-size-description: clamp(0.9375rem, 0.82rem + 0.45vw, 1.25rem);
 
   /* Fluid page gutter: ~16px on a 5" phone, ~32px on a tablet, ~48–72px on a TV.
@@ -148,6 +234,17 @@
   --page-gutter-left: max(var(--page-gutter), env(safe-area-inset-left, 0px));
   --page-gutter-right: max(var(--page-gutter), env(safe-area-inset-right, 0px));
   --section-space: clamp(3.25rem, 1.8rem + 4vw, 8rem);
+
+  /* --- Imagery treatment (one grade, one plate, one scrim, one frame) --- */
+  --image-grade: saturate(0.94) contrast(1.035);
+  --image-plate: var(--color-mist);
+  --image-frame: inset 0 0 0 1px color-mix(in srgb, var(--color-ink) 9%, transparent);
+  --scrim-ink: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--color-ink) 88%, transparent) 0%,
+    color-mix(in srgb, var(--color-ink) 58%, transparent) 42%,
+    transparent 76%
+  );
 
   /* Runtime column widths — same tokens as @theme, so the large-canvas media
      queries further down can widen them without fighting the theme layer. */
@@ -158,42 +255,49 @@
 /* Dark palette is defined so flipping next-themes to dark never produces an
    unreadable page, even though the shipped design is light-first. */
 .dark {
-  --background: #04151f;
-  --foreground: #f8f9fa;
+  /* Surfaces are ink lifted with a little haze — the same move the booking panel
+     and the dark inquiry form make with `bg-ink-80`, so a dark scheme needs no
+     colours of its own either. */
+  --surface-raised: color-mix(in srgb, var(--color-ink) 88%, var(--color-haze));
+  --surface-sunken: color-mix(in srgb, var(--color-ink) 80%, var(--color-haze));
+  --hairline-on-dark: color-mix(in srgb, var(--color-ink) 72%, var(--color-haze));
 
-  --card: #0b202e;
-  --card-foreground: #f8f9fa;
+  --background: var(--color-ink);
+  --foreground: var(--color-mist);
 
-  --popover: #0b202e;
-  --popover-foreground: #f8f9fa;
+  --card: var(--surface-raised);
+  --card-foreground: var(--color-mist);
 
-  --primary: #F7A230;
-  --primary-foreground: #04151f;
+  --popover: var(--surface-raised);
+  --popover-foreground: var(--color-mist);
 
-  --secondary: #1d3557;
-  --secondary-foreground: #f8f9fa;
+  --primary: var(--color-mist);
+  --primary-foreground: var(--color-ink);
 
-  --muted: #112838;
-  --muted-foreground: #a8b7c5;
+  --secondary: var(--surface-sunken);
+  --secondary-foreground: var(--color-mist);
 
-  --accent: #1d3557;
-  --accent-foreground: #f8f9fa;
+  --muted: var(--surface-sunken);
+  --muted-foreground: var(--color-haze);
 
-  --destructive: #d2637a;
-  --destructive-foreground: #04151f;
+  --accent: var(--surface-sunken);
+  --accent-foreground: var(--color-mist);
 
-  --border: #1d3557;
-  --input: #1d3557;
-  --ring: #F7A230;
+  --destructive: var(--color-sage-light);
+  --destructive-foreground: var(--color-ink);
 
-  --sidebar: #04151f;
-  --sidebar-foreground: #f8f9fa;
-  --sidebar-primary: #F7A230;
-  --sidebar-primary-foreground: #04151f;
-  --sidebar-accent: #1d3557;
-  --sidebar-accent-foreground: #f8f9fa;
-  --sidebar-border: #1d3557;
-  --sidebar-ring: #F7A230;
+  --border: var(--hairline-on-dark);
+  --input: var(--hairline-on-dark);
+  --ring: var(--color-haze);
+
+  --sidebar: var(--color-ink);
+  --sidebar-foreground: var(--color-mist);
+  --sidebar-primary: var(--color-haze);
+  --sidebar-primary-foreground: var(--color-ink);
+  --sidebar-accent: var(--surface-sunken);
+  --sidebar-accent-foreground: var(--color-mist);
+  --sidebar-border: var(--hairline-on-dark);
+  --sidebar-ring: var(--color-haze);
 }
 
 @theme inline {
@@ -248,7 +352,9 @@
   --color-sidebar-ring: var(--sidebar-ring);
 
   --font-sans: var(--font-archivo), 'Archivo', system-ui, sans-serif;
-  --font-heading: var(--font-google-sans-flex), 'Google Sans Flex', system-ui, sans-serif;
+  --font-heading: var(--font-archivo), 'Archivo', system-ui, sans-serif;
+  --font-display: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
+  --font-serif-accent: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
 }
 
 /* ==========================================================================
@@ -285,7 +391,7 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    /* Archivo Light is the locked body weight. */
+    /* Archivo Light is the body weight: quiet, even colour on a white page. */
     font-weight: 300;
     font-feature-settings:
       'kern' 1,
@@ -307,6 +413,14 @@
   video,
   iframe {
     max-width: 100%;
+  }
+
+  /* One photographic grade for the whole archive, so uploads shot years apart
+     and in different light hang together on the page. Scoped to `#main`: the
+     header logo and the admin keep their own treatment. */
+  #main img,
+  #main video {
+    filter: var(--image-grade);
   }
 
   h1,
@@ -331,7 +445,7 @@
   }
 
   ::selection {
-    @apply bg-sage text-ink;
+    @apply bg-sage-20 text-ink;
   }
 }
 
@@ -375,54 +489,64 @@
   padding-inline: var(--container-gutter-offset);
 }
 
-/* Eyebrow / kicker label above headings. */
+/* Eyebrow / kicker label above headings. A label, not a heading: it stays in
+   the text face at 12px with generous tracking, in the darker taupe (`slate-80`,
+   5.58:1 on paper and 5.17:1 on the mist panels it sometimes sits on — plain
+   `slate` measures 4.47:1 there and misses AA). Faces that sit on a dark
+   section override the colour with `text-mist`. */
 @utility eyebrow {
   font-family: var(--font-heading);
   font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  font-weight: 500;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--color-slate);
+  color: var(--color-slate-80);
 }
 
+/* --- Display tier: Instrument Serif, one weight, generous leading ---
+   Serif display against Archivo text is the whole editorial voice of the site.
+   The face ships a single 400 cut, so the weight is pinned and the tracking
+   opens up slightly — a high-contrast display serif squeezed with negative
+   tracking is the first thing that makes a page look cheap. */
 @utility heading-display {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.02;
-  font-size: clamp(2.125rem, 1.15rem + 4.2vw, 4.75rem);
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  line-height: 1.03;
+  font-size: clamp(2.25rem, 1.25rem + 4.2vw, 4.75rem);
   @media (width >= 120rem) {
     font-size: clamp(4.75rem, 2.2rem + 2.1vw, 7rem);
   }
 }
 
 @utility heading-xl {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  letter-spacing: -0.025em;
-  line-height: 1.06;
-  font-size: clamp(1.75rem, 1.15rem + 2.4vw, 3.5rem);
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.07;
+  font-size: clamp(1.9375rem, 1.25rem + 2.4vw, 3.5rem);
   @media (width >= 120rem) {
     font-size: clamp(3.5rem, 1.8rem + 1.4vw, 5rem);
   }
 }
 
 @utility heading-lg {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.002em;
   line-height: 1.12;
-  font-size: clamp(1.4rem, 1.1rem + 1.2vw, 2.4rem);
+  font-size: clamp(1.625rem, 1.25rem + 1.3vw, 2.5rem);
   @media (width >= 120rem) {
-    font-size: clamp(2.4rem, 1.4rem + 0.9vw, 3.25rem);
+    font-size: clamp(2.5rem, 1.5rem + 0.9vw, 3.25rem);
   }
 }
 
+/* --- Text tier: Archivo, the working voice of the site --- */
 @utility heading-md {
   font-family: var(--font-heading);
   font-weight: 600;
   letter-spacing: -0.015em;
-  line-height: 1.2;
+  line-height: 1.22;
   font-size: clamp(1.15rem, 1.05rem + 0.5vw, 1.6rem);
   @media (width >= 120rem) {
     font-size: clamp(1.6rem, 1.1rem + 0.4vw, 2rem);
@@ -442,14 +566,14 @@
 
 @utility lead {
   font-size: var(--font-size-description);
-  line-height: 1.65;
+  line-height: 1.7;
   font-weight: 300;
   color: var(--color-ink-60);
 }
 
-/* Subtle sage highlighter behind a phrase in a heading. */
+/* Quiet ember highlighter behind a phrase in a heading. */
 @utility mark-sage {
-  background-image: linear-gradient(to top, var(--color-sage-40) 38%, transparent 38%);
+  background-image: linear-gradient(to top, var(--color-sage-40) 34%, transparent 34%);
   padding-inline: 0.08em;
 }
 
@@ -466,7 +590,20 @@
   }
 }
 
-/* Thin gradient rule used to separate sections. */
+/* Hairline rule used to separate sections — one colour, faded at both ends so
+   it never terminates in a hard tick against the gutter. */
+@utility rule-hairline {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--color-slate-20) 12%,
+    var(--color-slate-20) 88%,
+    transparent
+  );
+}
+
+/* Kept under its historic name for any component that already carries it. */
 @utility rule-sage {
   height: 1px;
   background: linear-gradient(
@@ -478,6 +615,21 @@
   );
 }
 
+/* --- Imagery treatment ---------------------------------------------------
+   `photo-plate` is the frame every photograph sits in: a paper background that
+   shows while the file loads, and a 1px ink hairline instead of a drop shadow.
+   `photo-scrim` is the one navy gradient allowed under copy on an image. */
+@utility photo-plate {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--image-plate);
+  box-shadow: var(--image-frame);
+}
+
+@utility photo-scrim {
+  background-image: var(--scrim-ink);
+}
+
 /* ==========================================================================
    Rich text (rendered from Payload Lexical) — no client JS required
    ========================================================================== */
@@ -486,10 +638,10 @@
     @apply text-ink;
   }
   .prose-hg > * + * {
-    margin-top: 1.1em;
+    margin-top: 1.15em;
   }
   .prose-hg h2 {
-    @apply heading-md mt-12 text-ink;
+    @apply heading-md mt-14 text-ink;
   }
   .prose-hg h3 {
     font-family: var(--font-heading);
@@ -505,14 +657,14 @@
     @apply mt-8 text-ink;
   }
   .prose-hg p {
-    @apply leading-[1.75] text-ink-80;
+    @apply leading-[1.78] text-ink-80;
   }
   .prose-hg a {
-    @apply text-deep underline decoration-sage decoration-2 underline-offset-4 transition-colors hover:text-ink;
+    @apply text-deep underline decoration-slate-40 decoration-1 underline-offset-4 transition-colors hover:text-deep-80 hover:decoration-deep;
   }
   .prose-hg ul,
   .prose-hg ol {
-    @apply space-y-2 pl-5;
+    @apply space-y-2.5 pl-5;
   }
   .prose-hg ul {
     @apply list-disc;
@@ -521,20 +673,20 @@
     @apply list-decimal;
   }
   .prose-hg li {
-    @apply leading-[1.7] text-ink-80;
+    @apply leading-[1.72] text-ink-80;
     padding-left: 0.25rem;
   }
   .prose-hg li::marker {
-    color: var(--color-slate);
+    color: var(--color-slate-40);
   }
   .prose-hg blockquote {
     @apply border-l-2 border-sage pl-6 text-lg leading-relaxed text-ink;
   }
   .prose-hg hr {
-    @apply my-10 border-slate-20;
+    @apply my-12 border-slate-20;
   }
   .prose-hg strong {
-    @apply font-semibold text-ink;
+    @apply font-medium text-ink;
   }
   /* Tables — inserted from the ribbon's `+ → Table` dialog (Payload's Lexical table feature)
      and rendered by src/components/content/rich-text.tsx. The wrapper scrolls a grid that is
@@ -557,24 +709,24 @@
   }
   .prose-hg :is(th, td) {
     border: 1px solid var(--color-slate-20);
-    padding: 0.65rem 0.85rem;
+    padding: 0.7rem 0.85rem;
     text-align: left;
     vertical-align: top;
   }
   /* Header rows and columns are the editor's choice (cell menu → “Toggle Row/Column Header”),
      and an inline `vertical-align` or `background-color` it sets still wins over these. */
   .prose-hg th {
-    @apply font-semibold text-ink;
-    --table-cell-bg: var(--color-sage-20);
+    @apply font-medium text-ink;
+    --table-cell-bg: var(--color-mist);
     background-color: var(--table-cell-bg);
   }
   .prose-hg table.is-striped tbody tr:nth-of-type(even) {
-    --table-cell-bg: var(--color-mist);
+    --table-cell-bg: var(--color-mist-40);
     background-color: var(--table-cell-bg);
   }
   /* “Toggle First Column Freeze” in the cell menu pins the leading column, so a grid wide
      enough to scroll keeps its row labels in view. Collapsed borders belong to the table and do
-     not travel with a sticky cell — the shadow redraws the one edge that matters. */
+     not travel with a sticky cell — the hairline redraws the one edge that matters. */
   .prose-hg table[data-frozen-columns] :is(th, td):first-child {
     position: sticky;
     left: 0;
@@ -588,38 +740,40 @@
     margin-top: 0.4em;
   }
   .prose-hg :is(th, td) :is(p, li) {
-    @apply leading-[1.6];
+    @apply leading-[1.62];
   }
   .prose-hg figure {
-    @apply my-10;
+    @apply my-12;
   }
   .prose-hg figcaption {
-    @apply mt-3 text-sm text-slate;
+    @apply mt-3.5 text-sm text-slate;
   }
 }
 
 /* ==========================================================================
    Single pages — running copy for trips, blog posts, destinations & CMS pages
    ==========================================================================
-   One pixel above the site body size (16px → 17px) and pure black, so long-form
-   reading copy is as legible as possible on the white page.
+   One pixel above the site body size (16px → 17px) in ink, so long-form
+   reading copy is as legible as possible on the white page (13.45:1) without
+   the harshness of pure black.
 
    Only elements that inherit their type inherit this — headings, eyebrows, links,
-   captions, meta rows and UI accents keep their own size and colour. */
+   captions, meta rows and UI accents keep their own size and colour.
+   ========================================================================== */
 @layer components {
   .single-page-body {
     font-size: 1.0625rem; /* 1rem body size + 1px */
-    color: #000000;
+    color: var(--color-ink);
   }
 
   /* `prose-hg` tints its running copy with ink-80 for the multi-purpose rich-text
      contexts; inside a single page the paragraphs, list items and bold runs are
-     pure black instead. Headings, quotes and links keep their own colours. */
+     full ink instead. Headings, quotes and links keep their own colours. */
   .single-page-body .prose-hg,
   .single-page-body .prose-hg p,
   .single-page-body .prose-hg li,
   .single-page-body .prose-hg strong {
-    color: #000000;
+    color: var(--color-ink);
   }
 }
 
@@ -629,12 +783,12 @@
 @layer components {
   .blog-prose > p:first-child::first-letter {
     float: left;
-    margin: 0.12em 0.12em 0 0;
-    color: var(--color-deep);
-    font-family: var(--font-heading);
-    font-size: 4.1em;
-    font-weight: 600;
-    line-height: 0.72;
+    margin: 0.1em 0.14em 0 0;
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-size: 4.4em;
+    font-weight: 400;
+    line-height: 0.74;
   }
 
   .blog-prose h2[id],
@@ -645,40 +799,41 @@
   .blog-prose h2[id]::before {
     display: block;
     width: 2.25rem;
-    height: 2px;
-    margin-bottom: 1rem;
-    background: linear-gradient(to right, var(--color-deep), var(--color-sage));
+    height: 1px;
+    margin-bottom: 1.25rem;
+    background: var(--color-slate-40);
     content: '';
   }
 
   .blog-prose blockquote {
     position: relative;
-    margin-block: 2.5rem;
+    margin-block: 2.75rem;
     border: 0;
-    border-left: 2px solid var(--color-deep);
-    background: var(--color-sage-20);
-    padding: 1.5rem 1.5rem 1.5rem 2rem;
-    font-family: var(--font-heading);
-    font-size: clamp(1.125rem, 1rem + 0.45vw, 1.375rem);
-    line-height: 1.55;
+    border-left: 2px solid var(--color-sage);
+    background: var(--color-mist);
+    padding: 1.75rem 1.75rem 1.75rem 2rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.625rem);
+    line-height: 1.45;
   }
 
   .blog-prose blockquote p {
     color: var(--color-ink);
-    font-family: var(--font-heading);
-    font-weight: 500;
+    font-family: var(--font-display);
+    font-weight: 400;
   }
 
+  /* Photographs in an article hang on a hairline, not on a shadow. */
   .blog-prose figure > div {
-    box-shadow: 0 1.25rem 3rem rgb(4 21 31 / 9%);
+    box-shadow: var(--image-frame);
   }
 
   .blog-prose figcaption {
-    border-left: 2px solid var(--color-sage);
+    border-left: 1px solid var(--color-slate-40);
     padding-left: 0.875rem;
     text-align: left;
     font-size: 0.8125rem;
-    line-height: 1.5;
+    line-height: 1.55;
   }
 
   .blog-prose hr {
@@ -767,11 +922,11 @@
 /* Short landscape phones (5–6" rotated): keep hero copy inside the viewport. */
 @media (max-height: 500px) and (orientation: landscape) {
   .heading-display {
-    font-size: clamp(1.6rem, 8vh, 2.4rem);
+    font-size: clamp(1.75rem, 8vh, 2.5rem);
   }
 
   .heading-xl {
-    font-size: clamp(1.35rem, 6.5vh, 2rem);
+    font-size: clamp(1.5rem, 6.5vh, 2.1rem);
   }
 }
 

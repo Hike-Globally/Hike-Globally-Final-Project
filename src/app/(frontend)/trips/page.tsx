@@ -57,28 +57,28 @@ export default async function TripsPage() {
           aria-hidden="true"
           className="-z-20 object-cover"
         />
-        <div
-          className="absolute inset-0 -z-10 bg-gradient-to-t from-ink/95 via-ink/55 to-ink/30"
-          aria-hidden="true"
-        />
+        {/* One flat navy wash plus the shared photo scrim — the same recipe every
+            other photographic header on the site uses. */}
+        <div className="absolute inset-0 -z-10 bg-ink/72" aria-hidden="true" />
+        <div className="photo-scrim absolute inset-0 -z-10" aria-hidden="true" />
 
         <div className="container-content relative w-full pt-32 pb-14 md:pb-20">
           <Breadcrumbs
             items={[{ label: dict.nav.home, href: sitePath('/') }, { label: dict.nav.trips }]}
           />
 
-          <p className="eyebrow mt-10 text-sage">Nepal, one trail at a time</p>
+          <p className="eyebrow mt-10 text-mist">Nepal, one trail at a time</p>
           <h1 id="trips-heading" className="heading-display mt-5 max-w-4xl text-white">
             {dict.trips.listingTitle}
           </h1>
-          <p className="lead trips-hero-lead mt-6 max-w-2xl text-mist/80">
+          <p className="lead trips-hero-lead mt-6 max-w-2xl text-mist">
             {dict.trips.listingSubtitle}
           </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4">
             <Link
               href="#trips"
-              className="group inline-flex items-center gap-3 border-b border-sage/70 pb-2 text-sm font-medium text-white transition-colors hover:border-white"
+              className="group inline-flex items-center gap-3 border-b border-mist/45 pb-2 text-sm font-medium text-white transition-colors hover:border-mist"
             >
               {dict.trips.filterTitle}
               <ArrowDown

@@ -4,7 +4,9 @@
    The sphere is painted on a canvas (see `globe-canvas.tsx`); this file only
    styles the frame, the HTML destination labels and the pre-hydration
    placeholder. All colours stay inside the locked brand palette — the canvas
-   uses the same deep/ink values for the ocean and amber for pins and routes.
+   paints the ocean in ink lit with expedition blue, the atmosphere and routes
+   in haze, and the pins in ember; the placeholder below is the same sphere in
+   CSS, mixed from the same tokens.
 
    Background: NONE. The frame, the canvas and the placeholder layer are all
    transparent — only the circular globe (and its limb-hugging atmosphere,
@@ -30,7 +32,7 @@
 /* Circular focus ring around the sphere for keyboard visitors. */
 .globe-frame:focus-visible {
   border-radius: 9999px;
-  outline: 2px solid var(--color-sage);
+  outline: 2px solid var(--color-haze);
   outline-offset: -6px;
   outline-style: dashed;
 }
@@ -43,14 +45,14 @@
   white-space: nowrap;
   font-family: var(--font-heading);
   font-size: 0.6875rem;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgb(248 249 250 / 80%);
+  color: color-mix(in srgb, var(--color-mist) 90%, transparent);
   text-shadow:
-    0 1px 10px rgb(4 21 31 / 95%),
-    0 0 2px rgb(4 21 31 / 90%);
+    0 1px 10px color-mix(in srgb, var(--color-ink) 94%, transparent),
+    0 0 2px color-mix(in srgb, var(--color-ink) 88%, transparent);
   will-change: transform, opacity;
 }
 
@@ -71,17 +73,19 @@
   width: 79%;
   aspect-ratio: 1;
   border-radius: 50%;
-  border: 1px solid rgb(247 162 48 / 25%);
+  border: 1px solid color-mix(in srgb, var(--color-haze) 32%, transparent);
+  /* The same ocean ramp the canvas paints: ink lit with expedition blue,
+     stepping down to plain ink at the terminator. */
   background: radial-gradient(
     circle at 35% 28%,
-    #2f567c 0%,
-    #1b3a58 38%,
-    #0c2236 72%,
-    #04151f 100%
+    color-mix(in srgb, var(--color-ink) 55%, var(--color-deep)) 0%,
+    color-mix(in srgb, var(--color-ink) 74%, var(--color-deep)) 38%,
+    color-mix(in srgb, var(--color-ink) 89%, var(--color-deep)) 72%,
+    var(--color-ink) 100%
   );
   /* Kept tight to match the renderer's atmosphere (≈1.22× the sphere radius,
      fading to fully transparent) instead of a wide wash behind the globe. */
   box-shadow:
-    0 0 52px -10px rgb(247 162 48 / 38%),
-    inset 0 0 60px 10px rgb(4 21 31 / 35%);
+    0 0 52px -10px color-mix(in srgb, var(--color-haze) 42%, transparent),
+    inset 0 0 60px 10px color-mix(in srgb, var(--color-ink) 35%, transparent);
 }

@@ -16,11 +16,11 @@ import './cta.css'
  * ============================================================================
  * CTA CARD — the closing card immediately before the footer
  * ============================================================================
- * A cinematic, photographic card: a lone trekker crossing the Khumbu at dusk
- * under a slow Ken Burns drift, topographic contours, film grain and a
- * rotating expedition stamp — with the CMS copy (eyebrow, heading, text,
- * button) set over the top. All of the theatre lives in `cta.css`, scoped
- * under `[data-cta-card]`; this file only composes it.
+ * A photographic card: a lone trekker crossing the Khumbu at dusk under the
+ * site's single navy scrim, with printed topographic contours, an expedition
+ * stamp and the CMS copy (eyebrow, heading, text, button) set over the top.
+ * The composition lives in `cta.css`, scoped under `[data-cta-card]`; this file
+ * only assembles it.
  *
  * Two callers share the card so the homepage looks identical whichever way
  * it renders:
@@ -30,7 +30,7 @@ import './cta.css'
  *     CMS `home` page exists yet.
  *
  * The CMS `variant` still chooses the light: `dark` (default) is the dusk
- * photograph, `sage` washes it in brand green, `light` in morning mist.
+ * photograph under navy, `sage` washes it in the brand ember, `light` in paper.
  */
 
 export type CtaCardLink = {
@@ -138,8 +138,8 @@ export function CtaCard({
               aria-labelledby={titleId}
               className="relative"
             >
-              {/* Photograph + light. The zoom wrapper and the drifting image are
-                nested on purpose: their transforms compose into one motion. */}
+              {/* Photograph + light. The zoom wrapper and the image are nested so
+                the one slow hover zoom composes over a still photograph. */}
               <div className="cta-card__media" aria-hidden="true">
                 <div className="cta-card__zoom">
                   <Image
@@ -152,7 +152,6 @@ export function CtaCard({
                 </div>
               </div>
               <div className="cta-card__scrim" aria-hidden="true" />
-              <div className="cta-card__glow" aria-hidden="true" />
               <TopoContours />
               <span className="cta-card__topline" aria-hidden="true" />
 
@@ -188,7 +187,7 @@ export function CtaCard({
                         <Button
                           asChild
                           size="lg"
-                          variant={variant === 'dark' ? 'sage' : 'default'}
+                          variant={variant === 'dark' ? 'paper' : 'default'}
                           className="cta-card__button group h-[3.25rem] px-8 text-base"
                         >
                           {external || link.newTab ? (

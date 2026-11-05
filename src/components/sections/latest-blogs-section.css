@@ -16,18 +16,19 @@
 
    Everything is scoped to `[data-blog-dispatch]` (set once in
    `latest-blogs-section.tsx`), so no other surface picks these rules up.
-   Square corners, the five brand colours only, and every animation stops under
+   Square corners, the brand tokens only, and every animation stops under
    `prefers-reduced-motion` — the house rules.
 
-   The motion budget goes to four things, and only four:
-     1. the lead plate breathes on a slow 30s Ken Burns loop, and zooms a little
-        further when the card is hovered;
-     2. an index row wipes a sage wash behind itself, fills its waypoint, lights
-        up its stretch of the route line and slides its copy 6px to the right;
+   The motion budget goes to three things, and only three:
+     1. the lead plate zooms a little when the card is hovered (the always-on
+        Ken Burns drift is retired — a still photograph reads calmer);
+     2. an index row wipes a sheet of white behind itself, fills its waypoint,
+        lights up its stretch of the route line and slides its copy 6px right;
      3. a spring-driven preview plate follows the cursor down the index and
         cross-fades to the hovered story (desktop + fine pointer only — the
-        gating lives in `blog-dispatch-board.tsx`);
-     4. a sage rule draws across the foot of the lead plate on hover.
+        gating lives in `blog-dispatch-board.tsx`).
+   A fourth detail, the ember rule across the foot of the lead plate, draws
+   itself on hover — that is a transition, not a loop.
 
    Hover choreography is gated behind `(hover: hover) and (pointer: fine)` so a
    thumb tap never leaves a card stuck in its hovered state; `:focus-within`
@@ -43,14 +44,15 @@
 
 /* ---------------------------------------------------------------------------
    Topographic wash — contour lines behind the section (see the `<svg>` in
-   `latest-blogs-section.tsx`). Faded out with a radial mask so it reads as
-   paper texture in the corner rather than as an illustration.
+   `latest-blogs-section.tsx`), printed in the cool haze blue so they read as
+   cartography on the paper band rather than as a second accent colour. Faded
+   out with a radial mask.
    --------------------------------------------------------------------------- */
 [data-blog-dispatch] .lb-topo {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  color: var(--color-sage);
+  color: var(--color-haze);
   pointer-events: none;
 }
 
@@ -60,36 +62,32 @@
   right: -6%;
   width: min(84rem, 96%);
   height: auto;
-  opacity: 0.5;
+  opacity: 0.55;
+  /* Masks read the alpha channel, so the stops are brand ink rather than bare
+     black — nothing in this file sits outside the palette. */
   -webkit-mask-image: radial-gradient(
     56% 64% at 72% 24%,
-    #000 0%,
-    rgb(0 0 0 / 55%) 44%,
+    var(--color-ink) 0%,
+    color-mix(in srgb, var(--color-ink) 55%, transparent) 44%,
     transparent 76%
   );
-  mask-image: radial-gradient(56% 64% at 72% 24%, #000 0%, rgb(0 0 0 / 55%) 44%, transparent 76%);
+  mask-image: radial-gradient(
+    56% 64% at 72% 24%,
+    var(--color-ink) 0%,
+    color-mix(in srgb, var(--color-ink) 55%, transparent) 44%,
+    transparent 76%
+  );
 }
 
 /* ---------------------------------------------------------------------------
    Lead plate
    --------------------------------------------------------------------------- */
-/* The slow, always-on Ken Burns. It sits on a *wrapper* and the hover zoom sits
-   on the image inside it, so the two transforms compose instead of fighting
-   over the same property. */
-[data-blog-dispatch] .lb-breath {
-  animation: lb-breathe 30s ease-in-out infinite alternate;
-}
+/* The wrapper that used to carry the always-on Ken Burns drift. It stays in the
+   markup (the hover zoom on the image inside it composes over it) and simply
+   holds still. */
 
-@keyframes lb-breathe {
-  from {
-    transform: scale(1) translate3d(0, 0, 0);
-  }
-  to {
-    transform: scale(1.07) translate3d(0, -1.4%, 0);
-  }
-}
-
-/* Sage rule drawn across the foot of the plate on hover/focus. */
+/* Ember rule drawn across the foot of the plate on hover/focus — the board's
+   one warm accent. */
 [data-blog-dispatch] .lb-lead-rule {
   transform: scaleX(0);
   transform-origin: left center;
@@ -109,7 +107,7 @@
   line-height: 0.8;
 }
 
-/* Pulsing "fresh" marker inside the category flag. */
+/* "Fresh" marker inside the category flag: one still ember dot. */
 [data-blog-dispatch] .lb-live {
   position: relative;
   display: block;
@@ -117,28 +115,7 @@
   height: 6px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: currentColor;
-}
-
-[data-blog-dispatch] .lb-live::after {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: currentColor;
-  animation: lb-ping 2.8s var(--lb-ease) infinite;
-  content: '';
-}
-
-@keyframes lb-ping {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.55;
-  }
-  60% {
-    transform: scale(2.8);
-    opacity: 0;
-  }
+  background: var(--color-sage);
 }
 
 /* ---------------------------------------------------------------------------
@@ -158,9 +135,9 @@
   z-index: -1;
   background: linear-gradient(
     90deg,
-    var(--color-sage-20) 0%,
-    rgb(253 240 218 / 45%) 58%,
-    rgb(253 240 218 / 0%) 100%
+    var(--color-card) 0%,
+    color-mix(in srgb, var(--color-card) 55%, transparent) 58%,
+    color-mix(in srgb, var(--color-card) 0%, transparent) 100%
   );
   transform: scaleX(0);
   transform-origin: left center;
@@ -186,8 +163,20 @@
   left: 0.9375rem; /* half of the 1.875rem waypoint box */
   width: 1px;
   background-color: var(--color-slate-20);
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
-  mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    var(--color-ink) 14%,
+    var(--color-ink) 86%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    var(--color-ink) 14%,
+    var(--color-ink) 86%,
+    transparent
+  );
   transition: background-color 0.45s var(--lb-ease);
 }
 
@@ -198,7 +187,7 @@
 [data-blog-dispatch] .lb-row:focus-within .lb-row-rail {
   width: 2px;
   margin-left: -0.5px;
-  background-color: var(--color-deep);
+  background-color: var(--color-ink);
 }
 
 [data-blog-dispatch] .lb-row:first-child .lb-row-rail {
@@ -230,14 +219,14 @@
 }
 
 [data-blog-dispatch] .lb-row:focus-within .lb-node {
-  background: var(--color-deep);
-  border-color: var(--color-deep);
+  background: var(--color-ink);
+  border-color: var(--color-ink);
   color: var(--color-mist);
 }
 
 /* Thumbnail zoom + sage hairline on hover/focus. */
 [data-blog-dispatch] .lb-row-thumb {
-  border: 1px solid rgb(4 21 31 / 10%);
+  border: 1px solid var(--color-slate-20);
   transition: border-color 0.4s var(--lb-ease);
 }
 
@@ -271,10 +260,7 @@
   aspect-ratio: 4 / 5;
   overflow: hidden;
   background: var(--color-ink);
-  box-shadow:
-    0 26px 60px -26px rgb(4 21 31 / 55%),
-    0 3px 10px rgb(4 21 31 / 18%),
-    inset 0 0 0 1px rgb(255 255 255 / 14%);
+  box-shadow: var(--shadow-lg);
   transform: translate(-50%, -50%) scale(0.9) rotate(0deg);
   transition: transform 0.65s var(--lb-ease);
 }
@@ -301,12 +287,16 @@
   inset-inline: 0;
   bottom: 0;
   padding: 0.5rem 0.75rem;
-  background: linear-gradient(to top, rgb(4 21 31 / 92%), rgb(4 21 31 / 0%));
-  color: var(--color-sage);
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--color-ink) 92%, transparent),
+    color-mix(in srgb, var(--color-ink) 0%, transparent)
+  );
+  color: var(--color-mist);
   font-family: var(--font-heading);
   font-size: 0.625rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  font-weight: 500;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
@@ -327,8 +317,8 @@
   }
 
   [data-blog-dispatch] .lb-row:hover .lb-node {
-    background: var(--color-deep);
-    border-color: var(--color-deep);
+    background: var(--color-ink);
+    border-color: var(--color-ink);
     color: var(--color-mist);
   }
 
@@ -343,11 +333,6 @@
    so nothing here has to hide it.
    --------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
-  [data-blog-dispatch] .lb-breath,
-  [data-blog-dispatch] .lb-live::after {
-    animation: none !important;
-  }
-
   [data-blog-dispatch] .lb-lead-rule,
   [data-blog-dispatch] .lb-row::before,
   [data-blog-dispatch] .lb-row-rail,

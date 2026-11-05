@@ -1,22 +1,21 @@
 /* ==========================================================================
-   Global footer — compact about and navigation columns over a dark
-   corner-glow gradient, followed by a copyright and creator-credit bar.
+   Global footer — about and navigation columns on flat navy, closed by a
+   copyright and creator-credit bar.
+
+   One colour, no gradient: the footer is the quietest surface on the site, so
+   it is solid `--color-ink` with a single haze hairline along its top edge and
+   hairline-separated columns. Everything on it is mist (12.44:1) or haze
+   (5.45:1) — both AA on navy.
    ========================================================================== */
 
 .hg-footer {
   position: relative;
   width: 100%;
   overflow: hidden;
-  color: #f8f9fa;
+  color: var(--color-mist);
   padding-bottom: env(safe-area-inset-bottom, 0px);
-  background-color: #04151f;
-  background-image: radial-gradient(
-    130% 135% at 100% 100%,
-    #1d3557 0%,
-    #162b47 30%,
-    #102138 55%,
-    #04151f 80%
-  );
+  background-color: var(--color-ink);
+  border-top: 1px solid color-mix(in srgb, var(--color-haze) 24%, transparent);
 }
 
 /* The About statement is set at a fixed 16px rather than the fluid description
@@ -26,25 +25,49 @@
   font-size: 16px;
 }
 
-/* Boxed social icons — the small outlined rounded chips of the sample. The
-   8px radius is deliberate: it is part of the ported design even though the
-   rest of the site is square-cornered. */
+/* Column headings: the text face at 500 with a touch of tracking, in mist. They
+   are headings, so they keep the case the editor wrote them in. */
+.hg-footer__heading {
+  font-family: var(--font-heading);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  color: var(--color-mist);
+}
+
+/* A hairline between the link row and the legal bar. */
+.hg-footer__rule {
+  height: 1px;
+  background-color: color-mix(in srgb, var(--color-haze) 20%, transparent);
+}
+
+/* Social icons — square hairline chips, matching the square-cornered site. */
 .hg-footer__social {
   display: grid;
   place-items: center;
-  width: 2.125rem;
-  height: 2.125rem;
+  width: 2.25rem;
+  height: 2.25rem;
   flex-shrink: 0;
-  border: 1px solid rgb(248 249 250 / 0.35);
-  border-radius: 8px;
-  color: #f8f9fa;
+  border: 1px solid color-mix(in srgb, var(--color-haze) 34%, transparent);
+  color: var(--color-mist);
   transition:
     border-color 0.2s var(--ease-brand),
-    background-color 0.2s var(--ease-brand);
+    background-color 0.2s var(--ease-brand),
+    color 0.2s var(--ease-brand);
 }
 
 .hg-footer__social:hover,
 .hg-footer__social:focus-visible {
-  border-color: rgb(248 249 250 / 0.85);
-  background-color: rgb(248 249 250 / 0.08);
+  border-color: var(--color-haze);
+  background-color: color-mix(in srgb, var(--color-haze) 14%, transparent);
+  color: var(--color-mist);
+}
+
+/* The credit line: one small heart drawn as a hairline glyph in the palette
+   rather than an emoji, so it renders identically on every platform. */
+.hg-footer__mark {
+  display: inline-block;
+  vertical-align: -0.125em;
+  color: var(--color-sage-light);
 }

@@ -67,28 +67,28 @@ export default async function BlogPage() {
           aria-hidden="true"
           className="-z-20 object-cover"
         />
-        <div
-          className="absolute inset-0 -z-10 bg-gradient-to-t from-ink/95 via-ink/55 to-ink/30"
-          aria-hidden="true"
-        />
+        {/* One flat navy wash plus the shared photo scrim — the same recipe every
+            other photographic header on the site uses. */}
+        <div className="absolute inset-0 -z-10 bg-ink/72" aria-hidden="true" />
+        <div className="photo-scrim absolute inset-0 -z-10" aria-hidden="true" />
 
         <div className="container-content relative w-full pt-32 pb-14 md:pb-20">
           <Breadcrumbs
             items={[{ label: dict.nav.home, href: sitePath('/') }, { label: dict.nav.blog }]}
           />
 
-          <p className="eyebrow mt-10 text-sage">{dict.blog.heroEyebrow}</p>
+          <p className="eyebrow mt-10 text-mist">{dict.blog.heroEyebrow}</p>
           <h1 id="blog-heading" className="heading-display mt-5 max-w-4xl text-white">
             {dict.blog.listingTitle}
           </h1>
-          <p className="lead blog-hero-lead mt-6 max-w-2xl text-mist/80">
+          <p className="lead blog-hero-lead mt-6 max-w-2xl text-mist">
             {dict.blog.listingSubtitle}
           </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4">
             <Link
               href="#journal"
-              className="group inline-flex items-center gap-3 border-b border-sage/70 pb-2 text-sm font-medium text-white transition-colors hover:border-white"
+              className="group inline-flex items-center gap-3 border-b border-mist/45 pb-2 text-sm font-medium text-white transition-colors hover:border-mist"
             >
               {dict.blog.browseJournal}
               <ArrowDown
@@ -96,7 +96,7 @@ export default async function BlogPage() {
                 aria-hidden="true"
               />
             </Link>
-            <span className="text-sm text-mist/70">{dict.blog.heroNote}</span>
+            <span className="text-sm text-mist/85">{dict.blog.heroNote}</span>
           </div>
         </div>
       </section>
@@ -108,7 +108,7 @@ export default async function BlogPage() {
       >
         <div className="container-content">
           {posts.length === 0 ? (
-            <div className="border border-dashed border-black/10 bg-mist p-8 text-center sm:p-12">
+            <div className="border border-dashed border-slate-40 bg-mist p-8 text-center sm:p-12">
               <h2 className="heading-md">{dict.common.noResultsTitle}</h2>
               <p className="lead mx-auto mt-3 max-w-lg">{dict.common.noResultsText}</p>
             </div>

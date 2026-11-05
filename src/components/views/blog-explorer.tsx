@@ -54,8 +54,8 @@ export function BlogExplorer({ posts }: { posts: PostCardData[] }) {
           className={cn(
             'border px-4 py-2 text-[0.8125rem] transition-colors',
             category === 'all'
-              ? 'border-deep bg-deep text-mist'
-              : 'border-ink/12 text-ink-70 hover:border-deep/40 hover:text-ink',
+              ? 'border-ink bg-ink text-white'
+              : 'border-slate-20 text-ink-70 hover:border-slate-40 hover:text-ink',
           )}
         >
           {dict.blog.allCategories}
@@ -68,8 +68,8 @@ export function BlogExplorer({ posts }: { posts: PostCardData[] }) {
             className={cn(
               'border px-4 py-2 text-[0.8125rem] transition-colors',
               category === value
-                ? 'border-deep bg-deep text-mist'
-                : 'border-ink/12 text-ink-70 hover:border-deep/40 hover:text-ink',
+                ? 'border-ink bg-ink text-white'
+                : 'border-slate-20 text-ink-70 hover:border-slate-40 hover:text-ink',
             )}
           >
             {label(value)}

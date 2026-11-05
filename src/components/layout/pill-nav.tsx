@@ -22,9 +22,6 @@ type PillNavProps = {
   cta: PillNavLink | null
 }
 
-/** Switzer, self-hosted from node_modules (@carrot-kpi/switzer-font). */
-const PN_FONT = "'Switzer', 'Inter Variable', system-ui, sans-serif"
-
 const isActive = (pathname: string, href: string) =>
   href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`)
 
@@ -121,7 +118,7 @@ export function PillNav({ logoLabel, logoHref, links, cta }: PillNavProps) {
     link.newTab ? { target: '_blank', rel: 'noopener noreferrer' } : {}
 
   return (
-    <div className="pn-viewport" style={{ ['--pn-font' as string]: PN_FONT }}>
+    <div className="pn-viewport">
       <Link href={logoHref} className="pn-mobile-logo" aria-label={logoLabel}>
         <Image
           src="/images/logo.svg"

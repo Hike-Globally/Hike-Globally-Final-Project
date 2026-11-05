@@ -9,10 +9,15 @@ export function Stats({ block }: { block: StatsBlock }) {
   const dark = block.variant === 'dark'
 
   return (
-    <section className={cn('py-14 md:py-16', dark ? 'bg-ink text-mist' : 'bg-sage-20 text-ink')}>
+    <section
+      className={cn(
+        'py-14 md:py-16',
+        dark ? 'bg-ink text-mist' : 'border-y border-slate-20 bg-white text-ink',
+      )}
+    >
       <div className="container-content">
         {block.heading ? (
-          <p className={cn('eyebrow mb-8 text-center', dark ? 'text-sage' : 'text-deep')}>
+          <p className={cn('eyebrow mb-8 text-center', dark ? 'text-mist' : 'text-slate-80')}>
             {block.heading}
           </p>
         ) : null}
@@ -28,15 +33,15 @@ export function Stats({ block }: { block: StatsBlock }) {
               <div>
                 <dd
                   className={cn(
-                    'font-heading text-4xl font-semibold tracking-tight md:text-5xl 3xl:text-6xl',
-                    dark ? 'text-sage' : 'text-deep',
+                    'font-display text-5xl leading-none md:text-6xl 3xl:text-7xl',
+                    dark ? 'text-white' : 'text-ink',
                   )}
                 >
                   {item.value}
                 </dd>
-                <dt className="mt-2 text-[0.9375rem] font-medium">{item.label}</dt>
+                <dt className="mt-3 text-[0.9375rem] font-medium">{item.label}</dt>
                 {item.description ? (
-                  <p className={cn('mt-1 description-copy', dark ? 'text-mist/60' : 'text-ink-60')}>
+                  <p className={cn('mt-1 description-copy', dark ? 'text-mist/80' : 'text-ink-60')}>
                     {item.description}
                   </p>
                 ) : null}

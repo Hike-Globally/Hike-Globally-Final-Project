@@ -35,7 +35,7 @@ export function DestinationCard({
   return (
     <article
       className={cn(
-        'group relative isolate flex flex-col overflow-hidden bg-ink',
+        'group relative isolate flex flex-col overflow-hidden bg-ink photo-plate',
         // Heights are the previous values ×1.5 (26rem → 39rem, 32rem → 48rem, 20rem → 30rem).
         size === 'large'
           ? 'min-h-[min(28rem,75svh)] sm:min-h-[min(39rem,80svh)] lg:min-h-[min(48rem,85svh)]'
@@ -56,37 +56,34 @@ export function DestinationCard({
             : '(min-width: 1280px) 33vw, (min-width: 768px) 45vw, 92vw'
         }
         priority={priority}
-        imageClassName="scale-100 transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
+        imageClassName="scale-100 transition-transform duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.035]"
       />
-      {/* Flat black wash over the whole photo, then the bottom-up gradient on top of it,
-          so the caption text stays legible no matter how bright the image is. */}
-      <div className="pointer-events-none absolute inset-0 bg-black/35" aria-hidden="true" />
-      <div
-        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent"
-        aria-hidden="true"
-      />
+      {/* One navy scrim — the site's single treatment for copy over a photograph
+          (`--scrim-ink`). It is dark enough at the foot of the card that mist copy
+          holds 6.7:1 even over a snowfield. */}
+      <div className="photo-scrim pointer-events-none absolute inset-0" aria-hidden="true" />
 
       <div className="pointer-events-none relative mt-auto flex w-full flex-col items-start p-4 text-left">
-        <p className="text-[0.75rem] font-medium tracking-[0.16em] text-sage uppercase">
+        <p className="text-[0.75rem] font-medium tracking-[0.16em] text-mist/85 uppercase">
           {destination.country}
         </p>
         <h3
           className={cn(
-            'destination-card-title mt-2 font-heading font-semibold break-words text-white',
-            size === 'large' ? 'text-3xl md:text-4xl' : 'text-2xl',
+            'destination-card-title mt-2 font-display font-normal break-words text-white',
+            size === 'large' ? 'text-4xl md:text-5xl' : 'text-3xl',
           )}
         >
           {destination.name}
         </h3>
         {destination.tagline ? (
           <p
-            className="destination-card-description mt-2 max-w-md card-description-copy leading-relaxed text-white/80"
+            className="destination-card-description mt-2 max-w-md card-description-copy leading-relaxed text-mist/85"
           >
             {destination.tagline}
           </p>
         ) : null}
 
-        <span className="mt-5 inline-flex items-center gap-1.5 text-[0.7rem] font-semibold tracking-[0.16em] text-white/90 uppercase">
+        <span className="mt-5 inline-flex items-center gap-1.5 text-[0.7rem] font-medium tracking-[0.16em] text-mist uppercase">
           Explore region
           <ArrowUpRight
             className="size-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"

@@ -1,3 +1,14 @@
+import {
+  BRAND,
+  LAND_DOT,
+  OCEAN_DEEP,
+  OCEAN_LIT,
+  OCEAN_MID,
+  PIN,
+  PIN_CORE,
+  rgbaOf,
+} from '@/lib/brand-colors'
+
 import { GLOBE_DESTINATIONS, GLOBE_ROUTES, LAND_DOT_DATA } from './globe-data'
 
 /**
@@ -10,11 +21,16 @@ import { GLOBE_DESTINATIONS, GLOBE_ROUTES, LAND_DOT_DATA } from './globe-data'
  *
  * Transparency contract: the canvas itself has NO background. Each frame is
  * cleared to fully transparent and the only things ever painted are the
- * sphere (ocean disc, land dots, routes, pins) and a thin amber atmosphere
+ * sphere (ocean disc, land dots, routes, pins) and a thin haze-blue atmosphere
  * that hugs the limb and finishes fading to `rgba(…, 0)` well inside the
  * canvas. Nothing is ever clipped by the square canvas edge, so the globe
  * sits directly on whatever is behind it — here, the section's ink
  * background — with no visible rectangle or contrasting edge line.
+ *
+ * Colour: every shade is derived from the six brand colours in
+ * `@/lib/brand-colors` — a navy ocean lit with expedition blue, land dots in
+ * paper-cooled haze, routes and atmosphere in haze, and the destination pins
+ * in ember (the site's one warm accent).
  *
  * Deliberately dependency-free (no three.js / globe.gl): the whole visual is a
  * dot field of ~4.5k points, five route arcs and nine markers. Canvas 2D draws
@@ -201,23 +217,23 @@ export function drawGlobe(ctx: CanvasRenderingContext2D, view: GlobeView): Proje
   const cosTilt = Math.cos(tilt)
   const sinTilt = Math.sin(tilt)
 
-  /* --- Atmosphere: a thin amber glow hugging the limb -----------------------
+  /* --- Atmosphere: a thin haze glow hugging the limb ------------------------
      It must finish fading INSIDE the canvas. The old halo reached 1.5× the
      sphere radius — past the edge of the square canvas (sphere diameter is
      79% of the canvas, so 1.5× radius ≈ 59% of the width from centre) — and
      the browser clipped it mid-gradient at ~10% alpha. That straight clipped
      edge read as a contrasting background rectangle behind the globe.
      Now the glow is capped at 1.22× radius (≈48% of the width) and at least
-     2px short of the nearest canvas edge, is amber-only (no deep-blue wash
+     2px short of the nearest canvas edge, is haze-only (no second wash
      tinting the square), and its final stop is fully transparent — so
      outside the atmosphere the canvas is exactly transparent. */
   const haloRadius = Math.min(radius * 1.22, Math.max(radius, Math.min(cx, cy) - 2))
   const halo = ctx.createRadialGradient(cx, cy, radius * 0.92, cx, cy, haloRadius)
-  halo.addColorStop(0, 'rgba(247, 162, 48, 0.16)')
+  halo.addColorStop(0, rgbaOf(BRAND.haze, 0.2))
   // The limb itself sits at ≈0.27 of this gradient (1.00 between 0.92…1.22).
-  halo.addColorStop(0.3, 'rgba(247, 162, 48, 0.13)')
-  halo.addColorStop(0.62, 'rgba(247, 162, 48, 0.045)')
-  halo.addColorStop(1, 'rgba(247, 162, 48, 0)')
+  halo.addColorStop(0.3, rgbaOf(BRAND.haze, 0.16))
+  halo.addColorStop(0.62, rgbaOf(BRAND.haze, 0.055))
+  halo.addColorStop(1, rgbaOf(BRAND.haze, 0))
   ctx.fillStyle = halo
   ctx.beginPath()
   ctx.arc(cx, cy, haloRadius, 0, TAU)
@@ -232,10 +248,10 @@ export function drawGlobe(ctx: CanvasRenderingContext2D, view: GlobeView): Proje
     cy + radius * 0.12,
     radius * 1.12,
   )
-  body.addColorStop(0, '#2f567c')
-  body.addColorStop(0.38, '#1b3a58')
-  body.addColorStop(0.72, '#0c2236')
-  body.addColorStop(1, '#04151f')
+  body.addColorStop(0, OCEAN_LIT)
+  body.addColorStop(0.38, OCEAN_MID)
+  body.addColorStop(0.72, OCEAN_DEEP)
+  body.addColorStop(1, BRAND.ink)
 
   ctx.beginPath()
   ctx.arc(cx, cy, radius, 0, TAU)
@@ -281,14 +297,14 @@ export function drawGlobe(ctx: CanvasRenderingContext2D, view: GlobeView): Proje
       ctx.moveTo(x + dotRadius, y)
       ctx.arc(x, y, dotRadius, 0, TAU)
     }
-    ctx.fillStyle = `rgba(219, 234, 242, ${(0.1 + 0.55 * t).toFixed(3)})`
+    ctx.fillStyle = rgbaOf(LAND_DOT, 0.1 + 0.55 * t)
     ctx.fill()
   }
 
   /* --- Routes: great-circle arcs, only the stretches above the horizon --- */
   ctx.lineWidth = 1.1
   ctx.lineCap = 'round'
-  ctx.strokeStyle = 'rgba(247, 162, 48, 0.36)'
+  ctx.strokeStyle = rgbaOf(BRAND.haze, 0.34)
 
   for (const route of ROUTES) {
     let drawing = false
@@ -346,12 +362,12 @@ export function drawGlobe(ctx: CanvasRenderingContext2D, view: GlobeView): Proje
 
     const alpha = fade(projected.depth, HORIZON, 0.3)
 
-    ctx.fillStyle = `rgba(247, 162, 48, ${(0.16 * alpha).toFixed(3)})`
+    ctx.fillStyle = rgbaOf(BRAND.haze, 0.18 * alpha)
     ctx.beginPath()
     ctx.arc(projected.x, projected.y, routeDotRadius * 3, 0, TAU)
     ctx.fill()
 
-    ctx.fillStyle = `rgba(253, 232, 196, ${(0.9 * alpha).toFixed(3)})`
+    ctx.fillStyle = rgbaOf(LAND_DOT, 0.92 * alpha)
     ctx.beginPath()
     ctx.arc(projected.x, projected.y, routeDotRadius * 0.75, 0, TAU)
     ctx.fill()
@@ -360,7 +376,7 @@ export function drawGlobe(ctx: CanvasRenderingContext2D, view: GlobeView): Proje
   /* --- Rim light, then destination markers --- */
   ctx.beginPath()
   ctx.arc(cx, cy, radius - 0.6, 0, TAU)
-  ctx.strokeStyle = 'rgba(247, 162, 48, 0.34)'
+  ctx.strokeStyle = rgbaOf(BRAND.haze, 0.3)
   ctx.lineWidth = 1.2
   ctx.stroke()
 
@@ -388,24 +404,25 @@ export function drawGlobe(ctx: CanvasRenderingContext2D, view: GlobeView): Proje
 
     // Pulsing halo: a soft glow plus an expanding ring that fades as it grows,
     // which reads as a live pin instead of a blurry disc over the land dots.
-    ctx.fillStyle = `rgba(247, 162, 48, ${(0.16 * visibility).toFixed(3)})`
+    ctx.fillStyle = rgbaOf(BRAND.sage, 0.2 * visibility)
     ctx.beginPath()
     ctx.arc(projected.x, projected.y, 5.5, 0, TAU)
     ctx.fill()
 
-    ctx.strokeStyle = `rgba(247, 162, 48, ${(0.55 * visibility * (1 - pulse)).toFixed(3)})`
+    ctx.strokeStyle = rgbaOf(BRAND.sage, 0.55 * visibility * (1 - pulse))
     ctx.lineWidth = 1
     ctx.beginPath()
     ctx.arc(projected.x, projected.y, 5 + pulse * 9, 0, TAU)
     ctx.stroke()
 
-    // Pin: amber disc, warm white core.
-    ctx.fillStyle = `rgba(247, 162, 48, ${visibility.toFixed(3)})`
+    // Pin: ember disc lifted with white until it clears 4.5:1 on the ocean,
+    // with a near-paper core.
+    ctx.fillStyle = rgbaOf(PIN, visibility)
     ctx.beginPath()
     ctx.arc(projected.x, projected.y, 3.4, 0, TAU)
     ctx.fill()
 
-    ctx.fillStyle = `rgba(255, 246, 232, ${visibility.toFixed(3)})`
+    ctx.fillStyle = rgbaOf(PIN_CORE, visibility)
     ctx.beginPath()
     ctx.arc(projected.x, projected.y, 1.25, 0, TAU)
     ctx.fill()

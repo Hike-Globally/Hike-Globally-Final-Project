@@ -48,8 +48,11 @@ export function PageHeader({
             className="-z-10"
             imageClassName="object-cover"
           />
-          <div className="absolute inset-0 -z-10 bg-ink/62" />
-          <div className="absolute inset-x-0 bottom-0 -z-10 h-1/3 bg-gradient-to-t from-ink/70 to-transparent" />
+          {/* One navy wash, deepened towards the foot where the h1 and lead
+              sit. Measured at 4.5:1 or better for paper text even over a
+              fully blown-out photograph. */}
+          <div className="absolute inset-0 -z-10 bg-ink/72" />
+          <div className="absolute inset-x-0 bottom-0 -z-10 h-2/3 bg-gradient-to-t from-ink/85 via-ink/40 to-transparent" />
         </>
       ) : null}
 
@@ -69,7 +72,7 @@ export function PageHeader({
         ) : null}
 
         {eyebrow ? (
-          <p className={cn('eyebrow mb-4', hasBackground ? 'text-sage' : 'text-slate')}>
+          <p className={cn('eyebrow mb-4', hasBackground ? 'text-mist' : 'text-slate-80')}>
             {eyebrow}
           </p>
         ) : null}
@@ -88,7 +91,7 @@ export function PageHeader({
           <p
             className={cn(
               'lead mt-6 max-w-2xl',
-              hasBackground ? 'text-mist/80' : 'text-ink-60',
+              hasBackground ? 'text-mist' : 'text-ink-60',
               align === 'center' ? 'mx-auto' : '',
             )}
           >

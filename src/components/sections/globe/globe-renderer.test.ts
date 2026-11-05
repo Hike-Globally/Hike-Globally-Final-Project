@@ -179,8 +179,8 @@ test('the canvas stays transparent outside the sphere — no background wash rea
     `the atmosphere must fade to fully transparent, got "${lastStop[1]}"`,
   )
   assert.ok(
-    atmosphere.stops.every(([, colour]) => colour.startsWith('rgba(247, 162, 48')),
-    'the atmosphere is amber-only — no tinted wash behind the globe',
+    atmosphere.stops.every(([, colour]) => colour.startsWith('rgba(135, 170, 189')),
+    'the atmosphere is haze-only — no second wash tinting the square behind the globe',
   )
 
   // The painted discs themselves (atmosphere + ocean) are the largest arcs;

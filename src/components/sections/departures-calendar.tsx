@@ -30,7 +30,7 @@ function StatusBadge({ status }: { status: DepartureStatus }) {
 
   if (status === 'guaranteed') {
     return (
-      <span className="inline-flex items-center gap-1.5 bg-sage px-2.5 py-0.5 font-heading text-[0.6875rem] font-semibold tracking-[0.12em] text-ink uppercase">
+      <span className="inline-flex items-center gap-1.5 bg-sage-90 px-2.5 py-0.5 font-heading text-[0.6875rem] font-semibold tracking-[0.12em] text-white uppercase">
         <Check className="size-3" strokeWidth={3} aria-hidden />
         {label}
       </span>
@@ -39,7 +39,7 @@ function StatusBadge({ status }: { status: DepartureStatus }) {
 
   if (status === 'limited') {
     return (
-      <span className="inline-flex items-center gap-1.5 bg-ink px-2.5 py-0.5 font-heading text-[0.6875rem] font-semibold tracking-[0.12em] text-sage uppercase">
+      <span className="inline-flex items-center gap-1.5 bg-ink px-2.5 py-0.5 font-heading text-[0.6875rem] font-semibold tracking-[0.12em] text-mist uppercase">
         {label}
       </span>
     )
@@ -47,14 +47,14 @@ function StatusBadge({ status }: { status: DepartureStatus }) {
 
   if (status === 'sold-out') {
     return (
-      <span className="inline-flex items-center gap-1.5 bg-mist-60 px-2.5 py-0.5 font-heading text-[0.6875rem] font-semibold tracking-[0.12em] text-ink-60 uppercase">
+      <span className="inline-flex items-center gap-1.5 bg-mist px-2.5 py-0.5 font-heading text-[0.6875rem] font-semibold tracking-[0.12em] text-ink-60 uppercase">
         {label}
       </span>
     )
   }
 
   return (
-    <span className="inline-flex items-center gap-1.5 bg-sage-20 px-2.5 py-0.5 font-heading text-[0.6875rem] font-semibold tracking-[0.12em] text-deep uppercase ring-1 ring-sage/60">
+    <span className="inline-flex items-center gap-1.5 border border-sage-40 bg-sage-20 px-2.5 py-0.5 font-heading text-[0.6875rem] font-semibold tracking-[0.12em] text-sage-80 uppercase">
       {label}
     </span>
   )
@@ -185,8 +185,8 @@ export function DeparturesCalendar({
           className={cn(
             'shrink-0 cursor-pointer border px-3.5 py-2 font-heading text-xs font-semibold tracking-[0.08em] uppercase transition-colors',
             activeMonthFilter === 'all'
-              ? 'border-deep bg-deep text-white'
-              : 'border-black/10 bg-white text-ink-80 hover:border-deep/40 hover:text-deep',
+              ? 'border-ink bg-ink text-white'
+              : 'border-slate-20 bg-white text-ink-80 hover:border-slate-40 hover:text-ink',
           )}
         >
           {dict.trip.allDates} ({departures.length})
@@ -203,8 +203,8 @@ export function DeparturesCalendar({
               className={cn(
                 'shrink-0 cursor-pointer border px-3.5 py-2 font-heading text-xs font-semibold tracking-[0.08em] uppercase transition-colors',
                 active
-                  ? 'border-deep bg-deep text-white'
-                  : 'border-black/10 bg-white text-ink-80 hover:border-deep/40 hover:text-deep',
+                  ? 'border-ink bg-ink text-white'
+                  : 'border-slate-20 bg-white text-ink-80 hover:border-slate-40 hover:text-ink',
               )}
             >
               {month.shortLabel} ({month.count})
@@ -222,7 +222,7 @@ export function DeparturesCalendar({
               type="button"
               onClick={() => handleStepCalendarMonth(-1)}
               aria-label={dict.trip.previousMonth}
-              className="grid size-9 shrink-0 cursor-pointer place-items-center border border-black/10 bg-mist text-ink transition-colors hover:border-deep hover:bg-deep hover:text-white"
+              className="grid size-9 shrink-0 cursor-pointer place-items-center border border-slate-20 bg-white text-ink transition-colors hover:border-ink hover:bg-ink hover:text-white"
             >
               <ChevronLeft className="size-4" aria-hidden />
             </button>
@@ -231,7 +231,7 @@ export function DeparturesCalendar({
               <p className="font-heading text-base font-semibold text-ink">
                 {formatCalendarMonth(calendarMonth)}
               </p>
-              <p className="mt-0.5 text-xs text-slate">
+              <p className="mt-0.5 text-xs text-slate-80">
                 {departuresInCalendarMonth === 1
                   ? '1 departure'
                   : `${departuresInCalendarMonth} departures`}
@@ -242,20 +242,20 @@ export function DeparturesCalendar({
               type="button"
               onClick={() => handleStepCalendarMonth(1)}
               aria-label={dict.trip.nextMonth}
-              className="grid size-9 shrink-0 cursor-pointer place-items-center border border-black/10 bg-mist text-ink transition-colors hover:border-deep hover:bg-deep hover:text-white"
+              className="grid size-9 shrink-0 cursor-pointer place-items-center border border-slate-20 bg-white text-ink transition-colors hover:border-ink hover:bg-ink hover:text-white"
             >
               <ChevronRight className="size-4" aria-hidden />
             </button>
           </div>
 
           <div
-            className="grid grid-cols-7 gap-1 border-t border-black/[0.06] pt-4 pb-2 text-center"
+            className="grid grid-cols-7 gap-1 border-t border-slate-20 pt-4 pb-2 text-center"
             aria-hidden
           >
             {CALENDAR_WEEKDAYS.map((weekday) => (
               <span
                 key={weekday}
-                className="font-heading text-[0.6875rem] font-semibold tracking-[0.12em] text-slate uppercase"
+                className="font-heading text-[0.6875rem] font-semibold tracking-[0.12em] text-slate-80 uppercase"
               >
                 {weekday}
               </span>
@@ -295,10 +295,10 @@ export function DeparturesCalendar({
                       'relative flex h-10 flex-col items-center justify-center font-heading text-[0.875rem] font-semibold transition-colors cursor-pointer',
                       !cell.inCurrentMonth && !isSelectedStart && 'opacity-65',
                       isSelectedStart
-                        ? 'bg-deep text-white ring-1 ring-deep'
+                        ? 'bg-ink text-white'
                         : allSoldOut
-                          ? 'bg-mist text-ink-60 line-through ring-1 ring-slate-20 hover:bg-mist-60'
-                          : 'bg-sage-20 text-ink ring-1 ring-sage/80 hover:bg-sage hover:text-ink',
+                          ? 'bg-mist text-ink-70 line-through ring-1 ring-slate-20 hover:bg-mist-60'
+                          : 'bg-sage-20 text-ink ring-1 ring-sage-40 hover:bg-sage-40',
                     )}
                   >
                     <span>{cell.dayOfMonth}</span>
@@ -306,7 +306,7 @@ export function DeparturesCalendar({
                       aria-hidden
                       className={cn(
                         'mt-0.5 size-1 rounded-full',
-                        isSelectedStart ? 'bg-sage' : allSoldOut ? 'bg-ink-60' : 'bg-deep',
+                        isSelectedStart ? 'bg-sage-light' : allSoldOut ? 'bg-slate-40' : 'bg-sage-90',
                       )}
                     />
                   </button>
@@ -320,11 +320,11 @@ export function DeparturesCalendar({
                     'grid h-10 place-items-center text-[0.875rem]',
                     inSelectedWindow
                       ? isSelectedEnd
-                        ? 'bg-deep/18 font-heading font-semibold text-deep ring-1 ring-deep/35'
-                        : 'bg-deep/10 font-medium text-deep'
+                        ? 'bg-haze-20 font-heading font-semibold text-deep-90 ring-1 ring-haze-40'
+                        : 'bg-haze-20 font-medium text-deep-90'
                       : cell.inCurrentMonth
                         ? 'text-ink-70'
-                        : 'text-ink/25',
+                        : 'text-slate-80',
                   )}
                 >
                   {cell.dayOfMonth}
@@ -333,14 +333,14 @@ export function DeparturesCalendar({
             })}
           </div>
 
-          <div className="mt-5 space-y-3 border-t border-black/[0.06] pt-4">
+          <div className="mt-5 space-y-3 border-t border-slate-20 pt-4">
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-ink-70">
               <span className="inline-flex items-center gap-2">
-                <span aria-hidden className="inline-block size-3 bg-sage-20 ring-1 ring-sage/80" />
+                <span aria-hidden className="inline-block size-3 bg-sage-20 ring-1 ring-sage-40" />
                 {dict.trip.departureDateLegend}
               </span>
               <span className="inline-flex items-center gap-2">
-                <span aria-hidden className="inline-block size-3 bg-deep/15 ring-1 ring-deep/40" />
+                <span aria-hidden className="inline-block size-3 bg-haze-20 ring-1 ring-haze-40" />
                 {dict.trip.selectedWindowLegend}
               </span>
             </div>
@@ -354,7 +354,7 @@ export function DeparturesCalendar({
                     selectedDeparture.endDateKey,
                   )}
                 </span>
-                <span className="ml-auto shrink-0 text-slate">
+                <span className="ml-auto shrink-0 text-slate-80">
                   {selectedDeparture.durationDays} {dict.common.days}
                 </span>
               </div>
@@ -382,10 +382,10 @@ export function DeparturesCalendar({
                     onClick={() => handleSelectDeparture(departure)}
                     className={cn(
                       surface,
-                      'cursor-pointer border-l-[3px] p-4 transition-[border-color,box-shadow,background-color] sm:p-5',
+                      'cursor-pointer border-l-[3px] p-4 transition-colors sm:p-5',
                       isSelected
-                        ? 'border-l-deep bg-sage-20/25 ring-1 ring-deep'
-                        : 'border-l-transparent hover:border-l-sage',
+                        ? 'border-l-sage bg-mist'
+                        : 'border-l-transparent hover:border-l-slate-40',
                     )}
                   >
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -407,7 +407,7 @@ export function DeparturesCalendar({
 
                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.8125rem] text-ink-60">
                           <span className="inline-flex items-center gap-1.5">
-                            <Clock className="size-3.5 text-slate" aria-hidden />
+                            <Clock className="size-3.5 text-slate-80" aria-hidden />
                             {weekdaySummary} · {departure.durationDays} {dict.common.days}
                           </span>
                           {departure.note ? (
@@ -416,7 +416,7 @@ export function DeparturesCalendar({
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between gap-4 border-t border-black/[0.06] pt-3 sm:shrink-0 sm:justify-end sm:border-t-0 sm:pt-0">
+                      <div className="flex items-center justify-between gap-4 border-t border-slate-20 pt-3 sm:shrink-0 sm:justify-end sm:border-t-0 sm:pt-0">
                         <div className="sm:text-right">
                           <p className="font-heading text-lg leading-tight font-semibold text-ink sm:text-xl">
                             {formatPrice(departure.price, priceCurrency)}

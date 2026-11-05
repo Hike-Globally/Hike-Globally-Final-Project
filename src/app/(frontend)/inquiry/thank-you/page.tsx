@@ -24,7 +24,7 @@ export default async function ThankYouPage() {
   return (
     <section className="pt-32 pb-24 md:pt-40 md:pb-32">
       <div className="container-prose text-center">
-        <span className="mx-auto grid size-14 place-items-center rounded-full bg-sage/70 text-ink">
+        <span className="mx-auto grid size-14 place-items-center rounded-full bg-sage-90 text-white">
           <Check className="size-6" strokeWidth={3} aria-hidden />
         </span>
         <h1 className="heading-lg mt-8">{dict.inquiry.successTitle}</h1>

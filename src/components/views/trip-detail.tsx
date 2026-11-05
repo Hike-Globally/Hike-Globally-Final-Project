@@ -51,9 +51,10 @@ import type { Trip } from '@/payload-types'
    Shared styling
    ---------------------------------------------------------------------------- */
 
-/** Eyebrow for dark backgrounds (the shared `.eyebrow` utility is tuned for light ones). */
+/** Eyebrow for dark backgrounds (the shared `.eyebrow` utility is tuned for light ones).
+    Paper grey rather than ember: at this size the warm accent sits under 4.5:1. */
 const eyebrowOnDark =
-  'font-heading text-[0.75rem] font-semibold tracking-[0.18em] text-sage uppercase'
+  'font-heading text-[0.75rem] font-medium tracking-[0.18em] text-mist uppercase'
 
 function SectionTitle({
   title,
@@ -93,46 +94,36 @@ function TripBookingCard({
   return (
     <div
       className={cn(
-        'relative overflow-hidden bg-ink p-5 text-mist ring-1 ring-white/10 shadow-[0_40px_80px_-30px_rgba(4,21,31,0.6)] sm:p-7',
+        'relative overflow-hidden border-t-2 border-sage bg-ink p-5 text-mist sm:p-7',
         className,
       )}
     >
-      {/* Soft brand glows behind the content — purely decorative. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-24 -right-24 size-64 rounded-full bg-sage/20 blur-3xl"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-28 -left-20 size-64 rounded-full bg-deep blur-3xl"
-      />
-
       <div className="relative">
         <p className={eyebrowOnDark}>
           {perGroup ? dict.trip.pricePerGroup : dict.trip.pricePerPerson}
         </p>
 
-        <div className="mt-4 border border-white/10 bg-white/[0.05] px-5 py-4">
-          <p className="font-heading text-4xl leading-none font-semibold tracking-tight text-white">
+        <div className="mt-4 bg-ink-80 px-5 py-4">
+          <p className="font-display text-[2.75rem] leading-none text-white">
             {formatPrice(trip.priceFrom, trip.priceCurrency)}
           </p>
         </div>
 
         <dl className="mt-7 divide-y divide-white/10 border-t border-white/10">
           <div className="flex items-center justify-between gap-4 py-4">
-            <dt className="flex items-center gap-2.5 text-[0.9375rem] text-mist/65">
-              <Gauge className="size-4 text-sage" aria-hidden />
+            <dt className="flex items-center gap-2.5 text-[0.9375rem] text-mist/80">
+              <Gauge className="size-4 text-sage-light" aria-hidden />
               {dict.trip.difficultyLevel}
             </dt>
             <dd>
-              <span className="bg-sage/15 px-3 py-1 text-[0.8125rem] font-medium text-sage">
+              <span className="bg-sage-90 px-3 py-1 text-[0.8125rem] font-medium text-white">
                 {difficultyLabel(trip.difficulty)}
               </span>
             </dd>
           </div>
           <div className="flex items-center justify-between gap-4 py-4">
-            <dt className="flex items-center gap-2.5 text-[0.9375rem] text-mist/65">
-              <Clock className="size-4 text-sage" aria-hidden />
+            <dt className="flex items-center gap-2.5 text-[0.9375rem] text-mist/80">
+              <Clock className="size-4 text-sage-light" aria-hidden />
               {dict.trip.duration}
             </dt>
             <dd className="text-right font-heading text-[0.9375rem] font-semibold text-white">
@@ -213,8 +204,10 @@ export function TripDetail({
             className="-z-10"
             imageClassName="object-cover"
           />
-          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-ink/95 via-ink/70 to-ink/25" />
-          <div className="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/30 to-ink/40" />
+          {/* One navy wash plus the shared photo scrim — no second, competing
+              gradient, and no blur behind the copy. */}
+          <div className="absolute inset-0 -z-10 bg-ink/72" />
+          <div className="photo-scrim pointer-events-none absolute inset-0 -z-10" />
 
           <div className="container-content pt-28 pb-12 sm:pb-14 md:pt-36 md:pb-16">
             <Breadcrumbs
@@ -230,7 +223,7 @@ export function TripDetail({
               {destination ? (
                 <Link
                   href={sitePath(`/destinations/${destination.slug}`)}
-                  className="bg-white/10 px-3.5 py-1.5 text-[0.75rem] tracking-[0.14em] text-sage uppercase ring-1 ring-white/15 backdrop-blur transition-colors hover:bg-white/20"
+                  className="border border-mist/35 bg-ink/40 px-3.5 py-1.5 text-[0.75rem] tracking-[0.14em] text-mist uppercase transition-colors hover:border-mist hover:bg-ink/60"
                 >
                   {destination.name}
                 </Link>
@@ -239,7 +232,7 @@ export function TripDetail({
             </div>
 
             <h1 className="heading-xl mt-6 max-w-4xl text-white">{trip.title}</h1>
-            <p className="lead mt-6 max-w-2xl text-mist/80">{trip.summary}</p>
+            <p className="lead mt-6 max-w-2xl text-mist">{trip.summary}</p>
 
             <div className="mt-9 flex flex-wrap items-center gap-3">
               <Button asChild size="lg" variant="sage">
@@ -252,18 +245,18 @@ export function TripDetail({
               ) : null}
             </div>
 
-            {/* Glass dashboard. A 1px gap over a tinted background draws the grid lines. */}
-            <dl className="mt-10 grid grid-cols-1 gap-px overflow-hidden bg-white/10 ring-1 ring-white/10 backdrop-blur-xl xs:grid-cols-2 md:mt-14 md:grid-cols-4">
+            {/* Fact dashboard. A 1px gap over a hairline tint draws the grid lines. */}
+            <dl className="mt-10 grid grid-cols-1 gap-px overflow-hidden bg-white/12 xs:grid-cols-2 md:mt-14 md:grid-cols-4">
               {facts.map((fact) => (
                 <div
                   key={fact.label}
-                  className="flex items-center gap-4 bg-ink/60 p-5 backdrop-blur md:p-6"
+                  className="flex items-center gap-4 bg-ink/72 p-5 md:p-6"
                 >
-                  <span className="grid size-10 shrink-0 place-items-center rounded-full bg-sage/15 text-sage">
+                  <span className="grid size-10 shrink-0 place-items-center bg-mist/12 text-mist">
                     <fact.icon className="size-4" aria-hidden />
                   </span>
                   <div className="min-w-0">
-                    <dt className="text-[0.6875rem] tracking-[0.14em] text-mist/55 uppercase">
+                    <dt className="text-[0.6875rem] tracking-[0.14em] text-mist/75 uppercase">
                       {fact.label}
                     </dt>
                     <dd className="mt-1 truncate font-heading text-[0.9375rem] font-semibold text-white">
@@ -389,12 +382,12 @@ export function TripDetail({
           <Reveal as="section" className="py-16 md:py-24">
             <div className="grid gap-6 md:grid-cols-2">
               {trip.included?.length ? (
-                <div className="bg-sage-20 p-5 ring-1 ring-sage/30 sm:p-8 md:p-10">
+                <div className="border border-sage-40 bg-sage-20 p-5 sm:p-8 md:p-10">
                   <h2 className="heading-md mb-7">{dict.trip.included}</h2>
                   <ul className="space-y-4">
                     {trip.included.map((item) => (
                       <li key={item.id ?? item.item} className="flex items-start gap-3.5">
-                        <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-deep text-mist">
+                        <span className="mt-0.5 grid size-6 shrink-0 place-items-center bg-deep text-white">
                           <Check className="size-3.5" strokeWidth={3} aria-hidden />
                         </span>
                         <span className="text-[0.9375rem] leading-relaxed text-ink-80">
@@ -412,7 +405,7 @@ export function TripDetail({
                   <ul className="space-y-4">
                     {trip.notIncluded.map((item) => (
                       <li key={item.id ?? item.item} className="flex items-start gap-3.5">
-                        <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-mist-60 text-slate">
+                        <span className="mt-0.5 grid size-6 shrink-0 place-items-center bg-mist text-slate-80">
                           <X className="size-3.5" strokeWidth={3} aria-hidden />
                         </span>
                         <span className="text-[0.9375rem] leading-relaxed text-ink-60">
@@ -439,7 +432,7 @@ export function TripDetail({
                   key={item.id ?? `${item.item}-${index}`}
                   className={cn(surface, 'flex items-start gap-4 p-5')}
                 >
-                  <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-sage text-ink">
+                  <span className="mt-0.5 grid size-7 shrink-0 place-items-center bg-deep text-white">
                     <Check className="size-3.5" strokeWidth={3} aria-hidden />
                   </span>
                   <span className="text-[0.9375rem] leading-relaxed text-ink-80">{item.item}</span>
@@ -459,7 +452,7 @@ export function TripDetail({
             <div className="grid gap-5 sm:grid-cols-2">
               {trip.gallery.map((item, index) => (
                 <Reveal key={item.id ?? index} delay={index * 60}>
-                  <div className="group overflow-hidden bg-mist-60 ring-1 ring-black/5">
+                  <div className="photo-plate group">
                     <PayloadImage
                       media={item.image}
                       sizes="(min-width: 1280px) 30vw, (min-width: 640px) 45vw, 92vw"
@@ -477,21 +470,13 @@ export function TripDetail({
       <>
         <section id="inquiry" className="scroll-mt-24 py-16 md:py-24">
           <div className="container-content">
-            <div className="relative isolate overflow-hidden bg-ink p-5 text-mist ring-1 ring-white/10 sm:p-8 md:p-14">
-              <div
-                aria-hidden
-                className="pointer-events-none absolute -top-40 -right-32 -z-10 size-[28rem] rounded-full bg-sage/15 blur-3xl"
-              />
-              <div
-                aria-hidden
-                className="pointer-events-none absolute -bottom-40 -left-32 -z-10 size-[24rem] rounded-full bg-deep blur-3xl"
-              />
+            <div className="relative isolate overflow-hidden border-t-2 border-sage bg-ink p-5 text-mist sm:p-8 md:p-14">
 
               <div className="grid gap-10 xl:grid-cols-[0.85fr_1.15fr] xl:gap-16">
                 <div>
                   <p className={eyebrowOnDark}>{dict.inquiry.formTitle}</p>
                   <h2 className="heading-lg mt-3 text-white">{dict.inquiry.title}</h2>
-                  <p className="lead mt-5 text-mist/70">{dict.inquiry.subtitle}</p>
+                  <p className="lead mt-5 text-mist">{dict.inquiry.subtitle}</p>
                 </div>
                 <InquiryForm
                   trips={tripOptions}

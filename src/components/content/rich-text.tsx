@@ -379,7 +379,7 @@ const renderNode = (node: RichTextNode, index: number, context: RenderContext): 
             />
           </div>
           {caption ? (
-            <figcaption className="mt-3 text-center text-sm text-slate">{caption}</figcaption>
+            <figcaption className="mt-3 text-center text-sm text-slate-80">{caption}</figcaption>
           ) : null}
         </figure>
       )

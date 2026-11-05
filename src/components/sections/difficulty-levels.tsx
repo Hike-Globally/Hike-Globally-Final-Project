@@ -76,7 +76,7 @@ export function DifficultyLevels() {
           <p className="eyebrow mb-3">Find your level</p>
           <h2
             id="difficulty-heading"
-            className="home-section-title font-heading leading-tight font-semibold tracking-[0.045em] text-ink uppercase"
+            className="heading-lg home-section-title text-ink"
           >
             Different levels, all epic adventures
           </h2>
@@ -84,12 +84,12 @@ export function DifficultyLevels() {
             <p className="home-section-intro max-w-2xl leading-relaxed text-ink-60">
               Find your match — from gentle days out to high-altitude challenges.
             </p>
-            <span className="hidden text-slate/60 sm:inline" aria-hidden="true">
+            <span className="hidden text-slate-40 sm:inline" aria-hidden="true">
               /
             </span>
             <Link
               href={sitePath('/trips')}
-              className="group inline-flex items-center gap-1.5 text-sm font-medium text-deep underline decoration-sage decoration-2 underline-offset-4 transition-colors hover:text-ink"
+              className="group inline-flex items-center gap-1.5 text-sm font-medium text-deep underline decoration-slate-40 decoration-1 underline-offset-4 transition-colors hover:text-deep-80 hover:decoration-deep"
             >
               Explore all trips
               <ArrowUpRight
@@ -136,22 +136,21 @@ export function DifficultyLevels() {
                 className="-z-20 object-cover transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.045]"
                 aria-hidden="true"
               />
+              {/* Two navy washes, one per edge that carries copy — the level
+                  row at the top, the rung name and description at the foot. */}
               <div
-                className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-ink/85 via-ink/35 to-transparent"
+                className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-ink/80 via-ink/22 to-transparent"
                 aria-hidden="true"
               />
-              <div
-                className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-t from-ink/55 via-transparent to-transparent"
-                aria-hidden="true"
-              />
+              <div className="photo-scrim pointer-events-none absolute inset-0 -z-10" aria-hidden="true" />
 
               <div className="relative p-5 sm:p-6">
                 <div className="flex items-center justify-between gap-4">
-                  <span className="text-[0.62rem] font-semibold tracking-[0.2em] text-white/80 uppercase">
+                  <span className="text-[0.62rem] font-medium tracking-[0.18em] text-mist/85 uppercase">
                     Level {String(index + 1).padStart(2, '0')}
                   </span>
                   <span
-                    className="block h-[5px] w-[3.6rem] shrink-0 bg-white/35"
+                    className="block h-1 w-[3.6rem] shrink-0 bg-mist/25"
                     role="img"
                     aria-label={`Difficulty scale: ${index + 1} of ${DIFFICULTY_LEVELS.length}`}
                   >
@@ -162,24 +161,25 @@ export function DifficultyLevels() {
                   </span>
                 </div>
 
-                {/* Card copy is pinned to the sizes the design calls for — 25px
-                    headings, 16px descriptions — rather than the responsive
-                    description scale, so every rung reads the same at any width. */}
+                {/* Card copy is pinned to the sizes the design calls for — 26px
+                    headings in the display serif, 16px descriptions — rather than
+                    the responsive description scale, so every rung reads the same
+                    at any width. Headings keep the case they are written in. */}
                 <h3
                   id={`difficulty-${level.value}-title`}
-                  className="mt-3 font-heading text-[25px] leading-snug font-semibold tracking-[0.025em] text-white uppercase"
+                  className="mt-3 font-display text-[26px] leading-[1.14] font-normal text-white"
                 >
                   {level.label}
                 </h3>
                 <p
                   id={`difficulty-${level.value}-desc`}
-                  className="mt-2 max-w-[18rem] text-[16px] leading-relaxed text-white/90"
+                  className="mt-2 max-w-[18rem] text-[16px] leading-relaxed text-mist/90"
                 >
                   {level.description}
                 </p>
               </div>
 
-              <span className="absolute inset-x-5 bottom-5 inline-flex items-center gap-1.5 text-[0.78rem] font-medium tracking-[0.04em] text-white/90 uppercase sm:inset-x-6 sm:bottom-6">
+              <span className="absolute inset-x-5 bottom-5 inline-flex items-center gap-1.5 text-[0.78rem] font-medium tracking-[0.06em] text-mist uppercase sm:inset-x-6 sm:bottom-6">
                 View trips
                 <ArrowUpRight
                   className="size-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
@@ -211,7 +211,7 @@ function CarouselArrow({
       onClick={onClick}
       disabled={disabled}
       aria-label={direction === 'left' ? 'Previous difficulty levels' : 'Next difficulty levels'}
-      className="inline-flex size-11 items-center justify-center rounded-full border border-ink/20 bg-white text-ink transition duration-300 hover:border-deep hover:bg-deep hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-deep disabled:cursor-not-allowed disabled:border-ink/10 disabled:text-ink/30 disabled:hover:border-ink/10 disabled:hover:bg-white disabled:hover:text-ink/30"
+      className="inline-flex size-11 items-center justify-center rounded-full border border-slate-40 bg-white text-ink transition duration-300 hover:border-ink hover:bg-ink hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-deep disabled:cursor-not-allowed disabled:border-slate-20 disabled:text-slate-40 disabled:hover:border-slate-20 disabled:hover:bg-white disabled:hover:text-slate-40"
     >
       <Icon className="size-4" aria-hidden="true" />
     </button>
