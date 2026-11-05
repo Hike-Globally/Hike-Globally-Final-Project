@@ -214,14 +214,24 @@ also stalls indexing of the sitemap.
 Vercel + hosted Postgres + Vercel Blob for media (without a Blob store the deployment falls back to
 Postgres storage — see [Media storage](#media-storage)). See
 [§9 of the implementation plan](docs/IMPLEMENTATION-PLAN.md#9-deployment); the short version is
-`npm ci && npm run migrate && npm run build`, with the four environment variables above set.
+`npm ci && npm run build`, with the four environment variables above set. Production migrations are
+applied by Payload itself (`prodMigrations` in `src/payload.config.ts`) when the first request
+boots, so a separate migrate step in the build command is optional.
+
+`npm run build` runs `payload generate:importmap` before `next build`. Vercel caches
+`node_modules`, and the import map (`src/app/(payload)/admin/importMap.js`) is deliberately not
+committed — regenerating it in the build step is what keeps a cache-hit install from failing with
+`Module not found: Can't resolve './admin/importMap'`.
 
 ### Commit author must be a real GitHub account
 
-Vercel refuses to deploy a commit whose author email it cannot map to a GitHub account and fails the
-build with _"The commit author email is not a valid email address"_. Bot addresses such as
-`agent@arena.ai` or `probe@arena.local` do exactly that, so every commit — human or automated — must
-be authored with an address tied to the account that owns this repo:
+Vercel refuses to deploy a commit whose author email it cannot map to a GitHub account. The push
+succeeds, but the deployment is blocked before the build starts with _"GitHub couldn't verify an
+account for the commit"_ / _"The commit author email is not a valid email address"_, so the live
+site silently keeps the previous build. Bot addresses such as `agent@arena.ai` or
+`probe@arena.local` do exactly that (`fe87b32` and `2c7e039` on this repo are real examples), so
+every commit — human or automated — must be authored with an address tied to the account that owns
+this repo:
 
 ```bash
 git config user.name  "Hike-Globally"
@@ -229,9 +239,24 @@ git config user.email "337236695+Hike-Globally@users.noreply.github.com"
 ```
 
 The numeric `ID+USERNAME@users.noreply.github.com` form is preferred because GitHub keeps it stable
-even after the account's email privacy setting changes; the plain `USERNAME@users.noreply.github.com`
-form also works. Run `git log -1 --pretty='%an <%ae>'` to check the identity of the commit you are
-about to push — rewriting the author of an already-pushed commit requires a force-push and a new PR.
+even after the account's email privacy setting changes. Run `git log -1 --pretty='%an <%ae>'` to
+check the identity of the commit you are about to push — rewriting the author of an already-pushed
+commit requires a force-push and a new PR.
+
+Before pushing, run the guard that encodes this rule:
+
+```bash
+npm run verify:commit-author                     # the commit Vercel would build (HEAD)
+npm run verify:commit-author origin/main..HEAD   # every commit on the branch
+```
+
+It exits non-zero and prints the exact `git config` fix when it finds an author address Vercel
+cannot verify, instead of leaving a blocked deployment behind.
+
+Only the tip of a push is built, so a merge commit authored by the verified account deploys even
+when one of the commits it merges came from a bot — that is why the direct pushes `fe87b32` and
+`2c7e039` were blocked while the surrounding merge commits deployed. Pushing through a pull
+request therefore always deploys; pushing directly does not.
 
 #### If a pushed commit has a bad author
 

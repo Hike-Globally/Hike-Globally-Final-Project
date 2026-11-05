@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Hike Globally — trekking & expedition website. Next.js App Router + Payload CMS 3 + PostgreSQL.",
+  "description": "Hike Globally \u2014 trekking & expedition website. Next.js App Router + Payload CMS 3 + PostgreSQL.",
   "license": "ISC",
   "scripts": {
     "dev": "next dev",
     "devsafe": "rm -rf .next && next dev",
-    "build": "next build",
+    "build": "payload generate:importmap && next build",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
@@ -22,7 +22,8 @@
     "migrate:down": "payload migrate:down",
     "seed": "tsx src/scripts/seed.ts",
     "postinstall": "payload generate:importmap && patch-package",
-    "generate:globe-dots": "node scripts/generate-globe-dots.mjs"
+    "generate:globe-dots": "node scripts/generate-globe-dots.mjs",
+    "verify:commit-author": "node scripts/check-commit-author.mjs"
   },
   "dependencies": {
     "@carrot-kpi/switzer-font": "^0.1.0",
