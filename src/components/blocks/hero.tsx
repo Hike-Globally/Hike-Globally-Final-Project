@@ -9,12 +9,6 @@ import { cn } from '@/lib/utils'
 
 import { HomepageHeroBackground } from './hero-background'
 
-const heights: Record<string, string> = {
-  full: 'min-h-[100svh]',
-  tall: 'min-h-[88svh]',
-  compact: 'min-h-[62svh]',
-}
-
 const overlays: Record<string, string> = {
   strong: 'bg-ink/70',
   medium: 'bg-ink/45',
@@ -38,25 +32,29 @@ export function Hero({
   const primary = resolveLink(block.primaryLink)
   const secondary = resolveLink(block.secondaryLink)
   const hasImage = homepage || Boolean(block.backgroundImage)
-  const height = homepage
-    ? 'h-full min-h-[100svh]'
-    : (heights[block.height ?? 'tall'] ?? heights.tall!)
   const overlay = overlays[block.overlay ?? 'medium'] ?? overlays.medium!
   const eyebrow = block.eyebrow?.trim()
   const showEyebrow = Boolean(eyebrow && (!homepage || eyebrow.toLowerCase() !== 'home'))
 
   /* The heading is a plain-text field, but an editor may wrap part of it in
-     `<i>…</i>` to have it set in the accent face — on the homepage that is the
-     90px Instrument Serif italic line under the 120px first line. Anything
-     else in the string stays literal text (see lib/inline-emphasis.ts). */
+     `<i>…</i>` to have it set in the accent face — on every hero that is the
+     Instrument Serif italic line under the headline (see
+     lib/inline-emphasis.ts). Anything else in the string stays literal text. */
   const headingSegments = splitInlineEmphasis(block.heading)
 
+  /* One hero, everywhere: every hero block is a full-screen band and carries
+     the homepage hero's type (`.hero-region`, `.hero-title`,
+     `.hero-description` — see `globals.css`). An editor cannot shorten it, so
+     the page rhythm is identical wherever a hero is placed.
+
+     `h-full` is only meaningful on the homepage, where `HeroScrollCover` pins
+     the band inside a `100svh` sticky stage. */
   return (
     <section
       data-header-hero={opening ? 'true' : undefined}
       className={cn(
-        'relative isolate flex items-end overflow-hidden',
-        height,
+        'hero-region relative isolate flex items-end overflow-hidden',
+        homepage && 'h-full',
         hasImage ? 'bg-ink text-mist' : 'bg-mist text-ink',
       )}
     >
@@ -76,27 +74,21 @@ export function Hero({
         </>
       ) : null}
 
-      <div
-        className={cn(
-          'container-content',
-          homepage
-            ? 'pt-24 pb-20 md:pt-28 md:pb-20 [@media(max-height:500px)]:py-8'
-            : 'py-20 sm:py-24 md:py-28 [@media(max-height:500px)]:py-12',
-        )}
-      >
-        {/* The homepage hero's copy column spans the full content width: its
-            headline is set at 120px (90px on the italic second line), and the
-            768px measure every other hero uses would wrap "Walk Where The"
-            mid-phrase. Individual elements below cap their own width. */}
-        <div className={cn('min-w-0', homepage ? 'max-w-none' : 'max-w-3xl 3xl:max-w-4xl')}>
+      <div className="container-content pt-24 pb-20 md:pt-28 md:pb-20 [@media(max-height:500px)]:py-8">
+        {/* The copy column spans the full content width — the headline is set
+            at hero size (up to 72px) and every hero's copy is bottom-aligned,
+            so the band reads the same whether one line or three fit. Elements
+            below cap their own measure. */}
+        <div className="min-w-0 max-w-none">
           {showEyebrow ? (
-            <p className={cn('eyebrow mb-5', hasImage ? 'text-mist/85' : 'text-slate-80')}>{eyebrow}</p>
+            <p className={cn('eyebrow mb-5', hasImage ? 'text-mist/85' : 'text-slate-80')}>
+              {eyebrow}
+            </p>
           ) : null}
 
           <h1
             className={cn(
-              'heading-display',
-              homepage ? 'home-hero-title' : '',
+              'heading-display hero-title max-w-4xl 3xl:max-w-5xl',
               hasImage ? 'text-white' : 'text-ink',
             )}
           >
@@ -110,11 +102,7 @@ export function Hero({
           {block.subheading ? (
             <p
               className={cn(
-                'lead mt-6',
-                homepage ? 'home-hero-lead' : '',
-                /* 36rem keeps the standfirst on the same ~576px measure it had
-                   when the column itself was 768px wide and this was `w-3/4`. */
-                homepage ? 'max-w-[36rem]' : 'max-w-2xl',
+                'lead hero-description mt-6 max-w-[36rem]',
                 hasImage ? 'text-mist/90' : 'text-ink-60',
               )}
             >

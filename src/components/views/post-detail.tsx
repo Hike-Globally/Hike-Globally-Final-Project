@@ -93,7 +93,7 @@ export function PostDetail({
       <>
         <header
           data-header-hero
-          className="relative isolate flex min-h-[min(68svh,46rem)] items-end overflow-hidden bg-ink text-mist md:min-h-[min(76svh,52rem)] lg:min-h-[min(86svh,58rem)]"
+          className="hero-region relative isolate flex items-end overflow-hidden bg-ink text-mist"
         >
           <PayloadImageFill
             media={post.featuredImage}
@@ -136,18 +136,13 @@ export function PostDetail({
               </p>
 
               <div className="mt-6 max-w-[34rem] lg:max-w-[42rem]">
-                <h1
-                  id="post-title"
-                  className="font-display text-[clamp(2.1rem,6vw,4.9rem)] leading-[1.03] text-white 3xl:text-[clamp(4.9rem,3vw,6.5rem)]"
-                >
+                <h1 id="post-title" className="heading-display hero-title text-white">
                   {post.title}
                 </h1>
-                {/* The excerpt is pinned to 16px instead of riding the fluid
-                    `description-copy` scale — supporting copy under a hero title should hold
-                    its size on every viewport, TVs included. */}
-                <p className="mt-6 max-w-2xl text-body leading-relaxed text-mist md:leading-[1.75]">
-                  {post.excerpt}
-                </p>
+                {/* The excerpt reads the site's hero standfirst, exactly like every other
+                    hero on the site (`.hero-description` — see `globals.css`), instead of
+                    shrinking to body copy. */}
+                <p className="lead hero-description mt-6 max-w-2xl text-mist">{post.excerpt}</p>
               </div>
 
               <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3 text-small text-mist/85">

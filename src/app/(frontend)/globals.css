@@ -72,6 +72,12 @@
      they sit on a paper (`mist`) plate while they load, they are framed with a
      1px ink hairline rather than lifted with a drop shadow, and copy over a
      photograph always sits on the same single navy scrim (`--scrim-ink`).
+
+   Hero — one band and one type scale on every page (the homepage's, promoted to
+     the whole site; see `--hero-*` in `@theme` and the `.hero-region` /
+     `.hero-title` / `.hero-description` rules further down): exactly one
+     viewport tall, a 42 → 72px display headline with its italic accent line,
+     and a 17 → 18px standfirst.
    ========================================================================== */
 
 @theme {
@@ -174,6 +180,32 @@
   /* One shared rhythm: every section paddings, card padding and stack gap is a
      multiple of these, so spacing is consistent from the hero to the footer. */
   --spacing-card: clamp(1.25rem, 0.9rem + 1.1vw, 2rem);
+
+  /* --- Hero geometry and hero type — one hero, everywhere -----------------
+     Every hero on the site (the homepage's, a CMS page's hero block, the three
+     listing banners, the three detail mastheads and the page header behind
+     `/inquiry`) is a full-screen band: exactly one viewport tall, and never
+     shorter than its copy needs. `--hero-min-height` is that height, and
+     `100svh` (small viewport height) is deliberate — the band fills the screen
+     without a phone's browser chrome pushing the copy underneath it.
+
+     Its three type roles are the homepage hero's, promoted to the whole site:
+
+       role         track                size / line-height
+       headline     .hero-title          min(clamp(42px … 72px), 53svh − 14.25rem)
+       accent line  <i> inside the title same size, Instrument Serif italic
+       description  .hero-description    next to `lead`  17px → 18px / 1.7
+                                        (a page names its own standfirst class
+                                        and the hero rules make it match)
+
+     The `53svh - 14.25rem` ceiling is what keeps the copy visible on a short
+     screen: the band is one viewport tall, so a headline can only grow while
+     the eyebrow, buttons and gutters still fit beside it. It resolves against
+     the viewport rather than the band, so it behaves identically in the
+     homepage's pinned hero, a listing banner and an article masthead. */
+  --hero-min-height: 100svh;
+  --hero-title-size: min(clamp(2.625rem, 1.9rem + 3.2vw, 4.5rem), 53svh - 14.25rem);
+  --hero-title-accent-size: var(--hero-title-size);
 
   /* --- Motion: one shared easing curve keeps every animation feeling related --- */
   --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
@@ -983,6 +1015,93 @@
 
   .heading-xl {
     font-size: min(var(--text-section), 6.5vh);
+  }
+}
+
+/* ==========================================================================
+   Hero regions — one full-screen band, one type scale
+   ==========================================================================
+   Every page on the site opens with a hero: the homepage's video plate, a CMS
+   page's `hero` block, the three listing banners (`/trips`, `/destinations`,
+   `/blog`), the trip, destination and article mastheads, and `/inquiry`'s page
+   header.
+
+   They share one set of classes, so a new hero cannot drift away from the rest:
+
+     .hero-region       the band itself — exactly one viewport tall
+                        (`--hero-min-height` in `@theme`), and never shorter
+                        than the copy inside it
+     .hero-title        the h1 — the homepage hero's headline size
+     .hero-title i      its italic accent line (the `<i>…</i>` an editor
+                        writes into a heading, parsed by `lib/inline-emphasis`)
+     .hero-description  the standfirst under it — the homepage hero's lead size
+
+   These rules are deliberately *unlayered* plain CSS. Unlayered rules beat
+   anything in `@layer`, which includes every Tailwind v4 `@utility` in this
+   file — so a hero keeps the site's hero type even where the markup also
+   carries `text-*`, `leading-*` or a page-local class. The same technique
+   `homepage.css`, `blog.css` and `destinations.css` already rely on.
+
+   The type values themselves live in `@theme` (see `--hero-title-size` and
+   `--hero-min-height`): the homepage's scale, promoted from one page to the
+   whole site.
+   ========================================================================== */
+.hero-region {
+  /* `svh`, not `vh`: a phone's browser chrome must never push the hero copy
+     below the fold. The rest of the site (the pinned homepage stage, the card
+     heights) measures in `svh` for the same reason. */
+  min-height: var(--hero-min-height);
+}
+
+.hero-title {
+  font-size: var(--hero-title-size);
+}
+
+/* The emphasized part of a hero heading — the homepage's second line.
+
+   `display: block` is what actually makes it a second line: deterministic at
+   every viewport width, rather than relying on large copy happening to wrap.
+
+   Instrument Serif ships a single 400 weight and a *true* 400 italic, so both
+   `font-weight` and any inherited negative tracking have to be reset —
+   otherwise the browser synthesises a bold out of a face that has none and
+   squeezes letterforms that were drawn to be loose. */
+.hero-title i {
+  display: block;
+  margin-top: 0.05em;
+  font-family: var(--font-serif-accent);
+  font-size: var(--hero-title-accent-size);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1.08;
+}
+
+/* The hero standfirst. Pairs with the `lead` utility on the pages whose markup
+   already carries it (`<p class="lead hero-description">`): the utility paints
+   the colour and the role, this pins the size to the hero's own step of it. */
+.hero-description {
+  font-size: var(--text-lead);
+  line-height: var(--text-lead--line-height);
+}
+
+/* Short landscape phones (5–6" rotated): a full-screen band has very little
+   height to give, so the headline drops to a viewport-derived size, the gutters
+   above and below the copy close up, and the whole hero still fits inside the
+   fold. Same shape as the `heading-display` override above. */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero-title {
+    font-size: min(var(--text-hero), 8vh);
+  }
+
+  .hero-title i {
+    font-size: min(var(--text-hero), 6vh);
+  }
+
+  /* The copy sits inside each hero's `.container-content`, whichever page it
+     belongs to — so one rule keeps every hero's padding out of the way. */
+  .hero-region > .container-content {
+    padding-block: 4rem 2rem;
   }
 }
 

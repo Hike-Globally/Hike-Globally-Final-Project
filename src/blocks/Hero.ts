@@ -14,7 +14,7 @@ export const Hero: Block = {
       required: true,
       admin: {
         description:
-          'Wrap part of the heading in <i>…</i> to set it in the italic accent face. On the homepage that part becomes its own second line in Instrument Serif italic at 90px, under the first line at 120px — e.g. "Walk Where The <i>Map Runs Out of Names</i>". Anywhere else it stays inline italic. Only <i> and <em> are recognised; every other tag is shown as plain text.',
+          'Wrap part of the heading in <i>…</i> to set it in the italic accent face: it becomes its own second line, in Instrument Serif italic at the same size as the headline — e.g. "Walk Where The <i>Map Runs Out of Names</i>". Every hero on the site sets it the same way. Only <i> and <em> are recognised; every other tag is shown as plain text.',
       },
     },
     { name: 'subheading', type: 'textarea' },
@@ -29,17 +29,10 @@ export const Hero: Block = {
     },
     linkField({ name: 'primaryLink', label: 'Primary button' }),
     linkField({ name: 'secondaryLink', label: 'Secondary button' }),
-    {
-      name: 'height',
-      type: 'select',
-      defaultValue: 'tall',
-      options: [
-        { label: 'Full screen', value: 'full' },
-        { label: 'Tall', value: 'tall' },
-        { label: 'Compact', value: 'compact' },
-      ],
-      admin: { position: 'sidebar' },
-    },
+    /* There is no height setting: every hero on the site is a full-screen band
+       (`.hero-region` — see `frontend/globals.css`), the same one viewport tall
+       whether it opens the homepage, a listing or a detail page. An editor cannot
+       shorten it, so the page rhythm is identical everywhere a hero is placed. */
     {
       name: 'overlay',
       type: 'select',

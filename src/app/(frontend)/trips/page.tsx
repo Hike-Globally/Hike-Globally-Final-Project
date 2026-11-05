@@ -46,7 +46,7 @@ export default async function TripsPage() {
         aria-labelledby="trips-heading"
         data-header-hero
         data-trips-page
-        className="relative isolate flex min-h-[min(78svh,52rem)] items-end overflow-hidden bg-ink text-mist"
+        className="hero-region relative isolate flex items-end overflow-hidden bg-ink text-mist"
       >
         <Image
           src={TRIPS_HERO_IMAGE}
@@ -68,10 +68,10 @@ export default async function TripsPage() {
           />
 
           <p className="eyebrow mt-10 text-mist">Nepal, one trail at a time</p>
-          <h1 id="trips-heading" className="heading-display mt-5 max-w-4xl text-white">
+          <h1 id="trips-heading" className="heading-display hero-title mt-5 max-w-4xl text-white">
             {dict.trips.listingTitle}
           </h1>
-          <p className="lead trips-hero-lead mt-6 max-w-2xl text-mist">
+          <p className="lead hero-description mt-6 max-w-2xl text-mist">
             {dict.trips.listingSubtitle}
           </p>
 

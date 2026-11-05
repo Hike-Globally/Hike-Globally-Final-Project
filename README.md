@@ -68,15 +68,33 @@ capped at ~4.5 MB — larger originals need Blob plus `BLOB_CLIENT_UPLOADS=true`
 
 ## Design tokens
 
-Headings **Google Sans Flex 600**, body **Archivo 300** (self-hosted variable fonts).
+Headings **Instrument Serif 400**, body **Archivo** (self-hosted variable fonts). The single
+source of truth is `src/app/(frontend)/globals.css`.
 
 | Token   | Hex       |
 | ------- | --------- |
-| `ink`   | `#04151f` |
-| `deep`  | `#1d3557` |
-| `slate` | `#283618` |
-| `sage`  | `#F7A230` |
-| `mist`  | `#f8f9fa` |
+| `ink`   | `#183144` |
+| `deep`  | `#2177b5` |
+| `slate` | `#79706d` |
+| `sage`  | `#d0564d` |
+| `mist`  | `#f6f6f6` |
+
+### Heroes
+
+Every page opens with one hero band and they all render identically — the homepage's hero is the
+site's hero, not a special case:
+
+| Class              | What it is                                                                                       |
+| ------------------ | ------------------------------------------------------------------------------------------------ |
+| `.hero-region`     | The band: exactly one viewport tall (`--hero-min-height: 100svh`), never shorter than its copy.  |
+| `.hero-title`      | The h1: the display face at `min(clamp(42px … 72px), 53svh - 14.25rem)` — 42px on a phone, 72px on a desktop, capped by height so a short screen keeps the copy visible. |
+| `.hero-title i`    | The italic accent line an editor writes as `<i>…</i>` in a heading — `display: block`, so it is always the second line. |
+| `.hero-description`| The standfirst: the lead role (17px → 18px, 1.7).                                                |
+
+They cover the homepage, CMS `hero` blocks, `/trips`, `/destinations`, `/blog`, the trip /
+destination / article mastheads and the page header behind `/inquiry`. Use them (not a bespoke
+size) for any hero added later; the values live in `@theme` as `--hero-min-height`,
+`--hero-title-size` and `--hero-title-accent-size`.
 
 ## SEO
 

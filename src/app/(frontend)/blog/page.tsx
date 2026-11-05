@@ -56,7 +56,7 @@ export default async function BlogPage() {
       <section
         aria-labelledby="blog-heading"
         data-header-hero
-        className="relative isolate flex min-h-[min(78svh,52rem)] items-end overflow-hidden bg-ink text-mist"
+        className="hero-region relative isolate flex items-end overflow-hidden bg-ink text-mist"
       >
         <Image
           src={BLOG_HERO_IMAGE}
@@ -78,10 +78,10 @@ export default async function BlogPage() {
           />
 
           <p className="eyebrow mt-10 text-mist">{dict.blog.heroEyebrow}</p>
-          <h1 id="blog-heading" className="heading-display mt-5 max-w-4xl text-white">
+          <h1 id="blog-heading" className="heading-display hero-title mt-5 max-w-4xl text-white">
             {dict.blog.listingTitle}
           </h1>
-          <p className="lead blog-hero-lead mt-6 max-w-2xl text-mist">
+          <p className="lead hero-description mt-6 max-w-2xl text-mist">
             {dict.blog.listingSubtitle}
           </p>
 
