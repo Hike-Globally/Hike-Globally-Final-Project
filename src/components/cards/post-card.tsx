@@ -70,7 +70,7 @@ export function PostCard({
 
         <h3
           className={cn(
-            'mt-3 font-heading font-semibold text-ink',
+            'post-card-title mt-3 font-heading font-semibold text-ink',
             'text-card',
           )}
         >

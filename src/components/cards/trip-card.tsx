@@ -53,7 +53,7 @@ export function TripCard({
           )}
           <Badge
             variant={difficultyBadgeVariant(trip.difficulty)}
-            className="max-w-[10.5rem] text-center leading-snug whitespace-normal"
+            className="trip-card-difficulty max-w-[10.5rem] text-center leading-snug whitespace-normal"
           >
             {difficultyLabel(trip.difficulty)}
           </Badge>
@@ -68,7 +68,7 @@ export function TripCard({
       <div className="flex flex-1 flex-col p-5">
         <h3
           className={cn(
-            'font-heading text-card font-semibold break-words text-ink',
+            'trip-card-title font-heading text-card font-semibold break-words text-ink',
             titleClassName,
           )}
         >

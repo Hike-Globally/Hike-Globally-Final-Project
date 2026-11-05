@@ -48,3 +48,22 @@
 [data-blog-page] .post-card-description {
   font-size: var(--blog-card-description-size);
 }
+
+/* Journal titles — larger, black text on the white card surface. Set the link
+   color explicitly as well so it cannot pick up a light inherited link color.
+   The photographic hero and article-page cards keep their existing styles. */
+[data-blog-page] .post-card-title {
+  color: #000;
+  font-size: 1.5rem;
+  line-height: 1.3;
+}
+
+[data-blog-page] .post-card-title a {
+  color: inherit;
+}
+
+@media (min-width: 48rem) {
+  [data-blog-page] .post-card-title {
+    font-size: 1.75rem;
+  }
+}
