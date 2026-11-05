@@ -121,6 +121,37 @@ One `.table-wrap` card with a sticky `#F6F6F6` header (`#79716D` uppercase
 soft selection wash. Pagination, item counts and per-page controls share one
 unified `.page-controls` footer card.
 
+### Document action bar and the Publish button
+
+The sticky `.doc-controls` bar holds status, timestamps, `View live page`,
+`Expand preview`, the Publish action and the dot menu — all 32px tall, all on
+one line.
+
+Publish is the only control with a solid `#2177B5` fill; it settles to `#183144`
+on hover and press. It carries an upward arrow in a fixed 16px mask slot, set
+`--hg-space-2` (8px) from the label, and the label keeps the same 16px inline
+padding as the outline buttons beside it, so the four controls read as one row
+rather than four different shapes.
+
+Payload renders this action in **two** shapes, and both must be covered:
+
+| Document | DOM |
+| --- | --- |
+| Localized fields (trips, blog, pages, destinations) — the locale/schedule menu is enabled | `btn--style-primary` / `btn--withPopup` land on a wrapper `<div>`; the real `<button>` inside gets only layout classes, followed by a chevron `.popup-button` |
+| No localized fields | a single `<button class="btn btn--style-primary">` |
+
+So the fill, shadow, height and radius belong to `.form-submit > .btn--style-primary`
+(the face), while the inner `<button>` and the chevron segment stay transparent
+and inherit their colour and typography. The chevron is separated by a 1px
+`--hg-primary-seam` hairline, never by a second background colour, and the whole
+control lifts 1px on hover. When there is nothing to publish the face keeps its
+slot and scale but drops to `--hg-bg-inset` with `--hg-text-disabled` ink.
+
+Three ornament tokens support this and live in `admin-theme.css`:
+`--hg-primary-edge` (1px inner highlight along the top edge), `--hg-primary-seam`
+(the split seam and the same highlight on hover) and `--hg-primary-raised` (the
+chevron wash on hover/focus).
+
 ### Forms and editors
 
 Inputs and `react-select` controls sit at 40px on `#FFFFFF` with `#87AABD`
