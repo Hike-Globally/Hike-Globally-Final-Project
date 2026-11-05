@@ -53,18 +53,18 @@ export default async function InquiryPage() {
               <ul className="space-y-4 text-[0.9375rem]">
                 {settings.email ? (
                   <li className="flex items-center gap-3">
-                    <Mail className="size-4 shrink-0 text-deep" aria-hidden />
-                    <a href={`mailto:${settings.email}`} className="text-ink-80 hover:text-deep">
+                    <Mail className="size-4 shrink-0 text-sage-90" aria-hidden />
+                    <a href={`mailto:${settings.email}`} className="text-ink-80 hover:text-deep-90">
                       {settings.email}
                     </a>
                   </li>
                 ) : null}
                 {settings.phone ? (
                   <li className="flex items-center gap-3">
-                    <Phone className="size-4 shrink-0 text-deep" aria-hidden />
+                    <Phone className="size-4 shrink-0 text-sage-90" aria-hidden />
                     <a
                       href={`tel:${settings.phone.replace(/\s+/g, '')}`}
-                      className="text-ink-80 hover:text-deep"
+                      className="text-ink-80 hover:text-deep-90"
                     >
                       {settings.phone}
                     </a>
@@ -72,12 +72,12 @@ export default async function InquiryPage() {
                 ) : null}
                 {settings.whatsapp ? (
                   <li className="flex items-center gap-3">
-                    <MessageCircle className="size-4 shrink-0 text-deep" aria-hidden />
+                    <MessageCircle className="size-4 shrink-0 text-sage-90" aria-hidden />
                     <Link
                       href={`https://wa.me/${settings.whatsapp}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-ink-80 hover:text-deep"
+                      className="text-ink-80 hover:text-deep-90"
                     >
                       {dict.inquiry.openWhatsApp}
                     </Link>
@@ -86,12 +86,12 @@ export default async function InquiryPage() {
               </ul>
 
               {settings.responseTimeNote ? (
-                <p className="mt-6 text-[0.9375rem] text-deep">{settings.responseTimeNote}</p>
+                <p className="mt-6 text-[0.9375rem] text-deep-90">{settings.responseTimeNote}</p>
               ) : null}
             </div>
 
             {settings.address ? (
-              <div className="border border-black/[0.06] p-5 sm:p-7">
+              <div className="border border-slate-20 p-5 sm:p-7">
                 <h2 className="heading-md mb-4">{dict.structuredData.organization}</h2>
                 <p className="text-[0.9375rem] whitespace-pre-line text-ink-70">
                   {settings.address}

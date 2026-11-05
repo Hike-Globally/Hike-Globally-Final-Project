@@ -97,10 +97,10 @@ export function ArticleShareButton({
       onClick={shareArticle}
       aria-label={label}
       className={cn(
-        'inline-flex h-10 items-center justify-center gap-2 border px-4 text-[0.8125rem] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-sage',
+        'inline-flex h-10 items-center justify-center gap-2 border px-4 text-[0.8125rem] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-3',
         tone === 'dark'
-          ? 'border-white/20 bg-white/[0.04] text-white hover:border-white/35 hover:bg-white/10'
-          : 'border-ink/15 bg-white text-ink hover:border-deep/35 hover:bg-mist',
+          ? 'border-mist/45 bg-ink/35 text-white hover:border-mist hover:bg-ink/60 focus-visible:outline-mist'
+          : 'border-slate-40 bg-white text-ink hover:border-ink hover:bg-mist focus-visible:outline-deep',
         className,
       )}
     >

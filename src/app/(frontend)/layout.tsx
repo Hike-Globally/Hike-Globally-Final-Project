@@ -13,41 +13,45 @@ import { imageUrl } from '@/lib/seo'
 import { resolveSiteUrlObject } from '@/lib/site-url'
 import './globals.css'
 
-/* Section typefaces, self-hosted from node_modules — the exact families the
-   ported designs specify: Inter (Latest Stories tiles), Switzer (pill nav) and
-   Instrument Serif (the homepage hero's italic accent line).
-
-   Instrument Serif is a plain @font-face import rather than a preloaded
-   next/font like the two primary families below: only the homepage hero uses
-   it, so its two small latin files are fetched on that page alone instead of
-   sitting on every page's critical path. */
-import '@fontsource-variable/inter'
-import '@carrot-kpi/switzer-font/400.css'
-import '@carrot-kpi/switzer-font/500.css'
-import '@carrot-kpi/switzer-font/700.css'
-import '@fontsource/instrument-serif/latin-400.css'
-import '@fontsource/instrument-serif/latin-400-italic.css'
-
 /**
- * Fonts are self-hosted from node_modules (@fontsource) instead of fetched from
- * fonts.googleapis.com. Next preloads them, generates a size-adjusted fallback metric, and
- * serves them from your own domain — which removes two third-party connections from the
- * critical path and eliminates the flash of unstyled text.
+ * Two typefaces, both self-hosted from node_modules (@fontsource) instead of
+ * fetched from fonts.googleapis.com:
+ *
+ *   · Archivo (variable)     — body copy, sub-headings, eyebrows, navigation, buttons
+ *   · Instrument Serif       — display tier: hero, section and page headlines,
+ *                              pull quotes, oversized numerals (plus the italic
+ *                              accent line an editor writes with `<i>…</i>`)
+ *
+ * Next preloads both, generates a size-adjusted fallback metric and serves them
+ * from your own domain — which keeps third-party connections off the critical
+ * path and eliminates the flash of unstyled text. The display face is preloaded
+ * because the hero headline is the LCP element on the homepage.
  */
-const headingFont = localFont({
-  src: '../../../node_modules/@fontsource-variable/google-sans-flex/files/google-sans-flex-latin-wght-normal.woff2',
-  variable: '--font-google-sans-flex',
-  display: 'swap',
-  preload: true,
-  fallback: ['system-ui', 'sans-serif'],
-})
-
 const bodyFont = localFont({
   src: '../../../node_modules/@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2',
   variable: '--font-archivo',
   display: 'swap',
   preload: true,
   fallback: ['system-ui', 'sans-serif'],
+})
+
+const displayFont = localFont({
+  src: [
+    {
+      path: '../../../node_modules/@fontsource/instrument-serif/files/instrument-serif-latin-400-normal.woff2',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../../node_modules/@fontsource/instrument-serif/files/instrument-serif-latin-400-italic.woff2',
+      weight: '400',
+      style: 'italic',
+    },
+  ],
+  variable: '--font-instrument-serif',
+  display: 'swap',
+  preload: true,
+  fallback: ['Georgia', 'Times New Roman', 'serif'],
 })
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -93,7 +97,7 @@ export async function generateMetadata(): Promise<Metadata> {
     icons: { icon: '/images/logo.svg' },
     formatDetection: { telephone: false },
     other: {
-      'theme-color': '#04151f',
+      'theme-color': '#183144',
     },
     alternates: {
       /**
@@ -115,7 +119,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#04151f',
+  themeColor: '#183144',
   colorScheme: 'light',
   width: 'device-width',
   initialScale: 1,
@@ -128,7 +132,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang={htmlLang}
-      className={`${headingFont.variable} ${bodyFont.variable} overflow-x-clip`}
+      className={`${displayFont.variable} ${bodyFont.variable} overflow-x-clip`}
     >
       {/* Google tag (gtag.js) & Google AdSense — verbatim from gtag.txt and ads.txt at the repo
           root. This root layout wraps every public page, so placing the snippets inside <head> is
@@ -159,7 +163,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <LivePreviewRefresh />
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-deep focus:px-5 focus:py-3 focus:text-mist"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-ink focus:px-5 focus:py-3 focus:text-white"
         >
           {dict.common.skipToContent}
         </a>

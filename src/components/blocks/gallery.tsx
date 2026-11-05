@@ -50,7 +50,7 @@ export function Gallery({ block }: { block: GalleryBlock }) {
                   />
                 </div>
                 {item.caption ? (
-                  <figcaption className="mt-3 text-[0.8125rem] text-slate">
+                  <figcaption className="mt-3 text-[0.8125rem] text-slate-80">
                     {item.caption}
                   </figcaption>
                 ) : null}

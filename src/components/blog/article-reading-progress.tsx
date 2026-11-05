@@ -45,7 +45,7 @@ export function ArticleReadingProgress({ articleId, label }: { articleId: string
       aria-valuemax={100}
       aria-valuemin={0}
       aria-valuenow={progress}
-      className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-1 bg-ink/10"
+      className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-1 bg-slate-20"
       role="progressbar"
     >
       <div

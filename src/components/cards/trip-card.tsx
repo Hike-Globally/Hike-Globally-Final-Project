@@ -34,11 +34,11 @@ export function TripCard({
   return (
     <article
       className={cn(
-        'group relative flex h-full flex-col overflow-hidden border border-black/[0.06] bg-card transition-[transform,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_18px_40px_-24px_rgba(4,21,31,0.35)]',
+        'group relative flex h-full flex-col overflow-hidden border border-slate-20 bg-card transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-ink-60',
         className,
       )}
     >
-      <Link href={href} className="relative block aspect-[4/3] overflow-hidden bg-mist-60">
+      <Link href={href} className="photo-plate relative block aspect-[4/3]">
         <PayloadImageFill
           media={trip.heroImage}
           sizes="(min-width: 1280px) 33vw, (min-width: 768px) 45vw, 92vw"
@@ -47,22 +47,20 @@ export function TripCard({
         />
         <div className="absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-4">
           {trip.featured ? (
-            <Badge variant="sage" className="backdrop-blur">
-              {dict.common.featured}
-            </Badge>
+            <Badge variant="sage">{dict.common.featured}</Badge>
           ) : (
             <span />
           )}
           <Badge
             variant={difficultyBadgeVariant(trip.difficulty)}
-            className="max-w-[10.5rem] bg-white/90 text-center leading-snug whitespace-normal backdrop-blur"
+            className="max-w-[10.5rem] text-center leading-snug whitespace-normal"
           >
             {difficultyLabel(trip.difficulty)}
           </Badge>
         </div>
         {destinationName ? (
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/70 to-transparent p-4 pt-10">
-            <p className="text-[0.8125rem] font-medium text-white/90">{destinationName}</p>
+          <div className="photo-scrim absolute inset-x-0 bottom-0 p-4 pt-12">
+            <p className="text-[0.8125rem] font-medium text-mist">{destinationName}</p>
           </div>
         ) : null}
       </Link>
@@ -88,7 +86,7 @@ export function TripCard({
           {trip.summary}
         </p>
 
-        <dl className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.8125rem] text-slate">
+        <dl className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.8125rem] text-slate-80">
           <div className="flex items-center gap-1.5">
             <Clock className="size-4" aria-hidden />
             <dt className="sr-only">{dict.trip.duration}</dt>
@@ -112,19 +110,19 @@ export function TripCard({
           ) : null}
         </dl>
 
-        <div className="mt-5 flex flex-wrap items-end justify-between gap-3 border-t border-black/[0.06] pt-4">
-          <p className="text-[0.8125rem] text-slate">
+        <div className="mt-5 flex flex-wrap items-end justify-between gap-3 border-t border-slate-20 pt-4">
+          <p className="text-[0.8125rem] text-slate-80">
             {dict.common.from}{' '}
             <span className="font-heading text-lg font-semibold text-ink">
               {formatPrice(trip.priceFrom, trip.priceCurrency)}
             </span>
-            <span className="ml-1 text-slate">
+            <span className="ml-1 text-slate-80">
               {trip.priceUnit === 'per-group' ? dict.common.perGroup : dict.common.perPerson}
             </span>
           </p>
           <span
             aria-hidden
-            className="grid size-9 place-items-center rounded-full border border-ink/10 text-ink transition-colors duration-300 group-hover:border-deep group-hover:bg-deep group-hover:text-mist"
+            className="grid size-9 place-items-center rounded-full border border-slate-40 text-ink transition-colors duration-300 group-hover:border-ink group-hover:bg-ink group-hover:text-white"
           >
             <ArrowUpRight className="size-4" />
           </span>

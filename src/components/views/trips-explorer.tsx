@@ -124,10 +124,10 @@ export function TripsExplorer({
   return (
     <div>
       <div className="container-content">
-        <div className="border border-black/[0.06] bg-card p-5 shadow-[0_1px_2px_rgba(4,21,31,0.04)] md:p-6">
+        <div className="border border-slate-20 bg-white p-5 md:p-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-              <Label className="mb-2 text-xs tracking-[0.12em] text-slate uppercase">
+              <Label className="mb-2 text-xs tracking-[0.12em] text-slate-80 uppercase">
                 {dict.trips.difficulty}
               </Label>
               <Select value={difficulty} onValueChange={setDifficultySearch}>
@@ -146,7 +146,7 @@ export function TripsExplorer({
             </div>
 
             <div>
-              <Label className="mb-2 text-xs tracking-[0.12em] text-slate uppercase">
+              <Label className="mb-2 text-xs tracking-[0.12em] text-slate-80 uppercase">
                 {dict.trips.season}
               </Label>
               <Select value={season} onValueChange={setSeason}>
@@ -167,7 +167,7 @@ export function TripsExplorer({
             </div>
 
             <div>
-              <Label className="mb-2 text-xs tracking-[0.12em] text-slate uppercase">
+              <Label className="mb-2 text-xs tracking-[0.12em] text-slate-80 uppercase">
                 {dict.trips.destination}
               </Label>
               <Select value={destination} onValueChange={setDestination}>
@@ -186,7 +186,7 @@ export function TripsExplorer({
             </div>
 
             <div>
-              <Label className="mb-2 text-xs tracking-[0.12em] text-slate uppercase">
+              <Label className="mb-2 text-xs tracking-[0.12em] text-slate-80 uppercase">
                 {dict.trips.sort}
               </Label>
               <Select value={sort} onValueChange={(value) => setSort(value as Sort)}>
@@ -204,7 +204,7 @@ export function TripsExplorer({
             </div>
           </div>
 
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-black/[0.06] pt-4">
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-20 pt-4">
             <p className="text-[0.9375rem] text-ink-60">
               {plural(dict.trips as unknown as Record<string, string>, filtered.length)}
             </p>
@@ -219,7 +219,7 @@ export function TripsExplorer({
 
       <div className="container-content mt-12">
         {filtered.length === 0 ? (
-          <div className="border border-dashed border-black/10 bg-mist p-8 text-center sm:p-12">
+          <div className="border border-dashed border-slate-40 bg-mist p-8 text-center sm:p-12">
             <h2 className="heading-md">{dict.common.noResultsTitle}</h2>
             <p className="lead mx-auto mt-3 max-w-lg">{dict.common.noResultsText}</p>
             <Button variant="outline" className="mt-6" onClick={reset}>

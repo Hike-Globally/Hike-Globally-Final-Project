@@ -123,7 +123,7 @@ function FooterLink({
   const external = /^https?:\/\//.test(link.href)
   const nonHttpProtocol = /^(?:mailto|tel):/i.test(link.href)
   const className =
-    'text-sm leading-none text-mist/90 transition-colors hover:text-white hover:underline underline-offset-4'
+    'text-sm leading-normal text-mist/80 transition-colors hover:text-white hover:underline underline-offset-4'
 
   if (external) {
     return (
@@ -159,7 +159,7 @@ function FooterColumnBlock({
 }) {
   return (
     <nav aria-label={column.heading}>
-      <h3 className="font-heading text-sm font-semibold text-white">{column.heading}</h3>
+      <h3 className="hg-footer__heading">{column.heading}</h3>
       <ul className="mt-4 space-y-2.5">
         {column.links.map((link) => (
           <li key={`${link.href}-${link.label}`}>
@@ -284,8 +284,8 @@ export async function Footer() {
           "Plan your trip" box section above it does. */}
       <div className="container-content grid gap-12 pt-12 md:pt-16 lg:grid-cols-12 lg:gap-8">
         <div className="lg:col-span-5 xl:col-span-4">
-          <h3 className="font-heading text-sm font-semibold text-white">{dict.footer.about}</h3>
-          <p className="hg-footer__description mt-4 max-w-[34ch] leading-relaxed text-mist/90">
+          <h3 className="hg-footer__heading">{dict.footer.about}</h3>
+          <p className="hg-footer__description mt-4 max-w-[34ch] leading-relaxed text-mist/80">
             {introduction}
           </p>
           <div className="mt-8 flex flex-wrap gap-2.5">
@@ -319,10 +319,27 @@ export async function Footer() {
 
       {/* Copyright left, creator credit right, pinned to the very bottom — on the
           same content column as the row above. */}
-      <div className="container-content mt-16 flex flex-col gap-3 pb-6 sm:flex-row sm:items-center sm:justify-between md:mt-24">
-        <p className="text-[11px] leading-snug text-mist/80">{copyright}</p>
-        <p className="text-[11px] leading-snug text-mist/80">
-          Made with ❤️ by{' '}
+      <div className="container-content mt-16 flex flex-col gap-3 border-t border-haze/20 pt-8 pb-6 sm:flex-row sm:items-center sm:justify-between md:mt-24">
+        <p className="text-[11px] leading-snug text-mist/70">{copyright}</p>
+        <p className="flex items-center gap-1.5 text-[11px] leading-snug text-mist/70">
+          Made with{' '}
+          <svg
+            className="hg-footer__mark"
+            width="11"
+            height="10"
+            viewBox="0 0 12 11"
+            fill="none"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path
+              d="M6 10S1 6.9 1 3.9A2.9 2.9 0 0 1 6 2.2 2.9 2.9 0 0 1 11 3.9C11 6.9 6 10 6 10Z"
+              stroke="currentColor"
+              strokeWidth="1.1"
+              strokeLinejoin="round"
+            />
+          </svg>{' '}
+          by{' '}
           <a
             href="https://growlithacademy.com/"
             target="_blank"

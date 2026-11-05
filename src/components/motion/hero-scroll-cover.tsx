@@ -141,7 +141,7 @@ export function HeroScrollCover({
 
       {/* Covering surface: slides smoothly up and covers the Hero section.
           Square top corners — no radius on either the left or the right side. */}
-      <div className="relative z-10 -mt-6 border-t border-black/[0.06] bg-background shadow-[0_-25px_60px_-15px_rgba(0,0,0,0.25)] transition-shadow">
+      <div className="relative z-10 -mt-6 border-t border-slate-20 bg-background">
         {/* Hero region ends where this edge reaches the top of the viewport: the global
             header stays pinned over the Hero until it is completely covered
             (see header-frame.tsx). Zero height, so it never affects layout. */}
@@ -159,7 +159,7 @@ export function HeroScrollCover({
                 ? { width: handleWidth, opacity: handleOpacity }
                 : undefined
             }
-            className="h-1.5 w-11 rounded-full bg-slate-300/80"
+            className="h-1 w-11 rounded-full bg-slate-40"
           />
         </div>
 

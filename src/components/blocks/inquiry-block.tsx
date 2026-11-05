@@ -30,7 +30,7 @@ export async function InquirySection({ block }: { block: InquiryBlock }) {
   return (
     <section
       id="inquiry"
-      className={cn('py-16 md:py-24', dark ? 'bg-ink text-mist' : 'bg-sage-20 text-ink')}
+      className={cn('py-16 md:py-24', dark ? 'bg-ink text-mist' : 'bg-mist text-ink')}
     >
       <div className="container-content">
         <div className="grid min-w-0 gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
@@ -75,7 +75,7 @@ export async function InquirySection({ block }: { block: InquiryBlock }) {
             </ul>
 
             {settings.responseTimeNote ? (
-              <p className={cn('mt-6 text-[0.9375rem]', dark ? 'text-sage' : 'text-deep')}>
+              <p className={cn('mt-6 text-[0.9375rem]', dark ? 'text-sage-light' : 'text-deep-90')}>
                 {settings.responseTimeNote}
               </p>
             ) : null}
@@ -84,7 +84,7 @@ export async function InquirySection({ block }: { block: InquiryBlock }) {
               <p
                 className={cn(
                   'mt-6 text-xs tracking-[0.14em] uppercase',
-                  dark ? 'text-mist/50' : 'text-slate',
+                  dark ? 'text-mist/70' : 'text-slate-80',
                 )}
               >
                 {settings.socials
@@ -102,7 +102,7 @@ export async function InquirySection({ block }: { block: InquiryBlock }) {
               variant={dark ? 'dark' : 'light'}
             />
             {block.note ? (
-              <p className={cn('mt-4 text-[0.8125rem]', dark ? 'text-mist/60' : 'text-slate')}>
+              <p className={cn('mt-4 text-[0.8125rem]', dark ? 'text-mist/80' : 'text-slate-80')}>
                 {block.note}
               </p>
             ) : null}

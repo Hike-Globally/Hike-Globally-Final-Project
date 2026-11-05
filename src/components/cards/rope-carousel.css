@@ -6,18 +6,20 @@
    ========================================================================== */
 
 .rcc-mask {
+  /* Masks read the alpha channel, so the opaque stop is the brand ink rather
+     than a bare `#000` — no colour in this file sits outside the tokens. */
   -webkit-mask-image: linear-gradient(
     90deg,
     transparent 0px,
-    #000 24px,
-    #000 calc(100% - 24px),
+    var(--color-ink) 24px,
+    var(--color-ink) calc(100% - 24px),
     transparent 100%
   );
   mask-image: linear-gradient(
     90deg,
     transparent 0px,
-    #000 24px,
-    #000 calc(100% - 24px),
+    var(--color-ink) 24px,
+    var(--color-ink) calc(100% - 24px),
     transparent 100%
   );
 }
@@ -26,34 +28,28 @@
     -webkit-mask-image: linear-gradient(
       90deg,
       transparent 0px,
-      #000 72px,
-      #000 calc(100% - 72px),
+      var(--color-ink) 72px,
+      var(--color-ink) calc(100% - 72px),
       transparent 100%
     );
     mask-image: linear-gradient(
       90deg,
       transparent 0px,
-      #000 72px,
-      #000 calc(100% - 72px),
+      var(--color-ink) 72px,
+      var(--color-ink) calc(100% - 72px),
       transparent 100%
     );
   }
 }
 
+/* A hanging card does cast something, so it keeps one shadow from the shared
+   elevation scale — the four-layer stack it used to carry is gone. */
 .rcc-face {
-  box-shadow:
-    0 1px 2px rgba(24, 18, 12, 0.063),
-    0 12px 24px -14px rgba(24, 18, 12, 0.234),
-    0 34px 64px -34px rgba(24, 18, 12, 0.27),
-    inset 0 0 0 1px rgba(24, 18, 12, 0.045);
+  box-shadow: var(--shadow-md);
   transition: box-shadow 0.5s ease;
 }
 .rcc-face:hover {
-  box-shadow:
-    0 1px 2px rgba(24, 18, 12, 0.063),
-    0 12px 24px -14px rgba(24, 18, 12, 0.328),
-    0 34px 64px -34px rgba(24, 18, 12, 0.378),
-    inset 0 0 0 1px rgba(24, 18, 12, 0.045);
+  box-shadow: var(--shadow-lg);
 }
 .rcc-face img,
 .rcc-face video {
@@ -64,8 +60,8 @@
   transform: scale(1.045);
 }
 .rcc-face:focus-visible {
-  outline: 2px solid rgb(255, 255, 255);
-  outline-offset: 3px;
+  outline: 2px solid var(--color-deep);
+  outline-offset: 4px;
 }
 .rcc-shade {
   opacity: 0;

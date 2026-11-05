@@ -16,9 +16,10 @@ import './latest-blogs-section.css'
  * numbered index of the stories behind it (see `blog-dispatch-board.tsx`).
  *
  * The heading is the shared `SectionHeading` with `home-section-title`, so it is
- * an `<h2>` rendered at exactly the size, weight and uppercase treatment of the
- * DESTINATIONS headline above it — one type scale, no per-section tuning. Every
- * card title underneath it is an `<h3>`, one level down from the section.
+ * an `<h2>` rendered in exactly the same display face, size and weight as the
+ * destinations headline above it — one type scale, no per-section tuning, and no
+ * section shouting in capitals. Every card title underneath it is an `<h3>`, one
+ * level down from the section.
  *
  * Content is real CMS content (`getPosts`, newest published first), so a fresh
  * database still renders the section from `defaultPosts` instead of showing a
@@ -142,9 +143,9 @@ export async function LatestBlogsSection() {
     <section
       data-blog-dispatch=""
       /* `bg-mist` gives the journal its own sheet of paper between the white
-         destinations slider and the sage "Plan your trip" panel — the contour
-         wash below reads as printing on it rather than as a shape floating over
-         the page background. */
+         destinations slider above and the closing panel below — the one tinted
+         band on the page, so the contour wash reads as printing on paper rather
+         than as a shape floating over the page background. */
       className="relative bg-mist py-16 md:py-24"
       aria-labelledby={HEADING_ID}
     >

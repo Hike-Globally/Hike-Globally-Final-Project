@@ -48,7 +48,7 @@ export function SectionHeading({
     >
       <div className={align === 'center' ? 'max-w-2xl' : 'max-w-2xl'}>
         {eyebrow ? (
-          <p className={cn('eyebrow mb-3', variant === 'light' ? 'text-sage' : 'text-slate')}>
+          <p className={cn('eyebrow mb-3', variant === 'light' ? 'text-mist' : 'text-slate-80')}>
             {eyebrow}
           </p>
         ) : null}
@@ -66,7 +66,7 @@ export function SectionHeading({
           <p
             className={cn(
               'lead mt-4',
-              variant === 'light' ? 'text-mist/75' : 'text-ink-60',
+              variant === 'light' ? 'text-mist' : 'text-ink-60',
               descriptionClassName,
             )}
           >
@@ -83,7 +83,9 @@ export function SectionHeading({
               href={action.href}
               className={cn(
                 'group inline-flex shrink-0 items-center gap-2 text-[0.9375rem] font-medium transition-colors',
-                variant === 'light' ? 'text-white hover:text-sage' : 'text-deep hover:text-ink',
+                variant === 'light'
+                  ? 'text-white hover:text-sage-light'
+                  : 'text-deep hover:text-deep-80',
               )}
             >
               {action.label}

@@ -11,12 +11,13 @@
                                         the `<i>…</i>` the editor writes in the hero
                                         heading field (see lib/inline-emphasis.ts)
      .home-hero-lead              17px  hero standfirst ("Small-group treks and…")
-     .home-section-title          50px  every section headline, uppercase
+     .home-section-title          50px  every section headline, in the display serif
+                                        and in the case the editor wrote it in
      .home-section-lead           17px  the About Hike Globally standfirst
      .home-section-intro          16px  every other section intro
      .destination-card-title      23px  destination card heading
      .destination-card-description 16px destination card description
-     .home-blog-lead-title        40px  the lead story of the journal board
+     .home-blog-lead-title        40px  the lead story of the journal board, display serif
      .home-blog-row-title         23px  journal board index-row titles — the same
                                         card tier as `.destination-card-title`
      .home-blog-description       16px  the lead story's standfirst
@@ -142,11 +143,19 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Section headlines — 50px, uppercase
-   --------------------------------------------------------------------------- */
+   Section headlines — 50px in the display serif, in the case they were written
+   ---------------------------------------------------------------------------
+   Unlayered, so these three declarations also win over any `font-heading`,
+   `font-semibold`, `tracking-[…]` or `uppercase` utility a section still
+   carries on the same element: every homepage headline is set the same way,
+   without each section having to be edited into line. */
 [data-homepage] .home-section-title {
+  font-family: var(--font-display);
   font-size: var(--home-section-title-size);
-  text-transform: uppercase;
+  font-weight: 400;
+  letter-spacing: 0.002em;
+  line-height: 1.08;
+  text-transform: none;
 }
 
 /* ---------------------------------------------------------------------------
@@ -175,7 +184,10 @@
    Journal board — 40px lead story / 23px index rows
    --------------------------------------------------------------------------- */
 [data-homepage] .home-blog-lead-title {
+  font-family: var(--font-display);
   font-size: var(--home-blog-lead-title-size);
+  font-weight: 400;
+  letter-spacing: 0;
   line-height: 1.14;
 }
 

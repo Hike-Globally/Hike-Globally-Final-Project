@@ -35,10 +35,13 @@ export function Testimonials({ block }: { block: TestimonialsBlock }) {
                 <figure
                   className={cn(
                     'flex h-full flex-col border p-7',
-                    dark ? 'border-white/10 bg-white/[0.04]' : 'border-black/[0.06] bg-card',
+                    dark ? 'border-white/10 bg-ink-80' : 'border-slate-20 bg-white',
                   )}
                 >
-                  <Quote className={cn('size-7', dark ? 'text-sage' : 'text-sage')} aria-hidden />
+                  <Quote
+                    className={cn('size-7', dark ? 'text-sage-light' : 'text-sage')}
+                    aria-hidden
+                  />
 
                   <div className="mt-5 flex gap-0.5" aria-label={`${rating} out of 5`}>
                     {Array.from({ length: 5 }).map((_, star) => (
@@ -47,10 +50,12 @@ export function Testimonials({ block }: { block: TestimonialsBlock }) {
                         className={cn(
                           'size-4',
                           star < rating
-                            ? 'fill-sage text-sage'
+                            ? dark
+                              ? 'fill-sage-light text-sage-light'
+                              : 'fill-sage text-sage'
                             : dark
-                              ? 'text-white/20'
-                              : 'text-ink/15',
+                              ? 'text-mist/30'
+                              : 'text-slate-20',
                         )}
                         aria-hidden
                       />
@@ -60,7 +65,7 @@ export function Testimonials({ block }: { block: TestimonialsBlock }) {
                   <blockquote
                     className={cn(
                       'mt-5 flex-1 text-[1.0625rem] leading-relaxed',
-                      dark ? 'text-mist/90' : 'text-ink-80',
+                      dark ? 'text-mist' : 'text-ink-80',
                     )}
                   >
                     {item.quote}
@@ -77,7 +82,7 @@ export function Testimonials({ block }: { block: TestimonialsBlock }) {
                       <span
                         className={cn(
                           'grid size-11 shrink-0 place-items-center rounded-full font-heading text-sm font-semibold',
-                          dark ? 'bg-sage/20 text-sage' : 'bg-sage-40 text-ink',
+                          dark ? 'bg-ink-70 text-mist' : 'bg-mist text-ink',
                         )}
                         aria-hidden
                       >
@@ -87,7 +92,7 @@ export function Testimonials({ block }: { block: TestimonialsBlock }) {
                     <div>
                       <p className="text-[0.9375rem] font-medium">{item.name}</p>
                       {item.role ? (
-                        <p className={cn('text-[0.8125rem]', dark ? 'text-mist/60' : 'text-slate')}>
+                        <p className={cn('text-[0.8125rem]', dark ? 'text-mist/80' : 'text-slate-80')}>
                           {item.role}
                         </p>
                       ) : null}
@@ -99,7 +104,7 @@ export function Testimonials({ block }: { block: TestimonialsBlock }) {
                       href={sitePath(`/trips/${tripSlug}`)}
                       className={cn(
                         'mt-5 inline-flex text-[0.8125rem] underline underline-offset-4',
-                        dark ? 'text-sage hover:text-white' : 'text-deep hover:text-ink',
+                        dark ? 'text-sage-light hover:text-white' : 'text-deep hover:text-deep-80',
                       )}
                     >
                       {item.trip && typeof item.trip !== 'number' && 'title' in item.trip

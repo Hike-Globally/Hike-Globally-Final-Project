@@ -30,13 +30,18 @@ export function Logo({
         // The mark is an SVG, which Next's image optimizer refuses to serve unless
         // `dangerouslyAllowSVG` is on — serve it straight from `public/` instead.
         unoptimized
-        className={cn('h-10 w-auto shrink-0 object-contain', variant === 'light' && 'invert')}
+        // The mark ships as brand ink; `brightness-0 invert` flattens it to
+        // paper white where it sits on navy.
+        className={cn(
+          'h-10 w-auto shrink-0 object-contain',
+          variant === 'light' && 'brightness-0 invert',
+        )}
         priority
       />
       <span className="flex min-w-0 flex-col leading-none">
         <span
           className={cn(
-            'font-heading text-[1.0625rem] font-semibold tracking-tight',
+            'font-heading text-[1.0625rem] font-semibold tracking-[-0.01em]',
             variant === 'dark' ? 'text-ink' : 'text-white',
           )}
         >
@@ -46,7 +51,7 @@ export function Logo({
           <span
             className={cn(
               'mt-1 text-[0.6875rem] tracking-[0.14em] uppercase',
-              variant === 'dark' ? 'text-slate' : 'text-white/60',
+              variant === 'dark' ? 'text-slate-80' : 'text-mist',
             )}
           >
             {tagline}

@@ -1,3 +1,4 @@
+import { BRAND } from '@/lib/brand-colors'
 import { sitePath } from '@/i18n/config'
 
 /**
@@ -6,6 +7,11 @@ import { sitePath } from '@/i18n/config'
  * One list drives the CMS select on a trip, the homepage slider after the hero, the /trips
  * filter, and the badge on every trip card — so a level added (or renamed) here cannot drift
  * between the editor and the public site.
+ *
+ * The meter is one colour on every rung: `BRAND.mist`, paper white on the navy
+ * slider card it is drawn on. Intensity is already encoded twice — by the fill
+ * width (20% → 100%) and by the rung's own label — so a nine-step rainbow would
+ * only add noise, and one quiet colour keeps the scale inside the palette.
  */
 export const DIFFICULTY_LEVELS = [
   {
@@ -14,7 +20,7 @@ export const DIFFICULTY_LEVELS = [
     description: 'Gentle days on welcoming trails — a beautiful first step into the mountains.',
     image: '/images/difficulty/easy.jpg',
     meter: '20%',
-    meterColor: '#a9ed72',
+    meterColor: BRAND.mist,
     objectPosition: 'center',
     badge: 'sage',
   },
@@ -24,7 +30,7 @@ export const DIFFICULTY_LEVELS = [
     description: 'Unhurried walks, a little more elevation, and plenty of time to take it in.',
     image: '/images/difficulty/easy-moderate.jpg',
     meter: '29%',
-    meterColor: '#a9ed72',
+    meterColor: BRAND.mist,
     objectPosition: '50% 58%',
     badge: 'sage',
   },
@@ -34,7 +40,7 @@ export const DIFFICULTY_LEVELS = [
     description: 'Steady trail days with rewarding climbs and room to find your rhythm.',
     image: '/images/difficulty/moderate.jpg',
     meter: '39%',
-    meterColor: '#65a8d5',
+    meterColor: BRAND.mist,
     objectPosition: '50% 58%',
     badge: 'light',
   },
@@ -44,7 +50,7 @@ export const DIFFICULTY_LEVELS = [
     description: 'Longer days, sustained ascents, and trails that ask a little more of you.',
     image: '/images/difficulty/moderate-challenging.jpg',
     meter: '49%',
-    meterColor: '#65a8d5',
+    meterColor: BRAND.mist,
     objectPosition: '50% 55%',
     badge: 'light',
   },
@@ -54,7 +60,7 @@ export const DIFFICULTY_LEVELS = [
     description: 'Big mountain days for hikers ready to work for an unforgettable view.',
     image: '/images/difficulty/challenging.jpg',
     meter: '60%',
-    meterColor: '#f5a044',
+    meterColor: BRAND.mist,
     objectPosition: '50% 55%',
     badge: 'outline',
   },
@@ -64,7 +70,7 @@ export const DIFFICULTY_LEVELS = [
     description: 'Long, demanding days at altitude — preparation makes all the difference.',
     image: '/images/difficulty/challenging-strenuous.jpg',
     meter: '70%',
-    meterColor: '#f5a044',
+    meterColor: BRAND.mist,
     objectPosition: '50% 62%',
     badge: 'outline',
   },
@@ -74,7 +80,7 @@ export const DIFFICULTY_LEVELS = [
     description: 'A serious endurance test across remote terrain and consecutive hard days.',
     image: '/images/difficulty/strenuous.jpg',
     meter: '80%',
-    meterColor: '#f2743e',
+    meterColor: BRAND.mist,
     objectPosition: '50% 65%',
     badge: 'outline',
   },
@@ -84,7 +90,7 @@ export const DIFFICULTY_LEVELS = [
     description: 'High, exposed routes for seasoned trekkers with experience to match.',
     image: '/images/difficulty/strenuous-extreme.jpg',
     meter: '90%',
-    meterColor: '#eb584b',
+    meterColor: BRAND.mist,
     objectPosition: '50% 63%',
     badge: 'default',
   },
@@ -94,7 +100,7 @@ export const DIFFICULTY_LEVELS = [
     description: 'Technical, high-altitude objectives for experienced expedition climbers.',
     image: '/images/difficulty/extreme.jpg',
     meter: '100%',
-    meterColor: '#df3646',
+    meterColor: BRAND.mist,
     objectPosition: '50% 67%',
     badge: 'default',
   },

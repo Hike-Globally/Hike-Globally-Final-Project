@@ -40,19 +40,19 @@ export async function HomeFallback() {
         {/* Mirrors `blocks/hero.tsx` on the homepage: full-width copy column, with the
             standfirst capped at the same ~576px measure it always had. */}
         <div className="max-w-none min-w-0">
-          {showHeroEyebrow ? <p className="eyebrow mb-5 text-sage">{heroEyebrow}</p> : null}
+          {showHeroEyebrow ? <p className="eyebrow mb-5 text-mist">{heroEyebrow}</p> : null}
           {/* The `<i>` is the accent line — 90px Instrument Serif italic under the
               120px "Walk Where The" (see `homepage.css`). CMS-driven pages reach it
               by writing the same tag into the hero heading field. */}
           <h1 className="heading-display home-hero-title text-white">
             Walk Where The <i>Map Runs Out of Names</i>
           </h1>
-          <p className="lead home-hero-lead mt-6 max-w-[36rem] text-mist/85">
+          <p className="lead home-hero-lead mt-6 max-w-[36rem] text-mist">
             Small-group treks and expeditions across Nepal, led by guides who grew up on these
             trails. Tell us what you are dreaming of — we will build the itinerary around it.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
-            <Button asChild size="lg" variant="sage">
+            <Button asChild size="lg" variant="paper">
               <Link href={sitePath('/trips')}>{dict.nav.trips}</Link>
             </Button>
             <Button asChild size="lg" variant="outline-light">
