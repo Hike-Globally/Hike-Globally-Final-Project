@@ -372,6 +372,7 @@ export const Trips: CollectionConfig = {
               type: 'richText',
               required: true,
               admin: {
+                className: 'hg-trip-compact-editor',
                 description:
                   'Write the section content using the same rich-text editor and formatting options as the Overview — including tables. Use the toolbar’s “+” menu (or type /table) to insert one: rows and columns first, then the hover handles to add, remove, merge or resize. Handy for cost breakdowns, gear lists and season comparisons.',
               },
@@ -390,7 +391,10 @@ export const Trips: CollectionConfig = {
           name: 'whyChooseThisTrek',
           type: 'richText',
           localized: true,
-          admin: { description: 'Reasons to choose this trek. Displayed before Highlights.' },
+          admin: {
+            className: 'hg-trip-compact-editor',
+            description: 'Reasons to choose this trek. Displayed before Highlights.',
+          },
         },
       ],
     },
@@ -405,6 +409,7 @@ export const Trips: CollectionConfig = {
           type: 'richText',
           localized: true,
           admin: {
+            className: 'hg-trip-compact-editor',
             description: 'Optional introduction or route notes. Displayed after Highlights.',
           },
         },

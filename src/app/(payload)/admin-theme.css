@@ -174,6 +174,7 @@ html[data-theme='dark'] {
   --hg-breadcrumb-max-width: 320px;
   --hg-textarea-min-height: 120px;
   --hg-editor-min-height: 240px;
+  --hg-editor-compact-min-height: 144px;
 
   --hg-control-height-sm: 32px;
   --hg-control-height-md: 40px;
