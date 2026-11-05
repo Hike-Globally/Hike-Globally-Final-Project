@@ -74,10 +74,7 @@ export function DifficultyLevels() {
       <div className="container-content flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-10">
         <div className="max-w-3xl">
           <p className="eyebrow mb-3">Find your level</p>
-          <h2
-            id="difficulty-heading"
-            className="heading-lg home-section-title text-ink"
-          >
+          <h2 id="difficulty-heading" className="heading-lg home-section-title text-ink">
             Different levels, all epic adventures
           </h2>
           <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -142,7 +139,10 @@ export function DifficultyLevels() {
                 className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-ink/80 via-ink/22 to-transparent"
                 aria-hidden="true"
               />
-              <div className="photo-scrim pointer-events-none absolute inset-0 -z-10" aria-hidden="true" />
+              <div
+                className="photo-scrim pointer-events-none absolute inset-0 -z-10"
+                aria-hidden="true"
+              />
 
               <div className="relative p-5 sm:p-6">
                 <div className="flex items-center justify-between gap-4">
@@ -211,7 +211,7 @@ function CarouselArrow({
       onClick={onClick}
       disabled={disabled}
       aria-label={direction === 'left' ? 'Previous difficulty levels' : 'Next difficulty levels'}
-      className="inline-flex size-11 items-center justify-center rounded-full border border-slate-40 bg-white text-ink transition duration-300 hover:border-ink hover:bg-ink hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-deep disabled:cursor-not-allowed disabled:border-slate-20 disabled:text-slate-40 disabled:hover:border-slate-20 disabled:hover:bg-white disabled:hover:text-slate-40"
+      className="inline-flex size-11 items-center justify-center rounded-full border border-[#206CA4] bg-[#206CA4] text-white transition duration-300 hover:border-ink hover:bg-ink hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-deep disabled:cursor-not-allowed disabled:border-slate-20 disabled:bg-slate-20 disabled:text-slate-80 disabled:hover:border-slate-20 disabled:hover:bg-slate-20 disabled:hover:text-slate-40"
     >
       <Icon className="size-4" aria-hidden="true" />
     </button>

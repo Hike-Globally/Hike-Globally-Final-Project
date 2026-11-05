@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { useId } from 'react'
 import { ArrowRight, Clock, Mountain, Users } from 'lucide-react'
@@ -12,26 +11,7 @@ import type { CtaBlock } from '@/payload-types'
 
 import './cta.css'
 
-/**
- * ============================================================================
- * CTA CARD — the closing card immediately before the footer
- * ============================================================================
- * A photographic card: a lone trekker crossing the Khumbu at dusk under the
- * site's single navy scrim, with printed topographic contours, an expedition
- * stamp and the CMS copy (eyebrow, heading, text, button) set over the top.
- * The composition lives in `cta.css`, scoped under `[data-cta-card]`; this file
- * only assembles it.
- *
- * Two callers share the card so the homepage looks identical whichever way
- * it renders:
- *   · `Cta` below — the Payload `cta` block (About page today, and any page
- *     an editor adds it to, the homepage included);
- *   · `HomeFallback` — the homepage's closing “Plan your trip” card when no
- *     CMS `home` page exists yet.
- *
- * The CMS `variant` still chooses the light: `dark` (default) is the dusk
- * photograph under navy, `sage` washes it in the brand ember, `light` in paper.
- */
+/** Shared, image-free closing card for the homepage and CMS CTA blocks. */
 
 export type CtaCardLink = {
   href: string
@@ -118,7 +98,7 @@ export function CtaCard({
   const titleId = useId()
   const stampPathId = `${useId().replace(/:/g, '')}-stamp`
   const headingSegments = splitInlineEmphasis(heading)
-  const external = link ? /^https?:\/\//.test(link.href) : false
+  const external = link ? /^(?:https?:\/\/|mailto:|tel:)/i.test(link.href) : false
 
   const trustItems = [
     { icon: Clock, label: dict.cta.replyTime },
@@ -138,20 +118,6 @@ export function CtaCard({
               aria-labelledby={titleId}
               className="relative"
             >
-              {/* Photograph + light. The zoom wrapper and the image are nested so
-                the one slow hover zoom composes over a still photograph. */}
-              <div className="cta-card__media" aria-hidden="true">
-                <div className="cta-card__zoom">
-                  <Image
-                    src="/images/trips/hero.jpg"
-                    alt=""
-                    fill
-                    sizes="(min-width: 1280px) 1216px, 100vw"
-                    className="cta-card__img"
-                  />
-                </div>
-              </div>
-              <div className="cta-card__scrim" aria-hidden="true" />
               <TopoContours />
               <span className="cta-card__topline" aria-hidden="true" />
 
@@ -187,11 +153,15 @@ export function CtaCard({
                         <Button
                           asChild
                           size="lg"
-                          variant={variant === 'dark' ? 'paper' : 'default'}
+                          variant="default"
                           className="cta-card__button group h-[3.25rem] px-8 text-body"
                         >
                           {external || link.newTab ? (
-                            <a href={link.href} target="_blank" rel="noopener noreferrer">
+                            <a
+                              href={link.href}
+                              target={link.newTab ? '_blank' : undefined}
+                              rel={link.newTab ? 'noopener noreferrer' : undefined}
+                            >
                               {link.label}
                               <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
                             </a>

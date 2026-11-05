@@ -50,14 +50,30 @@ export function SmoothScroll() {
 
     // Route softly to in-page anchors (/#itinerary) instead of jumping.
     const onAnchorClick = (event: MouseEvent) => {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      )
+        return
       const anchor = (event.target as HTMLElement | null)?.closest?.('a')
-      if (!anchor) return
+      if (!anchor || anchor.target || anchor.hasAttribute('download')) return
       const href = anchor.getAttribute('href')
-      if (!href || !href.startsWith('#')) return
-      const target = document.querySelector(href)
+      if (!href || !href.startsWith('#') || href === '#') return
+      let id: string
+      try {
+        id = decodeURIComponent(href.slice(1))
+      } catch {
+        return
+      }
+      const target = document.getElementById(id)
       if (!target) return
       event.preventDefault()
-      lenis.scrollTo(target as HTMLElement, { offset: -96 })
+      window.history.pushState(null, '', href)
+      lenis.scrollTo(target, { offset: -96 })
     }
 
     document.addEventListener('click', onAnchorClick)

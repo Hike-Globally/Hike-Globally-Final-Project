@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Fragment } from 'react'
 import { Mail, MessageCircle, Phone } from 'lucide-react'
 
 import { InquiryForm } from '@/components/forms/inquiry-form'
@@ -87,9 +88,19 @@ export async function InquirySection({ block }: { block: InquiryBlock }) {
                   dark ? 'text-mist/70' : 'text-slate-80',
                 )}
               >
-                {settings.socials
-                  .map((social) => platformLabels[social.platform] ?? social.platform)
-                  .join(' · ')}
+                {settings.socials.map((social, index) => (
+                  <Fragment key={social.id ?? `${social.platform}-${social.url}`}>
+                    {index > 0 ? ' · ' : null}
+                    <a
+                      href={social.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:underline"
+                    >
+                      {platformLabels[social.platform] ?? social.platform}
+                    </a>
+                  </Fragment>
+                ))}
               </p>
             ) : null}
           </div>

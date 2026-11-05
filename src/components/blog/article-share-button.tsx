@@ -100,7 +100,7 @@ export function ArticleShareButton({
         'inline-flex h-10 items-center justify-center gap-2 border px-4 text-small font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-3',
         tone === 'dark'
           ? 'border-mist/45 bg-ink/35 text-white hover:border-mist hover:bg-ink/60 focus-visible:outline-mist'
-          : 'border-slate-40 bg-white text-ink hover:border-ink hover:bg-mist focus-visible:outline-deep',
+          : 'border-[#206CA4] bg-[#206CA4] text-white hover:border-[#175780] hover:bg-[#175780] focus-visible:outline-deep',
         className,
       )}
     >

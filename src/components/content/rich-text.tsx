@@ -4,6 +4,7 @@ import type { CSSProperties, ReactNode } from 'react'
 import { PayloadImage } from '@/components/ui/payload-image'
 import type { Media } from '@/payload-types'
 import { cn } from '@/lib/utils'
+import { resolveRichTextLink } from '@/lib/rich-text-links'
 
 /**
  * Lexical → React renderer.
@@ -313,43 +314,25 @@ const renderNode = (node: RichTextNode, index: number, context: RenderContext): 
       )
     }
 
-    case 'link': {
-      const internal = node.linkType === 'internal' ? docHref(node.relationTo, node.doc) : null
-      const href = internal ?? node.url ?? '#'
-      const external =
-        href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('tel:')
-
+    case 'link':
+    case 'autolink': {
+      const link = resolveRichTextLink(node)
+      // Keep the text readable when a relationship hasn't been populated or has been deleted.
+      if (!link) return <span key={key}>{children}</span>
+      const external = /^(?:https?:\/\/|mailto:|tel:|\/\/)/i.test(link.href)
+      const target = link.newTab ? '_blank' : undefined
+      const rel = link.newTab ? 'noopener noreferrer' : undefined
       if (external) {
         return (
-          <a
-            key={key}
-            href={href}
-            target={node.newTab ? '_blank' : undefined}
-            rel={node.newTab ? 'noopener noreferrer' : undefined}
-          >
+          <a key={key} href={link.href} target={target} rel={rel}>
             {children}
           </a>
         )
       }
-
       return (
-        <Link key={key} href={href} target={node.newTab ? '_blank' : undefined}>
+        <Link key={key} href={link.href} target={target} rel={rel}>
           {children}
         </Link>
-      )
-    }
-
-    case 'autolink': {
-      const href = node.url ?? '#'
-      return (
-        <a
-          key={key}
-          href={href}
-          target={node.newTab ? '_blank' : undefined}
-          rel={node.newTab ? 'noopener noreferrer' : undefined}
-        >
-          {children}
-        </a>
       )
     }
 
