@@ -119,7 +119,10 @@ rule holds for pages written later, not just the ones written today.
 | Publishing rebuilds it immediately               | Payload's revalidation hooks purge `/sitemap.xml` next to the page they changed, so a trip published now is in the sitemap now — not after the 1-hour fallback window. `npm test` covers the rules in `src/lib/sitemap.test.ts`. |
 
 `/robots.txt` (`src/app/robots.ts`) is the other half: it allows everything except `/admin`, `/api/`
-and `/preview/`, sets `Host`, and points crawlers at the sitemap.
+and `/preview/`, sets `Host`, and points crawlers at the sitemap. One explicit exception:
+`/api/media/file/` stays allowed, because that is where uploads are served from when media is
+stored in Postgres (`src/lib/media-storage.ts`). Blocking it would hide every CMS image from image
+search, and from the `image` of the JSON-LD nodes.
 
 ### Keywords
 
@@ -154,6 +157,7 @@ ones.
 | `/blog/[slug]` | `article` + `article:published_time` / `modified_time` / `tag` | `BreadcrumbList`, `BlogPosting` (author, `articleSection`, `wordCount`, keywords), `FAQPage` when the post has FAQs |
 | `/destinations/[slug]` | `website` + region hero | `BreadcrumbList`, `TouristDestination` (geo, country) |
 | `/inquiry` | `website` | `BreadcrumbList`, `ContactPage` |
+| `/search` | `website` | `BreadcrumbList`, `WebPage` (the page is `noindex`; it exists so the sitewide `SearchAction` has a target that really searches) |
 | any CMS page (`/[slug]`) | `website` + page image | `BreadcrumbList`, `WebPage` |
 | `/inquiry/thank-you`, 404 | — | — (both `noindex`, so nothing is offered to the index) |
 

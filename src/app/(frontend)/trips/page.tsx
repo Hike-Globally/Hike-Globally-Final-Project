@@ -92,10 +92,16 @@ export default async function TripsPage() {
 
       <section
         id="trips"
-        aria-label={dict.trips.filterTitle}
+        aria-labelledby="trips-results-heading"
         data-trips-page
         className="scroll-mt-8 py-12 md:py-16"
       >
+        {/* Visually hidden: the cards below are h3, so the grid needs an h2 between them and the
+            page's h1. The label is the one the section already carried as an aria-label. */}
+        <h2 id="trips-results-heading" className="sr-only">
+          {dict.trips.filterTitle}
+        </h2>
+
         <TripsExplorer
           trips={trips}
           cardSummaryClassName="trips-card-summary"

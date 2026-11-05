@@ -375,9 +375,12 @@ export const websiteJsonLd = ({ name, url }: { name: string; url: string }): Jso
   '@type': 'WebSite',
   name,
   url,
+  // The target must actually perform the search: Google validates a SearchAction by fetching it.
+  // `/search` reads `q` on the server, so this works with JavaScript disabled, and it is the
+  // `noindex` results route rather than a filter bolted onto the static `/trips` listing.
   potentialAction: {
     '@type': 'SearchAction',
-    target: `${url}/trips?q={search_term_string}`,
+    target: `${url}/search?q={search_term_string}`,
     'query-input': 'required name=search_term_string',
   },
 })

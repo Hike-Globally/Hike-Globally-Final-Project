@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next'
-import localFont from 'next/font/local'
 import { Analytics } from '@vercel/analytics/next'
 
 import { Footer } from '@/components/layout/footer'
@@ -9,50 +8,10 @@ import { SmoothScroll } from '@/components/providers/smooth-scroll'
 import { dictionary } from '@/i18n/dictionaries'
 import { htmlLang, ogLocale } from '@/i18n/config'
 import { getSettings } from '@/lib/data'
+import { bodyFont, displayFont } from '@/lib/fonts'
 import { imageUrl } from '@/lib/seo'
 import { resolveSiteUrlObject } from '@/lib/site-url'
 import './globals.css'
-
-/**
- * Two typefaces, both self-hosted from node_modules (@fontsource) instead of
- * fetched from fonts.googleapis.com:
- *
- *   · Archivo (variable)     — body copy, sub-headings, eyebrows, navigation, buttons
- *   · Instrument Serif       — display tier: hero, section and page headlines,
- *                              pull quotes, oversized numerals (plus the italic
- *                              accent line an editor writes with `<i>…</i>`)
- *
- * Next preloads both, generates a size-adjusted fallback metric and serves them
- * from your own domain — which keeps third-party connections off the critical
- * path and eliminates the flash of unstyled text. The display face is preloaded
- * because the hero headline is the LCP element on the homepage.
- */
-const bodyFont = localFont({
-  src: '../../../node_modules/@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2',
-  variable: '--font-archivo',
-  display: 'swap',
-  preload: true,
-  fallback: ['system-ui', 'sans-serif'],
-})
-
-const displayFont = localFont({
-  src: [
-    {
-      path: '../../../node_modules/@fontsource/instrument-serif/files/instrument-serif-latin-400-normal.woff2',
-      weight: '400',
-      style: 'normal',
-    },
-    {
-      path: '../../../node_modules/@fontsource/instrument-serif/files/instrument-serif-latin-400-italic.woff2',
-      weight: '400',
-      style: 'italic',
-    },
-  ],
-  variable: '--font-instrument-serif',
-  display: 'swap',
-  preload: true,
-  fallback: ['Georgia', 'Times New Roman', 'serif'],
-})
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings()
@@ -94,11 +53,8 @@ export async function generateMetadata(): Promise<Metadata> {
       description: settings.tagline ?? undefined,
       images: defaultOgImage ? [defaultOgImage] : undefined,
     },
-    icons: { icon: '/images/logo.svg' },
+    icons: { icon: '/images/logo.svg', apple: '/apple-touch-icon.png' },
     formatDetection: { telephone: false },
-    other: {
-      'theme-color': '#183144',
-    },
     alternates: {
       /**
        * Site-wide canonical fallback: the exact URL of whatever page is being rendered.

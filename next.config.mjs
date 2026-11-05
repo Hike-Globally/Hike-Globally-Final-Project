@@ -33,9 +33,10 @@ const nextConfig = {
   },
 
   images: {
-    // Serve original bytes everywhere (including bundled design assets), not a resized or
-    // re-encoded /_next/image variant. CMS uploads also use their original media.url.
-    unoptimized: true,
+    // Next optimizes and resizes on demand: one responsive `srcset` per image, served as AVIF or
+    // WebP to browsers that accept it, at the width the layout actually renders. CMS media is
+    // still addressed by its original `media.url` (`src/components/ui/payload-image.tsx`), so the
+    // full-resolution file is the source and never a Payload-derived crop.
     remotePatterns: [
       // Vercel Blob storage in production
       { protocol: 'https', hostname: '*.public.blob.vercel-storage.com' },
@@ -74,6 +75,26 @@ const nextConfig = {
 
   async headers() {
     return [
+      {
+        // Baseline security headers on every response. HSTS is safe here: production is HTTPS
+        // only (see README, Deployment) and this header is ignored over plain HTTP.
+        //
+        // No Content-Security-Policy: GA4, AdSense, the Pexels hero video and Vercel Blob all need
+        // their own sources, and guessing one would break ads or analytics. That is a separate,
+        // report-only exercise.
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload',
+          },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          // The admin renders the site in a live-preview iframe, which is same origin, so
+          // SAMEORIGIN keeps that working while blocking third-party framing.
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+        ],
+      },
       {
         // Static design assets under public/images (logo, difficulty badges, hero art) are never
         // mutated in place, so a long browser cache makes repeat visits instant. Media served by

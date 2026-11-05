@@ -270,6 +270,37 @@ const en = {
   structuredData: {
     organization: 'Hike Globally',
   },
+  /**
+   * `/search`, the page the sitewide `WebSite` SearchAction points at.
+   *
+   * The results page is `noindex` (a query string is not a page worth ranking), so these strings
+   * are for people, not for crawlers.
+   */
+  search: {
+    title: 'Search',
+    metaTitle: 'Search treks, destinations and stories',
+    metaDescription:
+      'Search every trek, destination and journal story on Hike Globally, then jump straight to the one you were looking for.',
+    eyebrow: 'Find it',
+    heading: 'Search the whole map',
+    lead: 'Look across every trek, region and field note on the site.',
+    label: 'Search the site',
+    placeholder: 'Trek, region or story',
+    submit: 'Search',
+    resultsFor: 'Results for “{query}”',
+    resultCount_one: '{count} result',
+    resultCount_other: '{count} results',
+    trips: 'Treks',
+    destinations: 'Destinations',
+    posts: 'Journal stories',
+    noQuery: 'Type a trek, a region or a story above to start looking.',
+    noResultsTitle: 'No matches this time',
+    noResultsText:
+      'Nothing on the site matches “{query}”. Try a shorter phrase, or start from one of the three indexes below.',
+    browseTrips: 'Browse all trips',
+    browseDestinations: 'Browse destinations',
+    browseJournal: 'Read the journal',
+  },
 } as const
 
 /** Widens the literal types of the dictionary (literal string types -> string). */

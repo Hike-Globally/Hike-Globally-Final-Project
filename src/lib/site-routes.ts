@@ -17,6 +17,9 @@ const RESERVED_PAGE_SLUGS = new Set<string>([
   ...Object.values(routes),
   // The homepage's page document — it is served at `/`, not `/${slug}`.
   'home',
+  // Site search. It has its own route and is `noindex`, so a page document with this slug has no
+  // URL of its own (and must not be advertised in the sitemap).
+  'search',
   // Preview entry point, Payload admin and the REST/GraphQL API.
   'preview',
   'admin',

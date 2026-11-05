@@ -103,10 +103,16 @@ export default async function BlogPage() {
 
       <section
         id="journal"
-        aria-label={dict.blog.listingTitle}
+        aria-labelledby="journal-heading"
         className="scroll-mt-8 py-14 md:py-20"
       >
         <div className="container-content">
+          {/* Visually hidden: post cards are h3, so the grid needs an h2 between them and the
+              page's h1. */}
+          <h2 id="journal-heading" className="sr-only">
+            {dict.blog.latest}
+          </h2>
+
           {posts.length === 0 ? (
             <div className="border border-dashed border-slate-40 bg-mist p-8 text-center sm:p-12">
               <h2 className="heading-md">{dict.common.noResultsTitle}</h2>

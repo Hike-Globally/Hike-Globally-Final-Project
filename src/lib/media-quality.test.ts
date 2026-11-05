@@ -33,13 +33,16 @@ test('every frontend media resolver prefers the original over generated crops', 
   assert.deepEqual(imageDimensions(image), { width: 4000, height: 3000 })
 })
 
-test('both image layouts serve the original without Next re-encoding or a srcset', () => {
+test('both image layouts point at the original and let Next build the srcset', () => {
   for (const Component of [PayloadImage, PayloadImageFill]) {
     const element = Component({ media: image, sizes: '100vw' })
     assert.ok(element)
     const img = Component === PayloadImage ? element.props.children : element
+    // The source is always the original upload, never a Payload crop ...
     assert.equal(img.props.src, '/api/media/file/original.jpg')
-    assert.equal(img.props.unoptimized, true)
+    // ... and no `unoptimized` flag is set, so Next serves a responsive, modern-format variant.
+    assert.notEqual(img.props.unoptimized, true)
+    assert.equal(img.props.sizes, '100vw')
     assert.equal(img.props.width ?? image.width, image.width)
   }
 })

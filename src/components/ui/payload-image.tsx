@@ -7,7 +7,7 @@ type PayloadImageProps = {
   media: number | Media | null | undefined
   /** Overrides the CMS alt text (only when the image is purely decorative). */
   alt?: string
-  /** The layout hint is kept at call sites, but the original upload is never resized or re-encoded. */
+  /** Layout hint for the responsive `srcset` Next generates from the original upload. */
   sizes: string
   className?: string
   imageClassName?: string
@@ -44,7 +44,13 @@ export function resolveMediaImage(
   return src ? { src, alt: media.alt ?? '' } : null
 }
 
-/** Render the uploaded image bytes, with no Payload derivative or Next image transformation. */
+/**
+ * Render the uploaded image.
+ *
+ * `src` is always the original upload (`media.url`), never a Payload-generated crop; Next's image
+ * optimizer then serves the widths the layout asks for. Returning the original here and letting
+ * Next resize it means one source of truth for the bytes.
+ */
 export function PayloadImage({
   media,
   alt,
@@ -83,7 +89,6 @@ export function PayloadImage({
         width={media.width ?? 1200}
         height={media.height ?? 800}
         sizes={sizes}
-        unoptimized
         priority={priority}
         loading={loading ?? (priority ? 'eager' : 'lazy')}
         style={{ objectPosition }}
@@ -130,7 +135,6 @@ export function PayloadImageFill({
       alt={alt ?? media.alt ?? ''}
       fill
       sizes={sizes}
-      unoptimized
       priority={priority}
       style={{ objectPosition }}
       className={cn('object-cover', imageClassName, className)}
