@@ -65,6 +65,15 @@ html[data-theme='dark'] {
   --hg-primary-soft-hover: rgb(135 170 189 / 28%);
   --hg-primary-soft-border: var(--hg-steel);
 
+  /* Ornamentation for a solid-primary control that carries a second click
+     target (the split Publish action in the document bar): a 1px inner light
+     along the top edge, a seam between the action and its menu, and the wash
+     the menu segment takes while it is open. Alpha variants of the palette's
+     own white/navy — never a new hue. */
+  --hg-primary-edge: rgb(255 255 255 / 18%);
+  --hg-primary-seam: rgb(255 255 255 / 24%);
+  --hg-primary-raised: rgb(255 255 255 / 12%);
+
   /* ------------------------------------------------------------------------
      3. COLOUR — sidebar rail (#183144 dark anchor)
      ------------------------------------------------------------------------ */
