@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import * as AccordionPrimitive from '@radix-ui/react-accordion'
-import { ChevronDownIcon, PlusIcon } from 'lucide-react'
+import { ChevronDownIcon, MinusIcon, PlusIcon } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 
@@ -28,31 +28,51 @@ function AccordionTrigger({
   children,
   indicator = 'plus',
   headingLevel = 'h3',
+  textRole = 'subhead',
   ...props
 }: React.ComponentProps<typeof AccordionPrimitive.Trigger> & {
   /**
    * Right-hand control. `plus` is the site-wide badge (rotates to an × when open);
-   * `chevron` is the circular chevron button used by the trip-page section cards.
+   * `chevron` is the optional circular chevron badge; `plus-minus` is that same circular badge
+   * showing a real − while open and + while closed (Essential Information sections).
    */
-  indicator?: 'plus' | 'chevron'
+  indicator?: 'plus' | 'chevron' | 'plus-minus'
   /** Semantic heading tag for the accordion question. */
-  headingLevel?: 'h3' | 'h4'
+  headingLevel?: 'h2' | 'h3' | 'h4'
+  /**
+   * Type role for the title. `section` reads the global H2 role (`heading-lg`) instead of the
+   * compact `text-subhead` used by FAQ questions and itinerary days.
+   */
+  textRole?: 'subhead' | 'section'
 }) {
   const Heading = headingLevel
+  const typography = textRole === 'section' ? 'heading-lg' : 'font-heading text-subhead font-medium'
 
   return (
     <AccordionPrimitive.Header asChild>
-      <Heading className="flex">
+      <Heading className={cn('flex', textRole === 'section' && 'heading-lg')}>
         <AccordionPrimitive.Trigger
           data-slot="accordion-trigger"
           className={cn(
-            'focus-visible:ring-deep/35 flex flex-1 items-start justify-between gap-4 py-5 text-left font-heading text-subhead font-medium text-ink transition-colors outline-none hover:text-deep focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50',
+            'focus-visible:ring-deep/35 flex flex-1 items-start justify-between gap-4 py-5 text-left text-ink transition-colors outline-none hover:text-deep focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50',
+            typography,
             className,
           )}
           {...props}
         >
           {children}
-          {indicator === 'chevron' ? (
+          {indicator === 'plus-minus' ? (
+            <span className="grid size-10 shrink-0 place-items-center rounded-full border border-slate-40 bg-white text-slate-80 [&>svg]:col-start-1 [&>svg]:row-start-1 [&>svg]:size-4">
+              <PlusIcon
+                className="transition-opacity duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] [[data-state=open]>span>&]:opacity-0"
+                aria-hidden
+              />
+              <MinusIcon
+                className="opacity-0 transition-opacity duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] [[data-state=open]>span>&]:opacity-100"
+                aria-hidden
+              />
+            </span>
+          ) : indicator === 'chevron' ? (
             <span className="grid size-10 shrink-0 place-items-center rounded-full border border-slate-40 bg-white text-slate-80 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] [&>svg]:size-4 [[data-state=open]>span>&]:rotate-180">
               <ChevronDownIcon aria-hidden />
             </span>

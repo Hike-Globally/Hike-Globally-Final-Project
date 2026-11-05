@@ -22,12 +22,7 @@ import { Reveal } from '@/components/motion/reveal'
 import { InquiryForm } from '@/components/forms/inquiry-form'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion'
+import { EssentialInformationSection } from '@/components/sections/essential-information-section'
 import { FaqSection } from '@/components/sections/faq-section'
 import { DeparturesSection } from '@/components/sections/departures-section'
 import { KeyTakeawaysSection } from '@/components/sections/key-takeaways-section'
@@ -341,40 +336,10 @@ export function TripDetail({
     ) : null,
     itinerary: <>{trip.itinerary?.length ? <ItinerarySection days={trip.itinerary} /> : null}</>,
     information: (
-      <>
-        {trip.contentSections?.length ? (
-          <section id="essential-information" className="scroll-mt-24 py-16 md:py-24">
-            <Reveal>
-              <SectionTitle title={dict.trip.essentialInformation} level="h2" />
-
-              <Accordion type="multiple" className="space-y-4">
-                {trip.contentSections.map((contentSection, index) => (
-                  <AccordionItem
-                    key={contentSection.id ?? index}
-                    value={`section-${contentSection.id ?? index}`}
-                    className={cn(surface, 'overflow-hidden px-4 sm:px-6 md:px-8')}
-                  >
-                    <AccordionTrigger
-                      indicator="chevron"
-                      className="items-center py-6 hover:no-underline md:py-7"
-                    >
-                      <span className="min-w-0 text-left font-heading text-subhead font-semibold text-ink">
-                        {contentSection.heading}
-                      </span>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <RichText
-                        content={contentSection.content}
-                        className="w-full min-w-0 break-words text-lead"
-                      />
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            </Reveal>
-          </section>
-        ) : null}
-      </>
+      <EssentialInformationSection
+        title={dict.trip.essentialInformation}
+        sections={trip.contentSections ?? []}
+      />
     ),
     inclusions: (
       <>
