@@ -5,7 +5,7 @@ import { sitePath } from '@/i18n/config'
  * The nine-rung hiking difficulty scale.
  *
  * One list drives the CMS select on a trip, the homepage slider after the hero, the /trips
- * filter, and the badge on every trip card — so a level added (or renamed) here cannot drift
+ * filter, and trip detail — so a level added (or renamed) here cannot drift
  * between the editor and the public site.
  *
  * The meter is one colour on every rung: `BRAND.mist`, paper white on the navy
@@ -22,7 +22,6 @@ export const DIFFICULTY_LEVELS = [
     meter: '20%',
     meterColor: BRAND.mist,
     objectPosition: 'center',
-    badge: 'sage',
   },
   {
     value: 'easy-moderate',
@@ -32,7 +31,6 @@ export const DIFFICULTY_LEVELS = [
     meter: '29%',
     meterColor: BRAND.mist,
     objectPosition: '50% 58%',
-    badge: 'sage',
   },
   {
     value: 'moderate',
@@ -42,7 +40,6 @@ export const DIFFICULTY_LEVELS = [
     meter: '39%',
     meterColor: BRAND.mist,
     objectPosition: '50% 58%',
-    badge: 'light',
   },
   {
     value: 'moderate-challenging',
@@ -52,7 +49,6 @@ export const DIFFICULTY_LEVELS = [
     meter: '49%',
     meterColor: BRAND.mist,
     objectPosition: '50% 55%',
-    badge: 'light',
   },
   {
     value: 'challenging',
@@ -62,7 +58,6 @@ export const DIFFICULTY_LEVELS = [
     meter: '60%',
     meterColor: BRAND.mist,
     objectPosition: '50% 55%',
-    badge: 'outline',
   },
   {
     value: 'challenging-strenuous',
@@ -72,7 +67,6 @@ export const DIFFICULTY_LEVELS = [
     meter: '70%',
     meterColor: BRAND.mist,
     objectPosition: '50% 62%',
-    badge: 'outline',
   },
   {
     value: 'strenuous',
@@ -82,7 +76,6 @@ export const DIFFICULTY_LEVELS = [
     meter: '80%',
     meterColor: BRAND.mist,
     objectPosition: '50% 65%',
-    badge: 'outline',
   },
   {
     value: 'strenuous-extreme',
@@ -92,7 +85,6 @@ export const DIFFICULTY_LEVELS = [
     meter: '90%',
     meterColor: BRAND.mist,
     objectPosition: '50% 63%',
-    badge: 'default',
   },
   {
     value: 'extreme',
@@ -102,13 +94,10 @@ export const DIFFICULTY_LEVELS = [
     meter: '100%',
     meterColor: BRAND.mist,
     objectPosition: '50% 67%',
-    badge: 'default',
   },
 ] as const
 
 export type Difficulty = (typeof DIFFICULTY_LEVELS)[number]['value']
-
-export type DifficultyBadgeVariant = (typeof DIFFICULTY_LEVELS)[number]['badge']
 
 export const DIFFICULTY_VALUES: readonly Difficulty[] = DIFFICULTY_LEVELS.map(
   (level) => level.value,
@@ -124,9 +113,6 @@ export const isDifficulty = (value: unknown): value is Difficulty =>
 
 export const difficultyLabel = (value: string): string =>
   DIFFICULTY_LEVELS.find((level) => level.value === value)?.label ?? value
-
-export const difficultyBadgeVariant = (value: string): DifficultyBadgeVariant =>
-  DIFFICULTY_LEVELS.find((level) => level.value === value)?.badge ?? 'light'
 
 /** Payload `select` options — labels match the public site exactly. */
 export const difficultySelectOptions: { label: string; value: Difficulty }[] =
