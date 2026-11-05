@@ -20,7 +20,6 @@ import { Breadcrumbs } from '@/components/sections/breadcrumbs'
 import { TripCard } from '@/components/cards/trip-card'
 import { Reveal } from '@/components/motion/reveal'
 import { InquiryForm } from '@/components/forms/inquiry-form'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { EssentialInformationSection } from '@/components/sections/essential-information-section'
 import { FaqSection } from '@/components/sections/faq-section'
@@ -217,19 +216,7 @@ export function TripDetail({
               ]}
             />
 
-            <div className="flex flex-wrap items-center gap-3">
-              {destination ? (
-                <Link
-                  href={sitePath(`/destinations/${destination.slug}`)}
-                  className="border border-mist/35 bg-ink/40 px-3.5 py-1.5 text-label tracking-[0.14em] text-mist uppercase transition-colors hover:border-mist hover:bg-ink/60"
-                >
-                  {destination.name}
-                </Link>
-              ) : null}
-              <Badge variant="sage">{dict.trip.factsTitle}</Badge>
-            </div>
-
-            <h1 className="heading-display hero-title mt-6 max-w-4xl text-white">{trip.title}</h1>
+            <h1 className="heading-display hero-title max-w-4xl text-white">{trip.title}</h1>
             <p className="lead hero-description mt-6 max-w-2xl text-mist">{trip.summary}</p>
 
             <div className="mt-9 flex flex-wrap items-center gap-3">
