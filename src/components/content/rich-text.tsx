@@ -119,9 +119,13 @@ const docHref = (relationTo: string | undefined, value: unknown): string | null 
   return null
 }
 
+type HeadingTag = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+
 type RenderContext = {
   headingIds?: readonly string[]
   headingIndex: number
+  /** Render every heading node at this level, whatever tag the editor stored. */
+  headingTag?: HeadingTag
 }
 
 const renderNodes = (nodes: RichTextNode[] | undefined, context: RenderContext): ReactNode[] =>
@@ -191,8 +195,9 @@ const columnWidths = (node: RichTextNode): number[] | null => {
 const renderNode = (node: RichTextNode, index: number, context: RenderContext): ReactNode => {
   if (!node) return null
   const key = `${node.type ?? 'node'}-${index}`
-  const headingTag = node.tag ?? 'h2'
-  const isOutlineHeading = node.type === 'heading' && (headingTag === 'h2' || headingTag === 'h3')
+  const storedHeadingTag = node.tag ?? 'h2'
+  const isOutlineHeading =
+    node.type === 'heading' && (storedHeadingTag === 'h2' || storedHeadingTag === 'h3')
   const headingId = isOutlineHeading ? context.headingIds?.[context.headingIndex] : undefined
   if (isOutlineHeading) context.headingIndex += 1
   const children = renderNodes(node.children, context)
@@ -212,7 +217,9 @@ const renderNode = (node: RichTextNode, index: number, context: RenderContext): 
       )
 
     case 'heading': {
-      const tag = node.tag ?? 'h2'
+      // `context.headingTag` keeps CMS subheadings one level below their section's H2, even
+      // when an older document was written with the editor's H2/H4 heading buttons.
+      const tag = context.headingTag ?? storedHeadingTag
       const Tag = (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tag) ? tag : 'h2') as 'h2'
       return (
         <Tag
@@ -394,15 +401,22 @@ export function RichText({
   content,
   className,
   headingIds,
+  headingTag,
 }: {
   content: unknown
   className?: string
   /** Adds matching anchor IDs to h2/h3 nodes when a page renders a table of contents. */
   headingIds?: readonly string[]
+  /**
+   * Force every heading node to this tag. Used where the rich text sits under its own CMS
+   * heading: subheadings become real `<h3>` elements rather than styled paragraphs or a
+   * second, competing `<h2>` level.
+   */
+  headingTag?: HeadingTag
 }) {
   const root = (content as { root?: RichTextNode } | null | undefined)?.root
   if (!root?.children?.length) return null
 
-  const context: RenderContext = { headingIds, headingIndex: 0 }
+  const context: RenderContext = { headingIds, headingIndex: 0, headingTag }
   return <div className={cn('prose-hg', className)}>{renderNodes(root.children, context)}</div>
 }
