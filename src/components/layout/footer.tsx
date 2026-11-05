@@ -103,7 +103,10 @@ const STATIC_ROUTE_ROOTS = new Set<string>(Object.values(routes))
  * page. Prefetching unpublished fallback slugs (`/about`, `/privacy`, `/terms`) would otherwise
  * fire three uncached serverless 404 renders on Fluid Compute every time a visitor scrolls down.
  */
-const canPrefetchInternalHref = (href: string, publishedPageSlugs: ReadonlySet<string>): boolean => {
+const canPrefetchInternalHref = (
+  href: string,
+  publishedPageSlugs: ReadonlySet<string>,
+): boolean => {
   if (!href.startsWith('/')) return false
   const [pathname = '/'] = href.split(/[?#]/, 1)
   const segments = pathname.split('/').filter(Boolean)
@@ -230,7 +233,7 @@ export async function Footer() {
       heading: dict.footer.company,
       links: [
         { href: sitePath('/about'), label: dict.footer.aboutUs, newTab: false },
-        { href: sitePath('/inquiry'), label: dict.nav.contact, newTab: false },
+        { href: sitePath('/contact'), label: dict.nav.contact, newTab: false },
       ],
     },
   ]
@@ -247,7 +250,7 @@ export async function Footer() {
 
   /* --- Contact column: the `settings` global ------------------------------- */
   const contactLinks: ResolvedLink[] = [
-    { href: sitePath('/inquiry'), label: dict.nav.inquiry, newTab: false },
+    { href: sitePath('/contact'), label: dict.nav.inquiry, newTab: false },
     { href: `mailto:${settings.email}`, label: settings.email, newTab: false },
     ...(settings.phone
       ? [
@@ -262,9 +265,23 @@ export async function Footer() {
 
   const rightColumns: FooterColumn[] = [
     ...(cmsColumns.length ? cmsColumns : fallbackColumns),
+    ...(cmsColumns.length &&
+    !cmsColumns.some((column) => column.links.some((link) => link.href === '/about'))
+      ? [
+          {
+            heading: dict.footer.company,
+            links: [{ href: sitePath('/about'), label: dict.footer.aboutUs, newTab: false }],
+          },
+        ]
+      : []),
     {
       heading: dict.footer.legalPages,
-      links: legalLinks.length ? legalLinks : fallbackLegalLinks,
+      links: [
+        ...legalLinks,
+        ...fallbackLegalLinks.filter(
+          (fallback) => !legalLinks.some((link) => link.href === fallback.href),
+        ),
+      ],
     },
     { heading: dict.footer.contactUs, links: contactLinks },
   ]

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -252,8 +253,14 @@ export function InquiryForm({
         >
           {submitting ? dict.inquiry.submitting : dict.inquiry.submit}
         </Button>
-        <p className={`mt-3 text-label md:mt-0 ${variant === 'dark' ? 'text-mist/80' : 'text-slate-80'}`}>
-          {dict.inquiry.privacyNote}
+        <p
+          className={`mt-3 text-label md:mt-0 ${variant === 'dark' ? 'text-mist/80' : 'text-slate-80'}`}
+        >
+          We use your details to respond to your enquiry. See our{' '}
+          <Link href="/privacy" className="underline underline-offset-2">
+            privacy policy
+          </Link>
+          .
         </p>
       </div>
     </form>

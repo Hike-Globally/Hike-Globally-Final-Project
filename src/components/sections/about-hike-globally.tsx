@@ -12,7 +12,7 @@ import { sitePath } from '@/i18n/config'
 const EYEBROW = 'About Hike Globally'
 const HEADING = 'One platform. Every trail on Earth.'
 const LEAD =
-  'Hike Globally is a travel booking platform that curates and sells travel packages to destinations all around the globe — treks, safaris, coastal escapes and city breaks — researched, priced and ready to book in one place.'
+  'Hike Globally is an affiliate travel platform connecting curious travellers with journeys around the world. Travel packages listed here are offered and operated by independent providers, not by Hike Globally.'
 
 const TICKER_DESTINATIONS = [
   'Nepal',
@@ -82,7 +82,7 @@ export function AboutHikeGlobally() {
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="outline-light">
-                  <Link href={sitePath('/inquiry')}>Plan your trip</Link>
+                  <Link href={sitePath('/contact')}>Plan your trip</Link>
                 </Button>
               </div>
             </Reveal>

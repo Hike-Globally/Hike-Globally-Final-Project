@@ -92,7 +92,10 @@ const STATIC_ROUTES: {
   },
   { path: sitePath(routes.blog), priority: 0.8, changeFrequency: 'daily', feeds: ['posts'] },
   // Nothing but the copy an editor writes on the inquiry page itself, so no `<lastmod>` is claimed.
-  { path: sitePath(routes.inquiry), priority: 0.8, changeFrequency: 'daily', feeds: [] },
+  { path: sitePath(routes.contact), priority: 0.8, changeFrequency: 'daily', feeds: [] },
+  { path: sitePath(routes.about), priority: 0.6, changeFrequency: 'monthly', feeds: [] },
+  { path: sitePath(routes.privacy), priority: 0.3, changeFrequency: 'yearly', feeds: [] },
+  { path: sitePath(routes.terms), priority: 0.3, changeFrequency: 'yearly', feeds: [] },
 ]
 
 /** Where each collection's documents live, and how prominently they rank. */

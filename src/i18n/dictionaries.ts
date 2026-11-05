@@ -217,7 +217,7 @@ const en = {
   inquiry: {
     title: 'Plan your trip',
     subtitle:
-      'Tell us roughly what you have in mind. A real person — usually the guide who would lead you — replies within 24 hours.',
+      'Tell us what you have in mind and we’ll help point you in the right direction.',
     formTitle: 'Request a quote',
     name: 'Full name',
     email: 'Email address',
@@ -237,7 +237,7 @@ const en = {
     required: 'Required',
     successTitle: 'Thank you — your enquiry is on its way',
     successText:
-      'We have received your message and will reply within 24 hours, usually with a first draft itinerary.',
+      'Thank you for getting in touch. We’ll be in contact about your enquiry.',
     successBackHome: 'Back to the homepage',
     successBrowseTrips: 'Browse more trips',
     privacyNote: 'We only use your details to answer your enquiry. No newsletters, no resale.',

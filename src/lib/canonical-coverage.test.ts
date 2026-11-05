@@ -79,6 +79,8 @@ test('every page exports metadata built with buildMetadata({ path })', () => {
   for (const file of pages) {
     const source = readFileSync(file, 'utf8')
     const name = relative(file)
+    // Redirects do not render a page or emit a canonical.
+    if (name === 'src/app/(frontend)/inquiry/page.tsx') continue
 
     if (
       !/export\s+(?:async\s+function\s+generateMetadata|const\s+(?:generateMetadata|metadata)\b)/.test(

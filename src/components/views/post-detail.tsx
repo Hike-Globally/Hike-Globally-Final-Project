@@ -266,7 +266,7 @@ export function PostDetail({
                   {dict.blog.planningText}
                 </p>
                 <Button asChild size="lg" className="mt-7">
-                  <Link href={sitePath('/inquiry')}>
+                  <Link href={sitePath('/contact')}>
                     {dict.blog.planningLink}
                     <ArrowRight aria-hidden="true" />
                   </Link>

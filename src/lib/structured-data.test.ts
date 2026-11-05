@@ -78,7 +78,11 @@ const expectedStructuredData: Record<string, string[]> = {
     'breadcrumbJsonLd',
     'touristDestinationJsonLd',
   ],
-  'src/app/(frontend)/inquiry/page.tsx': ['breadcrumbJsonLd', 'webPageJsonLd'],
+  'src/app/(frontend)/inquiry/page.tsx': [], // permanent redirect
+  'src/app/(frontend)/about/page.tsx': ['breadcrumbJsonLd', 'webPageJsonLd'],
+  'src/app/(frontend)/contact/page.tsx': ['breadcrumbJsonLd', 'webPageJsonLd'],
+  'src/app/(frontend)/privacy/page.tsx': ['breadcrumbJsonLd', 'webPageJsonLd'],
+  'src/app/(frontend)/terms/page.tsx': ['breadcrumbJsonLd', 'webPageJsonLd'],
   // Deliberately empty: the page is `noindex` and describes nothing worth indexing.
   'src/app/(frontend)/inquiry/thank-you/page.tsx': [],
 }

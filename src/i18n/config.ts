@@ -55,4 +55,8 @@ export const routes = {
   destinations: 'destinations',
   blog: 'blog',
   inquiry: 'inquiry',
+  contact: 'contact',
+  about: 'about',
+  privacy: 'privacy',
+  terms: 'terms',
 } as const

@@ -180,7 +180,7 @@ export function TripDetail({
 
   const sections = resolvePageSections(trip.pageSections, tripSectionOptions)
   const hasInquiry = sections.some(({ kind }) => kind === 'inquiry')
-  const inquiryHref = hasInquiry ? '#inquiry' : sitePath('/inquiry')
+  const inquiryHref = hasInquiry ? '#inquiry' : sitePath('/contact')
   const bookingLink = resolveLink(trip.bookingLink?.link)
   const bookingHref = bookingLink?.href ?? inquiryHref
   const faqGroups = getTripFaqGroups(trip)

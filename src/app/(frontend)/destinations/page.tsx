@@ -123,7 +123,7 @@ export default async function DestinationsPage() {
                 Check back soon, or tell us what kind of Himalayan journey you have in mind.
               </p>
               <Link
-                href={sitePath('/inquiry')}
+                href={sitePath('/contact')}
                 className="mt-6 inline-flex items-center gap-2 text-small font-medium text-deep-90 underline decoration-slate-40 decoration-1 underline-offset-4 transition-colors hover:text-deep-80 hover:decoration-deep"
               >
                 Plan a trip with us <ArrowRight className="size-4" aria-hidden="true" />
@@ -152,7 +152,7 @@ export default async function DestinationsPage() {
             </p>
           </div>
           <Link
-            href={sitePath('/inquiry')}
+            href={sitePath('/contact')}
             className="group inline-flex w-full shrink-0 items-center justify-center gap-3 bg-ink px-6 py-4 text-small font-medium text-white transition-colors hover:bg-deep sm:w-auto"
           >
             Plan your trip
