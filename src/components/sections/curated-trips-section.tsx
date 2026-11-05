@@ -40,7 +40,6 @@ export function CuratedTripsSection({
               priority={index < 3}
               titleClassName="ct-card-title"
               summaryClassName="ct-card-summary"
-              showDifficulty={false}
             />
           ))}
         </div>

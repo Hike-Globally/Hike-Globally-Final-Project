@@ -11,7 +11,6 @@
    picks these sizes up:
 
      .ct-card-title          the trip-card headings are gently reduced to 19–22px.
-     .trip-card-difficulty   the difficulty badge is compacted to 11px.
      .ct-card-summary        the trip-card summaries (excerpts) stay at 16px.
      .ct-description         layout only — the intro is held to three quarters of
                              the heading column.

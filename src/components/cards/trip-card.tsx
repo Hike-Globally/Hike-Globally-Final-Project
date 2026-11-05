@@ -6,7 +6,6 @@ import { PayloadImageFill } from '@/components/ui/payload-image'
 import { dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
 import type { TripCard } from '@/lib/data'
-import { difficultyBadgeVariant, difficultyLabel } from '@/lib/difficulty'
 import { formatNumber, formatPrice } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
@@ -16,7 +15,6 @@ export function TripCard({
   className,
   titleClassName,
   summaryClassName,
-  showDifficulty = true,
 }: {
   trip: TripCard
   priority?: boolean
@@ -25,8 +23,6 @@ export function TripCard({
   titleClassName?: string
   /** Extra classes for the summary paragraph — lets a section retune its copy in place. */
   summaryClassName?: string
-  /** Whether to show the difficulty badge on the photo — off on the homepage and /trips cards. */
-  showDifficulty?: boolean
 }) {
   const dict = dictionary
   const href = sitePath(`/trips/${trip.slug}`)
@@ -48,21 +44,11 @@ export function TripCard({
           priority={priority}
           imageClassName="transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
         />
-        <div className="absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-4">
-          {trip.featured ? (
+        {trip.featured ? (
+          <div className="absolute inset-x-0 top-0 p-4">
             <Badge variant="sage">{dict.common.featured}</Badge>
-          ) : (
-            <span />
-          )}
-          {showDifficulty ? (
-            <Badge
-              variant={difficultyBadgeVariant(trip.difficulty)}
-              className="trip-card-difficulty max-w-[10.5rem] text-center leading-snug whitespace-normal"
-            >
-              {difficultyLabel(trip.difficulty)}
-            </Badge>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
         {destinationName ? (
           <div className="photo-scrim absolute inset-x-0 bottom-0 p-4 pt-12">
             <p className="text-small font-medium text-mist">{destinationName}</p>
