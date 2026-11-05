@@ -12,7 +12,7 @@ import { viewLiveField } from '../fields/view-live'
 import { revalidateTrip, revalidateTripDelete } from '../hooks/revalidate'
 import { departureStatusOptions, toDateKey } from '../lib/departures'
 import { difficultySelectOptions } from '../lib/difficulty'
-import { siteLivePreviewURL } from '../lib/live-preview-url'
+import { buildLivePreviewURL, resolveLivePreviewPath } from '../lib/live-preview-url'
 
 /**
  * Trips — the longest form in the CMS.
@@ -45,9 +45,14 @@ export const Trips: CollectionConfig = {
     components: {
       edit: {
         beforeDocumentControls: ['@/components/admin/view-live-button'],
+        PreviewButton: '@/components/admin/trip-preview-button',
       },
     },
-    livePreview: { url: siteLivePreviewURL },
+    // Use Payload's standalone preview, not the split-screen live-preview pane.
+    preview: (data) => {
+      const path = resolveLivePreviewPath({ collectionConfig: { slug: 'trips' }, data })
+      return path ? buildLivePreviewURL(path) : null
+    },
   },
   versions: {
     drafts: { autosave: { interval: 1500 } },
