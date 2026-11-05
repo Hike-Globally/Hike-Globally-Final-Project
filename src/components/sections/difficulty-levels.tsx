@@ -89,7 +89,7 @@ export function DifficultyLevels() {
             </span>
             <Link
               href={sitePath('/trips')}
-              className="group inline-flex items-center gap-1.5 text-sm font-medium text-deep underline decoration-slate-40 decoration-1 underline-offset-4 transition-colors hover:text-deep-80 hover:decoration-deep"
+              className="group inline-flex items-center gap-1.5 text-small font-medium text-deep underline decoration-slate-40 decoration-1 underline-offset-4 transition-colors hover:text-deep-80 hover:decoration-deep"
             >
               Explore all trips
               <ArrowUpRight
@@ -146,7 +146,7 @@ export function DifficultyLevels() {
 
               <div className="relative p-5 sm:p-6">
                 <div className="flex items-center justify-between gap-4">
-                  <span className="text-[0.62rem] font-medium tracking-[0.18em] text-mist/85 uppercase">
+                  <span className="text-label font-medium tracking-[0.18em] text-mist/85 uppercase">
                     Level {String(index + 1).padStart(2, '0')}
                   </span>
                   <span
@@ -167,19 +167,19 @@ export function DifficultyLevels() {
                     at any width. Headings keep the case they are written in. */}
                 <h3
                   id={`difficulty-${level.value}-title`}
-                  className="mt-3 font-display text-[26px] leading-[1.14] font-normal text-white"
+                  className="mt-3 font-display text-card leading-[1.14] font-normal text-white"
                 >
                   {level.label}
                 </h3>
                 <p
                   id={`difficulty-${level.value}-desc`}
-                  className="mt-2 max-w-[18rem] text-[16px] leading-relaxed text-mist/90"
+                  className="mt-2 max-w-[18rem] text-body leading-relaxed text-mist/90"
                 >
                   {level.description}
                 </p>
               </div>
 
-              <span className="absolute inset-x-5 bottom-5 inline-flex items-center gap-1.5 text-[0.78rem] font-medium tracking-[0.06em] text-mist uppercase sm:inset-x-6 sm:bottom-6">
+              <span className="absolute inset-x-5 bottom-5 inline-flex items-center gap-1.5 text-label font-medium tracking-[0.06em] text-mist uppercase sm:inset-x-6 sm:bottom-6">
                 View trips
                 <ArrowUpRight
                   className="size-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"

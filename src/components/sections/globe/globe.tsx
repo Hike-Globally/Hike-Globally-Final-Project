@@ -74,7 +74,7 @@ export function Globe() {
 
       <p
         id="about-globe-hint"
-        className="mt-1 flex items-center justify-center gap-3 text-[0.625rem] font-medium tracking-[0.18em] text-mist/70 uppercase"
+        className="mt-1 flex items-center justify-center gap-3 text-label font-medium tracking-[0.18em] text-mist/70 uppercase"
       >
         <span aria-hidden="true" className="h-px w-6 bg-mist/25" />
         Drag to explore

@@ -42,7 +42,7 @@ export async function InquirySection({ block }: { block: InquiryBlock }) {
               className="mb-8"
             />
 
-            <ul className={cn('space-y-3 text-[0.9375rem]', dark ? 'text-mist/80' : 'text-ink-70')}>
+            <ul className={cn('space-y-3 text-ui', dark ? 'text-mist/80' : 'text-ink-70')}>
               {settings.email ? (
                 <li className="flex items-center gap-3">
                   <Mail className="size-4 shrink-0 text-sage" aria-hidden />
@@ -75,7 +75,7 @@ export async function InquirySection({ block }: { block: InquiryBlock }) {
             </ul>
 
             {settings.responseTimeNote ? (
-              <p className={cn('mt-6 text-[0.9375rem]', dark ? 'text-sage-light' : 'text-deep-90')}>
+              <p className={cn('mt-6 text-ui', dark ? 'text-sage-light' : 'text-deep-90')}>
                 {settings.responseTimeNote}
               </p>
             ) : null}
@@ -83,7 +83,7 @@ export async function InquirySection({ block }: { block: InquiryBlock }) {
             {settings.socials?.length ? (
               <p
                 className={cn(
-                  'mt-6 text-xs tracking-[0.14em] uppercase',
+                  'mt-6 text-label tracking-[0.14em] uppercase',
                   dark ? 'text-mist/70' : 'text-slate-80',
                 )}
               >
@@ -102,7 +102,7 @@ export async function InquirySection({ block }: { block: InquiryBlock }) {
               variant={dark ? 'dark' : 'light'}
             />
             {block.note ? (
-              <p className={cn('mt-4 text-[0.8125rem]', dark ? 'text-mist/80' : 'text-slate-80')}>
+              <p className={cn('mt-4 text-small', dark ? 'text-mist/80' : 'text-slate-80')}>
                 {block.note}
               </p>
             ) : null}

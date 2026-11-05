@@ -30,7 +30,7 @@ function StatusBadge({ status }: { status: DepartureStatus }) {
 
   if (status === 'guaranteed') {
     return (
-      <span className="inline-flex items-center gap-1.5 bg-sage-90 px-2.5 py-0.5 font-heading text-[0.6875rem] font-semibold tracking-[0.12em] text-white uppercase">
+      <span className="inline-flex items-center gap-1.5 bg-sage-90 px-2.5 py-0.5 font-heading text-label font-semibold tracking-[0.12em] text-white uppercase">
         <Check className="size-3" strokeWidth={3} aria-hidden />
         {label}
       </span>
@@ -39,7 +39,7 @@ function StatusBadge({ status }: { status: DepartureStatus }) {
 
   if (status === 'limited') {
     return (
-      <span className="inline-flex items-center gap-1.5 bg-ink px-2.5 py-0.5 font-heading text-[0.6875rem] font-semibold tracking-[0.12em] text-mist uppercase">
+      <span className="inline-flex items-center gap-1.5 bg-ink px-2.5 py-0.5 font-heading text-label font-semibold tracking-[0.12em] text-mist uppercase">
         {label}
       </span>
     )
@@ -47,14 +47,14 @@ function StatusBadge({ status }: { status: DepartureStatus }) {
 
   if (status === 'sold-out') {
     return (
-      <span className="inline-flex items-center gap-1.5 bg-mist px-2.5 py-0.5 font-heading text-[0.6875rem] font-semibold tracking-[0.12em] text-ink-60 uppercase">
+      <span className="inline-flex items-center gap-1.5 bg-mist px-2.5 py-0.5 font-heading text-label font-semibold tracking-[0.12em] text-ink-60 uppercase">
         {label}
       </span>
     )
   }
 
   return (
-    <span className="inline-flex items-center gap-1.5 border border-sage-40 bg-sage-20 px-2.5 py-0.5 font-heading text-[0.6875rem] font-semibold tracking-[0.12em] text-sage-80 uppercase">
+    <span className="inline-flex items-center gap-1.5 border border-sage-40 bg-sage-20 px-2.5 py-0.5 font-heading text-label font-semibold tracking-[0.12em] text-sage-80 uppercase">
       {label}
     </span>
   )
@@ -183,7 +183,7 @@ export function DeparturesCalendar({
           onClick={() => handleSelectMonthFilter('all')}
           aria-pressed={activeMonthFilter === 'all'}
           className={cn(
-            'shrink-0 cursor-pointer border px-3.5 py-2 font-heading text-xs font-semibold tracking-[0.08em] uppercase transition-colors',
+            'shrink-0 cursor-pointer border px-3.5 py-2 font-heading text-label font-semibold tracking-[0.08em] uppercase transition-colors',
             activeMonthFilter === 'all'
               ? 'border-ink bg-ink text-white'
               : 'border-slate-20 bg-white text-ink-80 hover:border-slate-40 hover:text-ink',
@@ -201,7 +201,7 @@ export function DeparturesCalendar({
               onClick={() => handleSelectMonthFilter(month.monthKey)}
               aria-pressed={active}
               className={cn(
-                'shrink-0 cursor-pointer border px-3.5 py-2 font-heading text-xs font-semibold tracking-[0.08em] uppercase transition-colors',
+                'shrink-0 cursor-pointer border px-3.5 py-2 font-heading text-label font-semibold tracking-[0.08em] uppercase transition-colors',
                 active
                   ? 'border-ink bg-ink text-white'
                   : 'border-slate-20 bg-white text-ink-80 hover:border-slate-40 hover:text-ink',
@@ -228,10 +228,10 @@ export function DeparturesCalendar({
             </button>
 
             <div className="min-w-0 text-center">
-              <p className="font-heading text-base font-semibold text-ink">
+              <p className="font-heading text-body font-semibold text-ink">
                 {formatCalendarMonth(calendarMonth)}
               </p>
-              <p className="mt-0.5 text-xs text-slate-80">
+              <p className="mt-0.5 text-label text-slate-80">
                 {departuresInCalendarMonth === 1
                   ? '1 departure'
                   : `${departuresInCalendarMonth} departures`}
@@ -255,7 +255,7 @@ export function DeparturesCalendar({
             {CALENDAR_WEEKDAYS.map((weekday) => (
               <span
                 key={weekday}
-                className="font-heading text-[0.6875rem] font-semibold tracking-[0.12em] text-slate-80 uppercase"
+                className="font-heading text-label font-semibold tracking-[0.12em] text-slate-80 uppercase"
               >
                 {weekday}
               </span>
@@ -292,7 +292,7 @@ export function DeparturesCalendar({
                     aria-label={`${formatDepartureDate(cell.dateKey)} — ${departureStatusLabel(primaryDeparture.status)}, ${formatPrice(primaryDeparture.price, priceCurrency)}`}
                     onClick={() => handleSelectDeparture(primaryDeparture)}
                     className={cn(
-                      'relative flex h-10 flex-col items-center justify-center font-heading text-[0.875rem] font-semibold transition-colors cursor-pointer',
+                      'relative flex h-10 flex-col items-center justify-center font-heading text-small font-semibold transition-colors cursor-pointer',
                       !cell.inCurrentMonth && !isSelectedStart && 'opacity-65',
                       isSelectedStart
                         ? 'bg-ink text-white'
@@ -317,7 +317,7 @@ export function DeparturesCalendar({
                 <span
                   key={cell.dateKey}
                   className={cn(
-                    'grid h-10 place-items-center text-[0.875rem]',
+                    'grid h-10 place-items-center text-small',
                     inSelectedWindow
                       ? isSelectedEnd
                         ? 'bg-haze-20 font-heading font-semibold text-deep-90 ring-1 ring-haze-40'
@@ -334,7 +334,7 @@ export function DeparturesCalendar({
           </div>
 
           <div className="mt-5 space-y-3 border-t border-slate-20 pt-4">
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-ink-70">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-label text-ink-70">
               <span className="inline-flex items-center gap-2">
                 <span aria-hidden className="inline-block size-3 bg-sage-20 ring-1 ring-sage-40" />
                 {dict.trip.departureDateLegend}
@@ -346,7 +346,7 @@ export function DeparturesCalendar({
             </div>
 
             {selectedDeparture ? (
-              <div className="flex items-center gap-2.5 bg-mist px-3 py-2.5 text-xs text-ink">
+              <div className="flex items-center gap-2.5 bg-mist px-3 py-2.5 text-label text-ink">
                 <Calendar className="size-3.5 shrink-0 text-deep" aria-hidden />
                 <span className="min-w-0 truncate font-heading font-semibold">
                   {formatDepartureRange(
@@ -398,14 +398,14 @@ export function DeparturesCalendar({
                               event.stopPropagation()
                               handleSelectDeparture(departure)
                             }}
-                            className="cursor-pointer text-left font-heading text-base font-semibold text-ink hover:text-deep sm:text-[1.0625rem]"
+                            className="cursor-pointer text-left font-heading text-subhead font-semibold text-ink hover:text-deep"
                           >
                             {formatDepartureRange(departure.startDateKey, departure.endDateKey)}
                           </button>
                           <StatusBadge status={departure.status} />
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.8125rem] text-ink-60">
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-small text-ink-60">
                           <span className="inline-flex items-center gap-1.5">
                             <Clock className="size-3.5 text-slate-80" aria-hidden />
                             {weekdaySummary} · {departure.durationDays} {dict.common.days}
@@ -418,14 +418,14 @@ export function DeparturesCalendar({
 
                       <div className="flex items-center justify-between gap-4 border-t border-slate-20 pt-3 sm:shrink-0 sm:justify-end sm:border-t-0 sm:pt-0">
                         <div className="sm:text-right">
-                          <p className="font-heading text-lg leading-tight font-semibold text-ink sm:text-xl">
+                          <p className="font-heading text-card font-semibold text-ink">
                             {formatPrice(departure.price, priceCurrency)}
                           </p>
-                          <p className="text-xs text-ink-60">{unitLabel}</p>
+                          <p className="text-label text-ink-60">{unitLabel}</p>
                         </div>
 
                         {soldOut ? (
-                          <span className="inline-flex h-9 items-center border border-slate-20 bg-mist px-4 font-heading text-xs font-semibold tracking-[0.08em] text-ink-60 uppercase">
+                          <span className="inline-flex h-9 items-center border border-slate-20 bg-mist px-4 font-heading text-label font-semibold tracking-[0.08em] text-ink-60 uppercase">
                             {departureStatusLabel('sold-out')}
                           </span>
                         ) : (
@@ -455,7 +455,7 @@ export function DeparturesCalendar({
             </ul>
           ) : (
             <div className={cn(surface, 'flex flex-wrap items-center justify-between gap-4 p-6')}>
-              <p className="text-[0.9375rem] text-ink-70">{dict.trip.noDeparturesInMonth}</p>
+              <p className="text-ui text-ink-70">{dict.trip.noDeparturesInMonth}</p>
               <Button
                 type="button"
                 size="sm"

@@ -91,7 +91,7 @@ export default async function DestinationsPage() {
           <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4">
             <Link
               href="#regions"
-              className="group inline-flex items-center gap-3 border-b border-mist/45 pb-2 text-sm font-medium text-white transition-colors hover:border-mist"
+              className="group inline-flex items-center gap-3 border-b border-mist/45 pb-2 text-small font-medium text-white transition-colors hover:border-mist"
             >
               Explore the atlas
               <ArrowDown
@@ -99,7 +99,7 @@ export default async function DestinationsPage() {
                 aria-hidden="true"
               />
             </Link>
-            <span className="text-sm text-mist/85">
+            <span className="text-small text-mist/85">
               Led by people who call these mountains home.
             </span>
           </div>
@@ -124,7 +124,7 @@ export default async function DestinationsPage() {
               </p>
               <Link
                 href={sitePath('/inquiry')}
-                className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-deep-90 underline decoration-slate-40 decoration-1 underline-offset-4 transition-colors hover:text-deep-80 hover:decoration-deep"
+                className="mt-6 inline-flex items-center gap-2 text-small font-medium text-deep-90 underline decoration-slate-40 decoration-1 underline-offset-4 transition-colors hover:text-deep-80 hover:decoration-deep"
               >
                 Plan a trip with us <ArrowRight className="size-4" aria-hidden="true" />
               </Link>
@@ -153,7 +153,7 @@ export default async function DestinationsPage() {
           </div>
           <Link
             href={sitePath('/inquiry')}
-            className="group inline-flex w-full shrink-0 items-center justify-center gap-3 bg-ink px-6 py-4 text-sm font-medium text-white transition-colors hover:bg-deep sm:w-auto"
+            className="group inline-flex w-full shrink-0 items-center justify-center gap-3 bg-ink px-6 py-4 text-small font-medium text-white transition-colors hover:bg-deep sm:w-auto"
           >
             Plan your trip
             <ArrowRight
@@ -204,19 +204,19 @@ function AtlasCard({ destination, index }: { destination: DestinationCard; index
           />
           <div className="photo-scrim pointer-events-none absolute inset-0 -z-10" />
           <div className="absolute inset-x-0 top-0 flex items-center justify-between p-5">
-            <span className="text-[0.65rem] font-medium tracking-[0.18em] text-mist uppercase">
+            <span className="text-label font-medium tracking-[0.18em] text-mist uppercase">
               {regionName(destination.region)}
             </span>
-            <span className="text-[0.65rem] font-medium tracking-[0.16em] text-mist/85 tabular-nums">
+            <span className="text-label font-medium tracking-[0.16em] text-mist/85 tabular-nums">
               {String(index + 1).padStart(2, '0')}
             </span>
           </div>
           <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 sm:p-6">
             <div>
-              <p className="text-[0.7rem] font-medium tracking-[0.15em] text-mist/85 uppercase">
+              <p className="text-label font-medium tracking-[0.15em] text-mist/85 uppercase">
                 {destination.country}
               </p>
-              <h3 className="mt-2 font-display text-2xl leading-tight text-white sm:text-[1.7rem]">
+              <h3 className="mt-2 font-display text-card text-white">
                 {destination.name}
               </h3>
               {destination.tagline ? (
@@ -230,7 +230,7 @@ function AtlasCard({ destination, index }: { destination: DestinationCard; index
             </span>
           </div>
         </div>
-        <div className="mt-4 flex items-center justify-between gap-4 border-t border-slate-20 pt-3 text-[0.7rem] font-medium tracking-[0.15em] text-slate-80 uppercase">
+        <div className="mt-4 flex items-center justify-between gap-4 border-t border-slate-20 pt-3 text-label font-medium tracking-[0.15em] text-slate-80 uppercase">
           <span>{destination.country} · Himalaya</span>
           <span className="text-slate-80">Explore region</span>
         </div>

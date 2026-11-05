@@ -54,7 +54,7 @@ import type { Trip } from '@/payload-types'
 /** Eyebrow for dark backgrounds (the shared `.eyebrow` utility is tuned for light ones).
     Paper grey rather than ember: at this size the warm accent sits under 4.5:1. */
 const eyebrowOnDark =
-  'font-heading text-[0.75rem] font-medium tracking-[0.18em] text-mist uppercase'
+  'font-heading text-label font-medium tracking-[0.18em] text-mist uppercase'
 
 function SectionTitle({
   title,
@@ -104,36 +104,36 @@ function TripBookingCard({
         </p>
 
         <div className="mt-4 bg-ink-80 px-5 py-4">
-          <p className="font-display text-[2.75rem] leading-none text-white">
+          <p className="font-display text-section leading-none text-white">
             {formatPrice(trip.priceFrom, trip.priceCurrency)}
           </p>
         </div>
 
         <dl className="mt-7 divide-y divide-white/10 border-t border-white/10">
           <div className="flex items-center justify-between gap-4 py-4">
-            <dt className="flex items-center gap-2.5 text-[0.9375rem] text-mist/80">
+            <dt className="flex items-center gap-2.5 text-ui text-mist/80">
               <Gauge className="size-4 text-sage-light" aria-hidden />
               {dict.trip.difficultyLevel}
             </dt>
             <dd>
-              <span className="bg-sage-90 px-3 py-1 text-[0.8125rem] font-medium text-white">
+              <span className="bg-sage-90 px-3 py-1 text-small font-medium text-white">
                 {difficultyLabel(trip.difficulty)}
               </span>
             </dd>
           </div>
           <div className="flex items-center justify-between gap-4 py-4">
-            <dt className="flex items-center gap-2.5 text-[0.9375rem] text-mist/80">
+            <dt className="flex items-center gap-2.5 text-ui text-mist/80">
               <Clock className="size-4 text-sage-light" aria-hidden />
               {dict.trip.duration}
             </dt>
-            <dd className="text-right font-heading text-[0.9375rem] font-semibold text-white">
+            <dd className="text-right font-heading text-ui font-semibold text-white">
               {trip.durationDays} {dict.common.days}
               {trip.durationNights ? ` / ${trip.durationNights} ${dict.common.nights}` : ''}
             </dd>
           </div>
         </dl>
 
-        <Button asChild size="lg" variant="sage" className="mt-6 h-13 w-full text-[0.9375rem]">
+        <Button asChild size="lg" variant="sage" className="mt-6 h-13 w-full text-ui">
           <Link href={bookingHref}>
             {dict.trip.bookThisTrek}
             <ArrowRight aria-hidden />
@@ -223,7 +223,7 @@ export function TripDetail({
               {destination ? (
                 <Link
                   href={sitePath(`/destinations/${destination.slug}`)}
-                  className="border border-mist/35 bg-ink/40 px-3.5 py-1.5 text-[0.75rem] tracking-[0.14em] text-mist uppercase transition-colors hover:border-mist hover:bg-ink/60"
+                  className="border border-mist/35 bg-ink/40 px-3.5 py-1.5 text-label tracking-[0.14em] text-mist uppercase transition-colors hover:border-mist hover:bg-ink/60"
                 >
                   {destination.name}
                 </Link>
@@ -256,10 +256,10 @@ export function TripDetail({
                     <fact.icon className="size-4" aria-hidden />
                   </span>
                   <div className="min-w-0">
-                    <dt className="text-[0.6875rem] tracking-[0.14em] text-mist/75 uppercase">
+                    <dt className="text-label tracking-[0.14em] text-mist/75 uppercase">
                       {fact.label}
                     </dt>
-                    <dd className="mt-1 truncate font-heading text-[0.9375rem] font-semibold text-white">
+                    <dd className="mt-1 truncate font-heading text-ui font-semibold text-white">
                       {fact.value}
                     </dd>
                   </div>
@@ -303,7 +303,7 @@ export function TripDetail({
             ].map(({ media, label }) =>
               media && typeof media !== 'number' ? (
                 <figure key={label} className={cn(surface, 'overflow-hidden p-4 sm:p-6')}>
-                  <figcaption className="mb-4 font-heading text-lg font-semibold">
+                  <figcaption className="mb-4 font-heading text-subhead font-semibold">
                     {label}
                   </figcaption>
                   <PayloadImage
@@ -358,14 +358,14 @@ export function TripDetail({
                       indicator="chevron"
                       className="items-center py-6 hover:no-underline md:py-7"
                     >
-                      <span className="min-w-0 text-left font-heading text-base font-semibold text-ink md:text-lg">
+                      <span className="min-w-0 text-left font-heading text-subhead font-semibold text-ink">
                         {contentSection.heading}
                       </span>
                     </AccordionTrigger>
                     <AccordionContent>
                       <RichText
                         content={contentSection.content}
-                        className="w-full min-w-0 break-words text-[1.0625rem]"
+                        className="w-full min-w-0 break-words text-lead"
                       />
                     </AccordionContent>
                   </AccordionItem>
@@ -390,7 +390,7 @@ export function TripDetail({
                         <span className="mt-0.5 grid size-6 shrink-0 place-items-center bg-deep text-white">
                           <Check className="size-3.5" strokeWidth={3} aria-hidden />
                         </span>
-                        <span className="text-[0.9375rem] leading-relaxed text-ink-80">
+                        <span className="text-ui leading-relaxed text-ink-80">
                           {item.item}
                         </span>
                       </li>
@@ -408,7 +408,7 @@ export function TripDetail({
                         <span className="mt-0.5 grid size-6 shrink-0 place-items-center bg-mist text-slate-80">
                           <X className="size-3.5" strokeWidth={3} aria-hidden />
                         </span>
-                        <span className="text-[0.9375rem] leading-relaxed text-ink-60">
+                        <span className="text-ui leading-relaxed text-ink-60">
                           {item.item}
                         </span>
                       </li>
@@ -435,7 +435,7 @@ export function TripDetail({
                   <span className="mt-0.5 grid size-7 shrink-0 place-items-center bg-deep text-white">
                     <Check className="size-3.5" strokeWidth={3} aria-hidden />
                   </span>
-                  <span className="text-[0.9375rem] leading-relaxed text-ink-80">{item.item}</span>
+                  <span className="text-ui leading-relaxed text-ink-80">{item.item}</span>
                 </li>
               ))}
             </ul>

@@ -118,6 +118,45 @@
      to it for italic accent lines. Both names resolve to the same family. */
   --font-serif-accent: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
 
+  /* --- Type scale — the single source of truth for every font size ---
+     Nine roles only; every `text-*` class and every `font-size` declaration
+     in the project resolves to one of these tokens. Headings are fluid
+     clamp()s that land on the mobile size at 375px and the desktop size at
+     1440px, so they scale smoothly between the two:
+
+       role     mobile / desktop   line-height   weight
+       hero     36px / 56px  (H1, one per page)   1.1   500
+       section  28px / 40px  (H2)                1.15  500
+       card     20px / 24px  (card H3)           1.3   500
+       subhead  17px / 18px  (small H4)          1.4   600
+       lead     17px / 18px  (lead paragraph)    1.7   400
+       body     16px fixed  (all copy)           1.7   400
+       small    14px fixed                      1.6   400
+       label    12px fixed, uppercase, 0.14em   1.4   600
+       ui       15px fixed  (buttons, nav)       1.5   500
+
+     Weights are set with font-normal (400) / font-medium (500) /
+     font-semibold (600) — three weights in total, alongside the two
+     families above. */
+  --text-hero: clamp(2.25rem, 1.8rem + 1.9vw, 3.5rem); /* 36px @375 → 56px @1440 */
+  --text-hero--line-height: 1.1;
+  --text-section: clamp(1.75rem, 1.49rem + 1.13vw, 2.5rem); /* 28px @375 → 40px @1440 */
+  --text-section--line-height: 1.15;
+  --text-card: clamp(1.25rem, 1.16rem + 0.38vw, 1.5rem); /* 20px @375 → 24px @1440 */
+  --text-card--line-height: 1.3;
+  --text-subhead: clamp(1.0625rem, 1.055rem + 0.09vw, 1.125rem); /* 17px @375 → 18px @1440 */
+  --text-subhead--line-height: 1.4;
+  --text-lead: clamp(1.0625rem, 1.055rem + 0.09vw, 1.125rem); /* 17px @375 → 18px @1440 */
+  --text-lead--line-height: 1.7;
+  --text-body: 1rem; /* 16px at every canvas */
+  --text-body--line-height: 1.7;
+  --text-small: 0.875rem; /* 14px */
+  --text-small--line-height: 1.6;
+  --text-label: 0.75rem; /* 12px, uppercase, letter-spacing 0.14em */
+  --text-label--line-height: 1.4;
+  --text-ui: 0.9375rem; /* 15px — buttons and navigation */
+  --text-ui--line-height: 1.5;
+
   /* --- Breakpoints (5" phones → 100" TVs) ---
      Defaults remain: sm 640, md 768, lg 1024, xl 1280, 2xl 1536.
      Extra steps cover small phones just above 320px, Full HD / living-room TVs,
@@ -130,7 +169,7 @@
   /* --- Spacing & layout --- */
   --container-*: initial;
   --container-content: 80rem; /* 1280px — overridden fluidly below for large canvases */
-  --container-prose: 44rem; /* 704px — optimal line length for reading */
+  --container-prose: 65ch; /* body paragraph measure, capped at 65 characters */
 
   /* One shared rhythm: every section paddings, card padding and stack gap is a
      multiple of these, so spacing is consistent from the hero to the footer. */
@@ -225,8 +264,8 @@
   --sidebar-border: var(--color-slate-20);
   --sidebar-ring: var(--color-deep);
 
-  /* Shared responsive type scale for short-form descriptions. */
-  --font-size-description: clamp(0.9375rem, 0.82rem + 0.45vw, 1.25rem);
+  /* (The old `--font-size-description` fluid scale is gone: every description
+     now reads `--text-body` from the `@theme` type scale.) */
 
   /* Fluid page gutter: ~16px on a 5" phone, ~32px on a tablet, ~48–72px on a TV.
      Safe-area insets keep content clear of notches and curved TV bezels. */
@@ -249,7 +288,7 @@
   /* Runtime column widths — same tokens as @theme, so the large-canvas media
      queries further down can widen them without fighting the theme layer. */
   --container-content: 80rem;
-  --container-prose: 44rem;
+  --container-prose: 65ch;
 }
 
 /* Dark palette is defined so flipping next-themes to dark never produces an
@@ -391,8 +430,11 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    /* Archivo Light is the body weight: quiet, even colour on a white page. */
-    font-weight: 300;
+    /* Body copy is Archivo Regular — one of the scale's three weights
+       (400 / 500 / 600) with the body role's 16px and 1.7 leading. */
+    font-weight: 400;
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
     font-feature-settings:
       'kern' 1,
       'liga' 1;
@@ -496,14 +538,16 @@
    section override the colour with `text-mist`. */
 @utility eyebrow {
   font-family: var(--font-heading);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.16em;
+  /* Label role from the type scale: 12px, uppercase, 0.14em tracking, 600. */
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-slate-80);
 }
 
-/* --- Display tier: Instrument Serif, one weight, generous leading ---
+/* --- Display tier: Instrument Serif — sizes come from the type scale ---
    Serif display against Archivo text is the whole editorial voice of the site.
    The face ships a single 400 cut, so the weight is pinned and the tracking
    opens up slightly — a high-contrast display serif squeezed with negative
@@ -512,33 +556,27 @@
   font-family: var(--font-display);
   font-weight: 400;
   letter-spacing: -0.005em;
-  line-height: 1.03;
-  font-size: clamp(2.25rem, 1.25rem + 4.2vw, 4.75rem);
-  @media (width >= 120rem) {
-    font-size: clamp(4.75rem, 2.2rem + 2.1vw, 7rem);
-  }
+  /* Hero H1 role (36px mobile → 56px desktop, 1.1). */
+  font-size: var(--text-hero);
+  line-height: var(--text-hero--line-height);
 }
 
 @utility heading-xl {
   font-family: var(--font-display);
   font-weight: 400;
   letter-spacing: 0;
-  line-height: 1.07;
-  font-size: clamp(1.9375rem, 1.25rem + 2.4vw, 3.5rem);
-  @media (width >= 120rem) {
-    font-size: clamp(3.5rem, 1.8rem + 1.4vw, 5rem);
-  }
+  /* Section H2 role (28px → 40px, 1.15) at display weight. */
+  font-size: var(--text-section);
+  line-height: var(--text-section--line-height);
 }
 
 @utility heading-lg {
   font-family: var(--font-display);
   font-weight: 400;
   letter-spacing: 0.002em;
-  line-height: 1.12;
-  font-size: clamp(1.625rem, 1.25rem + 1.3vw, 2.5rem);
-  @media (width >= 120rem) {
-    font-size: clamp(2.5rem, 1.5rem + 0.9vw, 3.25rem);
-  }
+  /* Section H2 role (28px → 40px, 1.15) at display weight. */
+  font-size: var(--text-section);
+  line-height: var(--text-section--line-height);
 }
 
 /* --- Text tier: Archivo, the working voice of the site --- */
@@ -546,28 +584,30 @@
   font-family: var(--font-heading);
   font-weight: 600;
   letter-spacing: -0.015em;
-  line-height: 1.22;
-  font-size: clamp(1.15rem, 1.05rem + 0.5vw, 1.6rem);
-  @media (width >= 120rem) {
-    font-size: clamp(1.6rem, 1.1rem + 0.4vw, 2rem);
-  }
+  /* Card H3 role (20px → 24px, 1.3) at the small-H4 weight. */
+  font-size: var(--text-card);
+  line-height: var(--text-card--line-height);
 }
 
 @utility description-copy {
-  font-size: var(--font-size-description);
+  /* Every description reads the body role — one size everywhere. */
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
 }
 
 /* Description copy inside the compact card surfaces (trip, blog, destination and
-   difficulty-level cards) — the shared description scale minus exactly 2px, so the
-   cards stay in step with the responsive scale instead of pinning a fixed size. */
+   difficulty-level cards) — same body role as every other description, so all
+   card copy is identical at every canvas. */
 @utility card-description-copy {
-  font-size: calc(var(--font-size-description) - 2px);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
 }
 
 @utility lead {
-  font-size: var(--font-size-description);
-  line-height: 1.7;
-  font-weight: 300;
+  /* Lead paragraph role: 17px → 18px, 1.7, 400. */
+  font-size: var(--text-lead);
+  line-height: var(--text-lead--line-height);
+  font-weight: 400;
   color: var(--color-ink-60);
 }
 
@@ -646,18 +686,23 @@
   .prose-hg h3 {
     font-family: var(--font-heading);
     font-weight: 600;
-    font-size: 1.2rem;
+    /* Small H4 role (17px → 18px, 1.4, 600). */
+    font-size: var(--text-subhead);
+    line-height: var(--text-subhead--line-height);
     letter-spacing: -0.01em;
     @apply mt-10 text-ink;
   }
   .prose-hg h4 {
     font-family: var(--font-heading);
     font-weight: 600;
-    font-size: 1.05rem;
+    font-size: var(--text-subhead);
+    line-height: var(--text-subhead--line-height);
     @apply mt-8 text-ink;
   }
   .prose-hg p {
-    @apply leading-[1.78] text-ink-80;
+    @apply text-ink-80;
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
   }
   .prose-hg a {
     @apply text-deep underline decoration-slate-40 decoration-1 underline-offset-4 transition-colors hover:text-deep-80 hover:decoration-deep;
@@ -673,14 +718,19 @@
     @apply list-decimal;
   }
   .prose-hg li {
-    @apply leading-[1.72] text-ink-80;
+    @apply text-ink-80;
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
     padding-left: 0.25rem;
   }
   .prose-hg li::marker {
     color: var(--color-slate-40);
   }
   .prose-hg blockquote {
-    @apply border-l-2 border-sage pl-6 text-lg leading-relaxed text-ink;
+    @apply border-l-2 border-sage pl-6 text-ink;
+    /* Pull quotes read the lead role (17px → 18px, 1.7). */
+    font-size: var(--text-lead);
+    line-height: var(--text-lead--line-height);
   }
   .prose-hg hr {
     @apply my-12 border-slate-20;
@@ -705,7 +755,8 @@
     width: 100%;
     border-collapse: collapse;
     /* A shade under the running copy, so wide grids fit without the editor having to fight. */
-    font-size: 0.9375rem;
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
   }
   .prose-hg :is(th, td) {
     border: 1px solid var(--color-slate-20);
@@ -740,13 +791,16 @@
     margin-top: 0.4em;
   }
   .prose-hg :is(th, td) :is(p, li) {
-    @apply leading-[1.62];
+    line-height: var(--text-body--line-height);
   }
   .prose-hg figure {
     @apply my-12;
   }
   .prose-hg figcaption {
-    @apply mt-3.5 text-sm text-slate;
+    @apply mt-3.5 text-slate;
+    /* Captions read the small role (14px, 1.6). */
+    font-size: var(--text-small);
+    line-height: var(--text-small--line-height);
   }
 }
 
@@ -762,7 +816,9 @@
    ========================================================================== */
 @layer components {
   .single-page-body {
-    font-size: 1.0625rem; /* 1rem body size + 1px */
+    /* Long-form reading copy reads the body role — 16px, 1.7. */
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
     color: var(--color-ink);
   }
 
@@ -786,7 +842,8 @@
     margin: 0.1em 0.14em 0 0;
     color: var(--color-ink);
     font-family: var(--font-display);
-    font-size: 4.4em;
+    /* Drop cap reads the hero role — the only display size in the scale. */
+    font-size: var(--text-hero);
     font-weight: 400;
     line-height: 0.74;
   }
@@ -813,7 +870,8 @@
     background: var(--color-mist);
     padding: 1.75rem 1.75rem 1.75rem 2rem;
     font-family: var(--font-display);
-    font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.625rem);
+    /* Article pull quotes read the card role (20px → 24px). */
+    font-size: var(--text-card);
     line-height: 1.45;
   }
 
@@ -832,8 +890,9 @@
     border-left: 1px solid var(--color-slate-40);
     padding-left: 0.875rem;
     text-align: left;
-    font-size: 0.8125rem;
-    line-height: 1.55;
+    /* Captions read the small role (14px, 1.6). */
+    font-size: var(--text-small);
+    line-height: var(--text-small--line-height);
   }
 
   .blog-prose hr {
@@ -886,12 +945,8 @@
 @media (width >= 120rem) {
   :root {
     --container-content: 108rem;
-    --container-prose: 48rem;
-    --font-size-description: clamp(1.125rem, 0.9rem + 0.35vw, 1.5rem);
-  }
-
-  body {
-    font-size: 1.125rem;
+    /* Reading measure stays 65 characters at every canvas. */
+    --container-prose: 65ch;
   }
 }
 
@@ -899,11 +954,7 @@
 @media (width >= 160rem) {
   :root {
     --container-content: 128rem;
-    --container-prose: 52rem;
-  }
-
-  body {
-    font-size: 1.25rem;
+    --container-prose: 65ch;
   }
 }
 
@@ -911,22 +962,19 @@
 @media (width >= 240rem) {
   :root {
     --container-content: 160rem;
-    --container-prose: 56rem;
-  }
-
-  body {
-    font-size: 1.375rem;
+    --container-prose: 65ch;
   }
 }
 
-/* Short landscape phones (5–6" rotated): keep hero copy inside the viewport. */
+/* Short landscape phones (5–6" rotated): headings drop to their mobile role
+   sizes so hero copy stays inside the viewport. */
 @media (max-height: 500px) and (orientation: landscape) {
   .heading-display {
-    font-size: clamp(1.75rem, 8vh, 2.5rem);
+    font-size: min(var(--text-hero), 8vh);
   }
 
   .heading-xl {
-    font-size: clamp(1.5rem, 6.5vh, 2.1rem);
+    font-size: min(var(--text-section), 6.5vh);
   }
 }
 

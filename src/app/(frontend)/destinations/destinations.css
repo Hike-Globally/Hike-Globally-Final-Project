@@ -35,8 +35,8 @@
 
 [data-destinations-page] {
   /* 16px — the hero description and every atlas-card description. */
-  --destinations-hero-description-size: 16px;
-  --destinations-card-description-size: 16px;
+  --destinations-hero-description-size: var(--text-body);
+  --destinations-card-description-size: var(--text-body);
 }
 
 /* Hero — the standfirst under "The Himalaya, in all its scale." */

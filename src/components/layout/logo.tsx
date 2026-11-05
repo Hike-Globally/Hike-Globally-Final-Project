@@ -41,7 +41,7 @@ export function Logo({
       <span className="flex min-w-0 flex-col leading-none">
         <span
           className={cn(
-            'font-heading text-[1.0625rem] font-semibold tracking-[-0.01em]',
+            'font-heading text-subhead font-semibold tracking-[-0.01em]',
             variant === 'dark' ? 'text-ink' : 'text-white',
           )}
         >
@@ -50,7 +50,7 @@ export function Logo({
         {tagline ? (
           <span
             className={cn(
-              'mt-1 text-[0.6875rem] tracking-[0.14em] uppercase',
+              'mt-1 text-label tracking-[0.14em] uppercase',
               variant === 'dark' ? 'text-slate-80' : 'text-mist',
             )}
           >

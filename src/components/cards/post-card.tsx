@@ -60,7 +60,7 @@ export function PostCard({
       </Link>
 
       <div className={cn('flex flex-1 flex-col', featured ? 'pt-6 lg:w-[42%] lg:pt-0' : 'pt-5')}>
-        <div className="flex items-center gap-3 text-[0.75rem] tracking-[0.12em] text-slate-80 uppercase">
+        <div className="flex items-center gap-3 text-label tracking-[0.12em] text-slate-80 uppercase">
           {categoryLabel ? <span className="text-deep-90">{categoryLabel}</span> : null}
           {categoryLabel ? <span aria-hidden>·</span> : null}
           <time dateTime={(post.publishedAt ?? post.createdAt) as string}>
@@ -71,7 +71,7 @@ export function PostCard({
         <h3
           className={cn(
             'mt-3 font-heading font-semibold text-ink',
-            featured ? 'text-3xl md:text-4xl' : 'text-xl',
+            'text-card',
           )}
         >
           <Link href={href} className="transition-colors hover:text-deep">
@@ -91,7 +91,7 @@ export function PostCard({
           {post.excerpt}
         </p>
 
-        <p className="mt-4 text-[0.8125rem] text-slate-80">
+        <p className="mt-4 text-small text-slate-80">
           {authorName ? `${dict.blog.by} ${authorName}` : null}
           {authorName ? <span aria-hidden> · </span> : null}
           {dict.blog.readTime.replace('{minutes}', String(readingTimeMinutes(post.excerpt ?? '')))}

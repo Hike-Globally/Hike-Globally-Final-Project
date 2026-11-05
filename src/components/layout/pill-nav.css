@@ -63,7 +63,7 @@
   background-color: var(--color-ink);
   color: color-mix(in srgb, var(--color-mist) 82%, transparent);
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: var(--text-small);
   font-weight: 400;
   letter-spacing: 0.005em;
   line-height: 1.2em;
@@ -103,7 +103,7 @@
   border-radius: 8px;
   color: var(--color-mist);
   font-family: var(--font-sans);
-  font-size: 15px;
+  font-size: var(--text-ui);
   font-weight: 500;
   letter-spacing: -0.005em;
   line-height: 1em;
@@ -155,7 +155,7 @@
   white-space: pre;
   color: var(--color-haze);
   font-family: var(--font-sans);
-  font-size: 15px;
+  font-size: var(--text-ui);
   font-weight: 500;
   letter-spacing: -0.005em;
   line-height: 1em;
@@ -221,7 +221,7 @@
   background-color: var(--background);
   color: var(--color-ink);
   font-family: var(--font-sans);
-  font-size: 15px;
+  font-size: var(--text-ui);
   font-weight: 500;
   letter-spacing: -0.005em;
   line-height: 1em;
@@ -382,7 +382,7 @@
   .pn-logo,
   .pn-label,
   .pn-cta {
-    font-size: 14px;
+    font-size: var(--text-small);
   }
 
   .pn-cta {
@@ -399,7 +399,7 @@
   .pn-logo,
   .pn-label,
   .pn-cta {
-    font-size: 16px;
+    font-size: var(--text-body);
   }
 }
 

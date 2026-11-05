@@ -64,7 +64,7 @@ export function Testimonials({ block }: { block: TestimonialsBlock }) {
 
                   <blockquote
                     className={cn(
-                      'mt-5 flex-1 text-[1.0625rem] leading-relaxed',
+                      'mt-5 flex-1 text-lead leading-relaxed',
                       dark ? 'text-mist' : 'text-ink-80',
                     )}
                   >
@@ -81,7 +81,7 @@ export function Testimonials({ block }: { block: TestimonialsBlock }) {
                     ) : (
                       <span
                         className={cn(
-                          'grid size-11 shrink-0 place-items-center rounded-full font-heading text-sm font-semibold',
+                          'grid size-11 shrink-0 place-items-center rounded-full font-heading text-small font-semibold',
                           dark ? 'bg-ink-70 text-mist' : 'bg-mist text-ink',
                         )}
                         aria-hidden
@@ -90,9 +90,9 @@ export function Testimonials({ block }: { block: TestimonialsBlock }) {
                       </span>
                     )}
                     <div>
-                      <p className="text-[0.9375rem] font-medium">{item.name}</p>
+                      <p className="text-ui font-medium">{item.name}</p>
                       {item.role ? (
-                        <p className={cn('text-[0.8125rem]', dark ? 'text-mist/80' : 'text-slate-80')}>
+                        <p className={cn('text-small', dark ? 'text-mist/80' : 'text-slate-80')}>
                           {item.role}
                         </p>
                       ) : null}
@@ -103,7 +103,7 @@ export function Testimonials({ block }: { block: TestimonialsBlock }) {
                     <a
                       href={sitePath(`/trips/${tripSlug}`)}
                       className={cn(
-                        'mt-5 inline-flex text-[0.8125rem] underline underline-offset-4',
+                        'mt-5 inline-flex text-small underline underline-offset-4',
                         dark ? 'text-sage-light hover:text-white' : 'text-deep hover:text-deep-80',
                       )}
                     >

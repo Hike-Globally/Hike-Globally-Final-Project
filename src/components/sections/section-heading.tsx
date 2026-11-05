@@ -82,7 +82,7 @@ export function SectionHeading({
             <Link
               href={action.href}
               className={cn(
-                'group inline-flex shrink-0 items-center gap-2 text-[0.9375rem] font-medium transition-colors',
+                'group inline-flex shrink-0 items-center gap-2 text-ui font-medium transition-colors',
                 variant === 'light'
                   ? 'text-white hover:text-sage-light'
                   : 'text-deep hover:text-deep-80',

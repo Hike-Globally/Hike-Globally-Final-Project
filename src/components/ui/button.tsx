@@ -5,7 +5,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  "inline-flex max-w-full items-center justify-center gap-2 whitespace-nowrap text-sm font-medium tracking-[0.01em] transition-[background-color,color,border-color] duration-300 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 outline-none focus-visible:ring-[3px] focus-visible:ring-deep/35 aria-invalid:ring-destructive/40",
+  "inline-flex max-w-full items-center justify-center gap-2 whitespace-nowrap text-ui font-medium tracking-[0.01em] transition-[background-color,color,border-color] duration-300 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 outline-none focus-visible:ring-[3px] focus-visible:ring-deep/35 aria-invalid:ring-destructive/40",
   {
     variants: {
       variant: {
@@ -20,8 +20,8 @@ const buttonVariants = cva(
       },
       size: {
         default: 'h-10 px-5 py-2 has-[>svg]:px-4',
-        sm: 'h-8 px-3.5 text-[0.8125rem] has-[>svg]:px-3',
-        lg: 'h-12 px-7 text-base has-[>svg]:px-6',
+        sm: 'h-8 px-3.5 text-small has-[>svg]:px-3',
+        lg: 'h-12 px-7 text-ui has-[>svg]:px-6',
         icon: 'size-10',
       },
     },

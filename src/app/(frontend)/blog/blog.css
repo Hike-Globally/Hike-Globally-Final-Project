@@ -29,10 +29,10 @@
 
 [data-blog-page] {
   /* 16px — hero standfirst under the display headline. */
-  --blog-hero-lead-size: 16px;
+  --blog-hero-lead-size: var(--text-body);
 
   /* 16px — excerpt on every journal card (lead plate + grid). */
-  --blog-card-description-size: 16px;
+  --blog-card-description-size: var(--text-body);
 }
 
 /* ---------------------------------------------------------------------------

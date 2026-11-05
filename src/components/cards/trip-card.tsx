@@ -60,7 +60,7 @@ export function TripCard({
         </div>
         {destinationName ? (
           <div className="photo-scrim absolute inset-x-0 bottom-0 p-4 pt-12">
-            <p className="text-[0.8125rem] font-medium text-mist">{destinationName}</p>
+            <p className="text-small font-medium text-mist">{destinationName}</p>
           </div>
         ) : null}
       </Link>
@@ -68,7 +68,7 @@ export function TripCard({
       <div className="flex flex-1 flex-col p-5">
         <h3
           className={cn(
-            'font-heading text-lg leading-snug font-semibold break-words text-ink',
+            'font-heading text-card font-semibold break-words text-ink',
             titleClassName,
           )}
         >
@@ -86,7 +86,7 @@ export function TripCard({
           {trip.summary}
         </p>
 
-        <dl className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.8125rem] text-slate-80">
+        <dl className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-small text-slate-80">
           <div className="flex items-center gap-1.5">
             <Clock className="size-4" aria-hidden />
             <dt className="sr-only">{dict.trip.duration}</dt>
@@ -111,9 +111,9 @@ export function TripCard({
         </dl>
 
         <div className="mt-5 flex flex-wrap items-end justify-between gap-3 border-t border-slate-20 pt-4">
-          <p className="text-[0.8125rem] text-slate-80">
+          <p className="text-small text-slate-80">
             {dict.common.from}{' '}
-            <span className="font-heading text-lg font-semibold text-ink">
+            <span className="font-heading text-card font-semibold text-ink">
               {formatPrice(trip.priceFrom, trip.priceCurrency)}
             </span>
             <span className="ml-1 text-slate-80">

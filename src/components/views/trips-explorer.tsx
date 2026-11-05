@@ -127,7 +127,7 @@ export function TripsExplorer({
         <div className="border border-slate-20 bg-white p-5 md:p-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-              <Label className="mb-2 text-xs tracking-[0.12em] text-slate-80 uppercase">
+              <Label className="mb-2 text-label tracking-[0.12em] text-slate-80 uppercase">
                 {dict.trips.difficulty}
               </Label>
               <Select value={difficulty} onValueChange={setDifficultySearch}>
@@ -146,7 +146,7 @@ export function TripsExplorer({
             </div>
 
             <div>
-              <Label className="mb-2 text-xs tracking-[0.12em] text-slate-80 uppercase">
+              <Label className="mb-2 text-label tracking-[0.12em] text-slate-80 uppercase">
                 {dict.trips.season}
               </Label>
               <Select value={season} onValueChange={setSeason}>
@@ -167,7 +167,7 @@ export function TripsExplorer({
             </div>
 
             <div>
-              <Label className="mb-2 text-xs tracking-[0.12em] text-slate-80 uppercase">
+              <Label className="mb-2 text-label tracking-[0.12em] text-slate-80 uppercase">
                 {dict.trips.destination}
               </Label>
               <Select value={destination} onValueChange={setDestination}>
@@ -186,7 +186,7 @@ export function TripsExplorer({
             </div>
 
             <div>
-              <Label className="mb-2 text-xs tracking-[0.12em] text-slate-80 uppercase">
+              <Label className="mb-2 text-label tracking-[0.12em] text-slate-80 uppercase">
                 {dict.trips.sort}
               </Label>
               <Select value={sort} onValueChange={(value) => setSort(value as Sort)}>
@@ -205,7 +205,7 @@ export function TripsExplorer({
           </div>
 
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-20 pt-4">
-            <p className="text-[0.9375rem] text-ink-60">
+            <p className="text-ui text-ink-60">
               {plural(dict.trips as unknown as Record<string, string>, filtered.length)}
             </p>
             {hasFilters ? (

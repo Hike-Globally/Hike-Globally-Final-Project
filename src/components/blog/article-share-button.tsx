@@ -97,7 +97,7 @@ export function ArticleShareButton({
       onClick={shareArticle}
       aria-label={label}
       className={cn(
-        'inline-flex h-10 items-center justify-center gap-2 border px-4 text-[0.8125rem] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-3',
+        'inline-flex h-10 items-center justify-center gap-2 border px-4 text-small font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-3',
         tone === 'dark'
           ? 'border-mist/45 bg-ink/35 text-white hover:border-mist hover:bg-ink/60 focus-visible:outline-mist'
           : 'border-slate-40 bg-white text-ink hover:border-ink hover:bg-mist focus-visible:outline-deep',

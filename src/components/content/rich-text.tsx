@@ -67,7 +67,7 @@ const withFormat = (
   if (format & FORMAT.strikethrough) node = <s key={`s-${key}`}>{node}</s>
   if (format & FORMAT.code)
     node = (
-      <code key={`c-${key}`} className="bg-mist-60 px-1.5 py-0.5 text-[0.9em]">
+      <code key={`c-${key}`} className="bg-mist-60 px-1.5 py-0.5 text-small">
         {node}
       </code>
     )
@@ -379,7 +379,7 @@ const renderNode = (node: RichTextNode, index: number, context: RenderContext): 
             />
           </div>
           {caption ? (
-            <figcaption className="mt-3 text-center text-sm text-slate-80">{caption}</figcaption>
+            <figcaption className="mt-3 text-center text-small text-slate-80">{caption}</figcaption>
           ) : null}
         </figure>
       )

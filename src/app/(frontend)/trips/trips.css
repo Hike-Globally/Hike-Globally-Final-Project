@@ -18,10 +18,10 @@
 
 /* Hero description — 16px, all viewports. */
 [data-trips-page] .trips-hero-lead {
-  font-size: 16px;
+  font-size: var(--text-body);
 }
 
 /* Trip card description — 16px, all viewports. */
 [data-trips-page] .trips-card-summary {
-  font-size: 16px;
+  font-size: var(--text-body);
 }
