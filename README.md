@@ -215,3 +215,34 @@ Vercel + hosted Postgres + Vercel Blob for media (without a Blob store the deplo
 Postgres storage — see [Media storage](#media-storage)). See
 [§9 of the implementation plan](docs/IMPLEMENTATION-PLAN.md#9-deployment); the short version is
 `npm ci && npm run migrate && npm run build`, with the four environment variables above set.
+
+### Commit author must be a real GitHub account
+
+Vercel refuses to deploy a commit whose author email it cannot map to a GitHub account and fails the
+build with _"The commit author email is not a valid email address"_. Bot addresses such as
+`agent@arena.ai` or `probe@arena.local` do exactly that, so every commit — human or automated — must
+be authored with an address tied to the account that owns this repo:
+
+```bash
+git config user.name  "Hike-Globally"
+git config user.email "337236695+Hike-Globally@users.noreply.github.com"
+```
+
+The numeric `ID+USERNAME@users.noreply.github.com` form is preferred because GitHub keeps it stable
+even after the account's email privacy setting changes; the plain `USERNAME@users.noreply.github.com`
+form also works. Run `git log -1 --pretty='%an <%ae>'` to check the identity of the commit you are
+about to push — rewriting the author of an already-pushed commit requires a force-push and a new PR.
+
+#### If a pushed commit has a bad author
+
+Vercel reads the author of each commit, so an existing commit with a bot address keeps failing that
+deployment. Either push a new commit with a good identity (Vercel then deploys the new head) or
+re-stamp the bad commit:
+
+```bash
+git rebase --exec 'git commit --amend --no-edit --reset-author' origin/main
+git push --force-with-lease origin <branch>
+```
+
+For any other commit already on the branch, `git filter-repo --commit-callback` or an interactive
+`rebase --root` does the same job. Only rewrite commits that are not yet on `main`.
