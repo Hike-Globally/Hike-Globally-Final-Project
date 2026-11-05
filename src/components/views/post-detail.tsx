@@ -294,12 +294,12 @@ export function PostDetail({
     related: (
       <>
         {related.length ? (
-          <section className="bg-mist py-16 md:py-24">
+          <section className="bg-mist py-16 md:py-24" data-related-rail="">
             <div className="container-content">
               <div className="mb-10 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <p className="eyebrow text-slate-80">{dict.blog.fieldNotes}</p>
-                  <h2 className="heading-lg mt-2">{dict.blog.related}</h2>
+                  <h2 className="heading-lg mt-2 text-ink">{dict.blog.related}</h2>
                   <p className="mt-3 max-w-xl description-copy leading-relaxed text-ink-60">
                     {dict.blog.relatedSubtitle}
                   </p>

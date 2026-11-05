@@ -7,6 +7,8 @@ import type { PostCard } from '@/lib/data'
 import { formatDate, readingTimeMinutes } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
+import './post-card.css'
+
 export function PostCard({
   post,
   priority = false,
@@ -68,12 +70,11 @@ export function PostCard({
           </time>
         </div>
 
-        <h3
-          className={cn(
-            'post-card-title mt-3 font-heading font-semibold text-ink',
-            'text-card',
-          )}
-        >
+        {/* `post-card-title` is the size hook page-level scales pin (see
+            `blog.css`); the card role is applied through it rather than a
+            `text-card` utility, because `text-card` resolves to the *colour*
+            `--color-card` (white) and would paint the title white on paper. */}
+        <h3 className="post-card-title mt-3 font-heading font-semibold">
           <Link href={href} className="transition-colors hover:text-deep">
             {post.title}
           </Link>
