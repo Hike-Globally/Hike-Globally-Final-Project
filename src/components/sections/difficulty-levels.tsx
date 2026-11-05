@@ -161,13 +161,11 @@ export function DifficultyLevels() {
                   </span>
                 </div>
 
-                {/* Card copy is pinned to the sizes the design calls for — 26px
-                    headings in the display serif, 16px descriptions — rather than
-                    the responsive description scale, so every rung reads the same
-                    at any width. Headings keep the case they are written in. */}
+                {/* The homepage type scale gives these rung names more presence
+                    than the card-title role; descriptions stay at 16px. */}
                 <h3
                   id={`difficulty-${level.value}-title`}
-                  className="mt-3 font-display text-card leading-[1.14] font-normal text-white"
+                  className="difficulty-level-card-title mt-3 font-display leading-[1.14] font-normal text-white"
                 >
                   {level.label}
                 </h3>
