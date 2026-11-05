@@ -127,9 +127,11 @@ Inputs and `react-select` controls sit at 40px on `#FFFFFF` with `#87AABD`
 hover borders and `#2177B5` focus rings (internal `.rs__input` elements stay
 chromeless). Top-level `group` and `collapsible` sections render as single-border
 `#FFFFFF` cards; `array` and `blocks` headers use clean hairline dividers rather
-than nested header boxes. Sticky elements (`.document-fields__sidebar-wrap` and
-Lexical `.fixed-toolbar`) offset cleanly below both the top bar and
-`.doc-controls`.
+than nested header boxes. Trip-specific short-form Lexical editors use a 144px
+minimum editing area so empty fields do not dominate the form, while still
+expanding naturally with content. Sticky elements
+(`.document-fields__sidebar-wrap` and Lexical `.fixed-toolbar`) offset cleanly
+below both the top bar and `.doc-controls`.
 
 ---
 

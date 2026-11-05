@@ -3091,6 +3091,12 @@ html[data-theme='light'] .template-default .graphic-account--active .graphic-acc
   min-height: var(--hg-editor-min-height);
 }
 
+/* Trip detail copy is usually short. Keep these editors compact when empty;
+   the editor still grows naturally as content is added. */
+.hg-trip-compact-editor .editor-scroller {
+  min-height: var(--hg-editor-compact-min-height);
+}
+
 .field-type.rich-text-lexical .editor-scroller .editor .ContentEditable__root {
   padding-right: var(--hg-space-4);
   color: var(--hg-text);
