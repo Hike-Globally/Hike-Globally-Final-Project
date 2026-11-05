@@ -37,7 +37,7 @@ export default async function AdminDashboard({ initPageResult, user }: AdminView
   if (!principal) {
     return (
       <main className="hg-dashboard">
-        <p className="hg-dashboard__empty">Please sign in to view the Hike Globally workspace.</p>
+        <p className="hg-empty">Please sign in to view the Hike Globally workspace.</p>
       </main>
     )
   }
@@ -128,6 +128,7 @@ export default async function AdminDashboard({ initPageResult, user }: AdminView
     day: 'numeric',
   }).format(now)
 
+  // Every statistic card shares one structure: label, value, supporting line.
   const metrics = [
     {
       label: 'Expeditions',
@@ -135,7 +136,6 @@ export default async function AdminDashboard({ initPageResult, user }: AdminView
       detail: 'Curated journeys',
       href: '/admin/collections/trips',
       icon: Mountain,
-      tone: 'evergreen',
     },
     {
       label: 'Destinations',
@@ -143,7 +143,6 @@ export default async function AdminDashboard({ initPageResult, user }: AdminView
       detail: 'Places worth going',
       href: '/admin/collections/destinations',
       icon: MapPin,
-      tone: 'clay',
     },
     {
       label: 'Field notes',
@@ -151,7 +150,6 @@ export default async function AdminDashboard({ initPageResult, user }: AdminView
       detail: 'Stories from the trail',
       href: '/admin/collections/blog',
       icon: BookOpen,
-      tone: 'blue',
     },
     {
       label: 'Media assets',
@@ -159,7 +157,6 @@ export default async function AdminDashboard({ initPageResult, user }: AdminView
       detail: 'Images and video',
       href: '/admin/collections/media',
       icon: Images,
-      tone: 'gold',
     },
   ]
 
@@ -169,180 +166,166 @@ export default async function AdminDashboard({ initPageResult, user }: AdminView
       detail: 'Create a new itinerary',
       href: '/admin/collections/trips/create',
       icon: Mountain,
-      tone: 'evergreen',
     },
     {
       label: 'Write a field note',
       detail: 'Share a story or guide',
       href: '/admin/collections/blog/create',
       icon: BookOpen,
-      tone: 'clay',
     },
     {
       label: 'Add a destination',
       detail: 'Open a new place to explore',
       href: '/admin/collections/destinations/create',
       icon: Compass,
-      tone: 'blue',
     },
   ]
 
   return (
     <main className="hg-dashboard">
-      <section className="hg-dashboard__hero" aria-labelledby="hg-dashboard-title">
-        <div className="hg-dashboard__hero-topline">
-          <span className="hg-dashboard__eyebrow">
-            <span className="hg-dashboard__live-dot" /> Hike Globally · Operations desk
-          </span>
-          <span className="hg-dashboard__date">{today}</span>
+      <header className="hg-page-header">
+        <div className="hg-page-header__copy">
+          <p className="hg-page-header__eyebrow">
+            {today} · Hike Globally operations desk
+          </p>
+          <h1>
+            {greeting}, {firstName}.
+          </h1>
+          <p className="hg-page-header__subtitle">
+            Make room for the extraordinary — your workspace for shaping remarkable journeys across
+            the Himalaya.
+          </p>
         </div>
 
-        <div className="hg-dashboard__hero-content">
-          <div className="hg-dashboard__hero-copy">
-            <p className="hg-dashboard__hero-kicker">A good day to go further</p>
-            <h1 id="hg-dashboard-title">
-              {greeting}, {firstName}.
-              <br />
-              <span>Make room for the extraordinary.</span>
-            </h1>
-            <p className="hg-dashboard__hero-description">
-              Your workspace for shaping remarkable journeys across the Himalaya.
-            </p>
-          </div>
-          <Link className="hg-dashboard__primary-action" href="/admin/collections/trips/create">
-            <Plus aria-hidden="true" size={17} strokeWidth={2.2} />
+        <div className="hg-page-header__actions">
+          <Link className="btn btn--style-secondary" href="/" target="_blank" rel="noreferrer">
+            <ArrowUpRight aria-hidden="true" />
+            Preview the live site
+          </Link>
+          <Link className="btn btn--style-primary" href="/admin/collections/trips/create">
+            <Plus aria-hidden="true" />
             Create an expedition
           </Link>
         </div>
+      </header>
 
-        <div className="hg-dashboard__hero-footer">
-          <span>
-            <Mountain aria-hidden="true" size={15} strokeWidth={1.8} />
-            The trail begins with a story.
-          </span>
-          <Link href="/" target="_blank" rel="noreferrer">
-            Preview the live site
-            <ArrowUpRight aria-hidden="true" size={15} strokeWidth={1.8} />
-          </Link>
-        </div>
-      </section>
-
-      <section className="hg-dashboard__metrics" aria-label="Content overview">
-        {metrics.map(({ label, value, detail, href, icon: Icon, tone }) => (
-          <Link className="hg-dashboard__metric" href={href} key={label}>
-            <span className={`hg-dashboard__metric-icon hg-dashboard__metric-icon--${tone}`}>
-              <Icon aria-hidden="true" size={20} strokeWidth={1.8} />
+      <section className="hg-stat-grid" aria-label="Content overview">
+        {metrics.map(({ label, value, detail, href, icon: Icon }) => (
+          <Link className="hg-stat" href={href} key={label}>
+            <span className="hg-stat__label">{label}</span>
+            <span className="hg-stat__value">{value === null ? '—' : value.toLocaleString('en')}</span>
+            <span className="hg-stat__meta">
+              <Icon aria-hidden="true" size={14} strokeWidth={1.75} />
+              {detail}
             </span>
-            <span className="hg-dashboard__metric-arrow">
-              <ArrowUpRight aria-hidden="true" size={17} strokeWidth={1.8} />
-            </span>
-            <span className="hg-dashboard__metric-value">
-              {value === null ? '—' : value.toLocaleString('en')}
-            </span>
-            <span className="hg-dashboard__metric-label">{label}</span>
-            <span className="hg-dashboard__metric-detail">{detail}</span>
           </Link>
         ))}
       </section>
 
-      <section className="hg-dashboard__section" aria-labelledby="hg-dashboard-actions-title">
-        <div className="hg-dashboard__section-heading">
-          <div>
-            <p className="hg-dashboard__section-kicker">Move the work forward</p>
-            <h2 id="hg-dashboard-actions-title">Create something meaningful</h2>
-          </div>
-          <Link className="hg-dashboard__text-link" href="/admin/collections/pages">
-            Browse all content
-            <ArrowRight aria-hidden="true" size={16} strokeWidth={1.8} />
-          </Link>
-        </div>
-
-        <div className="hg-dashboard__actions">
-          {actions.map(({ label, detail, href, icon: Icon, tone }) => (
-            <Link className="hg-dashboard__action-card" href={href} key={label}>
-              <span className={`hg-dashboard__action-icon hg-dashboard__action-icon--${tone}`}>
-                <Icon aria-hidden="true" size={19} strokeWidth={1.8} />
-              </span>
-              <span className="hg-dashboard__action-copy">
-                <strong>{label}</strong>
-                <span>{detail}</span>
-              </span>
-              <span className="hg-dashboard__action-arrow">
-                <ArrowUpRight aria-hidden="true" size={17} strokeWidth={1.8} />
-              </span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <div className="hg-dashboard__lower-grid">
-        <section className="hg-dashboard__panel" aria-labelledby="hg-dashboard-recent-title">
-          <div className="hg-dashboard__panel-heading">
+      <div className="hg-two-column">
+        <section className="hg-panel" aria-labelledby="hg-dashboard-recent-title">
+          <div className="hg-panel__header">
             <div>
-              <p className="hg-dashboard__section-kicker">A living library</p>
-              <h2 id="hg-dashboard-recent-title">Recently updated</h2>
+              <h2 className="hg-panel__title" id="hg-dashboard-recent-title">
+                Recently updated
+              </h2>
+              <p className="hg-panel__subtitle">The last five documents edited in this workspace.</p>
             </div>
-            <Link
-              className="hg-dashboard__icon-link"
-              href="/admin/collections/trips"
-              aria-label="Browse expeditions"
-            >
-              <ArrowRight aria-hidden="true" size={17} strokeWidth={1.8} />
+            <Link className="btn btn--style-secondary btn--size-small" href="/admin/collections/pages">
+              Browse all content
+              <ArrowRight aria-hidden="true" />
             </Link>
           </div>
 
           {activity.length ? (
-            <ul className="hg-dashboard__activity-list">
+            <ul className="hg-list">
               {activity.map((item) => (
                 <li key={`${item.kind}-${item.href}`}>
-                  <Link className="hg-dashboard__activity-link" href={item.href}>
-                    <span className="hg-dashboard__activity-marker" aria-hidden="true" />
-                    <span className="hg-dashboard__activity-copy">
-                      <strong>{item.title}</strong>
-                      <span>
+                  <Link className="hg-list__item" href={item.href}>
+                    <span className="hg-list__main">
+                      <span className="hg-list__title">{item.title}</span>
+                      <span className="hg-list__meta">
                         {item.kind} <span aria-hidden="true">·</span> {formatDate(item.updatedAt)}
                       </span>
                     </span>
-                    <span className={`hg-dashboard__status hg-dashboard__status--${item.status}`}>
-                      {item.status}
-                    </span>
+                    <span className={`hg-badge hg-badge--${item.status}`}>{item.status}</span>
+                    <ArrowRight aria-hidden="true" className="hg-list__cue" />
                   </Link>
                 </li>
               ))}
             </ul>
           ) : (
-            <div className="hg-dashboard__activity-empty">
-              <Clock aria-hidden="true" size={21} strokeWidth={1.7} />
+            <div className="hg-empty">
+              <Clock aria-hidden="true" />
               <p>Your latest edits will appear here.</p>
-              <Link href="/admin/collections/pages/create">Create your first page</Link>
+              <Link className="btn btn--style-secondary btn--size-small" href="/admin/collections/pages/create">
+                Create your first page
+              </Link>
             </div>
           )}
         </section>
 
-        <aside className="hg-dashboard__site-card" aria-labelledby="hg-dashboard-site-title">
-          <span className="hg-dashboard__site-mark">
-            <Compass aria-hidden="true" size={21} strokeWidth={1.7} />
-          </span>
-          <p className="hg-dashboard__section-kicker">Out in the world</p>
-          <h2 id="hg-dashboard-site-title">See your work on the mountain.</h2>
-          <p className="hg-dashboard__site-description">
-            Preview the public experience and make sure every detail feels right.
-          </p>
-          <Link
-            className="hg-dashboard__site-link"
-            href="/"
-            prefetch={false}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Open website
-            <ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.8} />
-          </Link>
-          <div className="hg-dashboard__site-footer">
-            <Images aria-hidden="true" size={15} strokeWidth={1.8} />
-            <span>Images and video, together in your media library.</span>
-          </div>
-        </aside>
+        <div className="hg-stack">
+          <section className="hg-panel" aria-labelledby="hg-dashboard-actions-title">
+            <div className="hg-panel__header">
+              <div>
+                <h2 className="hg-panel__title" id="hg-dashboard-actions-title">
+                  Create something meaningful
+                </h2>
+                <p className="hg-panel__subtitle">Move the work forward.</p>
+              </div>
+            </div>
+
+            <div className="hg-quick-actions">
+              {actions.map(({ label, detail, href, icon: Icon }) => (
+                <Link className="hg-quick-action" href={href} key={label}>
+                  <span className="hg-quick-action__icon">
+                    <Icon aria-hidden="true" />
+                  </span>
+                  <span className="hg-quick-action__copy">
+                    <strong>{label}</strong>
+                    <span>{detail}</span>
+                  </span>
+                  <ArrowRight aria-hidden="true" className="hg-quick-action__cue" />
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          <section className="hg-panel" aria-labelledby="hg-dashboard-site-title">
+            <div className="hg-panel__header">
+              <div>
+                <h2 className="hg-panel__title" id="hg-dashboard-site-title">
+                  See your work on the mountain.
+                </h2>
+                <p className="hg-panel__subtitle">
+                  Preview the public experience and make sure every detail feels right.
+                </p>
+              </div>
+            </div>
+
+            <div className="hg-quick-actions">
+              <Link className="hg-quick-action" href="/" prefetch={false} target="_blank" rel="noreferrer">
+                <span className="hg-quick-action__icon">
+                  <Compass aria-hidden="true" />
+                </span>
+                <span className="hg-quick-action__copy">
+                  <strong>Open website</strong>
+                  <span>The trail begins with a story.</span>
+                </span>
+                <ArrowUpRight aria-hidden="true" className="hg-quick-action__cue" />
+              </Link>
+            </div>
+
+            <div className="hg-panel__footer">
+              <span>Images and video, together in your media library.</span>
+              <Link className="btn btn--style-secondary btn--size-small" href="/admin/collections/media">
+                <Images aria-hidden="true" />
+                Media library
+              </Link>
+            </div>
+          </section>
+        </div>
       </div>
     </main>
   )

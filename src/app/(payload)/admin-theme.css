@@ -1,0 +1,284 @@
+/* ==========================================================================
+   HIKE GLOBALLY — ADMIN DESIGN SYSTEM (single source of truth)
+   ==========================================================================
+
+   Every colour, type size, weight, spacing step, radius and shadow used by the
+   admin panel is declared here exactly once. `custom.scss` only ever consumes
+   these variables — it contains no literal colours, sizes or shadows of its
+   own, so a change made in this file lands on every screen at once.
+
+   Documented in DESIGN_SYSTEM.md. Change a value here, not in a component.
+
+   Palette rules
+   -------------
+   • 1 primary colour + 1 neutral scale + 4 semantic colours. Nothing else.
+   • Text pairings are WCAG AA (≥ 4.5:1) — see the notes beside each token.
+   • Amber (#F7A230, the storefront accent) is folded into `warning`; it is no
+     longer used as a decorative highlight anywhere in the admin.
+   ========================================================================== */
+
+:root {
+  /* ------------------------------------------------------------------------
+     1. COLOUR — primary brand scale (navy-teal, derived from #1D3557)
+     ------------------------------------------------------------------------ */
+  --hg-primary-50: #f2f6fa;
+  --hg-primary-100: #e3ebf4;
+  --hg-primary-200: #c6d7e8;
+  --hg-primary-300: #9db9d5;
+  --hg-primary-400: #7095bd;
+  --hg-primary-500: #4d76a2;
+  --hg-primary-600: #2f5480; /* action surface — 7.9:1 on white */
+  --hg-primary-700: #234568; /* hover — 9.9:1 on white */
+  --hg-primary-800: #1d3557; /* brand ink — 12.6:1 on white */
+  --hg-primary-900: #142640;
+
+  /* ------------------------------------------------------------------------
+     2. COLOUR — neutral scale (cool gray: surfaces, borders, text)
+     ------------------------------------------------------------------------ */
+  --hg-gray-0: #ffffff;
+  --hg-gray-50: #f7f9fa; /* app canvas */
+  --hg-gray-100: #f1f4f6; /* hover wash / inset surface */
+  --hg-gray-200: #e6ebf0; /* default border */
+  --hg-gray-300: #d7dee6; /* strong border */
+  --hg-gray-400: #b3bec9; /* disabled border / icon muted */
+  --hg-gray-500: #8a96a4; /* disabled text, decorative icon */
+  --hg-gray-600: #667081; /* muted text — 5.0:1 on white */
+  --hg-gray-700: #4d5866; /* secondary text — 7.5:1 on white */
+  --hg-gray-800: #333c47;
+  --hg-gray-900: #1b2430; /* primary text — 15.8:1 on white */
+
+  /* ------------------------------------------------------------------------
+     3. COLOUR — semantic families (light surface + strong text, AA on light)
+     ------------------------------------------------------------------------ */
+  --hg-success-bg: #ecfdf3;
+  --hg-success-border: #abefc6;
+  --hg-success-text: #067647; /* 5.0:1 on --hg-success-bg */
+  --hg-success-solid: #079455;
+
+  --hg-warning-bg: #fffaeb;
+  --hg-warning-border: #fedf89;
+  --hg-warning-text: #b54708; /* 4.9:1 on --hg-warning-bg */
+  --hg-warning-solid: #dc6803;
+
+  --hg-danger-bg: #fef3f2;
+  --hg-danger-border: #fecdca;
+  --hg-danger-text: #b42318; /* 5.4:1 on --hg-danger-bg */
+  --hg-danger-solid: #d92d20;
+
+  --hg-info-bg: #eff8ff;
+  --hg-info-border: #b2ddff;
+  --hg-info-text: #175cd3; /* 5.0:1 on --hg-info-bg */
+  --hg-info-solid: #1570ef;
+
+  /* ------------------------------------------------------------------------
+     4. COLOUR — semantic aliases (what components reference)
+     ------------------------------------------------------------------------ */
+  --hg-bg-app: var(--hg-gray-50);
+  --hg-bg-surface: var(--hg-gray-0);
+  --hg-bg-subtle: var(--hg-gray-50);
+  --hg-bg-inset: var(--hg-gray-100);
+  --hg-bg-hover: var(--hg-gray-100);
+  --hg-bg-selected: var(--hg-primary-50);
+
+  --hg-border: var(--hg-gray-200);
+  --hg-border-strong: var(--hg-gray-300);
+  --hg-border-focus: var(--hg-primary-500);
+
+  --hg-text: var(--hg-gray-900);
+  --hg-text-secondary: var(--hg-gray-700);
+  --hg-text-muted: var(--hg-gray-600);
+  --hg-text-disabled: var(--hg-gray-500);
+  --hg-text-inverse: var(--hg-gray-0);
+  --hg-text-link: var(--hg-primary-700);
+
+  --hg-primary: var(--hg-primary-600);
+  --hg-primary-hover: var(--hg-primary-700);
+  --hg-primary-active: var(--hg-primary-800);
+  --hg-primary-soft: var(--hg-primary-50);
+  --hg-primary-soft-border: var(--hg-primary-200);
+
+  --hg-focus-ring: 0 0 0 3px rgb(47 84 128 / 18%);
+  --hg-focus-outline: 2px solid var(--hg-primary-500);
+  --hg-focus-outline-offset: 2px;
+
+  /* ------------------------------------------------------------------------
+     5. TYPOGRAPHY — one family, fixed scale (12 14 16 18 20 24 30)
+     ------------------------------------------------------------------------ */
+  --hg-font-sans:
+    'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --hg-font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+
+  --hg-root-font-size: 100%; /* browser default: 16px */
+
+  --hg-fs-12: 0.75rem; /* metadata, table headers, helper text */
+  --hg-fs-14: 0.875rem; /* body, labels, controls, table cells */
+  --hg-fs-16: 1rem; /* section titles, card titles */
+  --hg-fs-18: 1.125rem; /* panel titles */
+  --hg-fs-20: 1.25rem; /* page titles */
+  --hg-fs-24: 1.5rem; /* view titles (list / document) */
+  --hg-fs-30: 1.875rem; /* dashboard statistic values */
+
+  --hg-fw-regular: 400;
+  --hg-fw-medium: 500;
+  --hg-fw-semibold: 600;
+
+  --hg-lh-tight: 1.25;
+  --hg-lh-snug: 1.4;
+  --hg-lh-normal: 1.6;
+
+  /* ------------------------------------------------------------------------
+     6. SPACING — 4px grid only
+     ------------------------------------------------------------------------ */
+  --hg-space-1: 4px;
+  --hg-space-2: 8px;
+  --hg-space-3: 12px;
+  --hg-space-4: 16px;
+  --hg-space-5: 24px;
+  --hg-space-6: 32px;
+  --hg-space-7: 48px;
+
+  /* ------------------------------------------------------------------------
+     7. RADII — two shapes, one pill
+     ------------------------------------------------------------------------ */
+  --hg-radius-control: 6px; /* inputs, buttons, badges-square */
+  --hg-radius-card: 10px; /* cards, panels, tables, modals */
+  --hg-radius-pill: 999px;
+
+  /* ------------------------------------------------------------------------
+     8. ELEVATION — three soft, neutral shadows
+     ------------------------------------------------------------------------ */
+  --hg-shadow-sm: 0 1px 2px rgb(16 24 40 / 5%);
+  --hg-shadow-md: 0 1px 3px rgb(16 24 40 / 8%), 0 1px 2px rgb(16 24 40 / 4%);
+  --hg-shadow-lg: 0 8px 24px rgb(16 24 40 / 10%);
+
+  /* ------------------------------------------------------------------------
+     9. LAYOUT & CONTROLS
+     ------------------------------------------------------------------------ */
+  --hg-sidebar-width: 260px;
+  --hg-topbar-height: 56px;
+  --hg-content-max: 1200px;
+  --hg-page-pad-x: var(--hg-space-6);
+  --hg-page-pad-y: var(--hg-space-6);
+  --hg-section-gap: var(--hg-space-5);
+
+  --hg-badge-height: 22px;
+  --hg-badge-height-sm: 20px;
+  --hg-search-max-width: 420px;
+  --hg-textarea-min-height: 120px;
+  --hg-editor-min-height: 240px;
+
+  --hg-control-height-sm: 32px;
+  --hg-control-height-md: 40px;
+  --hg-control-height-lg: 48px;
+  --hg-table-row-height: 52px;
+  --hg-icon-size: 18px;
+  --hg-icon-stroke: 1.75;
+
+  --hg-transition: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ==========================================================================
+     PAYLOAD BRIDGE
+     --------------------------------------------------------------------------
+     Payload's own components (tables, fields, drawers, popovers, toasts) are
+     driven by its `--theme-*` / `--color-*` variables. Mapping them onto the
+     tokens above is what makes native Payload UI inherit the design system
+     instead of being re-styled selector by selector.
+     ========================================================================== */
+  --theme-bg: var(--hg-bg-app);
+  --theme-input-bg: var(--hg-bg-surface);
+  --theme-text: var(--hg-text);
+  --theme-border-color: var(--hg-border);
+
+  --theme-elevation-0: var(--hg-gray-0);
+  --theme-elevation-50: var(--hg-gray-50);
+  --theme-elevation-100: var(--hg-gray-100);
+  --theme-elevation-150: var(--hg-gray-200);
+  --theme-elevation-200: var(--hg-gray-300);
+  --theme-elevation-250: var(--hg-gray-400);
+  --theme-elevation-300: var(--hg-gray-400);
+  --theme-elevation-350: var(--hg-gray-500);
+  --theme-elevation-400: var(--hg-gray-600);
+  --theme-elevation-450: var(--hg-gray-600);
+  --theme-elevation-500: var(--hg-gray-600);
+  --theme-elevation-550: var(--hg-gray-700);
+  --theme-elevation-600: var(--hg-gray-700);
+  --theme-elevation-650: var(--hg-gray-700);
+  --theme-elevation-700: var(--hg-gray-800);
+  --theme-elevation-750: var(--hg-gray-800);
+  --theme-elevation-800: var(--hg-text);
+  --theme-elevation-850: var(--hg-text);
+  --theme-elevation-900: var(--hg-text);
+  --theme-elevation-950: var(--hg-text);
+  --theme-elevation-1000: var(--hg-gray-900);
+
+  --color-base-0: var(--hg-gray-0);
+  --color-base-50: var(--hg-gray-50);
+  --color-base-100: var(--hg-gray-100);
+  --color-base-150: var(--hg-gray-200);
+  --color-base-200: var(--hg-gray-300);
+  --color-base-250: var(--hg-gray-400);
+  --color-base-300: var(--hg-gray-400);
+  --color-base-350: var(--hg-gray-500);
+  --color-base-400: var(--hg-gray-600);
+  --color-base-450: var(--hg-gray-600);
+  --color-base-500: var(--hg-gray-600);
+  --color-base-550: var(--hg-gray-700);
+  --color-base-600: var(--hg-gray-700);
+  --color-base-650: var(--hg-gray-700);
+  --color-base-700: var(--hg-gray-800);
+  --color-base-750: var(--hg-gray-800);
+  --color-base-800: var(--hg-gray-900);
+  --color-base-900: var(--hg-gray-900);
+  --color-base-950: var(--hg-gray-900);
+  --color-base-1000: var(--hg-gray-900);
+
+  --theme-success-50: var(--hg-success-bg);
+  --theme-success-100: var(--hg-success-bg);
+  --theme-success-500: var(--hg-success-text);
+  --theme-success-600: var(--hg-success-text);
+  --theme-warning-50: var(--hg-warning-bg);
+  --theme-warning-100: var(--hg-warning-bg);
+  --theme-warning-500: var(--hg-warning-text);
+  --theme-warning-600: var(--hg-warning-text);
+  --theme-error-50: var(--hg-danger-bg);
+  --theme-error-100: var(--hg-danger-bg);
+  --theme-error-500: var(--hg-danger-text);
+  --theme-error-600: var(--hg-danger-text);
+  --theme-info-50: var(--hg-info-bg);
+  --theme-info-500: var(--hg-info-text);
+
+  --font-body: var(--hg-font-sans);
+  --font-serif: var(--hg-font-sans);
+  --font-mono: var(--hg-font-mono);
+
+  --base: 20px;
+  --gutter-h: var(--hg-page-pad-x);
+  --nav-width: var(--hg-sidebar-width);
+  --app-header-height: var(--hg-topbar-height);
+  --doc-controls-height: var(--hg-topbar-height);
+
+  --style-radius-s: var(--hg-radius-control);
+  --style-radius-m: var(--hg-radius-control);
+  --style-radius-l: var(--hg-radius-card);
+
+  --accessibility-outline: var(--hg-focus-outline);
+  --accessibility-outline-offset: var(--hg-focus-outline-offset);
+}
+
+/* Tablet: one padding step down, sidebar becomes an overlay drawer. */
+@media (max-width: 1024px) {
+  :root {
+    --hg-page-pad-x: var(--hg-space-5);
+    --hg-page-pad-y: var(--hg-space-5);
+    --nav-width: 288px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --hg-page-pad-x: var(--hg-space-4);
+    --hg-page-pad-y: var(--hg-space-4);
+    --nav-width: 100vw;
+  }
+}
