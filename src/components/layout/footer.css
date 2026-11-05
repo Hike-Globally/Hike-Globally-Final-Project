@@ -22,14 +22,14 @@
    scale — the footer is a compact block, and 16px keeps it readable from a
    phone right up to a TV. */
 .hg-footer__description {
-  font-size: 16px;
+  font-size: var(--text-body);
 }
 
 /* Column headings: the text face at 500 with a touch of tracking, in mist. They
    are headings, so they keep the case the editor wrote them in. */
 .hg-footer__heading {
   font-family: var(--font-heading);
-  font-size: 0.875rem;
+  font-size: var(--text-small);
   font-weight: 500;
   letter-spacing: 0.02em;
   line-height: 1.3;

@@ -88,7 +88,7 @@ export default async function BlogPage() {
           <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4">
             <Link
               href="#journal"
-              className="group inline-flex items-center gap-3 border-b border-mist/45 pb-2 text-sm font-medium text-white transition-colors hover:border-mist"
+              className="group inline-flex items-center gap-3 border-b border-mist/45 pb-2 text-small font-medium text-white transition-colors hover:border-mist"
             >
               {dict.blog.browseJournal}
               <ArrowDown
@@ -96,7 +96,7 @@ export default async function BlogPage() {
                 aria-hidden="true"
               />
             </Link>
-            <span className="text-sm text-mist/85">{dict.blog.heroNote}</span>
+            <span className="text-small text-mist/85">{dict.blog.heroNote}</span>
           </div>
         </div>
       </section>

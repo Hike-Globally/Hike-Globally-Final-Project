@@ -187,7 +187,7 @@ export function InquiryForm({
           name="tripTitle"
           defaultValue={trips.find((trip) => trip.slug === defaultTripSlug)?.title ?? ''}
           className={cn(
-            'h-11 w-full border px-4 text-sm outline-none transition-[color,border-color,box-shadow] focus-visible:border-deep focus-visible:ring-[3px] focus-visible:ring-deep/20',
+            'h-11 w-full border px-4 text-small outline-none transition-[color,border-color,box-shadow] focus-visible:border-deep focus-visible:ring-[3px] focus-visible:ring-deep/20',
             // A raw <select> has no shadcn primitive to inherit a surface from, so spell it out.
             isDark ? ghostClass : 'border-input bg-white text-ink',
           )}
@@ -252,7 +252,7 @@ export function InquiryForm({
         >
           {submitting ? dict.inquiry.submitting : dict.inquiry.submit}
         </Button>
-        <p className={`mt-3 text-xs md:mt-0 ${variant === 'dark' ? 'text-mist/80' : 'text-slate-80'}`}>
+        <p className={`mt-3 text-label md:mt-0 ${variant === 'dark' ? 'text-mist/80' : 'text-slate-80'}`}>
           {dict.inquiry.privacyNote}
         </p>
       </div>

@@ -50,7 +50,7 @@ export default async function InquiryPage() {
           <aside className="space-y-8">
             <div className="bg-sage-20 p-5 sm:p-7">
               <h2 className="heading-md mb-5">{dict.inquiry.contact}</h2>
-              <ul className="space-y-4 text-[0.9375rem]">
+              <ul className="space-y-4 text-ui">
                 {settings.email ? (
                   <li className="flex items-center gap-3">
                     <Mail className="size-4 shrink-0 text-sage-90" aria-hidden />
@@ -86,14 +86,14 @@ export default async function InquiryPage() {
               </ul>
 
               {settings.responseTimeNote ? (
-                <p className="mt-6 text-[0.9375rem] text-deep-90">{settings.responseTimeNote}</p>
+                <p className="mt-6 text-ui text-deep-90">{settings.responseTimeNote}</p>
               ) : null}
             </div>
 
             {settings.address ? (
               <div className="border border-slate-20 p-5 sm:p-7">
                 <h2 className="heading-md mb-4">{dict.structuredData.organization}</h2>
-                <p className="text-[0.9375rem] whitespace-pre-line text-ink-70">
+                <p className="text-ui whitespace-pre-line text-ink-70">
                   {settings.address}
                 </p>
               </div>

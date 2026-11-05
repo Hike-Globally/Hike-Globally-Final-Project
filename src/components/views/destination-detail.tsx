@@ -74,7 +74,7 @@ export function DestinationDetail({
             ]}
           />
 
-          <div className="flex flex-wrap items-center gap-3 text-[0.75rem] tracking-[0.14em] text-mist uppercase">
+          <div className="flex flex-wrap items-center gap-3 text-label tracking-[0.14em] text-mist uppercase">
             <span className="flex items-center gap-1.5">
               <MapPin className="size-3.5" aria-hidden />
               {destination.country}

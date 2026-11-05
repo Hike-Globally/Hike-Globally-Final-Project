@@ -52,12 +52,12 @@ export function FaqSection({
                       headingLevel="h4"
                       className="items-center py-6 hover:no-underline md:py-7"
                     >
-                      <span className="min-w-0 text-left font-heading text-base font-semibold text-ink md:text-lg">
+                      <span className="min-w-0 text-left font-heading text-subhead font-semibold text-ink">
                         {faq.question}
                       </span>
                     </AccordionTrigger>
                     <AccordionContent>
-                      <p className="max-w-3xl text-[1.0625rem] leading-relaxed whitespace-pre-line text-ink-70">
+                      <p className="max-w-3xl text-lead leading-relaxed whitespace-pre-line text-ink-70">
                         {faq.answer}
                       </p>
                     </AccordionContent>

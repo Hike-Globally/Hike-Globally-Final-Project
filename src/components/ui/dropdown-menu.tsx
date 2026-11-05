@@ -52,7 +52,7 @@ function DropdownMenuItem({
       data-inset={inset}
       data-variant={variant}
       className={cn(
-        "focus:bg-mist focus:text-ink data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 relative flex cursor-default items-center gap-2 px-2.5 py-2 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "focus:bg-mist focus:text-ink data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 relative flex cursor-default items-center gap-2 px-2.5 py-2 text-small outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
@@ -70,7 +70,7 @@ function DropdownMenuCheckboxItem({
     <DropdownMenuPrimitive.CheckboxItem
       data-slot="dropdown-menu-checkbox-item"
       className={cn(
-        'focus:bg-mist focus:text-ink relative flex cursor-default items-center gap-2 py-2 pr-2 pl-8 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+        'focus:bg-mist focus:text-ink relative flex cursor-default items-center gap-2 py-2 pr-2 pl-8 text-small outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
         className,
       )}
       checked={checked}
@@ -95,7 +95,7 @@ function DropdownMenuLabel({
     <DropdownMenuPrimitive.Label
       data-slot="dropdown-menu-label"
       data-inset={inset}
-      className={cn('px-2.5 py-1.5 text-xs text-muted-foreground data-[inset]:pl-8', className)}
+      className={cn('px-2.5 py-1.5 text-label text-muted-foreground data-[inset]:pl-8', className)}
       {...props}
     />
   )
@@ -125,7 +125,7 @@ function DropdownMenuSubTrigger({
       data-slot="dropdown-menu-sub-trigger"
       data-inset={inset}
       className={cn(
-        'focus:bg-mist focus:text-ink flex cursor-default items-center px-2.5 py-2 text-sm outline-hidden select-none data-[inset]:pl-8',
+        'focus:bg-mist focus:text-ink flex cursor-default items-center px-2.5 py-2 text-small outline-hidden select-none data-[inset]:pl-8',
         className,
       )}
       {...props}

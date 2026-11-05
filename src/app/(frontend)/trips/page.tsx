@@ -78,7 +78,7 @@ export default async function TripsPage() {
           <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4">
             <Link
               href="#trips"
-              className="group inline-flex items-center gap-3 border-b border-mist/45 pb-2 text-sm font-medium text-white transition-colors hover:border-mist"
+              className="group inline-flex items-center gap-3 border-b border-mist/45 pb-2 text-small font-medium text-white transition-colors hover:border-mist"
             >
               {dict.trips.filterTitle}
               <ArrowDown

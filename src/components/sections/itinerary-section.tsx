@@ -58,10 +58,10 @@ function DayChip({
         <Icon className="size-4" aria-hidden />
       </span>
       <div className="min-w-0">
-        <p className="text-[0.6875rem] tracking-[0.14em] text-slate-80 uppercase">{label}</p>
+        <p className="text-label tracking-[0.14em] text-slate-80 uppercase">{label}</p>
         <p
           className={cn(
-            'truncate font-heading text-[0.9375rem] font-semibold',
+            'truncate font-heading text-ui font-semibold',
             tone === 'muted' ? 'text-ink-60' : 'text-ink',
           )}
         >
@@ -119,7 +119,7 @@ function ExpandAllSwitch({
       </span>
       <span
         className={cn(
-          'font-heading text-[0.8125rem] font-semibold tracking-[0.06em] transition-colors duration-300 ease-brand',
+          'font-heading text-small font-semibold tracking-[0.06em] transition-colors duration-300 ease-brand',
           checked ? 'text-deep' : 'text-ink-60',
           'group-hover:text-deep',
         )}
@@ -189,10 +189,10 @@ export function ItinerarySection({ days }: { days: ItineraryDay[] }) {
                 <AccordionTrigger className="min-w-0 items-center gap-4 py-6 hover:no-underline md:py-7">
                   <span className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-2">
                     {/* Day number from the CMS — the label the itinerary was missing. */}
-                    <span className="inline-flex shrink-0 items-center border border-sage-40 bg-sage-20 px-2.5 py-1 font-heading text-[0.6875rem] font-semibold tracking-[0.14em] whitespace-nowrap text-sage-80 uppercase">
+                    <span className="inline-flex shrink-0 items-center border border-sage-40 bg-sage-20 px-2.5 py-1 font-heading text-label font-semibold tracking-[0.14em] whitespace-nowrap text-sage-80 uppercase">
                       {dict.trip.day} {dayNumber}
                     </span>
-                    <span className="min-w-0 break-words text-left font-heading text-base font-semibold text-ink md:text-lg">
+                    <span className="min-w-0 break-words text-left font-heading text-subhead font-semibold text-ink">
                       {day.title}
                     </span>
                   </span>
@@ -203,7 +203,7 @@ export function ItinerarySection({ days }: { days: ItineraryDay[] }) {
                     {splitParagraphs(day.description).map((paragraph, pIndex) => (
                       <p
                         key={pIndex}
-                        className="w-full break-words whitespace-pre-line text-[1.0625rem] leading-relaxed text-ink-70"
+                        className="w-full break-words whitespace-pre-line text-lead leading-relaxed text-ink-70"
                       >
                         {paragraph}
                       </p>

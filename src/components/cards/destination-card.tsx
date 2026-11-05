@@ -64,13 +64,13 @@ export function DestinationCard({
       <div className="photo-scrim pointer-events-none absolute inset-0" aria-hidden="true" />
 
       <div className="pointer-events-none relative mt-auto flex w-full flex-col items-start p-4 text-left">
-        <p className="text-[0.75rem] font-medium tracking-[0.16em] text-mist/85 uppercase">
+        <p className="text-label font-medium tracking-[0.16em] text-mist/85 uppercase">
           {destination.country}
         </p>
         <h3
           className={cn(
             'destination-card-title mt-2 font-display font-normal break-words text-white',
-            size === 'large' ? 'text-4xl md:text-5xl' : 'text-3xl',
+            'text-card',
           )}
         >
           {destination.name}
@@ -83,7 +83,7 @@ export function DestinationCard({
           </p>
         ) : null}
 
-        <span className="mt-5 inline-flex items-center gap-1.5 text-[0.7rem] font-medium tracking-[0.16em] text-mist uppercase">
+        <span className="mt-5 inline-flex items-center gap-1.5 text-label font-medium tracking-[0.16em] text-mist uppercase">
           Explore region
           <ArrowUpRight
             className="size-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"

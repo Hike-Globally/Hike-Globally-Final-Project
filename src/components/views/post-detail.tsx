@@ -145,12 +145,12 @@ export function PostDetail({
                 {/* The excerpt is pinned to 16px instead of riding the fluid
                     `description-copy` scale — supporting copy under a hero title should hold
                     its size on every viewport, TVs included. */}
-                <p className="mt-6 max-w-2xl text-base leading-relaxed text-mist md:leading-[1.75]">
+                <p className="mt-6 max-w-2xl text-body leading-relaxed text-mist md:leading-[1.75]">
                   {post.excerpt}
                 </p>
               </div>
 
-              <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3 text-[0.8125rem] text-mist/85">
+              <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3 text-small text-mist/85">
                 <span className="inline-flex items-center gap-2">
                   <CalendarDays className="size-4 text-mist" aria-hidden="true" />
                   <time dateTime={publishedAt}>{formatDate(publishedAt)}</time>
@@ -172,21 +172,21 @@ export function PostDetail({
                         className="size-11 shrink-0 rounded-full ring-1 ring-mist/35"
                       />
                     ) : (
-                      <span className="grid size-11 shrink-0 place-items-center rounded-full bg-mist/12 font-heading text-base font-semibold text-mist ring-1 ring-mist/25">
+                      <span className="grid size-11 shrink-0 place-items-center rounded-full bg-mist/12 font-heading text-body font-semibold text-mist ring-1 ring-mist/25">
                         {authorName.slice(0, 1)}
                       </span>
                     )}
                     <div className="min-w-0">
-                      <p className="text-[0.6875rem] tracking-[0.14em] text-mist/75 uppercase">
+                      <p className="text-label tracking-[0.14em] text-mist/75 uppercase">
                         {dict.blog.by}
                       </p>
-                      <p className="mt-0.5 truncate font-heading text-[0.9375rem] font-semibold text-white">
+                      <p className="mt-0.5 truncate font-heading text-ui font-semibold text-white">
                         {authorName}
                       </p>
                     </div>
                   </div>
                 ) : (
-                  <p className="text-[0.75rem] tracking-[0.13em] text-mist/80 uppercase">
+                  <p className="text-label tracking-[0.13em] text-mist/80 uppercase">
                     {siteName} <span className="px-1 text-mist/60">/</span> {dict.nav.blog}
                   </p>
                 )}
@@ -228,13 +228,13 @@ export function PostDetail({
                 className="size-16 shrink-0 rounded-full ring-1 ring-slate-20"
               />
             ) : (
-              <span className="grid size-16 shrink-0 place-items-center rounded-full bg-mist font-heading text-xl font-semibold text-ink">
+              <span className="grid size-16 shrink-0 place-items-center rounded-full bg-mist font-heading text-subhead font-semibold text-ink">
                 {authorName.slice(0, 1)}
               </span>
             )}
             <div className="min-w-0 pt-1">
               <p className="eyebrow text-slate-80">{dict.blog.aboutAuthor}</p>
-              <p className="mt-1 font-heading text-xl font-semibold text-ink">{authorName}</p>
+              <p className="mt-1 font-heading text-subhead font-semibold text-ink">{authorName}</p>
               <p className="mt-2 description-copy leading-relaxed text-ink-60">{author.bio}</p>
             </div>
           </div>
@@ -246,7 +246,7 @@ export function PostDetail({
         <div className="mt-10 border-t border-slate-20 pt-6">
           <Link
             href={sitePath('/blog')}
-            className="group inline-flex items-center gap-2 text-[0.9375rem] font-medium text-deep transition-colors hover:text-ink"
+            className="group inline-flex items-center gap-2 text-ui font-medium text-deep transition-colors hover:text-ink"
           >
             <ArrowLeft
               className="size-4 transition-transform group-hover:-translate-x-1"
@@ -306,7 +306,7 @@ export function PostDetail({
                 </div>
                 <Link
                   href={sitePath('/blog')}
-                  className="group inline-flex shrink-0 items-center gap-2 text-[0.875rem] font-medium text-deep transition-colors hover:text-ink"
+                  className="group inline-flex shrink-0 items-center gap-2 text-small font-medium text-deep transition-colors hover:text-ink"
                 >
                   {dict.common.viewAll}
                   <ArrowUpRight

@@ -33,13 +33,13 @@ export function Stats({ block }: { block: StatsBlock }) {
               <div>
                 <dd
                   className={cn(
-                    'font-display text-5xl leading-none md:text-6xl 3xl:text-7xl',
+                    'font-display text-section leading-none',
                     dark ? 'text-white' : 'text-ink',
                   )}
                 >
                   {item.value}
                 </dd>
-                <dt className="mt-3 text-[0.9375rem] font-medium">{item.label}</dt>
+                <dt className="mt-3 text-ui font-medium">{item.label}</dt>
                 {item.description ? (
                   <p className={cn('mt-1 description-copy', dark ? 'text-mist/80' : 'text-ink-60')}>
                     {item.description}

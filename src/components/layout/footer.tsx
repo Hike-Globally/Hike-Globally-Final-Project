@@ -123,7 +123,7 @@ function FooterLink({
   const external = /^https?:\/\//.test(link.href)
   const nonHttpProtocol = /^(?:mailto|tel):/i.test(link.href)
   const className =
-    'text-sm leading-normal text-mist/80 transition-colors hover:text-white hover:underline underline-offset-4'
+    'text-small leading-normal text-mist/80 transition-colors hover:text-white hover:underline underline-offset-4'
 
   if (external) {
     return (
@@ -320,8 +320,8 @@ export async function Footer() {
       {/* Copyright left, creator credit right, pinned to the very bottom — on the
           same content column as the row above. */}
       <div className="container-content mt-16 flex flex-col gap-3 border-t border-haze/20 pt-8 pb-6 sm:flex-row sm:items-center sm:justify-between md:mt-24">
-        <p className="text-[11px] leading-snug text-mist/70">{copyright}</p>
-        <p className="flex items-center gap-1.5 text-[11px] leading-snug text-mist/70">
+        <p className="text-label leading-snug text-mist/70">{copyright}</p>
+        <p className="flex items-center gap-1.5 text-label leading-snug text-mist/70">
           Made with{' '}
           <svg
             className="hg-footer__mark"

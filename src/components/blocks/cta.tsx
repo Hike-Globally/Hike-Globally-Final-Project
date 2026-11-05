@@ -188,7 +188,7 @@ export function CtaCard({
                           asChild
                           size="lg"
                           variant={variant === 'dark' ? 'paper' : 'default'}
-                          className="cta-card__button group h-[3.25rem] px-8 text-base"
+                          className="cta-card__button group h-[3.25rem] px-8 text-body"
                         >
                           {external || link.newTab ? (
                             <a href={link.href} target="_blank" rel="noopener noreferrer">
@@ -214,7 +214,7 @@ export function CtaCard({
                   {trustItems.map((item) => (
                     <li
                       key={item.label}
-                      className="flex items-center gap-2.5 text-[0.875rem] font-medium"
+                      className="flex items-center gap-2.5 text-small font-medium"
                     >
                       <item.icon className="size-4 shrink-0" aria-hidden="true" />
                       {item.label}

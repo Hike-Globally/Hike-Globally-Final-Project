@@ -623,7 +623,7 @@ export function RopeCarousel({
             >
               <div
                 style={{
-                  fontSize: 'clamp(1.05rem, 0.7rem + 1.6vw, 1.5rem)',
+                  fontSize: 'var(--text-card)',
                   fontWeight: 500,
                   letterSpacing: '-0.01em',
                   lineHeight: '1.2em',
@@ -639,7 +639,7 @@ export function RopeCarousel({
               </div>
               <div
                 style={{
-                  fontSize: 'clamp(0.8125rem, 0.7rem + 0.6vw, 1rem)',
+                  fontSize: 'var(--text-body)',
                   fontWeight: 400,
                   letterSpacing: '0em',
                   lineHeight: '1.4em',

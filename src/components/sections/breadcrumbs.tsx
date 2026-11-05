@@ -8,7 +8,7 @@ export function Breadcrumbs({ items, className }: { items: Crumb[]; className?: 
     <nav aria-label="Breadcrumb" className={className}>
       {/* Colours come from `currentColor`, so the trail reads on both the
           photographic header (paper) and the light one (ink). */}
-      <ol className="flex flex-wrap items-center gap-1.5 text-[0.8125rem]">
+      <ol className="flex flex-wrap items-center gap-1.5 text-small">
         {items.map((item, index) => {
           const isLast = index === items.length - 1
           return (

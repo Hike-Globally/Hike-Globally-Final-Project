@@ -205,7 +205,7 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
           />
 
           <div className="pointer-events-none flex items-start justify-between gap-4 p-6 sm:p-8 lg:p-9">
-            <span className="inline-flex items-center gap-2 bg-white px-3 py-1.5 font-heading text-[0.6875rem] font-medium tracking-[0.16em] text-ink uppercase">
+            <span className="inline-flex items-center gap-2 bg-white px-3 py-1.5 font-heading text-label font-medium tracking-[0.16em] text-ink uppercase">
               <span className="lb-live" aria-hidden="true" />
               {postCategory(lead) ?? dict.nav.blog}
             </span>
@@ -214,7 +214,7 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
                 the top of the page. Purely decorative: the index rows continue the
                 count. */}
             <span
-              className="lb-numeral -mt-1 text-[4.5rem] text-mist/16 sm:text-[6rem]"
+              className="lb-numeral -mt-1 text-hero text-mist/16"
               aria-hidden="true"
             >
               01
@@ -235,7 +235,7 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
               {lead.excerpt}
             </p>
 
-            <p className="mt-5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.8125rem] text-mist/75">
+            <p className="mt-5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-small text-mist/75">
               {leadAuthor ? <span>{`${dict.blog.by} ${leadAuthor}`}</span> : null}
               {leadAuthor ? <span aria-hidden="true">·</span> : null}
               <time dateTime={postDate(lead)}>{formatDate(postDate(lead))}</time>
@@ -244,7 +244,7 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
             </p>
 
             <div className="mt-7 border-t border-mist/20 pt-5">
-              <span className="inline-flex items-center gap-2.5 font-heading text-[0.75rem] font-medium tracking-[0.16em] text-mist uppercase">
+              <span className="inline-flex items-center gap-2.5 font-heading text-label font-medium tracking-[0.16em] text-mist uppercase">
                 {dict.blog.readStory}
                 <ArrowRight
                   className="size-4 text-sage transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1.5 group-focus-within:translate-x-1.5"
@@ -290,7 +290,7 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
                       {/* Waypoint — the row's place in the index, and the marker the
                           route line runs between. */}
                       <span
-                        className="lb-node relative z-[1] grid size-[1.875rem] shrink-0 place-items-center border border-slate-40 bg-white font-heading text-[0.6875rem] font-medium tabular-nums text-slate-80"
+                        className="lb-node relative z-[1] grid size-[1.875rem] shrink-0 place-items-center border border-slate-40 bg-white font-heading text-label font-medium tabular-nums text-slate-80"
                         aria-hidden="true"
                       >
                         {String(position + 2).padStart(2, '0')}
@@ -300,7 +300,7 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
                           heading is not phrasing content. The `<a>` around it has a
                           transparent content model, so flow content is legal here. */}
                       <div className="lb-row-body min-w-0">
-                        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-heading text-[0.6875rem] font-medium tracking-[0.14em] uppercase">
+                        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-heading text-label font-medium tracking-[0.14em] uppercase">
                           <span className="text-deep-90">{postCategory(post) ?? dict.nav.blog}</span>
                           <span className="text-slate-40" aria-hidden="true">
                             /
@@ -315,7 +315,7 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
                           {post.title}
                         </h3>
 
-                        <p className="mt-2.5 flex flex-wrap items-center gap-x-2 text-[0.8125rem] text-slate-80">
+                        <p className="mt-2.5 flex flex-wrap items-center gap-x-2 text-small text-slate-80">
                           {author ? <span>{`${dict.blog.by} ${author}`}</span> : null}
                           {author ? <span aria-hidden="true">·</span> : null}
                           <time dateTime={postDate(post)}>{formatDate(postDate(post))}</time>
@@ -347,12 +347,12 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
             </ol>
 
             <div className="mt-auto flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-t border-slate-20 pt-5">
-              <span className="font-heading text-[0.6875rem] font-medium tracking-[0.16em] text-slate-80 uppercase">
+              <span className="font-heading text-label font-medium tracking-[0.16em] text-slate-80 uppercase">
                 {dict.blog.fieldNotes}
               </span>
               <Link
                 href={sitePath('/blog')}
-                className="group/foot inline-flex items-center gap-2 text-[0.9375rem] font-medium text-deep transition-colors hover:text-deep-80 focus-visible:text-deep-80 focus-visible:outline-offset-4"
+                className="group/foot inline-flex items-center gap-2 text-ui font-medium text-deep transition-colors hover:text-deep-80 focus-visible:text-deep-80 focus-visible:outline-offset-4"
               >
                 {dict.blog.browseJournal}
                 <ArrowRight

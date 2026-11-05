@@ -101,7 +101,7 @@ export function AboutHikeGlobally() {
       {/* Infinite destination ticker */}
       <Reveal delay={60} className="relative mt-16 border-t border-white/10 pt-8 md:mt-20">
         <div data-about-ticker-group>
-          <p className="container-content mb-5 text-[0.75rem] font-medium tracking-[0.18em] text-mist/70 uppercase">
+          <p className="container-content mb-5 text-label font-medium tracking-[0.18em] text-mist/70 uppercase">
             Currently bookable in
           </p>
           <div className="overflow-hidden [mask-image:linear-gradient(to_right,transparent,var(--color-ink)_6%,var(--color-ink)_94%,transparent)]">
@@ -109,7 +109,7 @@ export function AboutHikeGlobally() {
               {[...TICKER_DESTINATIONS, ...TICKER_DESTINATIONS].map((destination, index) => (
                 <span
                   key={`${destination}-${index}`}
-                  className="flex shrink-0 items-center gap-2 text-base font-medium text-mist/60 sm:text-lg 3xl:text-xl"
+                  className="flex shrink-0 items-center gap-2 text-lead font-medium text-mist/60"
                 >
                   <MapPin className="size-4 text-sage-light" aria-hidden="true" />
                   {destination}
