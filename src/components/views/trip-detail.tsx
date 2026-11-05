@@ -190,7 +190,10 @@ export function TripDetail({
   const sectionContent: Record<string, ReactNode> = {
     hero: (
       <>
-        <section data-header-hero className="relative isolate overflow-hidden bg-ink text-mist">
+        <section
+          data-header-hero
+          className="hero-region relative isolate overflow-hidden bg-ink text-mist"
+        >
           <PayloadImageFill
             media={trip.heroImage}
             sizes="100vw"
@@ -213,8 +216,8 @@ export function TripDetail({
               ]}
             />
 
-            <h1 className="heading-xl max-w-4xl text-white">{trip.title}</h1>
-            <p className="lead mt-6 max-w-2xl text-mist">{trip.summary}</p>
+            <h1 className="heading-display hero-title max-w-4xl text-white">{trip.title}</h1>
+            <p className="lead hero-description mt-6 max-w-2xl text-mist">{trip.summary}</p>
 
             <div className="mt-9 flex flex-wrap items-center gap-3">
               <Button asChild size="lg" variant="sage">

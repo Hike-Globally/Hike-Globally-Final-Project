@@ -12,8 +12,11 @@
    curated-trips card summaries (`curated-trips-section.css`) — so 16px stays the
    site's one description size for card copy, rather than a page-local preference:
 
-     .destinations-hero-description   16px  hero description under the page title
      .destination-card-description    16px  atlas card description (the region tagline)
+
+   The hero standfirst is not pinned here: every hero on the site, this one
+   included, reads `.hero-description` (17px → 18px) from `globals.css` — the
+   homepage hero's lead size.
 
    Fixed pixels, not clamps: one legible size at any canvas — the same call the card
    tiers above make. On a phone this raises the pair slightly (15px → 16px for the
@@ -34,14 +37,8 @@
    ==========================================================================*/
 
 [data-destinations-page] {
-  /* 16px — the hero description and every atlas-card description. */
-  --destinations-hero-description-size: var(--text-body);
+  /* 16px — every atlas-card description. */
   --destinations-card-description-size: var(--text-body);
-}
-
-/* Hero — the standfirst under "The Himalaya, in all its scale." */
-[data-destinations-page] .destinations-hero-description {
-  font-size: var(--destinations-hero-description-size);
 }
 
 /* Atlas cards — the tagline under each destination name. */

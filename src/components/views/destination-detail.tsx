@@ -50,7 +50,7 @@ export function DestinationDetail({
           (see header-frame.tsx). */}
       <section
         data-header-hero
-        className="relative isolate min-h-[min(64svh,42rem)] overflow-hidden bg-ink text-mist"
+        className="hero-region relative isolate flex items-end overflow-hidden bg-ink text-mist"
       >
         <PayloadImageFill
           media={destination.heroImage}
@@ -64,7 +64,7 @@ export function DestinationDetail({
         <div className="absolute inset-0 -z-10 bg-ink/72" />
         <div className="photo-scrim absolute inset-0 -z-10" />
 
-        <div className="container-content pt-28 pb-12 sm:pb-16 md:pt-36 md:pb-20">
+        <div className="container-content w-full pt-28 pb-12 sm:pb-16 md:pt-36 md:pb-20">
           <Breadcrumbs
             className="mb-6"
             items={[
@@ -86,9 +86,11 @@ export function DestinationDetail({
             </span>
           </div>
 
-          <h1 className="heading-xl mt-5 max-w-4xl text-white">{destination.name}</h1>
+          <h1 className="heading-display hero-title mt-5 max-w-4xl text-white">
+            {destination.name}
+          </h1>
           {destination.tagline ? (
-            <p className="lead mt-5 max-w-2xl text-mist">{destination.tagline}</p>
+            <p className="lead hero-description mt-5 max-w-2xl text-mist">{destination.tagline}</p>
           ) : null}
 
           <div className="mt-8 flex flex-wrap items-center gap-3">

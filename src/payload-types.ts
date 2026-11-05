@@ -870,7 +870,6 @@ export interface HeroBlock {
     url?: string | null;
     newTab?: boolean | null;
   };
-  height?: ('full' | 'tall' | 'compact') | null;
   /**
    * Dark scrim behind the text, for legibility.
    */
@@ -1881,7 +1880,6 @@ export interface HeroBlockSelect<T extends boolean = true> {
         url?: T;
         newTab?: T;
       };
-  height?: T;
   overlay?: T;
   id?: T;
   blockName?: T;

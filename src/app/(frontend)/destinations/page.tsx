@@ -55,7 +55,7 @@ export default async function DestinationsPage() {
           screen (see header-frame.tsx). */}
       <section
         data-header-hero
-        className="relative isolate flex min-h-[min(78svh,52rem)] items-end overflow-hidden bg-ink text-mist"
+        className="hero-region relative isolate flex items-end overflow-hidden bg-ink text-mist"
       >
         <Image
           src={DESTINATIONS_HERO_IMAGE}
@@ -81,10 +81,10 @@ export default async function DestinationsPage() {
           />
 
           <p className="eyebrow mt-10 text-mist">The destination atlas · Nepal</p>
-          <h1 className="heading-display mt-5 max-w-3xl text-white">
+          <h1 className="heading-display hero-title mt-5 max-w-3xl text-white">
             The Himalaya, <span className="text-mist">in all its scale.</span>
           </h1>
-          <p className="destinations-hero-description lead mt-6 max-w-2xl text-mist">
+          <p className="lead hero-description mt-6 max-w-2xl text-mist">
             {dict.destinations.listingSubtitle}
           </p>
 

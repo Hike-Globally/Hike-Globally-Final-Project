@@ -4,11 +4,15 @@ import type { Media } from '@/payload-types'
 import { cn } from '@/lib/utils'
 
 /**
- * Shared page header for listing and detail pages.
+ * Shared hero header for listing and detail pages.
+ *
+ * Every page opens with the same full-screen hero band (`.hero-region`, see `globals.css`):
+ * one viewport tall, with the site's hero type — the display headline at the homepage hero's
+ * size and the standfirst under it at the homepage hero's lead size.
  *
  * With a `background` image it becomes a dark, immersive banner; without one it renders as a
- * light typographic header. One component, two moods — which is how the site keeps a
- * consistent rhythm without every page looking identical.
+ * light typographic hero. One component, two moods — which is how the site keeps a consistent
+ * rhythm without every page looking identical.
  */
 export function PageHeader({
   eyebrow,
@@ -35,8 +39,11 @@ export function PageHeader({
       // screen the global header stays pinned (see header-frame.tsx).
       data-header-hero
       className={cn(
-        'relative isolate overflow-hidden',
-        hasBackground ? 'bg-ink text-mist' : 'bg-mist text-ink',
+        'hero-region relative isolate',
+        // The hero band is one viewport tall, so its copy is bottom-aligned like
+        // every other hero on the site rather than floating near the top.
+        hasBackground ? 'flex items-end bg-ink text-mist' : 'flex items-end bg-mist text-ink',
+        'overflow-hidden',
       )}
     >
       {background ? (
@@ -61,7 +68,7 @@ export function PageHeader({
           'container-content',
           hasBackground
             ? 'pt-28 pb-16 sm:pb-20 md:pt-36 md:pb-28'
-            : 'pt-28 pb-12 md:pt-32 md:pb-16',
+            : 'pt-28 pb-16 md:pt-32 md:pb-24',
           align === 'center' ? 'text-center' : '',
         )}
       >
@@ -79,7 +86,7 @@ export function PageHeader({
 
         <h1
           className={cn(
-            'heading-xl max-w-4xl',
+            'heading-display hero-title max-w-4xl 3xl:max-w-5xl',
             hasBackground ? 'text-white' : 'text-ink',
             align === 'center' ? 'mx-auto' : '',
           )}
@@ -90,7 +97,7 @@ export function PageHeader({
         {lead ? (
           <p
             className={cn(
-              'lead mt-6 max-w-2xl',
+              'lead hero-description mt-6 max-w-2xl',
               hasBackground ? 'text-mist' : 'text-ink-60',
               align === 'center' ? 'mx-auto' : '',
             )}

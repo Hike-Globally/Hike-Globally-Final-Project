@@ -33,7 +33,7 @@ export async function HomeFallback() {
   const showHeroEyebrow = Boolean(heroEyebrow && heroEyebrow.toLowerCase() !== 'home')
 
   const heroSection = (
-    <section className="relative isolate flex h-full min-h-[100svh] items-end overflow-hidden bg-ink text-mist">
+    <section className="hero-region relative isolate flex h-full items-end overflow-hidden bg-ink text-mist">
       <HomepageHeroBackground />
 
       <div className="container-content pt-24 pb-20 md:pt-28 md:pb-20 [@media(max-height:500px)]:py-8">
@@ -41,13 +41,13 @@ export async function HomeFallback() {
             standfirst capped at the same ~576px measure it always had. */}
         <div className="max-w-none min-w-0">
           {showHeroEyebrow ? <p className="eyebrow mb-5 text-mist">{heroEyebrow}</p> : null}
-          {/* The `<i>` is the accent line — 90px Instrument Serif italic under the
-              120px "Walk Where The" (see `homepage.css`). CMS-driven pages reach it
-              by writing the same tag into the hero heading field. */}
-          <h1 className="heading-display home-hero-title text-white">
+          {/* The `<i>` is the accent line — Instrument Serif italic under the
+              headline (see `.hero-title` in `globals.css`). CMS-driven pages reach
+              it by writing the same tag into the hero heading field. */}
+          <h1 className="heading-display hero-title max-w-4xl text-white 3xl:max-w-5xl">
             Walk Where The <i>Map Runs Out of Names</i>
           </h1>
-          <p className="lead home-hero-lead mt-6 max-w-[36rem] text-mist">
+          <p className="lead hero-description mt-6 max-w-[36rem] text-mist">
             Small-group treks and expeditions across Nepal, led by guides who grew up on these
             trails. Tell us what you are dreaming of — we will build the itinerary around it.
           </p>

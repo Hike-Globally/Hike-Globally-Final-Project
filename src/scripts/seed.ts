@@ -1681,7 +1681,6 @@ const run = async () => {
         heading: copy.heading,
         subheading: copy.subheading,
         backgroundImage: imageAt(0),
-        height: 'tall',
         overlay: 'strong',
         primaryLink: { label: copy.primary, type: 'custom', url: '/trips' },
         secondaryLink: { label: copy.secondary, type: 'custom', url: '/inquiry' },
@@ -1798,7 +1797,6 @@ const run = async () => {
         eyebrow: copy.eyebrow,
         heading: copy.heading,
         subheading: copy.subheading,
-        height: 'compact',
       },
       {
         blockType: 'richText',

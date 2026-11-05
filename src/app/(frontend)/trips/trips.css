@@ -1,8 +1,11 @@
 /* ============================================================================
    TRIPS LISTING — copy sizes on `/trips`
    ----------------------------------------------------------------------------
-     .trips-hero-lead      16px  hero description under the "Trips" headline
      .trips-card-summary   16px  description on every trip card in the grid
+
+   The hero standfirst is no longer sized here: every hero on the site — this one
+   included — reads `.hero-description` (17px → 18px), the homepage hero's lead
+   size, from `globals.css`. Only the cards keep a page-local pin.
 
    The scope is `[data-trips-page]`, set once in `src/app/(frontend)/trips/page.tsx`,
    so no other surface that renders the shared `TripCard` (homepage, destination and
@@ -15,11 +18,6 @@
    viewport without `!important`. The same technique `homepage.css` and
    `curated-trips-section.css` rely on.
    ========================================================================== */
-
-/* Hero description — 16px, all viewports. */
-[data-trips-page] .trips-hero-lead {
-  font-size: var(--text-body);
-}
 
 /* Trip card description — 16px, all viewports. */
 [data-trips-page] .trips-card-summary {
