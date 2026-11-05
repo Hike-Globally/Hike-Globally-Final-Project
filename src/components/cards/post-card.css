@@ -1,0 +1,66 @@
+/* ============================================================================
+   PostCard — the journal card title (scope: `.post-card-title`)
+   ----------------------------------------------------------------------------
+   The title's size and colour live here, in plain unlayered CSS, instead of a
+   `text-*` utility on the element. That is deliberate:
+
+   `text-card` is NOT a font-size utility in this project. Tailwind v4 resolves
+   `text-card` against the `--color-card` theme token (the shadcn surface colour,
+   white) before it considers `--text-card` (the 20px → 24px card type role), so
+   `class="text-card"` compiles to `color: #fff`. On the white/mist card surface
+   that painted the headline white-on-white — the "Keep reading" rail on article
+   pages being the place it showed up.
+
+   So the card type role is applied here as `font-size: var(--text-card)` — the
+   exact same token the broken utility was meant to reach — and the colour is
+   pinned to `--color-ink` (13.45:1 on paper). Every surface that renders a
+   `PostCard` (`/blog` and the related-posts rail of `/blog/[slug]`) gets it;
+   page-level scales such as `blog.css` can still override both, because a more
+   specific selector wins over these.
+
+   Unlayered, so these rules beat any `@layer utilities` declaration without
+   `!important` — the same technique `blog.css`, `homepage.css` and
+   `curated-trips-section.css` already use.
+   ========================================================================== */
+
+.post-card-title {
+  color: var(--color-ink);
+  font-size: var(--text-card);
+  line-height: var(--text-card--line-height);
+  letter-spacing: -0.015em;
+  /* A long, unbroken trek name must not push a card past its column. */
+  overflow-wrap: anywhere;
+}
+
+/* The whole title is the link — inherit the title's colour so the anchor cannot
+   pick up a light link colour of its own, then hand the hover back to the
+   component's `hover:text-deep` utility. */
+.post-card-title a {
+  color: inherit;
+}
+
+/* ----------------------------------------------------------------------------
+   "Keep reading" rail — `/blog/[slug]` related posts
+   ----------------------------------------------------------------------------
+   The rail is a full-width band of three cards read at arm's length after a long
+   article, so its headlines run one step above the journal grid: 24px on phones
+   → 30px from `md` up (the card role tops out at 24px). Scoped to the rail via
+   `[data-related-rail]`, set once in `post-detail.tsx`, so the `/blog` listing
+   and the homepage boards keep their own scale. Ink on the mist band, 13.45:1.
+   -------------------------------------------------------------------------- */
+[data-related-rail] .post-card-title {
+  color: var(--color-ink);
+  font-size: 1.5rem;
+  line-height: 1.25;
+}
+
+@media (min-width: 48rem) {
+  [data-related-rail] .post-card-title {
+    font-size: 1.875rem;
+    line-height: 1.2;
+  }
+}
+
+[data-related-rail] .post-card-title a {
+  color: inherit;
+}
