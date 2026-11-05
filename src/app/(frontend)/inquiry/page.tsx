@@ -1,127 +1,16 @@
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import { Mail, MessageCircle, Phone } from 'lucide-react'
+import { permanentRedirect } from 'next/navigation'
 
-import { InquiryForm } from '@/components/forms/inquiry-form'
-import { PageHeader } from '@/components/sections/page-header'
-import { JsonLd } from '@/components/seo/json-ld'
-import { dictionary } from '@/i18n/dictionaries'
-import { sitePath } from '@/i18n/config'
-import { getSettings, getTripOptions } from '@/lib/data'
-import { breadcrumbJsonLd, buildMetadata, webPageJsonLd } from '@/lib/seo'
-
-export const revalidate = 3600
-
-export async function generateMetadata(): Promise<Metadata> {
-  const dict = dictionary
-  const settings = await getSettings()
-
-  return buildMetadata({
-    title: dict.inquiry.title,
-    description: dict.inquiry.subtitle,
-    image: settings.defaultOgImage,
-    path: sitePath('/inquiry'),
-    siteName: settings.siteName,
-  })
-}
-
-/**
- * INQUIRY PAGE — `/inquiry`
- * The form posts directly to Formsubmit.co; no Payload form collection, no API route.
- */
-export default async function InquiryPage() {
-  const dict = dictionary
-  const [settings, trips] = await Promise.all([getSettings(), getTripOptions()])
-
-  const email =
-    settings.formsubmitEmail || process.env.NEXT_PUBLIC_FORMSUBMIT_EMAIL || settings.email
-
-  return (
-    <>
-      <PageHeader
-        eyebrow={dict.nav.contact}
-        title={dict.inquiry.title}
-        lead={dict.inquiry.subtitle}
-        breadcrumbs={[{ label: dict.nav.home, href: sitePath('/') }, { label: dict.nav.inquiry }]}
-      />
-
-      <section className="py-14 md:py-20">
-        <div className="container-content grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16 3xl:gap-20">
-          <aside className="space-y-8">
-            <div className="bg-sage-20 p-5 sm:p-7">
-              <h2 className="heading-md mb-5">{dict.inquiry.contact}</h2>
-              <ul className="space-y-4 text-ui">
-                {settings.email ? (
-                  <li className="flex items-center gap-3">
-                    <Mail className="size-4 shrink-0 text-sage-90" aria-hidden />
-                    <a href={`mailto:${settings.email}`} className="text-ink-80 hover:text-deep-90">
-                      {settings.email}
-                    </a>
-                  </li>
-                ) : null}
-                {settings.phone ? (
-                  <li className="flex items-center gap-3">
-                    <Phone className="size-4 shrink-0 text-sage-90" aria-hidden />
-                    <a
-                      href={`tel:${settings.phone.replace(/\s+/g, '')}`}
-                      className="text-ink-80 hover:text-deep-90"
-                    >
-                      {settings.phone}
-                    </a>
-                  </li>
-                ) : null}
-                {settings.whatsapp ? (
-                  <li className="flex items-center gap-3">
-                    <MessageCircle className="size-4 shrink-0 text-sage-90" aria-hidden />
-                    <Link
-                      href={`https://wa.me/${settings.whatsapp}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-ink-80 hover:text-deep-90"
-                    >
-                      {dict.inquiry.openWhatsApp}
-                    </Link>
-                  </li>
-                ) : null}
-              </ul>
-
-              {settings.responseTimeNote ? (
-                <p className="mt-6 text-ui text-deep-90">{settings.responseTimeNote}</p>
-              ) : null}
-            </div>
-
-            {settings.address ? (
-              <div className="border border-slate-20 p-5 sm:p-7">
-                <h2 className="heading-md mb-4">{dict.structuredData.organization}</h2>
-                <p className="text-ui whitespace-pre-line text-ink-70">
-                  {settings.address}
-                </p>
-              </div>
-            ) : null}
-          </aside>
-
-          <div>
-            <InquiryForm trips={trips} email={email} />
-          </div>
-        </div>
-      </section>
-
-      <JsonLd
-        data={[
-          breadcrumbJsonLd([
-            { name: dict.nav.home, url: sitePath('/') },
-            { name: dict.nav.inquiry, url: sitePath('/inquiry') },
-          ]),
-          // A ContactPage: the node Google uses for "contact" sitelinks and the address panel.
-          webPageJsonLd({
-            type: 'ContactPage',
-            name: dict.inquiry.title,
-            description: dict.inquiry.subtitle,
-            url: sitePath('/inquiry'),
-            siteName: settings.legalName || settings.siteName,
-          }),
-        ]}
-      />
-    </>
-  )
+/** Preserve old enquiry links, including trip and departure-date parameters. */
+export default async function InquiryPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
+  const params = new URLSearchParams()
+  for (const [key, value] of Object.entries(await searchParams)) {
+    if (Array.isArray(value)) value.forEach((item) => params.append(key, item))
+    else if (value !== undefined) params.append(key, value)
+  }
+  const query = params.toString()
+  permanentRedirect(`/contact${query ? `?${query}` : ''}`)
 }

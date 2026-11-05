@@ -38,7 +38,7 @@ const continent = (id: number, name: string, tagline: string, image: string): De
   heroImage: photo(image, `${name} landscape`),
   region: 'annapurna',
   featured: true,
-  href: '/inquiry',
+  href: '/contact',
 })
 
 export const NEPAL_REGION_CARDS: DestinationCard[] = [

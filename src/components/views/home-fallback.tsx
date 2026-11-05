@@ -56,7 +56,7 @@ export async function HomeFallback() {
               <Link href={sitePath('/trips')}>{dict.nav.trips}</Link>
             </Button>
             <Button asChild size="lg" variant="outline-light">
-              <Link href={sitePath('/inquiry')}>{dict.nav.inquiry}</Link>
+              <Link href={sitePath('/contact')}>{dict.nav.inquiry}</Link>
             </Button>
           </div>
         </div>
@@ -87,7 +87,7 @@ export async function HomeFallback() {
       eyebrow={dict.cta.eyebrow}
       heading={dict.cta.heading}
       text={dict.inquiry.subtitle}
-      link={{ href: sitePath('/inquiry'), label: dict.cta.action }}
+      link={{ href: sitePath('/contact'), label: dict.cta.action }}
       variant="dark"
     />
   )

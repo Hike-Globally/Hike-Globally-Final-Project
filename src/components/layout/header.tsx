@@ -46,7 +46,7 @@ export async function Header() {
     .filter((link): link is PillNavLink => link !== null)
 
   const cta: PillNavLink | null =
-    actions[0] ?? { href: sitePath('/inquiry'), label: dict.nav.inquiry, newTab: false }
+    actions[0] ?? { href: sitePath('/contact'), label: dict.nav.inquiry, newTab: false }
 
   return (
     <HeaderFrame>

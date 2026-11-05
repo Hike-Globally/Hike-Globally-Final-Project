@@ -1683,7 +1683,7 @@ const run = async () => {
         backgroundImage: imageAt(0),
         overlay: 'strong',
         primaryLink: { label: copy.primary, type: 'custom', url: '/trips' },
-        secondaryLink: { label: copy.secondary, type: 'custom', url: '/inquiry' },
+        secondaryLink: { label: copy.secondary, type: 'custom', url: '/contact' },
       },
       {
         blockType: 'stats',
@@ -1825,7 +1825,7 @@ const run = async () => {
         eyebrow: copy.cta,
         heading: copy.ctaHeading,
         text: copy.ctaText,
-        link: { label: copy.ctaLink, type: 'custom', url: '/inquiry' },
+        link: { label: copy.ctaLink, type: 'custom', url: '/contact' },
         variant: 'sage',
       },
     ]
@@ -1920,7 +1920,7 @@ const run = async () => {
         { link: { label: 'Journal', type: 'custom', url: '/blog' } },
         { link: { label: 'About', type: 'custom', url: '/about' } },
       ],
-      actions: [{ link: { label: 'Plan your trip', type: 'custom', url: '/inquiry' } }],
+      actions: [{ link: { label: 'Plan your trip', type: 'custom', url: '/contact' } }],
     },
   })
 
@@ -1943,7 +1943,7 @@ const run = async () => {
               },
             },
             { link: { label: 'Annapurna region', type: 'custom', url: '/destinations/annapurna' } },
-            { link: { label: 'Plan your trip', type: 'custom', url: '/inquiry' } },
+            { link: { label: 'Plan your trip', type: 'custom', url: '/contact' } },
           ],
         },
         {
@@ -1951,7 +1951,7 @@ const run = async () => {
           links: [
             { link: { label: 'About us', type: 'custom', url: '/about' } },
             { link: { label: 'Journal', type: 'custom', url: '/blog' } },
-            { link: { label: 'Contact', type: 'custom', url: '/inquiry' } },
+            { link: { label: 'Contact', type: 'custom', url: '/contact' } },
           ],
         },
         {

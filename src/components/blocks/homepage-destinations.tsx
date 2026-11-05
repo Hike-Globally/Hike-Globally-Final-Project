@@ -25,7 +25,7 @@ export function HomepageDestinations() {
         destinations={WORLD_REGION_CARDS}
         title="Destinations Around The World"
         description="Beyond Nepal, we plan treks and expeditions on every continent. Tell us where you want to walk and we will shape the journey around it."
-        action={{ href: sitePath('/inquiry'), label: dictionary.common.viewAll }}
+        action={{ href: sitePath('/contact'), label: dictionary.common.viewAll }}
         titleClassName="home-section-title"
         descriptionClassName="home-section-intro"
       />

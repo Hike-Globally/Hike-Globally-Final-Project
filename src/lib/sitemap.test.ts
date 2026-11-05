@@ -61,19 +61,21 @@ test('URLs are the canonical spelling of each page', () => {
   )
 
   // The homepage is the bare origin — byte for byte what Next.js prints in its <link rel="canonical">.
-  assert.deepEqual(urls(entries).slice(0, 5), [
+  assert.deepEqual(urls(entries).slice(0, 8), [
     ORIGIN,
     `${ORIGIN}/trips`,
     `${ORIGIN}/destinations`,
     `${ORIGIN}/blog`,
-    `${ORIGIN}/inquiry`,
+    `${ORIGIN}/contact`,
+    `${ORIGIN}/about`,
+    `${ORIGIN}/privacy`,
+    `${ORIGIN}/terms`,
   ])
 
-  assert.deepEqual(urls(entries).slice(5), [
+  assert.deepEqual(urls(entries).slice(8), [
     `${ORIGIN}/trips/everest-base-camp`,
     `${ORIGIN}/destinations/khumbu`,
     `${ORIGIN}/blog/training-for-altitude`,
-    `${ORIGIN}/about`,
   ])
 
   // No trailing slashes, no double slashes anywhere after the scheme.
@@ -105,7 +107,7 @@ test('every published document gets one entry, and no URL appears twice', () => 
     }),
   )
 
-  assert.equal(entries.length, 5 + 7)
+  assert.equal(entries.length, 8 + 7)
   assert.equal(new Set(urls(entries)).size, urls(entries).length)
 })
 
@@ -119,7 +121,10 @@ test('two documents sharing a slug still produce one entry for that URL', () => 
     `${ORIGIN}/trips`,
     `${ORIGIN}/destinations`,
     `${ORIGIN}/blog`,
-    `${ORIGIN}/inquiry`,
+    `${ORIGIN}/contact`,
+    `${ORIGIN}/about`,
+    `${ORIGIN}/privacy`,
+    `${ORIGIN}/terms`,
     `${ORIGIN}/trips/one`,
   ])
 })
@@ -129,7 +134,7 @@ test('documents without a slug are skipped', () => {
     sources({ trips: [document({ slug: null }), document({ slug: '' })] }),
   )
 
-  assert.equal(entries.length, 5)
+  assert.equal(entries.length, 8)
 })
 
 test('a noindex document is never advertised', () => {
@@ -141,7 +146,7 @@ test('a noindex document is never advertised', () => {
     }),
   )
 
-  assert.deepEqual(urls(entries).slice(5), [`${ORIGIN}/trips/live-trip`])
+  assert.deepEqual(urls(entries).slice(8), [`${ORIGIN}/trips/live-trip`])
 })
 
 test('a page whose slug a dedicated route owns is not listed a second time', () => {
@@ -165,7 +170,8 @@ test('a page whose slug a dedicated route owns is not listed a second time', () 
     urls(entries).filter((url) => url === ORIGIN),
     [ORIGIN],
   )
-  assert.deepEqual(urls(entries).slice(5), [`${ORIGIN}/about`])
+  assert.deepEqual(urls(entries).slice(8), [])
+  assert.equal(urls(entries).filter((url) => url === `${ORIGIN}/about`).length, 1)
 })
 
 test('lastmod is the document’s own date, not the generation time', () => {
@@ -209,7 +215,7 @@ test('lastmod is omitted rather than invented when there is no usable date', () 
 
   assert.equal(lastModifiedOf(entries, `${ORIGIN}/trips/no-date`), undefined)
   // The inquiry page has no collection behind it either: no date beats a date that means nothing.
-  assert.equal(lastModifiedOf(entries, `${ORIGIN}/inquiry`), undefined)
+  assert.equal(lastModifiedOf(entries, `${ORIGIN}/contact`), undefined)
 })
 
 test('an unparseable date is ignored instead of being written into the XML', () => {
@@ -220,10 +226,10 @@ test('an unparseable date is ignored instead of being written into the XML', () 
   assert.equal(lastModifiedOf(entries, `${ORIGIN}/trips/broken`), undefined)
 })
 
-test('with no content at all the sitemap is still the five static routes', () => {
+test('with no content at all the sitemap is still the eight static routes', () => {
   const entries = buildSitemap()
 
-  assert.equal(entries.length, 5)
+  assert.equal(entries.length, 8)
   assert.equal(entryFor(entries, ORIGIN).priority, 1)
   assert.equal(entryFor(entries, ORIGIN).changeFrequency, 'weekly')
   assert.equal(entryFor(entries, `${ORIGIN}/trips`).priority, 0.8)

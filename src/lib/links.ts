@@ -55,7 +55,9 @@ export const resolveLink = (link: LinkValue | null | undefined): ResolvedLink | 
 
   if (link.type === 'custom') {
     if (!link.url) return null
-    return { href: link.url, label, newTab: Boolean(link.newTab) }
+    // Existing CMS links to the retired inquiry route should lead directly to contact.
+    const href = link.url.replace(/^\/inquiry(?=\?|#|$)/, '/contact')
+    return { href, label, newTab: Boolean(link.newTab) }
   }
 
   const reference = link.reference
