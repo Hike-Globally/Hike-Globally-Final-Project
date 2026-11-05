@@ -76,6 +76,10 @@
 .info-page h2 em {
   font-weight: 400;
 }
+/* Override the global dark heading color over the contact hero photograph. */
+.info-hero--contact h1 {
+  color: #fff;
+}
 .info-hero__lead {
   max-width: 475px;
   font-size: 18px;
