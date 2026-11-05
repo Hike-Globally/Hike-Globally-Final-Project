@@ -9,11 +9,13 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-ink text-white hover:bg-deep',
-        sage: 'bg-sage-90 text-white hover:bg-sage-80',
-        paper: 'bg-white text-ink hover:bg-mist',
-        outline: 'border border-slate-40 bg-transparent text-ink hover:border-ink hover:bg-mist',
-        'outline-light': 'border border-white/45 bg-transparent text-white hover:border-white hover:bg-white/12',
+        default: 'bg-[#206CA4] text-white hover:bg-[#175780]',
+        sage: 'bg-[#206CA4] text-white hover:bg-[#175780]',
+        paper: 'bg-[#206CA4] text-white hover:bg-[#175780]',
+        outline:
+          'border border-[#206CA4] bg-[#206CA4] text-white hover:border-[#175780] hover:bg-[#175780]',
+        'outline-light':
+          'border border-[#206CA4] bg-[#206CA4] text-white hover:border-[#175780] hover:bg-[#175780]',
         ghost: 'text-ink hover:bg-mist-60',
         link: 'text-deep underline-offset-4 hover:text-deep-80 hover:underline',
         destructive: 'bg-destructive text-destructive-foreground hover:bg-sage-80',

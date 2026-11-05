@@ -1,78 +1,41 @@
-/* ============================================================================
-   CTA CARD — the closing card that sits immediately before the footer
-   ----------------------------------------------------------------------------
-   Kept in a dedicated stylesheet (the pattern `footer.css`,
-   `about-hike-globally.css` and `latest-posts.css` already use) because the
-   card's composition — photograph, scrim, printed stamp, ruled trust row —
-   reads far better as plain CSS than as Tailwind utility soup.
-
-   These rules are intentionally *unlayered*: real (unlayered) rules beat
-   anything inside `@layer`, which includes every Tailwind v4 `@utility`
-   (`heading-lg`, `lead`, `eyebrow`…), so the sizes declared here win without
-   `!important`. The same technique `homepage.css` relies on. Everything is
-   scoped under `[data-cta-card]`, so nothing outside this card can pick the
-   styles up, and the three CMS variants (`dark` / `sage` / `light`) are
-   expressed as CSS variables over one shared layout — the photograph and the
-   composition never change, only the light does.
-
-   The card is deliberately still. The photograph does not drift, there is no
-   grain, no blurred glow and no shine sweep: one navy scrim, one ember rule
-   along the top edge, one hairline frame offset behind the card, and a printed
-   expedition stamp that does not spin. Square corners throughout, the only
-   circles being the stamp and the pulse-free marker dot.
-   ========================================================================== */
+/* Image-free editorial CTA: layered colour and cartographic details. */
 
 [data-cta-card] {
-  /* Dark (default): a dusk photograph of the Khumbu under the site's one navy
-     scrim, ember accents, mist copy. */
   --cta-fg: var(--color-mist);
   --cta-muted: color-mix(in srgb, var(--color-mist) 82%, transparent);
   --cta-faint: color-mix(in srgb, var(--color-mist) 62%, transparent);
   --cta-accent: var(--color-sage-light);
   --cta-line: color-mix(in srgb, var(--color-mist) 20%, transparent);
-  --cta-scrim: var(--scrim-ink);
 
   position: relative;
   isolation: isolate;
   overflow: hidden;
   color: var(--cta-fg);
-  background-color: var(--color-ink);
+  background:
+    radial-gradient(circle at 88% 15%, #2879a5 0%, transparent 38%),
+    linear-gradient(125deg, #102b42 0%, #164660 58%, #1d627c 100%);
 }
 
-/* Sage: the same photograph washed in the brand's warm accent, mist copy. */
+/* CMS colour variants keep the same illustration-free composition. */
 [data-cta-card][data-variant='sage'] {
-  --cta-fg: var(--color-white);
-  --cta-muted: color-mix(in srgb, var(--color-white) 88%, transparent);
-  --cta-faint: color-mix(in srgb, var(--color-white) 80%, transparent);
-  --cta-accent: var(--color-mist);
-  --cta-line: color-mix(in srgb, var(--color-white) 26%, transparent);
-  --cta-scrim:
-    linear-gradient(
-      100deg,
-      color-mix(in srgb, var(--color-sage-90) 94%, transparent) 0%,
-      color-mix(in srgb, var(--color-sage-90) 82%, transparent) 46%,
-      color-mix(in srgb, var(--color-sage-90) 34%, transparent) 100%
-    ),
-    linear-gradient(to top, color-mix(in srgb, var(--color-sage-80) 72%, transparent) 0%, transparent 58%);
-  background-color: var(--color-sage-90);
+  --cta-fg: #fff;
+  --cta-muted: rgba(255, 255, 255, 0.88);
+  --cta-faint: rgba(255, 255, 255, 0.72);
+  --cta-accent: #d9ecca;
+  --cta-line: rgba(255, 255, 255, 0.24);
+  background:
+    radial-gradient(circle at 90% 10%, #658e7d, transparent 42%),
+    linear-gradient(125deg, #183c39, #315e56);
 }
-
-/* Light: the photograph under morning paper, ink copy, ember accents. */
 [data-cta-card][data-variant='light'] {
-  --cta-fg: var(--color-ink);
-  --cta-muted: var(--color-ink-80);
-  --cta-faint: var(--color-slate-80);
-  --cta-accent: var(--color-sage-90);
-  --cta-line: color-mix(in srgb, var(--color-ink) 16%, transparent);
-  --cta-scrim:
-    linear-gradient(
-      100deg,
-      color-mix(in srgb, var(--color-mist) 96%, transparent) 0%,
-      color-mix(in srgb, var(--color-mist) 88%, transparent) 46%,
-      color-mix(in srgb, var(--color-mist) 42%, transparent) 100%
-    ),
-    linear-gradient(to top, color-mix(in srgb, var(--color-mist) 80%, transparent) 0%, transparent 60%);
-  background-color: var(--color-mist);
+  --cta-fg: #102b42;
+  --cta-muted: #35576b;
+  --cta-faint: #557485;
+  --cta-accent: #206ca4;
+  --cta-line: rgba(16, 43, 66, 0.18);
+  background:
+    radial-gradient(circle at 90% 10%, #c8e4e7, transparent 42%),
+    linear-gradient(125deg, #f2f7f4, #dceef0);
 }
 
 /* Offset hairline frame behind the card — an editorial “second sheet” peeking
@@ -95,49 +58,6 @@
   }
 }
 
-/* ---------------------------------------------------------------------------
-   Photograph, scrim and contours
-   --------------------------------------------------------------------------- */
-[data-cta-card] .cta-card__media {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-}
-
-[data-cta-card] .cta-card__img {
-  object-fit: cover;
-  object-position: 68% 42%;
-  filter: var(--image-grade);
-}
-
-/* Kept as a hook: the markup still nests a zoom wrapper inside the media layer,
-   and one slow, small zoom on hover is the only movement the card allows. */
-[data-cta-card] .cta-card__zoom {
-  position: absolute;
-  inset: 0;
-  transition: transform 1.6s var(--ease-brand, cubic-bezier(0.22, 1, 0.36, 1));
-}
-
-@media (hover: hover) and (pointer: fine) {
-  [data-cta-card]:hover .cta-card__zoom {
-    transform: scale(1.025);
-  }
-}
-
-[data-cta-card] .cta-card__scrim {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: var(--cta-scrim);
-}
-
-/* The glow layer is retired: it stays in the markup as an empty, inert span so
-   the composition is unchanged, and paints nothing. */
-[data-cta-card] .cta-card__glow {
-  display: none;
-}
-
 /* Topographic contours — survey lines printed quietly in the corner, the
    cartographic echo of the “map runs out of names” headline above them. */
 [data-cta-card] .cta-card__topo {
@@ -148,7 +68,7 @@
   width: min(62%, 44rem);
   height: 100%;
   color: var(--cta-fg);
-  opacity: 0.1;
+  opacity: 0.18;
   pointer-events: none;
 }
 
@@ -160,7 +80,7 @@
   right: 0;
   left: 0;
   height: 2px;
-  background: var(--color-sage);
+  background: linear-gradient(90deg, #80c7de, #e9c998, transparent);
 }
 
 [data-cta-card][data-variant='sage'] .cta-card__topline {
@@ -253,8 +173,7 @@
   fill: var(--cta-fg);
 }
 
-/* A filed disc behind the stamp, so its ring lettering stays legible where it
-   crosses snowfields in the photograph. */
+/* A subtle disc grounds the stamp against the gradient. */
 [data-cta-card] .cta-card__stamp-disc {
   position: absolute;
   inset: 0.4rem;
