@@ -216,7 +216,7 @@ function AtlasCard({ destination, index }: { destination: DestinationCard; index
               <p className="text-label font-medium tracking-[0.15em] text-mist/85 uppercase">
                 {destination.country}
               </p>
-              <h3 className="mt-2 font-display text-card text-white">
+              <h3 className="mt-2 font-display text-section font-medium break-words text-white">
                 {destination.name}
               </h3>
               {destination.tagline ? (
