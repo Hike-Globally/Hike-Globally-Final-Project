@@ -123,9 +123,10 @@ unified `.page-controls` footer card.
 
 ### Document action bar and the Publish button
 
-The sticky `.doc-controls` bar holds status, timestamps, `View live page`,
+The `.doc-controls` bar holds status, timestamps, `View live page`,
 `Expand preview`, the Publish action and the dot menu — all 32px tall, all on
-one line.
+one line. It is deliberately **not** sticky (Payload's default pins it under the
+top bar): it reads as the head of the form and scrolls away with it.
 
 Publish is the only control with a solid `#2177B5` fill; it settles to `#183144`
 on hover and press. It carries an upward arrow in a fixed 16px mask slot, set
@@ -160,9 +161,10 @@ chromeless). Top-level `group` and `collapsible` sections render as single-borde
 `#FFFFFF` cards; `array` and `blocks` headers use clean hairline dividers rather
 than nested header boxes. Trip-specific short-form Lexical editors use a 144px
 minimum editing area so empty fields do not dominate the form, while still
-expanding naturally with content. Sticky elements
-(`.document-fields__sidebar-wrap` and Lexical `.fixed-toolbar`) offset cleanly
-below both the top bar and `.doc-controls`.
+expanding naturally with content. The one sticky element in a document
+view, `.document-fields__sidebar-wrap`, offsets cleanly below the top bar alone;
+Lexical's `.fixed-toolbar` is pinned `relative` so it never floats into the
+writing area.
 
 ---
 

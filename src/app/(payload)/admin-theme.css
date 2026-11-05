@@ -171,7 +171,6 @@ html[data-theme='dark'] {
      ------------------------------------------------------------------------ */
   --hg-sidebar-width: 260px;
   --hg-topbar-height: 56px;
-  --hg-docbar-offset: 124px; /* sticky offset below top bar + doc controls */
   --hg-content-max: 1200px;
   --hg-page-pad-x: var(--hg-space-6);
   --hg-page-pad-y: var(--hg-space-6);
