@@ -275,11 +275,11 @@ export const Trips: CollectionConfig = {
     },
 
     /* --------------------------------------------------------------------------
-       Highlights & itinerary — the heart of a trip page, so it stays open
+       Highlights & itinerary — the heart of a trip page, so they stay open
        -------------------------------------------------------------------------- */
     {
       type: 'collapsible',
-      label: 'Highlights & itinerary',
+      label: 'Highlights',
       fields: [
         {
           name: 'highlights',
@@ -293,6 +293,12 @@ export const Trips: CollectionConfig = {
           },
           fields: [{ name: 'text', type: 'text', required: true }],
         },
+      ],
+    },
+    {
+      type: 'collapsible',
+      label: 'Itinerary',
+      fields: [
         {
           name: 'itinerary',
           type: 'array',
@@ -349,6 +355,12 @@ export const Trips: CollectionConfig = {
             },
           ],
         },
+      ],
+    },
+    {
+      type: 'collapsible',
+      label: 'Content sections',
+      fields: [
         {
           name: 'contentSections',
           type: 'array',
@@ -551,7 +563,7 @@ export const Trips: CollectionConfig = {
        -------------------------------------------------------------------------- */
     {
       type: 'collapsible',
-      label: 'Inclusions & FAQs',
+      label: 'Inclusions',
       admin: { initCollapsed: true },
       fields: [
         {
@@ -575,9 +587,14 @@ export const Trips: CollectionConfig = {
             },
           ],
         },
-        // Shared with Blog (src/fields/faqs.ts), so both pages render the same FAQ section.
-        ...faqFields(),
       ],
+    },
+    {
+      type: 'collapsible',
+      label: 'FAQs',
+      admin: { initCollapsed: true },
+      // Shared with Blog (src/fields/faqs.ts), so both pages render the same FAQ section.
+      fields: faqFields(),
     },
     {
       type: 'collapsible',
