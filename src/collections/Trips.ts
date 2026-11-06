@@ -277,6 +277,64 @@ export const Trips: CollectionConfig = {
     },
 
     /* --------------------------------------------------------------------------
+       Trip Brochure — the downloadable PDF (or image) version of this itinerary.
+
+       Deliberately placed directly under Pricing and left open, rather than in the run of
+       optional panels at the bottom: on the live page the download button belongs to the
+       booking card, so it is filled in at the same moment as the price. Fully optional — a
+       trip with no file simply renders no button (see `TripBrochureButton` in
+       `src/components/views/trip-detail.tsx`).
+       -------------------------------------------------------------------------- */
+    {
+      type: 'collapsible',
+      label: 'Trip Brochure',
+      fields: [
+        {
+          name: 'brochureFile',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'Brochure file',
+          // PDF is the printable document; an image covers a brochure exported or photographed
+          // as a page. Video is excluded so the picker only offers something a visitor can read;
+          // Media's own `mimeTypes` allow-list has the final say on what can be stored.
+          filterOptions: { mimeType: { not_like: 'video/%' } },
+          admin: {
+            description:
+              'Upload the downloadable version of this itinerary. A “Download Trip Brochure” button then appears under “Book This Trek” on the trip page. Leave empty to hide the button.',
+          },
+        },
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'brochureTitle',
+              type: 'text',
+              label: 'Button title',
+              localized: true,
+              admin: {
+                width: '50%',
+                placeholder: 'Download Trip Brochure',
+                description: 'Optional. Replaces the default button text.',
+              },
+            },
+            {
+              name: 'brochureNote',
+              type: 'text',
+              label: 'Supporting note',
+              localized: true,
+              admin: {
+                width: '50%',
+                placeholder: 'PDF · day-by-day itinerary, map and packing list',
+                description:
+                  'Optional single line under the button. Defaults to the file type and size (e.g. “PDF · 2.3 MB”).',
+              },
+            },
+          ],
+        },
+      ],
+    },
+
+    /* --------------------------------------------------------------------------
        Highlights & itinerary — the heart of a trip page, so they stay open
        -------------------------------------------------------------------------- */
     {

@@ -23,6 +23,7 @@ import { Reveal } from '@/components/motion/reveal'
 import { InquiryForm } from '@/components/forms/inquiry-form'
 import { Button } from '@/components/ui/button'
 import { EssentialInformationSection } from '@/components/sections/essential-information-section'
+import { TripBrochureButton } from '@/components/trips/trip-brochure-button'
 import { FaqSection } from '@/components/sections/faq-section'
 import { DeparturesSection } from '@/components/sections/departures-section'
 import { KeyTakeawaysSection } from '@/components/sections/key-takeaways-section'
@@ -36,6 +37,7 @@ import type { TripCard as TripCardData } from '@/lib/data'
 import { difficultyLabel } from '@/lib/difficulty'
 import { formatNumber, formatPrice } from '@/lib/format'
 import { getTripFaqGroups } from '@/lib/trip-faqs'
+import { resolveTripBrochure, type TripBrochure } from '@/lib/trip-brochure'
 import { resolveLink } from '@/lib/links'
 import { cn } from '@/lib/utils'
 import { hasRichTextContent } from '@/lib/rich-text-content'
@@ -77,11 +79,13 @@ function TripBookingCard({
   trip,
   dict,
   bookingHref,
+  brochure,
   className,
 }: {
   trip: Trip
   dict: Dictionary
   bookingHref: string
+  brochure: TripBrochure | null
   className?: string
 }) {
   const perGroup = trip.priceUnit === 'per-group'
@@ -134,6 +138,10 @@ function TripBookingCard({
             <ArrowRight aria-hidden />
           </Link>
         </Button>
+
+        {/* Sits under the booking CTA — the brochure answers "what exactly am I booking?"
+            at the moment the price and the button have the visitor's attention. */}
+        {brochure ? <TripBrochureButton brochure={brochure} /> : null}
       </div>
     </div>
   )
@@ -187,6 +195,7 @@ export function TripDetail({
   const faqGroups = getTripFaqGroups(trip)
   const faqs = faqGroups.flatMap(({ faqs: items }) => items)
   const highlights = trip.highlights?.filter(({ text }) => text.trim())
+  const brochure = resolveTripBrochure(trip, trip.slug, dict.trip.downloadBrochure)
 
   const sectionContent: Record<string, ReactNode> = {
     hero: (
@@ -473,7 +482,12 @@ export function TripDetail({
             )}
             {section === bookingAnchor ? (
               <div className="mb-16 lg:hidden">
-                <TripBookingCard trip={trip} dict={dict} bookingHref={bookingHref} />
+                <TripBookingCard
+                  trip={trip}
+                  dict={dict}
+                  bookingHref={bookingHref}
+                  brochure={brochure}
+                />
               </div>
             ) : null}
           </Fragment>
@@ -486,7 +500,12 @@ export function TripDetail({
           >
             <div className="single-page-body min-w-0">{content}</div>
             <aside className="hidden lg:sticky lg:top-28 lg:mt-16 lg:block lg:self-start">
-              <TripBookingCard trip={trip} dict={dict} bookingHref={bookingHref} />
+              <TripBookingCard
+                trip={trip}
+                dict={dict}
+                bookingHref={bookingHref}
+                brochure={brochure}
+              />
             </aside>
           </div>
         )

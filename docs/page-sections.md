@@ -8,7 +8,7 @@ Open a trip or blog post in the Payload admin and use **Page sections** near the
 - Removing an existing section row hides it without deleting its source content. Add that section again to restore it. A built-in section may only appear once, and at least one row must remain.
 - Save a draft or use live preview to review the order, then publish to update the public page. The order and custom HTML are included in version history.
 
-The trip booking sidebar remains alongside body content, and the blog table of contents remains alongside the article body. Hero, inquiry/planning, and related-content bands keep their full-width layouts when moved. The shared site header and footer are not part of these per-page layouts.
+The trip booking sidebar remains alongside body content, and the blog table of contents remains alongside the article body. Hero, inquiry/planning, and related-content bands keep their full-width layouts when moved. The shared site header and footer are not part of these per-page layouts. The sidebar's **Download Trip Brochure** button is not a section either — it belongs to the trip document itself (see `docs/trip-brochure.md`).
 
 ## Blog FAQs
 

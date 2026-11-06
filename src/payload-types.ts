@@ -469,6 +469,18 @@ export interface Trip {
    */
   priceNote?: string | null;
   /**
+   * Upload the downloadable version of this itinerary. A “Download Trip Brochure” button then appears under “Book This Trek” on the trip page. Leave empty to hide the button.
+   */
+  brochureFile?: (number | null) | Media;
+  /**
+   * Optional. Replaces the default button text.
+   */
+  brochureTitle?: string | null;
+  /**
+   * Optional single line under the button. Defaults to the file type and size (e.g. “PDF · 2.3 MB”).
+   */
+  brochureNote?: string | null;
+  /**
    * One bullet per row. Wrap a phrase in **double asterisks** to make it bold.
    */
   highlights?:
@@ -810,7 +822,7 @@ export interface HeroBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap part of the heading in <i>…</i> to set it in the italic accent face. On the homepage that part becomes its own second line in Instrument Serif italic at 90px, under the first line at 120px — e.g. "Walk Where The <i>Map Runs Out of Names</i>". Anywhere else it stays inline italic. Only <i> and <em> are recognised; every other tag is shown as plain text.
+   * Wrap part of the heading in <i>…</i> to set it in the italic accent face: it becomes its own second line, in Instrument Serif italic at the same size as the headline — e.g. "Walk Where The <i>Map Runs Out of Names</i>". Every hero on the site sets it the same way. Only <i> and <em> are recognised; every other tag is shown as plain text.
    */
   heading: string;
   subheading?: string | null;
@@ -1595,6 +1607,9 @@ export interface TripsSelect<T extends boolean = true> {
   priceCurrency?: T;
   priceUnit?: T;
   priceNote?: T;
+  brochureFile?: T;
+  brochureTitle?: T;
+  brochureNote?: T;
   highlights?:
     | T
     | {

@@ -42,8 +42,13 @@ export const Media: CollectionConfig = {
     // survive a read-only filesystem with no extra configuration.
     staticDir: path.join(dirname, '../../public/media'),
     adminThumbnail: 'card',
-    // Keep images and video in one library so editors can use either in the CMS.
-    mimeTypes: ['image/*', 'video/*'],
+    // Keep images, video and documents in one library so editors can use any of them in the CMS.
+    // PDF is here for the trip brochure (see the "Trip Brochure" panel in
+    // `src/collections/Trips.ts`): stored as a normal upload, Payload serves it from
+    // `/api/media/file/<filename>` in every storage mode (disk, Vercel Blob, Postgres), which is
+    // what keeps the public "Download Trip Brochure" link working everywhere. Documents skip
+    // Payload's image resizing, so the size definitions below simply do not apply to them.
+    mimeTypes: ['image/*', 'video/*', 'application/pdf'],
     imageSizes: [
       { name: 'thumbnail', width: 400, height: 300, position: 'centre' },
       {
