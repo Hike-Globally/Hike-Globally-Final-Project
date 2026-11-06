@@ -3093,7 +3093,7 @@ html[data-theme='light'] .template-default .graphic-account--active .graphic-acc
 
 /* Trip detail copy is usually short. Keep these editors compact when empty;
    the editor still grows naturally as content is added. */
-.hg-trip-compact-editor .editor-scroller {
+.field-type.rich-text-lexical.hg-trip-compact-editor .editor-scroller {
   min-height: var(--hg-editor-compact-min-height);
 }
 
