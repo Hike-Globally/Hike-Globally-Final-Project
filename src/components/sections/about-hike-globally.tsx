@@ -81,7 +81,7 @@ export function AboutHikeGlobally() {
                     <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
                   </Link>
                 </Button>
-                <Button asChild size="lg" variant="outline-light">
+                <Button asChild size="lg" variant="haze">
                   <Link href={sitePath('/contact')}>Plan your trip</Link>
                 </Button>
               </div>

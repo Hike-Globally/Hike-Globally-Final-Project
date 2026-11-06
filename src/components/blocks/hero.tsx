@@ -118,7 +118,11 @@ export function Hero({
                 </Button>
               ) : null}
               {secondary ? (
-                <Button asChild size="lg" variant={hasImage ? 'outline-light' : 'outline'}>
+                <Button
+                  asChild
+                  size="lg"
+                  variant={homepage ? 'haze' : hasImage ? 'outline-light' : 'outline'}
+                >
                   <Link href={secondary.href}>{secondary.label}</Link>
                 </Button>
               ) : null}
