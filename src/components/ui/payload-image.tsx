@@ -1,6 +1,8 @@
 import Image from 'next/image'
 
 import type { Media } from '@/payload-types'
+
+import { localMediaUrl } from '@/lib/media-url'
 import { cn } from '@/lib/utils'
 
 type PayloadImageProps = {
@@ -18,16 +20,9 @@ type PayloadImageProps = {
 /**
  * Payload may return an absolute URL for media served by this site. Use a relative URL so
  * images still work behind preview domains; leave external storage URLs untouched.
+ * (Kept exported from here for existing call sites — the rule itself lives in `@/lib/media-url`.)
  */
-export const localMediaUrl = (url: string): string => {
-  if (!/^https?:\/\//.test(url)) return url
-  try {
-    const parsed = new URL(url)
-    return parsed.pathname.startsWith('/api/media/') ? `${parsed.pathname}${parsed.search}` : url
-  } catch {
-    return url
-  }
-}
+export { localMediaUrl }
 
 /** The only frontend source for uploaded images is the original file, never a Payload crop. */
 export function originalMediaUrl(media: number | Media | null | undefined): string | null {

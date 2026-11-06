@@ -128,6 +128,7 @@ const en = {
     pricePerGroup: 'Price per group',
     difficultyLevel: 'Difficulty level',
     bookThisTrek: 'Book This Trek',
+    downloadBrochure: 'Download Trip Brochure',
     day: 'Day',
     elevation: 'Elevation',
     enquire: 'Request this trip',
