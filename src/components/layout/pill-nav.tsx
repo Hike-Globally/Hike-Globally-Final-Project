@@ -25,6 +25,28 @@ type PillNavProps = {
 const isActive = (pathname: string, href: string) =>
   href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`)
 
+function NavCaret() {
+  return (
+    <svg
+      className="pn-caret"
+      width="10"
+      height="6"
+      viewBox="0 0 10 6"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M1 1L5 5L9 1"
+        stroke="currentColor"
+        strokeOpacity="0.56"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
 /**
  * Pill dropdown nav — interaction port of Header-Sample.html.
  *
@@ -32,13 +54,15 @@ const isActive = (pathname: string, href: string) =>
  * glides to whichever tab is hovered (spring), the tab's dropdown panel fades
  * /slides in below the track; leaving the track returns the pill to the
  * active tab and closes the panel.
- * Mobile (<810px): the track collapses to a 56×56 burger; tapping expands it
- * into a 316px column where each tab accordion-expands its panel.
+ * Mobile (<810px): the track collapses to a 56×56 burger and opens into a
+ * full-screen menu. Submenus expand independently of their parent links.
  */
 export function PillNav({ logoLabel, logoHref, links, cta }: PillNavProps) {
   const pathname = usePathname()
   const reduceMotion = useReducedMotion()
 
+  const viewportRef = useRef<HTMLDivElement>(null)
+  const burgerRef = useRef<HTMLButtonElement>(null)
   const linksRef = useRef<HTMLDivElement>(null)
   const tabRefs = useRef<(HTMLAnchorElement | null)[]>([])
   const panelRef = useRef<HTMLDivElement>(null)
@@ -72,8 +96,77 @@ export function PillNav({ logoLabel, logoHref, links, cta }: PillNavProps) {
     return () => mq.removeEventListener('change', onChange)
   }, [])
 
-  const mobileOpen = openedOn === pathname
+  const mobileOpen = isMobile && openedOn === pathname
   const mobileExpanded = expanded?.path === pathname ? expanded.index : null
+
+  const closeMobileMenu = useCallback((restoreFocus = false) => {
+    setOpenedOn(null)
+    setExpanded(null)
+    if (restoreFocus) burgerRef.current?.focus({ preventScroll: true })
+  }, [])
+
+  useEffect(() => {
+    const onHistoryNavigation = () => closeMobileMenu()
+    window.addEventListener('popstate', onHistoryNavigation)
+    return () => window.removeEventListener('popstate', onHistoryNavigation)
+  }, [closeMobileMenu])
+
+  useEffect(() => {
+    if (!mobileOpen) return
+
+    // Keep the page behind the full-screen menu still. Lenis intercepts wheel
+    // events separately, so stop it too; the menu opts out for its own scroll.
+    const html = document.documentElement
+    const body = document.body
+    const htmlOverflow = html.style.overflow
+    const bodyOverflow = body.style.overflow
+    const lenis = window.__lenis
+    const resumeLenis = lenis && !lenis.isStopped
+    html.style.overflow = 'hidden'
+    body.style.overflow = 'hidden'
+    if (resumeLenis) lenis.stop()
+
+    burgerRef.current?.focus({ preventScroll: true })
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        closeMobileMenu(true)
+        return
+      }
+      if (event.key !== 'Tab' || !viewportRef.current) return
+
+      // The overlay is modal: keep keyboard focus inside it, including the logo
+      // and any open submenu, until the visitor closes it or chooses a link.
+      const focusable = Array.from(
+        viewportRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((element) => element.getClientRects().length > 0)
+      if (!focusable.length) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      const active = document.activeElement
+      if (event.shiftKey && (active === first || !focusable.includes(active as HTMLElement))) {
+        event.preventDefault()
+        last.focus()
+      } else if (
+        !event.shiftKey &&
+        (active === last || !focusable.includes(active as HTMLElement))
+      ) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+    document.addEventListener('keydown', onKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      html.style.overflow = htmlOverflow
+      body.style.overflow = bodyOverflow
+      if (resumeLenis) lenis.start()
+    }
+  }, [mobileOpen, closeMobileMenu])
 
   const activeIndex = links.findIndex((link) => isActive(pathname, link.href))
 
@@ -118,8 +211,22 @@ export function PillNav({ logoLabel, logoHref, links, cta }: PillNavProps) {
     link.newTab ? { target: '_blank', rel: 'noopener noreferrer' } : {}
 
   return (
-    <div className="pn-viewport">
-      <Link href={logoHref} className="pn-mobile-logo" aria-label={logoLabel}>
+    <div
+      ref={viewportRef}
+      className="pn-viewport"
+      data-open={mobileOpen}
+      role={mobileOpen ? 'dialog' : undefined}
+      aria-modal={mobileOpen ? true : undefined}
+      aria-label={mobileOpen ? 'Main menu' : undefined}
+    >
+      <Link
+        href={logoHref}
+        className="pn-mobile-logo"
+        aria-label={logoLabel}
+        onClick={() => {
+          if (mobileOpen) closeMobileMenu(true)
+        }}
+      >
         <Image
           src="/images/logo.svg"
           alt=""
@@ -130,33 +237,34 @@ export function PillNav({ logoLabel, logoHref, links, cta }: PillNavProps) {
         />
       </Link>
 
-      <nav className="pn-track" data-open={mobileOpen} aria-label="Main">
+      <nav
+        className="pn-track"
+        data-open={mobileOpen}
+        data-lenis-prevent={mobileOpen ? true : undefined}
+        aria-label="Main"
+      >
         <button
+          ref={burgerRef}
           type="button"
           className="pn-burger"
           aria-expanded={mobileOpen}
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           onClick={() => {
-            setOpenedOn((current) => (current === pathname ? null : pathname))
-            setExpanded(null)
+            if (mobileOpen) closeMobileMenu()
+            else {
+              setOpenedOn(pathname)
+              setExpanded(null)
+            }
           }}
         >
           <motion.span
             className="pn-burger-bar"
-            animate={
-              mobileOpen && !reduceMotion
-                ? { rotate: 45, y: 4.24 }
-                : { rotate: 0, y: 0 }
-            }
+            animate={mobileOpen ? { rotate: 45, y: 3 } : { rotate: 0, y: 0 }}
             transition={spring}
           />
           <motion.span
             className="pn-burger-bar"
-            animate={
-              mobileOpen && !reduceMotion
-                ? { rotate: -45, y: -4.24 }
-                : { rotate: 0, y: 0 }
-            }
+            animate={mobileOpen ? { rotate: -45, y: -3 } : { rotate: 0, y: 0 }}
             transition={spring}
           />
         </button>
@@ -165,11 +273,7 @@ export function PillNav({ logoLabel, logoHref, links, cta }: PillNavProps) {
           {logoLabel}
         </Link>
 
-        <div
-          className="pn-links"
-          ref={linksRef}
-          onMouseLeave={() => setHovered(null)}
-        >
+        <div className="pn-links" ref={linksRef} onMouseLeave={() => setHovered(null)}>
           <motion.div
             className="pn-pill"
             animate={{
@@ -187,7 +291,11 @@ export function PillNav({ logoLabel, logoHref, links, cta }: PillNavProps) {
             const expanded = isMobile ? mobileExpanded === index : openPanel === index
 
             return (
-              <div key={`${link.href}-${link.label}`} style={{ display: 'contents' }}>
+              <div
+                key={`${link.href}-${link.label}`}
+                className="pn-item"
+                data-has-children={hasPanel}
+              >
                 <Link
                   href={link.href}
                   {...linkProps(link)}
@@ -196,45 +304,43 @@ export function PillNav({ logoLabel, logoHref, links, cta }: PillNavProps) {
                   }}
                   className="pn-tab"
                   data-active={isActive(pathname, link.href)}
-                  aria-expanded={hasPanel ? expanded : undefined}
+                  aria-expanded={hasPanel && !mobileOpen ? expanded : undefined}
                   onMouseEnter={() => setHovered(index)}
                   onFocus={() => setHovered(index)}
                   onClick={() => {
-                    if (isMobile && hasPanel) {
+                    if (mobileOpen) closeMobileMenu(true)
+                  }}
+                >
+                  <span className="pn-label">{link.label}</span>
+                  {hasPanel ? <NavCaret /> : null}
+                </Link>
+
+                {hasPanel ? (
+                  <button
+                    type="button"
+                    className="pn-expand"
+                    aria-label={`${mobileExpanded === index ? 'Collapse' : 'Expand'} ${link.label} submenu`}
+                    aria-expanded={mobileExpanded === index}
+                    aria-controls={
+                      mobileExpanded === index ? `pn-mobile-panel-${index}` : undefined
+                    }
+                    onClick={() => {
                       setExpanded((current) =>
                         current?.path === pathname && current.index === index
                           ? null
                           : { path: pathname, index },
                       )
-                    }
-                  }}
-                >
-                  <span className="pn-label">{link.label}</span>
-                  {hasPanel ? (
-                    <svg
-                      className="pn-caret"
-                      width="10"
-                      height="6"
-                      viewBox="0 0 10 6"
-                      fill="none"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M1 1L5 5L9 1"
-                        stroke="currentColor"
-                        strokeOpacity="0.56"
-                        strokeWidth="1.4"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  ) : null}
-                </Link>
+                    }}
+                  >
+                    <NavCaret />
+                  </button>
+                ) : null}
 
                 {isMobile && hasPanel ? (
                   <AnimatePresence initial={false}>
                     {mobileExpanded === index ? (
                       <motion.div
+                        id={`pn-mobile-panel-${index}`}
                         className="pn-panel"
                         initial={reduceMotion ? false : { height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
@@ -248,6 +354,7 @@ export function PillNav({ logoLabel, logoHref, links, cta }: PillNavProps) {
                             href={child.href}
                             {...linkProps(child)}
                             className="pn-panel-item"
+                            onClick={() => closeMobileMenu(true)}
                           >
                             <span className="pn-label">{child.label}</span>
                           </Link>
@@ -295,8 +402,13 @@ export function PillNav({ logoLabel, logoHref, links, cta }: PillNavProps) {
           </Link>
         ) : null}
 
-        {isMobile && mobileOpen && cta ? (
-          <Link href={cta.href} {...linkProps(cta)} className="pn-cta">
+        {mobileOpen && cta ? (
+          <Link
+            href={cta.href}
+            {...linkProps(cta)}
+            className="pn-cta"
+            onClick={() => closeMobileMenu(true)}
+          >
             {cta.label}
           </Link>
         ) : null}
