@@ -1849,7 +1849,7 @@ const run = async () => {
         meta: {
           title: 'Hike Globally | Family Tours, Trekking & Travel Guides',
           description:
-            'Explore family tours, Himalayan treks and worldwide destinations with Hike Globally. Find travel guides, trip ideas and practical tips for your next adventure.',
+            'Discover family tours, treks and global destinations with Hike Globally. Explore travel guides, expert tips and inspiring ideas for your next adventure.',
         },
         _status: 'published',
       },
