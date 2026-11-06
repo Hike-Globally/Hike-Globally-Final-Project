@@ -245,15 +245,17 @@ export function HeaderFrame({ children }: { children: ReactNode }) {
 
   /* -- animation ----------------------------------------------------------- */
 
-  // Reduced motion gets a plain fade instead of a slide; at rest opacity is 1 and
-  // the transform is `none`, which keeps the pills' backdrop blur sampling the page.
+  // Reduced motion gets a plain fade instead of a slide. Both branches specify
+  // the same initial styles so server and client markup agree for that preference.
   const animate = reduceMotion
     ? {
+        y: 0,
         opacity: hidden ? 0 : 1,
         transition: { duration: 0.2, ease: 'easeOut' as const },
       }
     : {
         y: hidden ? -hideDistance : 0,
+        opacity: 1,
         transition: hidden ? { duration: 0.34, ease: EASE_IN } : { duration: 0.42, ease: EASE_OUT },
       }
 
@@ -263,6 +265,7 @@ export function HeaderFrame({ children }: { children: ReactNode }) {
       className="hg-header"
       data-hidden={hidden ? 'true' : undefined}
       data-in-hero={inHero ? 'true' : undefined}
+      data-menu-open={menuOpen ? 'true' : undefined}
       initial={false}
       animate={animate}
       // Off-screen and out of the tab order — focus inside would otherwise scroll
