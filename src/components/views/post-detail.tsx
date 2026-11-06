@@ -9,6 +9,7 @@ import { ArticleShareButton } from '@/components/blog/article-share-button'
 import { ArticleTableOfContents } from '@/components/blog/article-table-of-contents'
 import { RichText } from '@/components/content/rich-text'
 import { PostCard } from '@/components/cards/post-card'
+import { CtaCard } from '@/components/blocks/cta'
 import { JsonLd } from '@/components/seo/json-ld'
 import { Breadcrumbs } from '@/components/sections/breadcrumbs'
 import { FaqSection } from '@/components/sections/faq-section'
@@ -253,38 +254,13 @@ export function PostDetail({
       </>
     ),
     planning: (
-      <>
-        <section className="container-content pb-16 md:pb-24" aria-labelledby="next-trail-title">
-          <div className="relative isolate overflow-hidden bg-sage-20 p-7 sm:p-9 md:p-12">
-            <div className="grid items-center gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:gap-12">
-              <div className="max-w-2xl">
-                <p className="eyebrow text-slate-80">{dict.blog.planningEyebrow}</p>
-                <h2 id="next-trail-title" className="heading-lg mt-3">
-                  {dict.blog.planningTitle}
-                </h2>
-                <p className="mt-4 max-w-xl description-copy leading-relaxed text-ink-60">
-                  {dict.blog.planningText}
-                </p>
-                <Button asChild size="lg" className="mt-7">
-                  <Link href={sitePath('/contact')}>
-                    {dict.blog.planningLink}
-                    <ArrowRight aria-hidden="true" />
-                  </Link>
-                </Button>
-              </div>
-
-              <div
-                aria-hidden="true"
-                className="relative hidden size-36 shrink-0 place-items-center rounded-full border border-deep/25 text-deep md:grid lg:mr-5"
-              >
-                <span className="absolute inset-3 rounded-full border border-deep/15" />
-                <span className="absolute inset-7 rounded-full border border-deep/10" />
-                <Compass className="size-12" strokeWidth={1} />
-              </div>
-            </div>
-          </div>
-        </section>
-      </>
+      <CtaCard
+        eyebrow={dict.cta.eyebrow}
+        heading={dict.cta.heading}
+        text={dict.inquiry.subtitle}
+        link={{ href: sitePath('/contact'), label: dict.cta.action }}
+        variant="dark"
+      />
     ),
     related: (
       <>

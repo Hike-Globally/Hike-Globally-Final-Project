@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 
 import { RichText } from '@/components/content/rich-text'
+import { CtaCard } from '@/components/blocks/cta'
 import { JsonLd } from '@/components/seo/json-ld'
 import { Breadcrumbs } from '@/components/sections/breadcrumbs'
 import { TripCard } from '@/components/cards/trip-card'
@@ -426,28 +427,13 @@ export function TripDetail({
       </>
     ),
     inquiry: (
-      <>
-        <section id="inquiry" className="scroll-mt-24 py-16 md:py-24">
-          <div className="container-content">
-            <div className="relative isolate overflow-hidden border-t-2 border-sage bg-ink p-5 text-mist sm:p-8 md:p-14">
-
-              <div className="grid gap-10 xl:grid-cols-[0.85fr_1.15fr] xl:gap-16">
-                <div>
-                  <p className={eyebrowOnDark}>{dict.inquiry.formTitle}</p>
-                  <h2 className="heading-lg mt-3 text-white">{dict.inquiry.title}</h2>
-                  <p className="lead mt-5 text-mist">{dict.inquiry.subtitle}</p>
-                </div>
-                <InquiryForm
-                  trips={tripOptions}
-                  email={formEmail}
-                  defaultTripSlug={trip.slug}
-                  variant="dark"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-      </>
+      <CtaCard
+        eyebrow={dict.cta.eyebrow}
+        heading={dict.cta.heading}
+        text={dict.inquiry.subtitle}
+        link={{ href: sitePath('/contact'), label: dict.cta.action }}
+        variant="dark"
+      />
     ),
     related: (
       <>
