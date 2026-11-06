@@ -46,7 +46,10 @@ download real, on every storage mode, and keeps the storage location an implemen
 | `src/components/views/trip-detail.tsx`                   | Renders it inside the booking card (sidebar + mobile stack).                                     |
 | `src/app/(frontend)/trips/[slug]/brochure/route.ts`      | The same-origin download endpoint.                                                               |
 | `src/lib/trip-brochure-fetch.ts`                         | URL resolution, bounded redirects, scheme checks. Tested in `trip-brochure-fetch.test.ts`.       |
-| `src/migrations/20261106_120000_trip_brochure.{ts,json}` | Two nullable columns, their indexes and `set null` foreign keys, on the trips and drafts tables. |
+| `src/migrations/20261106_120000_trip_brochure.{ts,json}` | Six nullable columns (the upload and its two localized overrides, on the trips and drafts tables), their indexes and `set null` foreign keys. |
+| `src/lib/trip-brochure-schema.ts`                        | Those six columns as one list, shared by the boot-time repair and the drift tests.               |
+| `src/lib/schema-repair.ts`                               | Completes the columns on a database the failed build left half-migrated.                         |
+| `src/lib/migration-guard.ts`                             | Advisory-locks every production migration so concurrent boots cannot collide.                     |
 
 ## Design notes
 
@@ -60,15 +63,26 @@ download real, on every storage mode, and keeps the storage location an implemen
 
 ## Deployment
 
-Run `npm run migrate`. `20261106_120000_trip_brochure` adds `trips.brochure_file_id` and
-`_trips_v.version_brochure_file_id` with their indexes and foreign keys; it touches no existing
-content, and every existing trip simply renders no button until a file is uploaded.
+Run `npm run migrate`. `20261106_120000_trip_brochure` adds six nullable columns — the upload and
+its two localized overrides, each mirrored on the drafts tables — with their indexes and foreign
+keys. It touches no existing content, and every existing trip simply renders no button until a file
+is uploaded.
+
+On Vercel the migration is applied by Payload at boot, which means it can run in several build
+workers at once; `src/lib/migration-guard.ts` serialises them. The version of this migration that
+shipped first created only the two `_id` columns, so a database that ran it can be missing
+`brochure_title` / `brochure_note` while `payload_migrations` already lists it as done. Both the
+migration and the boot-time `src/lib/schema-repair.ts` close that gap idempotently — see
+[Deployment in the README](../README.md#deployment) for the full story.
 
 ## Verification
 
 - `npm test` — the resolver's rules (missing/unpopulated upload, editor overrides, file names,
   sizes) and the route's fetcher (URL resolution, redirect cap, scheme refusal).
 - `npm run typecheck`, `npm run lint`, `npm run build`.
+- Concurrency: three simultaneous production boots against one empty database all succeed, and the
+  brochure migration is applied exactly once (verified with `npx payload migrate` and with
+  `getPayload()` under `NODE_ENV=production`).
 - End-to-end: upload a PDF through the admin, attach it to a published trip, then open
   `/trips/<slug>` — the button should read “Download Trip Brochure”, and the downloaded file
   should arrive named `<slug>-brochure.pdf`. Unpublishing the trip makes the route 404.

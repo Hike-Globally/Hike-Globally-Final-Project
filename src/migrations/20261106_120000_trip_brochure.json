@@ -4504,6 +4504,18 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true
+        },
+        "brochure_title": {
+          "name": "brochure_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "brochure_note": {
+          "name": "brochure_note",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {
@@ -7598,6 +7610,18 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true
+        },
+        "version_brochure_title": {
+          "name": "version_brochure_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_brochure_note": {
+          "name": "version_brochure_note",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {

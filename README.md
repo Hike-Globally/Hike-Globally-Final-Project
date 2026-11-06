@@ -236,6 +236,19 @@ Postgres storage — see [Media storage](#media-storage)). See
 applied by Payload itself (`prodMigrations` in `src/payload.config.ts`) when the first request
 boots, so a separate migrate step in the build command is optional.
 
+Those migrations are **serialised across processes** (`src/lib/migration-guard.ts`). Payload applies
+them on every production boot, and a boot is not a one-off event: `next build` collects page data
+with several workers, each of which opens its own Payload connection. Unwrapped, the workers all see
+the same "not yet migrated" list and run the same `ALTER TABLE` at once — the winner commits and the
+losers die with `column "…" already exists`, which fails the build (`0ace700`'s deploy did exactly
+that). Each migration now takes a Postgres advisory lock keyed on its filename and re-checks
+`payload_migrations` inside it, so exactly one process migrates and the rest no-op. Migration files
+need no changes of their own: anything added to `src/migrations/index.ts` is covered automatically.
+
+A boot-time repair (`src/lib/schema-repair.ts`) also completes the trip brochure columns if a
+database has the migration recorded but is missing some of its columns — the state the failed build
+left behind. On a healthy database it costs one catalogue query and no DDL.
+
 `npm run build` runs `payload generate:importmap` before `next build`. Vercel caches
 `node_modules`, and the import map (`src/app/(payload)/admin/importMap.js`) is deliberately not
 committed — regenerating it in the build step is what keeps a cache-hit install from failing with
