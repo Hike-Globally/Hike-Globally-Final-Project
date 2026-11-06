@@ -55,7 +55,7 @@ export async function HomeFallback() {
             <Button asChild size="lg" variant="paper">
               <Link href={sitePath('/trips')}>{dict.nav.trips}</Link>
             </Button>
-            <Button asChild size="lg" variant="outline-light">
+            <Button asChild size="lg" variant="haze">
               <Link href={sitePath('/contact')}>{dict.nav.inquiry}</Link>
             </Button>
           </div>

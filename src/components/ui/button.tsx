@@ -12,6 +12,8 @@ const buttonVariants = cva(
         default: 'bg-[#206CA4] text-white hover:bg-[#175780]',
         sage: 'bg-[#206CA4] text-white hover:bg-[#175780]',
         paper: 'bg-[#206CA4] text-white hover:bg-[#175780]',
+        // Keep the color override alongside the `text-ui` token appended by CVA.
+        haze: 'border border-haze bg-haze text-ink! hover:border-haze-40 hover:bg-haze-40',
         outline:
           'border border-[#206CA4] bg-[#206CA4] text-white hover:border-[#175780] hover:bg-[#175780]',
         'outline-light':
