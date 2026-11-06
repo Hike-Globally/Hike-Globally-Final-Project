@@ -2,7 +2,7 @@ import path from 'path'
 import { tmpdir } from 'os'
 import { fileURLToPath } from 'url'
 
-import { postgresAdapter } from '@payloadcms/db-postgres'
+import { postgresAdapter, sql } from '@payloadcms/db-postgres'
 import {
   EXPERIMENTAL_TableFeature,
   FixedToolbarFeature,
@@ -23,6 +23,8 @@ import { Settings } from './globals/Settings'
 import { defaultLocale, localeMeta, locales } from './i18n/config'
 import { migrations } from './migrations'
 import { resolveMediaStorage } from './lib/media-storage'
+import { serialiseMigrations } from './lib/migration-guard'
+import { ensureTripBrochureSchema } from './lib/schema-repair'
 import { MEDIA_FILES_TABLE } from './lib/media-storage-schema'
 import { resolveSiteUrl } from './lib/site-url'
 import { trustedOrigins } from './lib/trusted-origins'
@@ -149,7 +151,11 @@ export default buildConfig({
       idleTimeoutMillis: 30_000,
       connectionTimeoutMillis: 10_000,
     },
-    prodMigrations: migrations,
+    // Wrapped so the several workers `next build` starts cannot run the same migration at the
+    // same time, which is what failed a production build with `column "…" already exists`.
+    // Production only — that is the only place Payload applies migrations on boot; the
+    // `payload migrate` CLI reads the files directly. See src/lib/migration-guard.ts.
+    prodMigrations: serialiseMigrations(migrations, sql),
     // `push` is intentionally NOT used: production changes go through real migration files
     // (npm run migrate:create). Set PAYLOAD_PUSH=true only for throwaway local databases.
     // push: process.env.PAYLOAD_PUSH === 'true',
@@ -183,6 +189,19 @@ export default buildConfig({
   serverURL: siteUrl,
   sharp,
   telemetry: false,
+
+  /**
+   * Boot-time schema repair for the trip brochure columns.
+   *
+   * Production applies migrations during boot, and the build that shipped the brochure migration
+   * failed halfway through it (three workers racing — see `src/lib/migration-guard.ts`). That left a
+   * database that has the migration *recorded* but is missing two localized columns, which Payload
+   * would never re-run. This heals it once, on the first boot, and does nothing at all on a healthy
+   * database. The media store does the same thing for its own table in `src/storage/plugin.ts`.
+   */
+  onInit: async (payload) => {
+    await ensureTripBrochureSchema(payload)
+  },
 
   // Shared with the middleware, which defers to these origins instead of rewriting their headers.
   cors: trustedOrigins(),
