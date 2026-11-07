@@ -233,9 +233,13 @@ Vercel + hosted Postgres + Vercel Blob for media (without a Blob store the deplo
 Postgres storage — see [Media storage](#media-storage)). See
 [§9 of the implementation plan](docs/IMPLEMENTATION-PLAN.md#9-deployment); the short version is
 `npm ci && npm run build`, with the four environment variables above set. `npm run build` applies
-pending migrations **before** it builds (`payload generate:importmap && payload migrate && next
-build`), so a deploy can never ship against an outdated schema — and the build's own workers find
-nothing left to migrate.
+pending migrations **before** it builds (`payload generate:importmap && node
+scripts/migrate-for-build.mjs && next build`), so a deploy can never ship against an outdated
+schema — and the build's own workers find nothing left to migrate. With no connection string
+configured that step skips itself and says so, because a build without a database attached has to
+keep working (`src/lib/data.ts` falls back to static content in exactly that state — a Preview
+deployment, or a first deploy before the environment variables exist). A database that *is*
+configured but unreachable fails the build instead of being quietly skipped.
 
 Payload *also* applies migrations on every production boot (`prodMigrations` in
 `src/payload.config.ts`), which is a safety net rather than the plan, because a boot is not a
@@ -262,7 +266,7 @@ A boot-time repair (`src/lib/schema-repair.ts`) also completes the trip brochure
 database has the migration recorded but is missing some of its columns — the state the failed build
 left behind. On a healthy database it costs one catalogue query and no DDL.
 
-`npm run build` runs `payload generate:importmap` and `payload migrate` before `next build`. Vercel caches
+`npm run build` runs `payload generate:importmap` and the migration step before `next build`. Vercel caches
 `node_modules`, and the import map (`src/app/(payload)/admin/importMap.js`) is deliberately not
 committed — regenerating it in the build step is what keeps a cache-hit install from failing with
 `Module not found: Can't resolve './admin/importMap'`.

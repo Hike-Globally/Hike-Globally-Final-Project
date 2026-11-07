@@ -151,12 +151,13 @@ export default buildConfig({
       idleTimeoutMillis: 30_000,
       connectionTimeoutMillis: 10_000,
     },
-    // Boot-time migrations are the safety net, not the plan: `npm run build` runs `payload migrate`
-    // in one process *before* `next build`, so the workers Next then starts normally find nothing
-    // pending. When something still is pending — two instances booting at once, a build that was
-    // skipped — the wrapper keeps them from running the same DDL twice, which failed a production
-    // build with `column "…" already exists` and then with a 120s lock timeout. Production only;
-    // the `payload migrate` CLI reads the files directly. See src/lib/migration-guard.ts.
+    // Boot-time migrations are the safety net, not the plan: `npm run build` migrates in one
+    // process *before* `next build` (scripts/migrate-for-build.mjs), so the workers Next then
+    // starts normally find nothing pending. When something still is pending — two instances booting
+    // at once, a build that skipped the step — the wrapper keeps them from running the same DDL
+    // twice, which failed a production build with `column "…" already exists` and then with a 120s
+    // lock timeout. Production only; the `payload migrate` CLI reads the files directly.
+    // See src/lib/migration-guard.ts.
     prodMigrations: serialiseMigrations(migrations, sql),
     // `push` is intentionally NOT used: production changes go through real migration files
     // (npm run migrate:create). Set PAYLOAD_PUSH=true only for throwaway local databases.
