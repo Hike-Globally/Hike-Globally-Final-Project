@@ -5,6 +5,9 @@ export const tripSectionOptions = [
   { label: 'Overview', value: 'overview' },
   { label: 'Why Choose This Trek', value: 'whyChoose' },
   { label: 'Highlights', value: 'highlights' },
+  // Added after page layouts shipped: migration 20261107_120000_trip_audience inserts this row
+  // right after Highlights in every layout saved before it existed.
+  { label: 'Who is this trip for / not for', value: 'audience' },
   { label: 'Original route map and altitude chart', value: 'routeMap' },
   { label: 'Itinerary', value: 'itinerary' },
   { label: 'Departures', value: 'departures' },

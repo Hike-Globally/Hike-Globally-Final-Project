@@ -166,6 +166,13 @@ view, `.document-fields__sidebar-wrap`, offsets cleanly below the top bar alone;
 Lexical's `.fixed-toolbar` is pinned `relative` so it never floats into the
 writing area.
 
+
+The two trip audience panels (**Who Is This Trip For** / **… Not For**, class
+`hg-trip-audience`) are ordinary collapsible cards with a single accent each:
+a 3px leading-edge spine and a 22px glyph chip before the title (masked
+check on `--hg-success-bg` / `--hg-success-solid`, masked cross on
+`--hg-danger-bg` / `--hg-danger-solid`). Their content area uses `--hg-space-5`
+padding because it holds reading copy.
 ---
 
 ## 5. Rules of engagement

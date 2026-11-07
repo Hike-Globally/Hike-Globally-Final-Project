@@ -111,6 +111,9 @@ const en = {
     faqs: 'Frequently Asked Questions',
     related: 'You may also like',
     highlights: 'Key Highlights',
+    /** Small uppercase labels above the two “Who Is This Trip For / Not For” card headings. */
+    audienceForEyebrow: 'The right fit',
+    audienceNotForEyebrow: 'Not the right fit',
     factsTitle: 'Trip at a glance',
     duration: 'Duration',
     groupSize: 'Group size',

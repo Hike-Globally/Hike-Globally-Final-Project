@@ -10,6 +10,13 @@ Open a trip or blog post in the Payload admin and use **Page sections** near the
 
 The trip booking sidebar remains alongside body content, and the blog table of contents remains alongside the article body. Hero, inquiry/planning, and related-content bands keep their full-width layouts when moved. The shared site header and footer are not part of these per-page layouts. The sidebar's **Download Trip Brochure** button is not a section either — it belongs to the trip document itself (see `docs/trip-brochure.md`).
 
+## Who is this trip for / not for
+
+Trips have a **Who is this trip for / not for** row directly after **Highlights**. It renders the two
+audience cards edited in the **Who Is This Trip For** and **Who Is This Trip Not For** panels. Migration
+`20261107_120000_trip_audience` adds this row after Highlights in every trip layout that was already
+saved. See `docs/trip-audience.md`.
+
 ## Blog FAQs
 
 Blog posts have the same **FAQs** panel as trips, directly below the post body, with the same seven categories (General Questions, Best Time To Trek, Required Permits For The Trek, and so on). Each filled-in category is shown under its heading in a **Frequently Asked Questions** section that looks exactly like the one on trip pages; empty categories are hidden, and the questions are also published as `FAQPage` structured data.

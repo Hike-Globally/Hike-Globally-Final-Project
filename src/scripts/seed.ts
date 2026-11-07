@@ -492,6 +492,26 @@ const run = async () => {
         'The Khumbu icefall from Base Camp, reached on foot',
         'Namche Bazaar market day and the Sherpa museum',
       ].map((value) => ({ text: value })),
+      tripForDescription: richText(
+        paragraph(
+          'A first taste of high altitude for walkers who want the real Himalaya without technical climbing.',
+        ),
+        bulletList([
+          'Regular hikers comfortable with 6–8 hours on foot, day after day',
+          'First-timers at altitude who want a proven, well-paced acclimatisation plan',
+          'Travellers happy with simple teahouse rooms and shared facilities',
+          'Anyone who has dreamed of standing beneath Everest, Lhotse and Nuptse',
+        ]),
+      ),
+      tripNotForDescription: richText(
+        paragraph('Honest expectations make for better trips — this one may not suit you if:'),
+        bulletList([
+          'You have heart or lung conditions your doctor has not cleared for 5,000 m+',
+          'You need hotel-standard comfort, private bathrooms or reliable hot showers',
+          'Your dates are fixed tight — mountain weather can delay Lukla flights by a day or more',
+          'You are looking for a technical summit — Island Peak is the trip for that',
+        ]),
+      ),
       included: [
         'Kathmandu ↔ Lukla flights, incl. 15 kg checked baggage',
         'All teahouse accommodation on a twin-share basis',

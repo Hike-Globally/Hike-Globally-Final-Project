@@ -381,6 +381,7 @@ export interface Trip {
           | 'overview'
           | 'whyChoose'
           | 'highlights'
+          | 'audience'
           | 'routeMap'
           | 'itinerary'
           | 'departures'
@@ -489,6 +490,50 @@ export interface Trip {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Optional. Leave empty to use “Who Is This Trip For”.
+   */
+  tripForHeading?: string | null;
+  /**
+   * Describe the travellers this trip suits best — fitness, experience, travel style. Bullet lists display with a check mark on each point. Leave empty to hide this card.
+   */
+  tripForDescription?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Optional. Leave empty to use “Who Is This Trip Not For”.
+   */
+  tripNotForHeading?: string | null;
+  /**
+   * Be candid about who should choose a different trip — and why. Bullet lists display with a cross on each point. Leave empty to hide this card.
+   */
+  tripNotForDescription?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * One entry per day. Day-level content is translated per language.
    */
@@ -1616,6 +1661,10 @@ export interface TripsSelect<T extends boolean = true> {
         text?: T;
         id?: T;
       };
+  tripForHeading?: T;
+  tripForDescription?: T;
+  tripNotForHeading?: T;
+  tripNotForDescription?: T;
   itinerary?:
     | T
     | {

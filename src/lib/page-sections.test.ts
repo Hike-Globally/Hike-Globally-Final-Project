@@ -102,7 +102,8 @@ test('full-width sections can be interleaved with body sections without changing
 test('trip: new content sections have the requested default positions', () => {
   const kinds = defaultPageSections(tripSectionOptions).map(({ kind }) => kind)
   assert.equal(kinds[kinds.indexOf('highlights') - 1], 'whyChoose')
-  assert.equal(kinds[kinds.indexOf('highlights') + 1], 'routeMap')
+  assert.equal(kinds[kinds.indexOf('highlights') + 1], 'audience')
+  assert.equal(kinds[kinds.indexOf('audience') + 1], 'routeMap')
   assert.equal(kinds[kinds.indexOf('itinerary') + 1], 'departures')
   for (const kind of ['whyChoose', 'routeMap', 'departures']) {
     const hidden = defaultPageSections(tripSectionOptions).filter((row) => row.kind !== kind)
@@ -116,4 +117,18 @@ test('trip: Key Takeaways sits immediately before Overview and can be hidden', (
   assert.equal(layout[overview - 1].kind, 'keyTakeaways')
   const hidden = layout.filter(({ kind }) => kind !== 'keyTakeaways')
   assert.deepEqual(resolvePageSections(hidden, tripSectionOptions), hidden)
+})
+
+test('trip: Who is this trip for / not for sits immediately after Highlights and can be hidden', () => {
+  const layout = defaultPageSections(tripSectionOptions)
+  const highlights = layout.findIndex(({ kind }) => kind === 'highlights')
+  assert.equal(layout[highlights + 1].kind, 'audience')
+  const hidden = layout.filter(({ kind }) => kind !== 'audience')
+  assert.deepEqual(resolvePageSections(hidden, tripSectionOptions), hidden)
+  assert.equal(
+    groupPageSections(layout, ['hero', 'inquiry', 'related'])[1].sections.some(
+      ({ kind }) => kind === 'audience',
+    ),
+    true,
+  )
 })
