@@ -15,6 +15,9 @@ import { cn } from '@/lib/utils'
  *    card; a second one would split the page's single most important decision in two.
  *  - A hairline outline in `mist` at 30% reads as a quiet sibling to the filled booking CTA on
  *    the ink card: same height, same type size, half the volume.
+ *  - The label is centred in the well with the icon trailing it as one phrase, so the control reads
+ *    the same as the booking CTA above it (which is also a centred label + trailing icon) rather
+ *    than looking like a left-aligned list row with the icon pushed to the far edge.
  *  - Nothing else sits inside the button. The file's kind and size — "PDF · 2.3 MB" — go in the
  *    single muted line underneath, so the control itself stays one readable phrase.
  *  - The arrow slides down on hover; it is the only motion in the card besides the icon colours.
@@ -34,7 +37,7 @@ export function TripBrochureButton({
         href={brochure.url}
         download={brochure.filename}
         className={cn(
-          'group flex h-13 w-full items-center justify-between gap-4 border border-mist/30 px-5',
+          'group flex h-13 w-full items-center justify-center gap-2.5 border border-mist/30 px-5',
           'font-heading text-ui font-medium tracking-[0.01em] text-mist',
           'transition-colors duration-300 hover:border-mist/60 hover:bg-white/5 hover:text-white',
           'focus-visible:border-mist/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-haze/40',
