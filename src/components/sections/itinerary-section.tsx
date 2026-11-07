@@ -137,9 +137,12 @@ function ExpandAllSwitch({
 /**
  * Detailed itinerary — one card per day, each headed by its CMS day number ("Day 1", "Day 2"…).
  *
- * The heading row carries an "Expand all" switch: off (the default) shows nothing but the day
- * headings, on opens every day at once. Days stay individually collapsible in between, because
- * the switch is wired to the accordion's own state rather than replacing it.
+ * The first day starts open so the top of the itinerary reads as a real entry rather than a
+ * stack of closed headings; every other day starts collapsed.
+ *
+ * The heading row carries an "Expand all" switch: off shows just the open first day, on opens
+ * every day at once. Days stay individually collapsible in between, because the switch is wired
+ * to the accordion's own state rather than replacing it.
  */
 export function ItinerarySection({ days }: { days: ItineraryDay[] }) {
   const dict = dictionary
@@ -150,7 +153,8 @@ export function ItinerarySection({ days }: { days: ItineraryDay[] }) {
    */
   const dayValues = useMemo(() => days.map((day, index) => `day-${day.id ?? index}`), [days])
 
-  const [openDays, setOpenDays] = useState<string[]>([])
+  /** Day 1 is open on first paint; the remaining days stay collapsed until opened. */
+  const [openDays, setOpenDays] = useState<string[]>(() => dayValues.slice(0, 1))
   const allExpanded = dayValues.length > 0 && dayValues.every((value) => openDays.includes(value))
 
   return (
