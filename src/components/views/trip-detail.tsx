@@ -42,7 +42,7 @@ import { resolveLink } from '@/lib/links'
 import { cn } from '@/lib/utils'
 import { hasRichTextContent } from '@/lib/rich-text-content'
 import { breadcrumbJsonLd, faqJsonLd, touristTripJsonLd } from '@/lib/seo'
-import type { Trip } from '@/payload-types'
+import type { Media, Trip } from '@/payload-types'
 
 /* ----------------------------------------------------------------------------
    Shared styling
@@ -144,6 +144,55 @@ function TripBookingCard({
         {brochure ? <TripBrochureButton brochure={brochure} /> : null}
       </div>
     </div>
+  )
+}
+
+/* ----------------------------------------------------------------------------
+   Route map and altitude chart — the two uploaded figures as a side-by-side pair
+   ---------------------------------------------------------------------------- */
+
+/** The figures that actually have an upload behind them, in reading order. */
+function routeMapFigures(trip: Trip): { media: Media; label: string }[] {
+  return [
+    { media: trip.routeMap, label: 'Original route map' },
+    { media: trip.altitudeChart, label: 'Altitude chart' },
+  ].flatMap(({ media, label }) => (media && typeof media !== 'number' ? [{ media, label }] : []))
+}
+
+function RouteMapSection({ trip }: { trip: Trip }) {
+  const figures = routeMapFigures(trip)
+  const intro = hasRichTextContent(trip.routeMapContent) ? trip.routeMapContent : null
+  if (!intro && !figures.length) return null
+
+  return (
+    <section id="route-map" className="scroll-mt-24 pb-16 md:pb-24">
+      <SectionTitle title="Original route map and altitude chart" />
+      {intro ? <RichText content={intro} className="mb-8" /> : null}
+
+      {/* Stacked on a phone, side by side from tablet up — the same split the
+          included/not-included grid makes further down the page. A lone upload
+          keeps the full column instead of stranding half an empty grid. */}
+      <div className={cn('grid gap-6', figures.length > 1 && 'md:grid-cols-2')}>
+        {figures.map(({ media, label }) => (
+          <figure key={label} className={cn(surface, 'flex flex-col overflow-hidden p-4 sm:p-6')}>
+            <figcaption className="mb-4 font-heading text-subhead font-semibold">
+              {label}
+            </figcaption>
+            {/* The cards stretch to the taller of the two, so the wide, short
+                altitude chart is centred in the space the route map leaves
+                beside it rather than pinned under its caption. */}
+            <div className="flex flex-1 items-center">
+              <PayloadImage
+                media={media}
+                sizes="(min-width: 1024px) 30vw, (min-width: 768px) 45vw, 92vw"
+                className="w-full"
+                imageClassName="h-auto object-contain"
+              />
+            </div>
+          </figure>
+        ))}
+      </div>
+    </section>
   )
 }
 
@@ -286,36 +335,7 @@ export function TripDetail({
         <RichText content={trip.whyChooseThisTrek} />
       </section>
     ) : null,
-    routeMap:
-      hasRichTextContent(trip.routeMapContent) ||
-      (trip.routeMap && typeof trip.routeMap !== 'number') ||
-      (trip.altitudeChart && typeof trip.altitudeChart !== 'number') ? (
-        <section id="route-map" className="scroll-mt-24 pb-16 md:pb-24">
-          <SectionTitle title="Original route map and altitude chart" />
-          {hasRichTextContent(trip.routeMapContent) ? (
-            <RichText content={trip.routeMapContent} className="mb-8" />
-          ) : null}
-          <div className="space-y-8">
-            {[
-              { media: trip.routeMap, label: 'Original route map' },
-              { media: trip.altitudeChart, label: 'Altitude chart' },
-            ].map(({ media, label }) =>
-              media && typeof media !== 'number' ? (
-                <figure key={label} className={cn(surface, 'overflow-hidden p-4 sm:p-6')}>
-                  <figcaption className="mb-4 font-heading text-subhead font-semibold">
-                    {label}
-                  </figcaption>
-                  <PayloadImage
-                    media={media}
-                    sizes="(max-width: 1024px) 100vw, 66vw"
-                    imageClassName="h-auto object-contain"
-                  />
-                </figure>
-              ) : null,
-            )}
-          </div>
-        </section>
-      ) : null,
+    routeMap: <RouteMapSection trip={trip} />,
     departures: (
       <DeparturesSection
         trip={trip}
