@@ -43,8 +43,12 @@ The shared rules (default headings, "only show a side with real content") live i
 
 ## Deployment
 
-Run `npm run migrate` before (or as part of) deploying. In production Payload also applies it on
-boot through `prodMigrations`. Migration `20261107_120000_trip_audience`:
+`npm run build` applies it before `next build` starts (`scripts/migrate-for-build.mjs` runs
+`payload migrate` as part of the build command, skipping only when no database is configured at
+all), so the schema is in place before any build worker boots Payload. In production Payload also
+applies it on boot through `prodMigrations`, serialised across processes by
+`src/lib/migration-guard.ts`.
+Migration `20261107_120000_trip_audience`:
 
 - adds `trip_for_heading`, `trip_for_description`, `trip_not_for_heading` and
   `trip_not_for_description` to `trips_locales`, plus the `version_` counterparts on

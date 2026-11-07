@@ -232,24 +232,41 @@ also stalls indexing of the sitemap.
 Vercel + hosted Postgres + Vercel Blob for media (without a Blob store the deployment falls back to
 Postgres storage — see [Media storage](#media-storage)). See
 [§9 of the implementation plan](docs/IMPLEMENTATION-PLAN.md#9-deployment); the short version is
-`npm ci && npm run build`, with the four environment variables above set. Production migrations are
-applied by Payload itself (`prodMigrations` in `src/payload.config.ts`) when the first request
-boots, so a separate migrate step in the build command is optional.
+`npm ci && npm run build`, with the four environment variables above set. `npm run build` applies
+pending migrations **before** it builds (`payload generate:importmap && node
+scripts/migrate-for-build.mjs && next build`), so a deploy can never ship against an outdated
+schema — and the build's own workers find nothing left to migrate. With no connection string
+configured that step skips itself and says so, because a build without a database attached has to
+keep working (`src/lib/data.ts` falls back to static content in exactly that state — a Preview
+deployment, or a first deploy before the environment variables exist). A database that *is*
+configured but unreachable fails the build instead of being quietly skipped.
 
-Those migrations are **serialised across processes** (`src/lib/migration-guard.ts`). Payload applies
-them on every production boot, and a boot is not a one-off event: `next build` collects page data
-with several workers, each of which opens its own Payload connection. Unwrapped, the workers all see
-the same "not yet migrated" list and run the same `ALTER TABLE` at once — the winner commits and the
-losers die with `column "…" already exists`, which fails the build (`0ace700`'s deploy did exactly
-that). Each migration now takes a Postgres advisory lock keyed on its filename and re-checks
-`payload_migrations` inside it, so exactly one process migrates and the rest no-op. Migration files
-need no changes of their own: anything added to `src/migrations/index.ts` is covered automatically.
+Payload *also* applies migrations on every production boot (`prodMigrations` in
+`src/payload.config.ts`), which is a safety net rather than the plan, because a boot is not a
+one-off event: `next build` collects page data with several workers, each of which opens its own
+Payload connection, and a fresh deployment's first requests can land on more than one instance.
+
+Those boots are **serialised across processes** (`src/lib/migration-guard.ts`). Each migration takes
+a Postgres **transaction-scoped** advisory lock keyed on its filename and re-checks
+`payload_migrations` inside it, so exactly one process migrates and the rest no-op. Transaction
+scope is the detail that matters: Payload writes the `payload_migrations` row *after* `up` returns
+and commits after that, so a lock released inside `up` is released while the row is still invisible
+to everybody else — the next process would re-run the same DDL. Postgres drops a transaction-scoped
+lock at COMMIT/ROLLBACK on its own, which is exactly the right moment. A process waiting for the
+lock also re-checks `payload_migrations` on every poll and returns as soon as the row appears, so a
+stuck lock costs one poll round instead of the whole timeout.
+
+Both failure modes this prevents are real, not theoretical: unwrapped, the workers all saw the same
+"not yet migrated" list and ran the same `ALTER TABLE` at once, and the losers died with
+`column "…" already exists` (`0ace700`'s deploy); with a session-level lock, two workers spent the
+full 120s unable to take it and exited, failing the build (2026-11-07). Migration files need no
+changes of their own: anything added to `src/migrations/index.ts` is covered automatically.
 
 A boot-time repair (`src/lib/schema-repair.ts`) also completes the trip brochure columns if a
 database has the migration recorded but is missing some of its columns — the state the failed build
 left behind. On a healthy database it costs one catalogue query and no DDL.
 
-`npm run build` runs `payload generate:importmap` before `next build`. Vercel caches
+`npm run build` runs `payload generate:importmap` and the migration step before `next build`. Vercel caches
 `node_modules`, and the import map (`src/app/(payload)/admin/importMap.js`) is deliberately not
 committed — regenerating it in the build step is what keeps a cache-hit install from failing with
 `Module not found: Can't resolve './admin/importMap'`.
