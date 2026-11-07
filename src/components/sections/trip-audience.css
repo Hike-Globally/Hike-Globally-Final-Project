@@ -1,0 +1,271 @@
+/* Who Is This Trip For / Not For — a matched pair of editorial cards.
+
+   Built from the same restrained vocabulary as the Highlights card directly
+   above it (`key-takeaways.css`): a white sheet, one warm hairline, no shadow,
+   and a short rule filed along the top-left corner. The two cards differ by a
+   single accent — deep blue for "for", ember for "not for" — carried through
+   the corner rule, the icon chip and every list marker, so the pair reads as
+   yes / no at a glance without turning into a traffic light.
+
+   Layout is a container query on the section itself, not a viewport media
+   query: the trip body column narrows when the sticky booking card appears at
+   `lg`, so the pair goes side by side only when *its* column can hold two
+   readable measures (~44rem), and stacks otherwise. */
+
+.trip-audience {
+  container-type: inline-size;
+  container-name: trip-audience;
+}
+
+.trip-audience-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(1rem, 2.2vw, 1.5rem);
+}
+
+@container trip-audience (min-width: 44rem) {
+  .trip-audience-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* One side filled in: let it use the whole row instead of half of it. */
+  .trip-audience-cell:only-child {
+    grid-column: 1 / -1;
+  }
+
+  /* Side by side, the two cards share their row tracks (header, body) through
+     subgrid, so a heading that wraps to two lines on one side still leaves
+     both header dividers — and both first lines of copy — on the same line.
+     Browsers without subgrid simply keep each card's own rhythm. */
+  @supports (grid-template-rows: subgrid) {
+    .trip-audience-grid {
+      row-gap: 0;
+    }
+
+    /* Grid-scoped selectors so these outrank the single-column base rules
+       declared further down. */
+    .trip-audience-grid > .trip-audience-cell,
+    .trip-audience-grid .trip-audience-card {
+      display: grid;
+      grid-row: span 2;
+      grid-template-rows: subgrid;
+      row-gap: 0;
+    }
+
+    /* Top-aligned, so both eyebrows sit on one line and the shorter title
+       never floats in the middle of the taller header. */
+    .trip-audience-grid .trip-audience-card-header {
+      align-self: stretch;
+      align-items: flex-start;
+    }
+  }
+}
+
+/* The Reveal wrapper is the grid item; stretch the card inside it so both
+   cards in a row always share one height. */
+.trip-audience-cell {
+  display: flex;
+  min-width: 0;
+}
+
+.trip-audience-card {
+  --audience-accent: var(--color-deep);
+  --audience-accent-ink: var(--color-deep-90);
+  --audience-accent-soft: var(--color-deep-20);
+  --audience-marker-bg: var(--color-deep);
+  --audience-marker-ink: var(--color-paper);
+  --audience-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+
+  position: relative;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--color-slate-20);
+  background: var(--color-card);
+  padding: clamp(1.25rem, 2.8vw, 2.25rem);
+  transition: border-color 220ms ease;
+}
+
+.trip-audience-card--not-for {
+  --audience-accent: var(--color-sage);
+  --audience-accent-ink: var(--color-sage-90);
+  --audience-accent-soft: var(--color-sage-20);
+  --audience-marker-bg: var(--color-sage-20);
+  --audience-marker-ink: var(--color-sage-90);
+  --audience-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E");
+
+  /* A breath of tint separates the "no" sheet from the "yes" one without a
+     second border or a heavier colour. */
+  background: var(--color-mist-40);
+}
+
+.trip-audience-card:hover {
+  border-color: var(--color-slate-40);
+}
+
+/* The corner rule — the card's only bold detail. */
+.trip-audience-card::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4.25rem;
+  height: 2px;
+  background: var(--audience-accent);
+  content: '';
+  pointer-events: none;
+  transition: width 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.trip-audience-card:hover::before {
+  width: 6.5rem;
+}
+
+.trip-audience-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  border-bottom: 1px solid var(--color-slate-20);
+  padding-bottom: 1.125rem;
+}
+
+.trip-audience-card-icon {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: 0 0 2.75rem;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--audience-accent) 28%, transparent);
+  background: var(--audience-accent-soft);
+  color: var(--audience-accent-ink);
+}
+
+.trip-audience-card-eyebrow {
+  margin: 0 0 0.25rem;
+  color: var(--color-slate-80);
+  font-family: var(--font-heading);
+  font-size: var(--text-label);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+/* Text face, like the Highlights title: the display serif is reserved for the
+   26px-and-up tier. `text-wrap: balance` keeps two-line headings even. */
+.trip-audience-card-title {
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+
+/* -- Description ------------------------------------------------------------ */
+
+.trip-audience-copy {
+  padding-top: 1.25rem;
+  color: var(--color-ink-80);
+  overflow-wrap: anywhere;
+}
+
+.trip-audience-copy > :first-child {
+  margin-top: 0;
+}
+
+.trip-audience-copy p {
+  line-height: 1.72;
+}
+
+.trip-audience-copy h3 {
+  margin-top: 1.75rem;
+}
+
+/* Bullet lists become the card's marked list: hairline-separated rows, each
+   led by a small square chip carrying a check (for) or a cross (not for). */
+.trip-audience-copy ul {
+  list-style: none;
+  margin-top: 0.25rem;
+  padding: 0;
+}
+
+.trip-audience-copy > * + ul {
+  margin-top: 0.75rem;
+}
+
+.trip-audience-copy ul > li {
+  position: relative;
+  margin: 0;
+  padding: 0.8rem 0 0.8rem 2.25rem;
+  line-height: 1.7;
+}
+
+.trip-audience-copy ul > li + li {
+  margin-top: 0;
+  border-top: 1px solid var(--color-slate-20);
+}
+
+/* Chip */
+.trip-audience-copy ul > li::before {
+  position: absolute;
+  top: calc(0.8rem + 0.85em - 0.6875rem);
+  left: 0;
+  width: 1.375rem;
+  height: 1.375rem;
+  background: var(--audience-marker-bg);
+  content: '';
+}
+
+/* Glyph, masked so it always takes the marker ink. */
+.trip-audience-copy ul > li::after {
+  position: absolute;
+  top: calc(0.8rem + 0.85em - 0.375rem);
+  left: 0.3125rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  background: var(--audience-marker-ink);
+  content: '';
+  -webkit-mask: var(--audience-glyph) center / contain no-repeat;
+  mask: var(--audience-glyph) center / contain no-repeat;
+}
+
+.trip-audience-copy li > p {
+  margin: 0;
+}
+
+/* Lexical nests an indented list inside its parent item: keep the hierarchy
+   quiet — a short dash, no chip, no extra divider. */
+.trip-audience-copy ul ul {
+  margin: 0.5rem 0 0;
+}
+
+.trip-audience-copy ul ul > li {
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  border-top: 0;
+}
+
+.trip-audience-copy ul ul > li::before {
+  top: calc(0.25rem + 0.85em);
+  width: 0.5rem;
+  height: 1px;
+  background: var(--audience-accent);
+}
+
+.trip-audience-copy ul ul > li::after {
+  content: none;
+}
+
+/* Numbered lists keep their numerals, tinted to the card's accent. */
+.trip-audience-copy ol li::marker {
+  color: var(--audience-accent-ink);
+  font-weight: 500;
+}
+
+.trip-audience-copy strong {
+  color: var(--color-ink);
+  font-weight: 500;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trip-audience-card,
+  .trip-audience-card::before {
+    transition: none;
+  }
+}

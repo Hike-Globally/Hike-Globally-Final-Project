@@ -3041,6 +3041,86 @@ $hg-icon-publish: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   font-weight: var(--hg-fw-medium);
 }
 
+/* -- Trip audience panels ----------------------------------------------------
+   "Who Is This Trip For" and "Who Is This Trip Not For" (Trips → after
+   Highlights). Two ordinary collapsible cards, told apart by one accent each —
+   blue for "for", red for "not for", mirroring the live page — carried by a
+   slim spine on the leading edge and a glyph chip before the title. Nothing
+   else changes, so the pair sits quietly in the run of panels around it.
+   Glyphs are masks (`stroke='%23000'` is only the mask's alpha), so they always
+   take the token colour. */
+$hg-icon-audience-for: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+$hg-icon-audience-not-for: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E");
+
+.template-default .hg-trip-audience {
+  --hg-audience-accent: var(--hg-success-solid);
+  --hg-audience-soft: var(--hg-success-bg);
+  --hg-audience-glyph: #{$hg-icon-audience-for};
+}
+
+.template-default .hg-trip-audience--not-for {
+  --hg-audience-accent: var(--hg-danger-solid);
+  --hg-audience-soft: var(--hg-danger-bg);
+  --hg-audience-glyph: #{$hg-icon-audience-not-for};
+}
+
+.template-default .hg-trip-audience > .collapsible {
+  position: relative;
+}
+
+/* Accent spine — inside the card's rounded clip, so it follows the radius. */
+.template-default .hg-trip-audience > .collapsible::before {
+  position: absolute;
+  z-index: 1;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: calc(var(--hg-space-1) - 1px);
+  background-color: var(--hg-audience-accent);
+  content: '';
+  pointer-events: none;
+}
+
+/* Glyph chip before the panel title. */
+.template-default .hg-trip-audience .collapsible-field__row-label-wrap {
+  position: relative;
+  display: flex;
+  min-height: var(--hg-badge-height);
+  align-items: center;
+  gap: var(--hg-space-2);
+  padding-inline-start: calc(var(--hg-badge-height) + var(--hg-space-3));
+}
+
+.template-default .hg-trip-audience .collapsible-field__row-label-wrap::before,
+.template-default .hg-trip-audience .collapsible-field__row-label-wrap::after {
+  position: absolute;
+  top: 50%;
+  content: '';
+  transform: translateY(-50%);
+}
+
+.template-default .hg-trip-audience .collapsible-field__row-label-wrap::before {
+  inset-inline-start: 0;
+  width: var(--hg-badge-height);
+  height: var(--hg-badge-height);
+  border-radius: var(--hg-radius-control);
+  background-color: var(--hg-audience-soft);
+}
+
+.template-default .hg-trip-audience .collapsible-field__row-label-wrap::after {
+  inset-inline-start: calc((var(--hg-badge-height) - var(--hg-space-3)) / 2);
+  width: var(--hg-space-3);
+  height: var(--hg-space-3);
+  background-color: var(--hg-audience-accent);
+  -webkit-mask: var(--hg-audience-glyph) center / contain no-repeat;
+  mask: var(--hg-audience-glyph) center / contain no-repeat;
+}
+
+/* A touch more air than the default panel: these hold reading copy, and the
+   heading + description pair should breathe like the card it becomes. */
+.template-default .hg-trip-audience > .collapsible .collapsible__content {
+  padding: var(--hg-space-5);
+}
+
 /* --------------------------------------------------------------------------
    10. BADGES, BANNERS, POPUPS, MODALS, DRAWERS, TOASTS
    -------------------------------------------------------------------------- */

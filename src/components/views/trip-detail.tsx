@@ -27,6 +27,7 @@ import { TripBrochureButton } from '@/components/trips/trip-brochure-button'
 import { FaqSection } from '@/components/sections/faq-section'
 import { DeparturesSection } from '@/components/sections/departures-section'
 import { KeyTakeawaysSection } from '@/components/sections/key-takeaways-section'
+import { TripAudienceSection } from '@/components/sections/trip-audience-section'
 import { KeyPointsPanel } from '@/components/sections/key-points-panel'
 import { ItinerarySection } from '@/components/sections/itinerary-section'
 import { surface } from '@/components/ui/surface'
@@ -358,6 +359,7 @@ export function TripDetail({
         </Reveal>
       </section>
     ) : null,
+    audience: <TripAudienceSection trip={trip} />,
     itinerary: <>{trip.itinerary?.length ? <ItinerarySection days={trip.itinerary} /> : null}</>,
     information: (
       <EssentialInformationSection

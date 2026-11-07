@@ -13,6 +13,7 @@ import { revalidateTrip, revalidateTripDelete } from '../hooks/revalidate'
 import { departureStatusOptions, toDateKey } from '../lib/departures'
 import { difficultySelectOptions } from '../lib/difficulty'
 import { buildLivePreviewURL, resolveLivePreviewPath } from '../lib/live-preview-url'
+import { tripAudienceDefaults } from '../lib/trip-audience'
 
 /**
  * Trips — the longest form in the CMS.
@@ -355,6 +356,77 @@ export const Trips: CollectionConfig = {
         },
       ],
     },
+
+    /* --------------------------------------------------------------------------
+       Who Is This Trip For / Not For — the honest "is this right for me?" pair.
+
+       Two panels, one per side of the answer, each with an optional heading override and a
+       rich-text description (paragraphs and bullet lists). On the live page they render as a
+       matched pair of cards directly after Highlights (`TripAudienceSection` in
+       `src/components/sections/trip-audience-section.tsx`), positioned by the single
+       "Who is this trip for / not for" row in Page sections. A side with no description is
+       hidden; when both are empty the whole section is.
+
+       The `hg-trip-audience` classes give the two panels their accent glyph and rule in the
+       admin (see `custom.scss` → "Trip audience panels").
+       -------------------------------------------------------------------------- */
+    {
+      type: 'collapsible',
+      label: 'Who Is This Trip For',
+      admin: { className: 'hg-trip-audience hg-trip-audience--for' },
+      fields: [
+        {
+          name: 'tripForHeading',
+          type: 'text',
+          label: 'Heading',
+          localized: true,
+          admin: {
+            placeholder: tripAudienceDefaults.forHeading,
+            description: `Optional. Leave empty to use “${tripAudienceDefaults.forHeading}”.`,
+          },
+        },
+        {
+          name: 'tripForDescription',
+          type: 'richText',
+          label: 'Description',
+          localized: true,
+          admin: {
+            className: 'hg-trip-compact-editor',
+            description:
+              'Describe the travellers this trip suits best — fitness, experience, travel style. Bullet lists display with a check mark on each point. Leave empty to hide this card.',
+          },
+        },
+      ],
+    },
+    {
+      type: 'collapsible',
+      label: 'Who Is This Trip Not For',
+      admin: { className: 'hg-trip-audience hg-trip-audience--not-for' },
+      fields: [
+        {
+          name: 'tripNotForHeading',
+          type: 'text',
+          label: 'Heading',
+          localized: true,
+          admin: {
+            placeholder: tripAudienceDefaults.notForHeading,
+            description: `Optional. Leave empty to use “${tripAudienceDefaults.notForHeading}”.`,
+          },
+        },
+        {
+          name: 'tripNotForDescription',
+          type: 'richText',
+          label: 'Description',
+          localized: true,
+          admin: {
+            className: 'hg-trip-compact-editor',
+            description:
+              'Be candid about who should choose a different trip — and why. Bullet lists display with a cross on each point. Leave empty to hide this card.',
+          },
+        },
+      ],
+    },
+
     {
       type: 'collapsible',
       label: 'Itinerary',
