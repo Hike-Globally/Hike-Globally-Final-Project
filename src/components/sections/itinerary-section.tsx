@@ -204,10 +204,12 @@ export function ItinerarySection({ days }: { days: ItineraryDay[] }) {
 
                 <AccordionContent>
                   <div className="w-full min-w-0 space-y-4">
+                    {/* Day copy reads `lead-tight` — the lead role one step down (1px smaller at
+                        every canvas), so a long multi-day trek does not loom over its heading. */}
                     {splitParagraphs(day.description).map((paragraph, pIndex) => (
                       <p
                         key={pIndex}
-                        className="w-full break-words whitespace-pre-line text-lead leading-relaxed text-ink-70"
+                        className="w-full break-words whitespace-pre-line text-lead-tight leading-relaxed text-ink-70"
                       >
                         {paragraph}
                       </p>
