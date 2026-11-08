@@ -118,12 +118,11 @@ const en = {
     packingYourProgress: 'Your packing',
     packingLocalNote: 'Saved in this browser only — nothing is sent to us.',
     packingReset: 'Reset',
-    packingBlurbClothing:
-      'Layers you can shed at lunchtime and put back on before dawn. Boots broken in, never new.',
-    packingBlurbEquipment:
-      'The kit that carries you and keeps you dry. Rentable in Kathmandu if you would rather travel light.',
-    packingBlurbPersonal:
-      'Documents, medicine and the small comforts that make a teahouse feel like home.',
+    // These sit under a group heading at ~174px wide on a phone, so each is kept to a length that
+    // finishes on the second line at 390px rather than being clipped mid-word by the line clamp.
+    packingBlurbClothing: 'Layers for sun and cold. Boots never new.',
+    packingBlurbEquipment: 'The kit that carries you and keeps you dry.',
+    packingBlurbPersonal: 'Documents, medicine and the comforts of home.',
     gallery: 'Gallery',
     faqs: 'Frequently Asked Questions',
     related: 'You may also like',
