@@ -9,7 +9,7 @@ import { PayloadImageFill } from '@/components/ui/payload-image'
 import { JsonLd } from '@/components/seo/json-ld'
 import { dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
-import { getDestinations, getSettings, type DestinationCard } from '@/lib/data'
+import { getSettings, type DestinationCard } from '@/lib/data'
 import { breadcrumbJsonLd, buildMetadata, webPageJsonLd } from '@/lib/seo'
 
 import './destinations.css'
@@ -18,10 +18,6 @@ export const revalidate = 3600
 
 /**
  * Full-bleed background for the atlas hero.
- *
- * Deliberately bundled with the site instead of pulled from a destination document: the hero
- * is the masthead of the whole listing, so it must look the same whether one region or twenty
- * are published — and it keeps every destination photo available for its own card below.
  */
 const DESTINATIONS_HERO_IMAGE = '/images/destinations/hero.jpg'
 
@@ -41,18 +37,99 @@ export async function generateMetadata(): Promise<Metadata> {
 /** DESTINATIONS LISTING — `/destinations` */
 export default async function DestinationsPage() {
   const dict = dictionary
-  const destinations = await getDestinations()
+  const settings = await getSettings()
+
+  // Custom hardcoded regions as requested
+  const destinations: DestinationCard[] = [
+    {
+      id: 1,
+      name: 'Eastern Nepal',
+      slug: 'eastern-nepal',
+      tagline: 'Explore Eastern Nepal, renowned for Mount Kanchenjunga, tea gardens, lush hills, scenic trekking trails, and rich cultural experiences.',
+      heroImage: {
+        id: 0,
+        url: 'https://hikeglobally.com/api/media/file/eastern-nepal.jpg?dpl=dpl_83cHoXiYjNuXkaoG1WR4e46xBp42',
+        alt: 'Eastern Nepal landscape',
+        updatedAt: '2026-11-08T00:00:00.000Z',
+        createdAt: '2026-11-08T00:00:00.000Z',
+      },
+      country: 'Nepal',
+      region: 'eastern',
+      featured: true,
+      href: sitePath('/destinations/eastern-nepal'),
+    },
+    {
+      id: 2,
+      name: 'Central Nepal',
+      slug: 'central-nepal',
+      tagline: 'Discover Central Nepal, featuring Kathmandu Valley heritage, Himalayan adventures, ancient temples, scenic landscapes, and vibrant local culture.',
+      heroImage: {
+        id: 0,
+        url: 'https://hikeglobally.com/api/media/file/central-nepal.jpg?dpl=dpl_83cHoXiYjNuXkaoG1WR4e46xBp42',
+        alt: 'Central Nepal landscape',
+        updatedAt: '2026-11-08T00:00:00.000Z',
+        createdAt: '2026-11-08T00:00:00.000Z',
+      },
+      country: 'Nepal',
+      region: 'central',
+      featured: true,
+      href: sitePath('/destinations/central-nepal'),
+    },
+    {
+      id: 3,
+      name: 'Western Nepal',
+      slug: 'western-nepal',
+      tagline: 'Explore Western Nepal, famous for breathtaking Himalayan views, scenic trekking routes, serene lakes, cultural treasures, and adventure tourism.',
+      heroImage: {
+        id: 0,
+        url: 'https://hikeglobally.com/api/media/file/western-nepal.jpg?dpl=dpl_83cHoXiYjNuXkaoG1WR4e46xBp42',
+        alt: 'Western Nepal landscape',
+        updatedAt: '2026-11-08T00:00:00.000Z',
+        createdAt: '2026-11-08T00:00:00.000Z',
+      },
+      country: 'Nepal',
+      region: 'western',
+      featured: true,
+      href: sitePath('/destinations/western-nepal'),
+    },
+    {
+      id: 4,
+      name: 'Mid-Western Nepal',
+      slug: 'mid-western-nepal',
+      tagline: 'Discover Mid-Western Nepal, home to pristine lakes, majestic mountains, diverse wildlife, cultural heritage, and unforgettable trekking adventures.',
+      heroImage: {
+        id: 0,
+        url: 'https://hikeglobally.com/api/media/file/mid-western-nepal.jpg?dpl=dpl_83cHoXiYjNuXkaoG1WR4e46xBp42',
+        alt: 'Mid-Western Nepal landscape',
+        updatedAt: '2026-11-08T00:00:00.000Z',
+        createdAt: '2026-11-08T00:00:00.000Z',
+      },
+      country: 'Nepal',
+      region: 'mid-western',
+      featured: true,
+      href: sitePath('/destinations/mid-western-nepal'),
+    },
+    {
+      id: 5,
+      name: 'Far-Western Nepal',
+      slug: 'far-western-nepal',
+      tagline: 'Explore Far Western Nepal, a hidden gem offering stunning Himalayan landscapes, remote trekking trails, rich culture, and authentic travel experiences.',
+      heroImage: {
+        id: 0,
+        url: 'https://hikeglobally.com/api/media/file/far-western-nepal.jpg?dpl=dpl_83cHoXiYjNuXkaoG1WR4e46xBp42',
+        alt: 'Far-Western Nepal landscape',
+        updatedAt: '2026-11-08T00:00:00.000Z',
+        createdAt: '2026-11-08T00:00:00.000Z',
+      },
+      country: 'Nepal',
+      region: 'far-western',
+      featured: true,
+      href: sitePath('/destinations/far-western-nepal'),
+    },
+  ]
 
   return (
-    /* `data-destinations-page` scopes this page's fixed description sizes (see
-       `destinations.css`): the hero standfirst and every atlas-card description are pinned
-       to 16px here, while the same shared classes and utilities keep their own type
-       everywhere else on the site. */
     <div data-destinations-page="">
-      {/* HERO — full-width banner. Every destination (the featured one included) now appears in
-          the atlas grid below, so the hero stands on its own image rather than on a card.
-          Marked as the hero region: the global header stays pinned for as long as it is on
-          screen (see header-frame.tsx). */}
       <section
         data-header-hero
         className="hero-region relative isolate flex items-end overflow-hidden bg-ink text-mist"
@@ -66,9 +143,6 @@ export default async function DestinationsPage() {
           aria-hidden="true"
           className="-z-20 object-cover"
         />
-        {/* One flat navy wash plus the shared photo scrim — the same recipe the
-            trip and journal heroes use, so every photograph on the site sits under
-            the same amount of ink. */}
         <div className="absolute inset-0 -z-10 bg-ink/72" aria-hidden="true" />
         <div className="photo-scrim absolute inset-0 -z-10" aria-hidden="true" />
 
@@ -170,16 +244,15 @@ export default async function DestinationsPage() {
             { name: dict.nav.home, url: sitePath('/') },
             { name: dict.nav.destinations, url: sitePath('/destinations') },
           ]),
-          // A CollectionPage whose ItemList is exactly the atlas cards above.
           webPageJsonLd({
             type: 'CollectionPage',
             name: dict.destinations.listingTitle,
             description: dict.destinations.listingSubtitle,
             url: sitePath('/destinations'),
-            siteName: dict.structuredData.organization,
+            siteName: settings.siteName,
             items: destinations.map((destination) => ({
               name: destination.name,
-              url: sitePath(`/destinations/${destination.slug}`),
+              url: destination.href || sitePath(`/destinations/${destination.slug}`),
             })),
           }),
         ]}
@@ -192,7 +265,7 @@ function AtlasCard({ destination, index }: { destination: DestinationCard; index
   return (
     <article className="group">
       <Link
-        href={sitePath(`/destinations/${destination.slug}`)}
+        href={destination.href || sitePath(`/destinations/${destination.slug}`)}
         aria-label={`Explore ${destination.name}`}
         className="block focus-visible:outline-offset-4"
       >
