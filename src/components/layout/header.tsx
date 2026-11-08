@@ -13,7 +13,7 @@ import { resolveLink } from '@/lib/links'
  *   • navItems        → tabs (with optional `children` → dropdown panel)
  *   • actions[0]      → the white CTA pill at the right of the track
  *   • announcement    → slim floating bar above the track
- *   • settings.siteName → the wordmark slot at the left of the track
+ *   • settings.siteName → accessible label for the logo at the left of the track
  */
 export async function Header() {
   const [header, settings] = await Promise.all([getHeader(), getSettings()])

@@ -269,8 +269,15 @@ export function PillNav({ logoLabel, logoHref, links, cta }: PillNavProps) {
           />
         </button>
 
-        <Link href={logoHref} className="pn-logo">
-          {logoLabel}
+        <Link href={logoHref} className="pn-logo" aria-label={logoLabel}>
+          <Image
+            src="/images/logo.svg"
+            alt=""
+            width={1297}
+            height={1212}
+            unoptimized
+            className="pn-logo-mark"
+          />
         </Link>
 
         <div className="pn-links" ref={linksRef} onMouseLeave={() => setHovered(null)}>
