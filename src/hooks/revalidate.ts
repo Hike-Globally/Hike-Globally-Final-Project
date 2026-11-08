@@ -8,6 +8,7 @@ import type {
 } from 'payload'
 
 import { CACHE_TAG, revalidationDisabled } from '../lib/cache-tags'
+import { LLMS_TXT_PATH } from '../lib/llms-txt'
 import {
   shouldRevalidateAfterChange,
   shouldRevalidateAfterDelete,
@@ -25,8 +26,8 @@ import {
  *
  * Two mechanisms are used together, deliberately:
  *   1. `revalidateTag` — purges the cached database reads (see `src/lib/data.ts`).
- *   2. `revalidatePath` — purges the rendered HTML of the affected routes, plus `/sitemap.xml`,
- *      whose URL list changes whenever a slug is published, renamed or deleted.
+ *   2. `revalidatePath` — purges the rendered HTML of the affected routes, plus `/sitemap.xml`
+ *      and `/llms.txt`, whose URL lists change whenever a slug is published, renamed or deleted.
  *
  * Hooks run inside Payload's route handlers (a Next.js request scope), so both are legal here.
  * During seeding and CLI work there is no request scope; `revalidationDisabled()` plus the
@@ -108,9 +109,11 @@ const revalidateDocument = async ({
     tags.push(documentTag(collection, previousSlug))
   }
 
-  // `/sitemap.xml` lists this document's slug, so a publish, rename or delete has to rebuild it —
-  // otherwise a brand-new trip only appears in the sitemap when the route's 1-hour window expires.
+  // `/sitemap.xml` and `/llms.txt` both list this document's slug and title, so a publish, rename
+  // or delete has to rebuild them — otherwise a brand-new trip only appears when the route's
+  // 1-hour window expires.
   paths.push('/sitemap.xml')
+  paths.push(LLMS_TXT_PATH)
 
   if (revalidationDisabled()) return
 
