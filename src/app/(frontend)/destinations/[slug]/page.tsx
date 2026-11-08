@@ -7,10 +7,10 @@ import {
   createInternalLinker,
   getAllDestinationSlugs,
   getDestination,
+  getDestinationTrips,
   getDestinations,
 } from '@/lib/data'
 import { isLivePreviewRequest } from '@/lib/live-preview-access'
-import type { TripCard } from '@/lib/data'
 import { buildMetadata, seoFromDoc } from '@/lib/seo'
 
 export const revalidate = 3600
@@ -56,9 +56,10 @@ export default async function DestinationPage({ params }: { params: Promise<{ sl
 
   const allDestinations = await getDestinations()
 
-  // The `trips` join field is resolved in the same query as the destination — no extra round trip.
-  const trips = ((destination as unknown as { trips?: { docs?: (number | unknown)[] } }).trips
-    ?.docs ?? []) as unknown as TripCard[]
+  // Read the trips as cards (depth 1) instead of off the destination's `trips` join field: joined
+  // documents are only populated at the join's own `maxDepth`, which left every trip's `heroImage`
+  // as a bare ID and hid the card photographs. See `getDestinationTrips` in `@/lib/data`.
+  const trips = await getDestinationTrips(destination.id, { includeDraft })
 
   const otherDestinations = allDestinations.filter((item) => item.id !== destination.id).slice(0, 3)
 
