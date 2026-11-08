@@ -3,7 +3,15 @@ import { unstable_cache } from 'next/cache'
 import type { TypedLocale, Where } from 'payload'
 
 import { CACHE_TAG, REVALIDATE_SECONDS } from '@/lib/cache-tags'
-import { defaultLocale } from '@/i18n/config'
+import { defaultLocale, sitePath } from '@/i18n/config'
+import {
+  buildLinkTargets,
+  compileLinkIndex,
+  InternalLinker,
+  type InternalLinkCollection,
+  type InternalLinkConfig,
+  type InternalLinkSelf,
+} from '@/lib/internal-links'
 import type {
   Blog,
   Destination,
@@ -1095,6 +1103,155 @@ export const getSitemapSources = async (): Promise<SitemapSources> => {
 
   return { trips, destinations, posts, pages }
 }
+
+/* -------------------------------------------------------------------------- */
+/* Internal linking                                                            */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The public URL of a document, spelled the way `resolveRichTextLink()` and the renderer's own
+ * `docHref()` spell it — so an auto-link and a link an editor inserted by hand to the same
+ * document are always the identical string.
+ */
+export const internalLinkHref = (
+  collection: InternalLinkCollection,
+  slug: string,
+): string | null => {
+  if (!slug) return null
+  if (collection === 'pages') return sitePath(slug === 'home' ? '/' : `/${slug}`)
+  return sitePath(`/${collection}/${slug}`)
+}
+
+/**
+ * What the four queries below pull per document: only what a phrase can be built from.
+ *
+ * `meta` comes along for its `noIndex` flag (a page told to stay out of the index must not be
+ * linked to either), and `name` is selected next to `title` because destinations call it that.
+ * No rich text, no images, no itineraries — these rows stay tiny.
+ */
+const internalLinkSelect = {
+  slug: true,
+  title: true,
+  name: true,
+  keywords: true,
+  meta: true,
+} as const
+
+type InternalLinkRecord = {
+  collection: InternalLinkCollection
+  id: number
+  slug: string | null
+  title: string | null
+  keywords: string[] | null
+  href: string
+}
+
+/** Narrows a `select`ed document into the shape the link index consumes. */
+const toInternalLinkRecord = (
+  collection: InternalLinkCollection,
+  doc: unknown,
+): InternalLinkRecord | null => {
+  const record = doc as {
+    id?: number
+    slug?: string | null
+    title?: string | null
+    name?: string | null
+    keywords?: (string | null)[] | null
+    meta?: { noIndex?: boolean | null } | null
+  }
+
+  const slug = typeof record.slug === 'string' ? record.slug.trim() : ''
+  // Same exclusion as the sitemap: advertising a URL the page disavows, or one a static route
+  // already owns, is a contradiction rather than a link.
+  if (!slug || record.meta?.noIndex) return null
+  if (collection === 'pages' && isReservedPageSlug(slug)) return null
+
+  const href = internalLinkHref(collection, slug)
+  if (!href || typeof record.id !== 'number') return null
+
+  const keywords = Array.isArray(record.keywords)
+    ? record.keywords.filter((keyword): keyword is string => typeof keyword === 'string')
+    : null
+
+  return {
+    collection,
+    id: record.id,
+    slug,
+    title: record.title ?? record.name ?? null,
+    keywords,
+    href,
+  }
+}
+
+/**
+ * Every document the site can link *to*, for automated internal keyword linking.
+ *
+ * Four queries in parallel, shaped like `getSitemapSources()` above it, and cached under one key
+ * tagged with all four collections: publishing, renaming or unpublishing a trip purges the index
+ * along with the pages that link to it, so a slug change cannot leave auto-links pointing at a URL
+ * that no longer exists. `src/hooks/revalidate.ts` already fires those tags — nothing new to wire.
+ */
+const readInternalLinkTargets = unstable_cache(
+  async () => {
+    const payload = await getPayloadClient()
+
+    const query = (collection: InternalLinkCollection) =>
+      payload.find({
+        collection,
+        locale: SITE_LOCALE,
+        depth: 0,
+        limit: 1000,
+        select: internalLinkSelect,
+        where: { _status: { equals: 'published' } },
+      })
+
+    const [trips, destinations, posts, pages] = await Promise.all([
+      query('trips'),
+      query('destinations'),
+      query('blog'),
+      query('pages'),
+    ])
+
+    return [
+      ...trips.docs.map((doc) => toInternalLinkRecord('trips', doc)),
+      ...destinations.docs.map((doc) => toInternalLinkRecord('destinations', doc)),
+      ...posts.docs.map((doc) => toInternalLinkRecord('blog', doc)),
+      ...pages.docs.map((doc) => toInternalLinkRecord('pages', doc)),
+    ].filter((record): record is InternalLinkRecord => record !== null)
+  },
+  ['internal-link-targets'],
+  {
+    tags: [CACHE_TAG.trips, CACHE_TAG.destinations, CACHE_TAG.posts, CACHE_TAG.pages],
+    revalidate: REVALIDATE_SECONDS,
+  },
+)
+
+const getInternalLinkTargets = cache((): Promise<InternalLinkRecord[]> =>
+  safeQuery(readInternalLinkTargets, []),
+)
+
+/**
+ * The linker for one page render.
+ *
+ * Returns an empty linker (never `null`, never a throw) when no database is configured or the
+ * queries fail, so a build without Postgres renders the same HTML it always did and the feature
+ * degrades to "off" rather than to an error page.
+ *
+ * `cache()`-wrapped on the `self` identity, so the four detail routes each compile one index per
+ * request no matter how many rich text blocks they render.
+ */
+export const createInternalLinker = cache(
+  async (
+    self: InternalLinkSelf | null,
+    overrides?: InternalLinkConfig,
+  ): Promise<InternalLinker> => {
+    const records = await getInternalLinkTargets()
+    const targets = buildLinkTargets(records)
+    const index = compileLinkIndex(targets, overrides)
+
+    return new InternalLinker(index, self, overrides)
+  },
+)
 
 /* -------------------------------------------------------------------------- */
 /* Globals                                                                     */

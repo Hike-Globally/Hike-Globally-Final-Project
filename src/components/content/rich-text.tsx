@@ -5,6 +5,12 @@ import { PayloadImage } from '@/components/ui/payload-image'
 import type { Media } from '@/payload-types'
 import { cn } from '@/lib/utils'
 import { resolveRichTextLink } from '@/lib/rich-text-links'
+import {
+  splitAutoLinkedText,
+  type AutoLinkSegment,
+  type InternalLinker,
+  type NodeLinkPlan,
+} from '@/lib/internal-links'
 
 /**
  * Lexical → React renderer.
@@ -122,11 +128,49 @@ const docHref = (relationTo: string | undefined, value: unknown): string | null 
 
 type HeadingTag = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
 
+/**
+ * One text node, cut into plain runs and the mentions this page decided to link.
+ *
+ * Returns the untouched string when the node won nothing, so the overwhelmingly common case keeps
+ * rendering exactly the markup it did before this feature existed — important because the output of
+ * this renderer is asserted on in tests and read by crawlers.
+ *
+ * The anchor text is the copy as written (see `splitAutoLinkedText`), and the link is marked with
+ * `data-auto-link` so the automated links can be counted in QA and styled separately if they ever
+ * need to be. It is `next/link`, not a bare `<a>`, for the same reason an editor's internal link is:
+ * client-side navigation and prefetching.
+ */
+const autoLinkedText = (
+  text: string,
+  node: RichTextNode,
+  linker: InternalLinker | null | undefined,
+): string | ReactNode[] => {
+  if (!linker) return text
+
+  const plan: NodeLinkPlan | null = linker.planFor(node)
+  if (!plan?.length) return text
+
+  const segments: AutoLinkSegment[] = splitAutoLinkedText(text, plan)
+  if (!segments.some((segment) => segment.kind === 'link')) return text
+
+  return segments.map((segment, index) =>
+    segment.kind === 'link' ? (
+      <Link key={`auto-${index}`} href={segment.href} data-auto-link="true">
+        {segment.text}
+      </Link>
+    ) : (
+      segment.text
+    ),
+  )
+}
+
 type RenderContext = {
   headingIds?: readonly string[]
   headingIndex: number
   /** Render every heading node at this level, whatever tag the editor stored. */
   headingTag?: HeadingTag
+  /** The page's automated internal linking, threaded down from the `linker` prop. */
+  linker?: InternalLinker | null
 }
 
 const renderNodes = (nodes: RichTextNode[] | undefined, context: RenderContext): ReactNode[] =>
@@ -204,8 +248,16 @@ const renderNode = (node: RichTextNode, index: number, context: RenderContext): 
   const children = renderNodes(node.children, context)
 
   switch (node.type) {
-    case 'text':
-      return <span key={key}>{withFormat(node.text ?? '', node.format, key)}</span>
+    case 'text': {
+      const text = node.text ?? ''
+      // The auto-link pass runs inside `withFormat`, so a bold or italic mention keeps its
+      // formatting and the `<a>` sits inside the `<strong>` rather than around it.
+      return (
+        <span key={key}>
+          {withFormat(autoLinkedText(text, node, context.linker), node.format, key)}
+        </span>
+      )
+    }
 
     case 'linebreak':
       return <br key={key} />
@@ -385,6 +437,7 @@ export function RichText({
   className,
   headingIds,
   headingTag,
+  linker,
 }: {
   content: unknown
   className?: string
@@ -396,10 +449,35 @@ export function RichText({
    * second, competing `<h2>` level.
    */
   headingTag?: HeadingTag
+  /**
+   * Automated internal keyword linking for this page (see `src/lib/internal-links.ts`).
+   *
+   * One linker is created per page render by the route and threaded to every rich text block on it,
+   * which is what makes the budget — eight links, one per target — a *page* budget rather than a
+   * paragraph budget. Omit it and this component renders byte-for-byte as it did before the feature
+   * existed, which is also what a build without a database does: `createInternalLinker()` hands back
+   * an empty linker rather than throwing.
+   *
+   * A prop rather than React context because this is a React Server Component tree, and `createContext`
+   * is not available to one — nor would it help: a provider component returns before React has
+   * rendered its children, so there is no moment at which a context value could be both set and read.
+   */
+  linker?: InternalLinker | null
 }) {
   const root = (content as { root?: RichTextNode } | null | undefined)?.root
   if (!root?.children?.length) return null
 
-  const context: RenderContext = { headingIds, headingIndex: 0, headingTag }
+  /**
+   * Collect before rendering, so this block's mentions compete for the page budget against every
+   * other block's rather than only against the paragraphs that happen to precede them. `planFor()`
+   * flushes whatever is still undecided, so each block decides its own nodes at the moment it
+   * renders, with full knowledge of everything collected on the page so far.
+   */
+  if (linker) {
+    linker.collect(content)
+    linker.flush()
+  }
+
+  const context: RenderContext = { headingIds, headingIndex: 0, headingTag, linker }
   return <div className={cn('prose-hg', className)}>{renderNodes(root.children, context)}</div>
 }

@@ -1,5 +1,6 @@
 import { RichText } from '@/components/content/rich-text'
 import type { RichTextBlock } from '@/payload-types'
+import type { InternalLinker } from '@/lib/internal-links'
 import { cn } from '@/lib/utils'
 
 /**
@@ -8,13 +9,18 @@ import { cn } from '@/lib/utils'
  * `singlePage` is set by `/slug` pages only: it opts the copy into the single-page body
  * style (17px pure black — see `.single-page-body`), while the homepage keeps the
  * multi-purpose default.
+ *
+ * `linker` is the page's automated internal linking, threaded down from the route (see
+ * `src/lib/internal-links.ts`).
  */
 export function RichTextSection({
   block,
   singlePage = false,
+  linker,
 }: {
   block: RichTextBlock
   singlePage?: boolean
+  linker?: InternalLinker | null
 }) {
   const narrow = block.width === 'narrow'
 
@@ -28,7 +34,7 @@ export function RichTextSection({
         )}
       >
         {block.heading ? <h2 className="heading-lg mb-6">{block.heading}</h2> : null}
-        <RichText content={block.content} />
+        <RichText content={block.content} linker={linker} />
       </div>
     </section>
   )

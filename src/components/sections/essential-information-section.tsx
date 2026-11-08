@@ -1,5 +1,6 @@
 import { RichText } from '@/components/content/rich-text'
 import { Reveal } from '@/components/motion/reveal'
+import type { InternalLinker } from '@/lib/internal-links'
 import {
   Accordion,
   AccordionContent,
@@ -26,9 +27,12 @@ type ContentSections = NonNullable<Trip['contentSections']>
 export function EssentialInformationSection({
   title,
   sections,
+  linker,
 }: {
   title: string
   sections: ContentSections
+  /** The page's automated internal linking (see `src/lib/internal-links.ts`). */
+  linker?: InternalLinker | null
 }) {
   if (!sections.length) return null
 
@@ -62,6 +66,7 @@ export function EssentialInformationSection({
                   content={section.content}
                   headingTag="h3"
                   className="essential-information-copy w-full min-w-0 break-words text-lead"
+                  linker={linker}
                 />
               </AccordionContent>
             </AccordionItem>

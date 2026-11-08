@@ -1,5 +1,6 @@
 import { Fragment, type ReactNode } from 'react'
 import { CustomHtmlSection } from '@/components/content/custom-html-section'
+import type { InternalLinker } from '@/lib/internal-links'
 import { groupPageSections, resolvePageSections, tripSectionOptions } from '@/lib/page-sections'
 import Link from 'next/link'
 import {
@@ -51,8 +52,7 @@ import type { Media, Trip } from '@/payload-types'
 
 /** Eyebrow for dark backgrounds (the shared `.eyebrow` utility is tuned for light ones).
     Paper grey rather than ember: at this size the warm accent sits under 4.5:1. */
-const eyebrowOnDark =
-  'font-heading text-label font-medium tracking-[0.18em] text-mist uppercase'
+const eyebrowOnDark = 'font-heading text-label font-medium tracking-[0.18em] text-mist uppercase'
 
 function SectionTitle({
   title,
@@ -160,7 +160,7 @@ function routeMapFigures(trip: Trip): { media: Media; label: string }[] {
   ].flatMap(({ media, label }) => (media && typeof media !== 'number' ? [{ media, label }] : []))
 }
 
-function RouteMapSection({ trip }: { trip: Trip }) {
+function RouteMapSection({ trip, linker }: { trip: Trip; linker?: InternalLinker | null }) {
   const figures = routeMapFigures(trip)
   const intro = hasRichTextContent(trip.routeMapContent) ? trip.routeMapContent : null
   if (!intro && !figures.length) return null
@@ -168,7 +168,7 @@ function RouteMapSection({ trip }: { trip: Trip }) {
   return (
     <section id="route-map" className="scroll-mt-24 pb-16 md:pb-24">
       <SectionTitle title="Original route map and altitude chart" />
-      {intro ? <RichText content={intro} className="mb-8" /> : null}
+      {intro ? <RichText content={intro} className="mb-8" linker={linker} /> : null}
 
       {/* Stacked on a phone, side by side from tablet up — the same split the
           included/not-included grid makes further down the page. A lone upload
@@ -205,7 +205,19 @@ function RouteMapSection({ trip }: { trip: Trip }) {
  * Trip detail view — shared by the public route (statically rendered) and the
  * preview route (draft mode), so editors see exactly what visitors will see.
  */
-export function TripDetail({ trip, related }: { trip: Trip; related: TripCardData[] }) {
+export function TripDetail({
+  trip,
+  related,
+  linker,
+}: {
+  trip: Trip
+  related: TripCardData[]
+  /**
+   * The page's automated internal keyword linking, created by the route (see
+   * `src/lib/internal-links.ts`). Omitted, every section renders exactly as it did before.
+   */
+  linker?: InternalLinker | null
+}) {
   const dict = dictionary
 
   const destination =
@@ -287,10 +299,7 @@ export function TripDetail({ trip, related }: { trip: Trip; related: TripCardDat
             {/* Fact dashboard. A 1px gap over a hairline tint draws the grid lines. */}
             <dl className="mt-10 grid grid-cols-1 gap-px overflow-hidden bg-white/12 xs:grid-cols-2 md:mt-14 md:grid-cols-4">
               {facts.map((fact) => (
-                <div
-                  key={fact.label}
-                  className="flex items-center gap-4 bg-ink/72 p-5 md:p-6"
-                >
+                <div key={fact.label} className="flex items-center gap-4 bg-ink/72 p-5 md:p-6">
                   <span className="grid size-10 shrink-0 place-items-center bg-mist/12 text-mist">
                     <fact.icon className="size-4" aria-hidden />
                   </span>
@@ -315,7 +324,7 @@ export function TripDetail({ trip, related }: { trip: Trip; related: TripCardDat
         <Reveal as="section" className="py-16 md:py-24">
           <SectionTitle title={dict.trip.overview} />
           <div className="prose-hg max-w-none leading-[1.8]">
-            <RichText content={trip.description} />
+            <RichText content={trip.description} linker={linker} />
           </div>
         </Reveal>
       </>
@@ -323,15 +332,16 @@ export function TripDetail({ trip, related }: { trip: Trip; related: TripCardDat
     whyChoose: hasRichTextContent(trip.whyChooseThisTrek) ? (
       <section id="why-choose-this-trek" className="scroll-mt-24 pb-16 md:pb-24">
         <SectionTitle title="Why Choose This Trek" />
-        <RichText content={trip.whyChooseThisTrek} />
+        <RichText content={trip.whyChooseThisTrek} linker={linker} />
       </section>
     ) : null,
-    routeMap: <RouteMapSection trip={trip} />,
+    routeMap: <RouteMapSection trip={trip} linker={linker} />,
     departures: (
       <DeparturesSection
         trip={trip}
         bookingHref={bookingHref}
         hasExternalBookingLink={Boolean(bookingLink)}
+        linker={linker}
       />
     ),
     highlights: highlights?.length ? (
@@ -349,12 +359,13 @@ export function TripDetail({ trip, related }: { trip: Trip; related: TripCardDat
         </Reveal>
       </section>
     ) : null,
-    audience: <TripAudienceSection trip={trip} />,
+    audience: <TripAudienceSection trip={trip} linker={linker} />,
     itinerary: <>{trip.itinerary?.length ? <ItinerarySection days={trip.itinerary} /> : null}</>,
     information: (
       <EssentialInformationSection
         title={dict.trip.essentialInformation}
         sections={trip.contentSections ?? []}
+        linker={linker}
       />
     ),
     inclusions: (
@@ -371,9 +382,7 @@ export function TripDetail({ trip, related }: { trip: Trip; related: TripCardDat
                         <span className="mt-0.5 grid size-6 shrink-0 place-items-center bg-deep text-white">
                           <Check className="size-3.5" strokeWidth={3} aria-hidden />
                         </span>
-                        <span className="text-ui leading-relaxed text-ink-80">
-                          {item.item}
-                        </span>
+                        <span className="text-ui leading-relaxed text-ink-80">{item.item}</span>
                       </li>
                     ))}
                   </ul>
@@ -389,9 +398,7 @@ export function TripDetail({ trip, related }: { trip: Trip; related: TripCardDat
                         <span className="mt-0.5 grid size-6 shrink-0 place-items-center bg-mist text-slate-80">
                           <X className="size-3.5" strokeWidth={3} aria-hidden />
                         </span>
-                        <span className="text-ui leading-relaxed text-ink-60">
-                          {item.item}
-                        </span>
+                        <span className="text-ui leading-relaxed text-ink-60">{item.item}</span>
                       </li>
                     ))}
                   </ul>

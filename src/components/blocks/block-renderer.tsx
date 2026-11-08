@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
 import type { Page } from '@/payload-types'
+import type { InternalLinker } from '@/lib/internal-links'
 import { HeroScrollCover } from '@/components/motion/hero-scroll-cover'
 import { AboutHikeGlobally } from '@/components/sections/about-hike-globally'
 import { DifficultyLevels } from '@/components/sections/difficulty-levels'
@@ -46,6 +47,7 @@ function renderBlock(
   homepage: boolean,
   singlePage = false,
   opening = false,
+  linker?: InternalLinker | null,
 ) {
   const key = `${block.blockType}-${index}`
 
@@ -53,7 +55,7 @@ function renderBlock(
     case 'hero':
       return <Hero key={key} block={block} homepage={homepage} opening={opening} />
     case 'richText':
-      return <RichTextSection key={key} block={block} singlePage={singlePage} />
+      return <RichTextSection key={key} block={block} singlePage={singlePage} linker={linker} />
     case 'featuredTrips':
       return <FeaturedTrips key={key} block={block} />
     case 'featuredDestinations':
@@ -88,11 +90,17 @@ export async function BlockRenderer({
   blocks,
   homepage = false,
   singlePage = false,
+  linker,
 }: {
   blocks: Block[] | null | undefined
   homepage?: boolean
   /** `/slug` pages pass `true` so their body copy uses the single-page type style. */
   singlePage?: boolean
+  /**
+   * The page's automated internal linking, created by the route and passed to every `richText`
+   * block so they share one budget (see `src/lib/internal-links.ts`).
+   */
+  linker?: InternalLinker | null
 }) {
   if (!blocks?.length) return null
 
@@ -124,7 +132,7 @@ export async function BlockRenderer({
           block.blockType === 'featuredDestinations' ? (
             <HomepageDestinations key={`${block.blockType}-${index}`} />
           ) : (
-            renderBlock(block, index, false)
+            renderBlock(block, index, false, false, false, linker)
           ),
           ...(block.blockType === 'featuredTrips' ? [aboutElement] : []),
         ]
@@ -162,7 +170,7 @@ export async function BlockRenderer({
   return (
     <>
       {blocks.map((block, index) =>
-        renderBlock(block, index, homepage, singlePage, !homepage && index === 0),
+        renderBlock(block, index, homepage, singlePage, !homepage && index === 0, linker),
       )}
     </>
   )

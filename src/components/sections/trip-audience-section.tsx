@@ -3,6 +3,7 @@ import { UserRoundCheck, UserRoundX, type LucideIcon } from 'lucide-react'
 import { RichText } from '@/components/content/rich-text'
 import { Reveal } from '@/components/motion/reveal'
 import { dictionary } from '@/i18n/dictionaries'
+import type { InternalLinker } from '@/lib/internal-links'
 import { resolveTripAudience, type TripAudienceKind } from '@/lib/trip-audience'
 import type { Trip } from '@/payload-types'
 
@@ -29,7 +30,14 @@ const cardChrome: Record<TripAudienceKind, { icon: LucideIcon; eyebrow: string; 
  * beside the sticky booking card as it does without it) and stacks otherwise. A side with no
  * description is omitted; with only one side filled in, that card takes the full width.
  */
-export function TripAudienceSection({ trip }: { trip: Trip }) {
+export function TripAudienceSection({
+  trip,
+  linker,
+}: {
+  trip: Trip
+  /** The page's automated internal linking (see `src/lib/internal-links.ts`). */
+  linker?: InternalLinker | null
+}) {
   const cards = resolveTripAudience(trip)
   if (!cards.length) return null
 
@@ -60,7 +68,12 @@ export function TripAudienceSection({ trip }: { trip: Trip }) {
                     </h2>
                   </div>
                 </header>
-                <RichText content={description} headingTag="h3" className="trip-audience-copy" />
+                <RichText
+                  content={description}
+                  headingTag="h3"
+                  className="trip-audience-copy"
+                  linker={linker}
+                />
               </article>
             </Reveal>
           )

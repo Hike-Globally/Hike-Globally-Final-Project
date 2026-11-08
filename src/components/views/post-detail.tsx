@@ -17,6 +17,7 @@ import { PayloadImage, PayloadImageFill } from '@/components/ui/payload-image'
 import { blogCategoryLabel, dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
 import type { PostCard as PostCardData } from '@/lib/data'
+import type { InternalLinker } from '@/lib/internal-links'
 import { getArticleHeadings } from '@/lib/article-headings'
 import { formatDate, readingTimeMinutes } from '@/lib/format'
 import { blogPostingJsonLd, breadcrumbJsonLd, faqJsonLd } from '@/lib/seo'
@@ -54,10 +55,16 @@ export function PostDetail({
   post,
   related,
   siteName,
+  linker,
 }: {
   post: Blog
   related: PostCardData[]
   siteName: string
+  /**
+   * The page's automated internal keyword linking, created by the route (see
+   * `src/lib/internal-links.ts`). Omitted, the body renders exactly as it did before.
+   */
+  linker?: InternalLinker | null
 }) {
   const dict = dictionary
   const author = post.author && typeof post.author !== 'number' ? post.author : null
@@ -200,7 +207,12 @@ export function PostDetail({
     ),
     content: (
       <>
-        <RichText content={post.content} className="blog-prose" headingIds={headingIds} />
+        <RichText
+          content={post.content}
+          className="blog-prose"
+          headingIds={headingIds}
+          linker={linker}
+        />
       </>
     ),
     // Same section as the trip page. Margins rather than the trip's padding, so the gap to the

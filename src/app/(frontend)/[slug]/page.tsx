@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { BlockRenderer } from '@/components/blocks/block-renderer'
 import { JsonLd } from '@/components/seo/json-ld'
 import { sitePath } from '@/i18n/config'
-import { getAllPageSlugs, getPage, getSettings } from '@/lib/data'
+import { createInternalLinker, getAllPageSlugs, getPage, getSettings } from '@/lib/data'
 import { isLivePreviewRequest } from '@/lib/live-preview-access'
 import { breadcrumbJsonLd, buildMetadata, seoFromDoc, webPageJsonLd } from '@/lib/seo'
 import { isReservedPageSlug } from '@/lib/site-routes'
@@ -68,10 +68,14 @@ export default async function FlexiblePage({ params }: { params: Promise<{ slug:
   if (!page) notFound()
 
   const seo = seoFromDoc(page, { title: page.title })
+  const linker = await createInternalLinker({ collection: 'pages', id: page.id })
 
   return (
     <>
-      <BlockRenderer blocks={page.blocks} singlePage />
+      {/* Automated internal keyword linking (see `src/lib/internal-links.ts`) for this page's rich
+          text blocks — every block shares one budget, and `self` keeps the page from linking to
+          itself. */}
+      <BlockRenderer blocks={page.blocks} singlePage linker={linker} />
       <JsonLd
         data={[
           breadcrumbJsonLd([

@@ -213,6 +213,35 @@ output is the same whether an editor used the chip input or pasted a spreadsheet
 ignored the meta tag as a ranking signal for years; treat the list as a record of intent that keeps
 the title, the copy, Bing/Yandex and internal search pointed at the same terms.
 
+### Internal linking
+
+The keyword list does a second job. On blog posts, trip pages, destination pages and CMS pages, a
+mention of another document's phrase in running copy becomes a real link to it — no editor action,
+and nothing written back into the CMS.
+
+| Rule | Why |
+| ---- | --- |
+| Phrases come from `keywords`, then the title, then the slug | An editor-typed keyword is trusted as written; a derived phrase has to be two words and free of generic edges ("Best Treks in Nepal" is a heading, not an anchor). |
+| Longest phrase wins, first mention only, one link per target per page | Repeating an anchor text, or linking the same URL twice, is the pattern that reads as manipulation. |
+| At most 8 links per page, at least 140 characters of copy apart | Past that the value per link drops and clusters of adjacent anchors read as a link farm. |
+| Trips and destinations outrank posts when the budget runs out | The pages the operator earns from take the anchor. |
+| Headings, lists, quotes, tables, captions and existing links are never touched | The article outline is built from heading text, the rest is data or verbatim copy — and a link an editor placed by hand always wins. |
+| Anchor text is the copy exactly as written | Rewriting it to the target's title is what Google's spam policy targets. |
+
+Linking happens **at render time, not at save time**: `src/lib/internal-links.ts` compiles the
+published documents into a phrase index, one `InternalLinker` per page render decides which mentions
+win under the budget, and the `text` branch of `src/components/content/rich-text.tsx` emits the
+`<a>`. The CMS content is never modified, so a renamed slug cannot leave a dead link behind —
+`src/hooks/revalidate.ts` purges the index along with the pages that read it — and switching the
+feature off is deleting four wrapper components.
+
+It is wired on the four detail routes: each awaits one `createInternalLinker({ collection, id })` and
+threads it down to every rich text block on the page, so they share one budget and the page cannot
+link to itself. With no database configured it yields an empty linker and every page renders
+byte-for-byte as it did before. Full design, rules, limitations and the verify-after-deploy `curl`:
+**[docs/internal-linking.md](docs/internal-linking.md)**. `npm test` covers the engine and the
+rendered markup in `src/lib/internal-links.test.ts`.
+
 ### Redirections
 
 **Admin → SEO → Redirections** manages the rules that send an old URL to its new home. Each rule
