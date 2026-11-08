@@ -111,8 +111,8 @@
 [data-blog-dispatch] .lb-live {
   position: relative;
   display: block;
-  width: 6px;
-  height: 6px;
+  width: 0.375rem;
+  height: 0.375rem;
   flex-shrink: 0;
   border-radius: 50%;
   background: var(--color-sage);
@@ -161,7 +161,7 @@
   top: 0;
   bottom: 0;
   left: 0.9375rem; /* half of the 1.875rem waypoint box */
-  width: 1px;
+  width: 0.0625rem;
   background-color: var(--color-slate-20);
   -webkit-mask-image: linear-gradient(
     to bottom,
@@ -185,8 +185,8 @@
    a second vertical bar appearing down its leading edge. */
 [data-blog-dispatch] .lb-row:hover .lb-row-rail,
 [data-blog-dispatch] .lb-row:focus-within .lb-row-rail {
-  width: 2px;
-  margin-left: -0.5px;
+  width: 0.125rem;
+  margin-left: -0.03125rem;
   background-color: var(--color-ink);
 }
 
@@ -215,7 +215,7 @@
 }
 
 [data-blog-dispatch] .lb-row:focus-within .lb-row-body {
-  transform: translateX(6px);
+  transform: translateX(0.375rem);
 }
 
 [data-blog-dispatch] .lb-row:focus-within .lb-node {
@@ -226,7 +226,7 @@
 
 /* Thumbnail zoom + sage hairline on hover/focus. */
 [data-blog-dispatch] .lb-row-thumb {
-  border: 1px solid var(--color-slate-20);
+  border: 0.0625rem solid var(--color-slate-20);
   transition: border-color 0.4s var(--lb-ease);
 }
 
@@ -313,7 +313,7 @@
   }
 
   [data-blog-dispatch] .lb-row:hover .lb-row-body {
-    transform: translateX(6px);
+    transform: translateX(0.375rem);
   }
 
   [data-blog-dispatch] .lb-row:hover .lb-node {

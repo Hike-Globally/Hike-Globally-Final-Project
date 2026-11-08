@@ -1,43 +1,23 @@
 /* ============================================================================
-   BLOG TYPE SCALE — one place for the pinned description sizes on `/blog`
+   BLOG PAGE COPY
    ----------------------------------------------------------------------------
-   The journal page asks for one legible description size per surface, at every
-   canvas, instead of the fluid `card-description-copy` / `lead` clamps the
-   shared components ship with:
+   Journal excerpts use the shared body role (`--text-body`): 16px on the
+   1440px reference canvas and larger in lockstep with the global rem canvas
+   scale on wide displays. The lead plate and grid cards stay consistent with
+   the homepage journal board; the hero standfirst still reads the shared
+   `.hero-description` role.
 
-     .post-card-description  16px  the excerpt on every journal card — the lead
-                                   plate and the grid cards alike
-
-   The hero standfirst is not in this list: every hero on the site, this one
-   included, reads `.hero-description` (17px → 18px) from `globals.css` — the
-   homepage hero's lead size.
-
-   The scope is `[data-blog-page]`, set once in `src/app/(frontend)/blog/page.tsx`,
-   so nothing outside `/blog` picks these sizes up: the shared `PostCard` keeps
-   its own responsive type on the "Keep reading" rail of article pages, and the
-   `lead` utility keeps its scale on every other hero.
-
-   These rules are intentionally *unlayered* plain CSS: real (unlayered) rules
-   beat anything inside `@layer`, which includes every Tailwind v4 `@utility`
-   in `globals.css` (`lead`, `card-description-copy`) and their own media
-   queries — so a class here overrides a utility's `font-size` without
-   `!important` and without fighting source order. The same technique
-   `homepage.css` and `curated-trips-section.css` already rely on.
-
-   Fixed, not fluid: 16px is the *specified* size, so unlike the homepage hero
-   clamps there is no ceiling to grow towards — a 5" phone and a 100" TV both
-   read the journal's descriptions at exactly 16px, matching the pinned card
-   copy on the homepage journal board (`.home-blog-description`).
+   These rules are scoped to `[data-blog-page]`, so the shared `PostCard` keeps
+   its own type on article-page rails. They remain unlayered intentionally so
+   the page-level title treatment wins over Tailwind utilities.
    ==========================================================================*/
 
 [data-blog-page] {
-  /* 16px — excerpt on every journal card (lead plate + grid). */
+  /* Body role — 16px on the reference canvas, scales with the root rem size. */
   --blog-card-description-size: var(--text-body);
 }
 
-/* ---------------------------------------------------------------------------
-   Journal cards — excerpt at 16px, lead plate and grid cards alike
-   --------------------------------------------------------------------------- */
+/* Journal card excerpts use the body role at every canvas. */
 [data-blog-page] .post-card-description {
   font-size: var(--blog-card-description-size);
 }

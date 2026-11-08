@@ -31,9 +31,9 @@
 
 /* Circular focus ring around the sphere for keyboard visitors. */
 .globe-frame:focus-visible {
-  border-radius: 9999px;
-  outline: 2px solid var(--color-haze);
-  outline-offset: -6px;
+  border-radius: 624.938rem;
+  outline: 0.125rem solid var(--color-haze);
+  outline-offset: -0.375rem;
   outline-style: dashed;
 }
 
@@ -51,8 +51,8 @@
   text-transform: uppercase;
   color: color-mix(in srgb, var(--color-mist) 90%, transparent);
   text-shadow:
-    0 1px 10px color-mix(in srgb, var(--color-ink) 94%, transparent),
-    0 0 2px color-mix(in srgb, var(--color-ink) 88%, transparent);
+    0 0.0625rem 0.625rem color-mix(in srgb, var(--color-ink) 94%, transparent),
+    0 0 0.125rem color-mix(in srgb, var(--color-ink) 88%, transparent);
   will-change: transform, opacity;
 }
 
@@ -73,7 +73,7 @@
   width: 79%;
   aspect-ratio: 1;
   border-radius: 50%;
-  border: 1px solid color-mix(in srgb, var(--color-haze) 32%, transparent);
+  border: 0.0625rem solid color-mix(in srgb, var(--color-haze) 32%, transparent);
   /* The same ocean ramp the canvas paints: ink lit with expedition blue,
      stepping down to plain ink at the terminator. */
   background: radial-gradient(
@@ -86,6 +86,6 @@
   /* Kept tight to match the renderer's atmosphere (≈1.22× the sphere radius,
      fading to fully transparent) instead of a wide wash behind the globe. */
   box-shadow:
-    0 0 52px -10px color-mix(in srgb, var(--color-haze) 42%, transparent),
-    inset 0 0 60px 10px color-mix(in srgb, var(--color-ink) 35%, transparent);
+    0 0 3.25rem -0.625rem color-mix(in srgb, var(--color-haze) 42%, transparent),
+    inset 0 0 3.75rem 0.625rem color-mix(in srgb, var(--color-ink) 35%, transparent);
 }

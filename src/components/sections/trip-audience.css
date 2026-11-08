@@ -81,7 +81,7 @@
   width: 100%;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid var(--color-slate-20);
+  border: 0.0625rem solid var(--color-slate-20);
   background: var(--color-card);
   padding: clamp(1.25rem, 2.8vw, 2.25rem);
   transition: border-color 220ms ease;
@@ -110,7 +110,7 @@
   top: 0;
   left: 0;
   width: 4.25rem;
-  height: 2px;
+  height: 0.125rem;
   background: var(--audience-accent);
   content: '';
   pointer-events: none;
@@ -125,7 +125,7 @@
   display: flex;
   align-items: center;
   gap: 0.875rem;
-  border-bottom: 1px solid var(--color-slate-20);
+  border-bottom: 0.0625rem solid var(--color-slate-20);
   padding-bottom: 1.125rem;
 }
 
@@ -135,7 +135,7 @@
   height: 2.75rem;
   flex: 0 0 2.75rem;
   place-items: center;
-  border: 1px solid color-mix(in srgb, var(--audience-accent) 28%, transparent);
+  border: 0.0625rem solid color-mix(in srgb, var(--audience-accent) 28%, transparent);
   background: var(--audience-accent-soft);
   color: var(--audience-accent-ink);
 }
@@ -199,7 +199,7 @@
 
 .trip-audience-copy ul > li + li {
   margin-top: 0;
-  border-top: 1px solid var(--color-slate-20);
+  border-top: 0.0625rem solid var(--color-slate-20);
 }
 
 /* Chip */
@@ -244,7 +244,7 @@
 .trip-audience-copy ul ul > li::before {
   top: calc(0.25rem + 0.85em);
   width: 0.5rem;
-  height: 1px;
+  height: 0.0625rem;
   background: var(--audience-accent);
 }
 
