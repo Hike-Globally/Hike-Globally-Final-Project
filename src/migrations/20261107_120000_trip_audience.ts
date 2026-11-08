@@ -18,6 +18,11 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
  * value added in the same transaction, and the layout rows below need it. This is the same shape
  * as the earlier page-section migrations.
  *
+ * Older production schemas can contain the retired `whoFor` / `whoNotFor` layout kinds from a
+ * pre-release version of the audience section. Normalize those to the single current `audience`
+ * section before casting back to the new enum; otherwise PostgreSQL rejects the legacy label.
+ * Duplicate audience rows are collapsed to the earliest layout position.
+ *
  * Re-runnable: columns use IF (NOT) EXISTS and layouts that already hold an `audience` row are
  * skipped, so a half-applied run (see `20261106_120000_trip_brochure`) can simply be run again.
  * Concurrent boots are serialised by `src/lib/migration-guard.ts`.
@@ -37,12 +42,40 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "trips_page_sections" ALTER COLUMN "kind" SET DEFAULT 'html'::text;
   DROP TYPE IF EXISTS "public"."enum_trips_page_sections_kind";
   CREATE TYPE "public"."enum_trips_page_sections_kind" AS ENUM(${KINDS_WITH_AUDIENCE});
+
+  -- Older preview schemas used two layout keys for the same audience panel.
+  -- Keep the earliest row per document/locale, then map it to the current key.
+  WITH ranked AS (
+    SELECT "id", ROW_NUMBER() OVER (
+      PARTITION BY "_parent_id", "_locale" ORDER BY "_order", "id"
+    ) AS rn
+    FROM "trips_page_sections"
+    WHERE "kind" IN ('audience', 'whoFor', 'whoNotFor')
+  )
+  DELETE FROM "trips_page_sections" AS section
+  USING ranked
+  WHERE section."id" = ranked."id" AND ranked.rn > 1;
+  UPDATE "trips_page_sections" SET "kind" = 'audience' WHERE "kind" IN ('whoFor', 'whoNotFor');
+
   ALTER TABLE "trips_page_sections" ALTER COLUMN "kind" SET DEFAULT 'html'::"public"."enum_trips_page_sections_kind";
   ALTER TABLE "trips_page_sections" ALTER COLUMN "kind" SET DATA TYPE "public"."enum_trips_page_sections_kind" USING "kind"::"public"."enum_trips_page_sections_kind";
   ALTER TABLE "_trips_v_version_page_sections" ALTER COLUMN "kind" SET DATA TYPE text;
   ALTER TABLE "_trips_v_version_page_sections" ALTER COLUMN "kind" SET DEFAULT 'html'::text;
   DROP TYPE IF EXISTS "public"."enum__trips_v_version_page_sections_kind";
   CREATE TYPE "public"."enum__trips_v_version_page_sections_kind" AS ENUM(${KINDS_WITH_AUDIENCE});
+
+  WITH ranked AS (
+    SELECT "_uuid", ROW_NUMBER() OVER (
+      PARTITION BY "_parent_id", "_locale" ORDER BY "_order", "_uuid"
+    ) AS rn
+    FROM "_trips_v_version_page_sections"
+    WHERE "kind" IN ('audience', 'whoFor', 'whoNotFor')
+  )
+  DELETE FROM "_trips_v_version_page_sections" AS section
+  USING ranked
+  WHERE section."_uuid" = ranked."_uuid" AND ranked.rn > 1;
+  UPDATE "_trips_v_version_page_sections" SET "kind" = 'audience' WHERE "kind" IN ('whoFor', 'whoNotFor');
+
   ALTER TABLE "_trips_v_version_page_sections" ALTER COLUMN "kind" SET DEFAULT 'html'::"public"."enum__trips_v_version_page_sections_kind";
   ALTER TABLE "_trips_v_version_page_sections" ALTER COLUMN "kind" SET DATA TYPE "public"."enum__trips_v_version_page_sections_kind" USING "kind"::"public"."enum__trips_v_version_page_sections_kind";
 
