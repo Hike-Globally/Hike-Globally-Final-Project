@@ -17,6 +17,7 @@ import * as migration_20261104_144321_trip_departure_dates from './20261104_1443
 import * as migration_20261105_120000_hero_full_screen from './20261105_120000_hero_full_screen'
 import * as migration_20261106_120000_trip_brochure from './20261106_120000_trip_brochure'
 import * as migration_20261107_120000_trip_audience from './20261107_120000_trip_audience'
+import * as migration_20261108_120000_trip_packing_categories from './20261108_120000_trip_packing_categories'
 
 export const migrations = [
   {
@@ -113,5 +114,10 @@ export const migrations = [
     up: migration_20261107_120000_trip_audience.up,
     down: migration_20261107_120000_trip_audience.down,
     name: '20261107_120000_trip_audience',
+  },
+  {
+    up: migration_20261108_120000_trip_packing_categories.up,
+    down: migration_20261108_120000_trip_packing_categories.down,
+    name: '20261108_120000_trip_packing_categories',
   },
 ]

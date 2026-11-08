@@ -20,7 +20,6 @@ import { JsonLd } from '@/components/seo/json-ld'
 import { Breadcrumbs } from '@/components/sections/breadcrumbs'
 import { TripCard } from '@/components/cards/trip-card'
 import { Reveal } from '@/components/motion/reveal'
-import { InquiryForm } from '@/components/forms/inquiry-form'
 import { Button } from '@/components/ui/button'
 import { EssentialInformationSection } from '@/components/sections/essential-information-section'
 import { TripBrochureButton } from '@/components/trips/trip-brochure-button'
@@ -28,6 +27,7 @@ import { FaqSection } from '@/components/sections/faq-section'
 import { DeparturesSection } from '@/components/sections/departures-section'
 import { KeyTakeawaysSection } from '@/components/sections/key-takeaways-section'
 import { TripAudienceSection } from '@/components/sections/trip-audience-section'
+import { TripPackingSection } from '@/components/sections/trip-packing-section'
 import { KeyPointsPanel } from '@/components/sections/key-points-panel'
 import { ItinerarySection } from '@/components/sections/itinerary-section'
 import { surface } from '@/components/ui/surface'
@@ -205,17 +205,7 @@ function RouteMapSection({ trip }: { trip: Trip }) {
  * Trip detail view — shared by the public route (statically rendered) and the
  * preview route (draft mode), so editors see exactly what visitors will see.
  */
-export function TripDetail({
-  trip,
-  related,
-  tripOptions,
-  formEmail,
-}: {
-  trip: Trip
-  related: TripCardData[]
-  tripOptions: { id: number; title: string; slug: string }[]
-  formEmail: string
-}) {
+export function TripDetail({ trip, related }: { trip: Trip; related: TripCardData[] }) {
   const dict = dictionary
 
   const destination =
@@ -412,28 +402,10 @@ export function TripDetail({
         ) : null}
       </>
     ),
-    packing: (
-      <>
-        {trip.packingList?.length ? (
-          <Reveal as="section" className="py-16 md:py-24">
-            <SectionTitle title={dict.trip.packingList} />
-            <ul className="grid gap-3 sm:grid-cols-2">
-              {trip.packingList.map((item, index) => (
-                <li
-                  key={item.id ?? `${item.item}-${index}`}
-                  className={cn(surface, 'flex items-start gap-4 p-5')}
-                >
-                  <span className="mt-0.5 grid size-7 shrink-0 place-items-center bg-deep text-white">
-                    <Check className="size-3.5" strokeWidth={3} aria-hidden />
-                  </span>
-                  <span className="text-ui leading-relaxed text-ink-80">{item.item}</span>
-                </li>
-              ))}
-            </ul>
-          </Reveal>
-        ) : null}
-      </>
-    ),
+    // Three accordions (Clothing and Footwear, Trekking Equipment, Personal Items) under a
+    // packing dashboard — grouping, the legible count and the tickable checklist all live in the
+    // section so the preview and the public page cannot drift apart.
+    packing: <TripPackingSection rows={trip.packingList} tripSlug={trip.slug ?? 'trip'} />,
     faqs: <FaqSection title={dict.trip.faqs} groups={faqGroups} />,
     gallery: (
       <>

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 
 import { TripDetail } from '@/components/views/trip-detail'
 import { sitePath } from '@/i18n/config'
-import { getAllTripSlugs, getRelatedTrips, getSettings, getTrip, getTripOptions } from '@/lib/data'
+import { getAllTripSlugs, getRelatedTrips, getTrip } from '@/lib/data'
 import { isLivePreviewRequest } from '@/lib/live-preview-access'
 import { buildMetadata, seoFromDoc } from '@/lib/seo'
 
@@ -55,20 +55,7 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
 
   if (!trip) notFound()
 
-  const [related, tripOptions, settings] = await Promise.all([
-    getRelatedTrips(trip, 3),
-    getTripOptions(),
-    getSettings(),
-  ])
+  const related = await getRelatedTrips(trip, 3)
 
-  return (
-    <TripDetail
-      trip={trip}
-      related={related}
-      tripOptions={tripOptions}
-      formEmail={
-        settings.formsubmitEmail || process.env.NEXT_PUBLIC_FORMSUBMIT_EMAIL || settings.email
-      }
-    />
-  )
+  return <TripDetail trip={trip} related={related} />
 }

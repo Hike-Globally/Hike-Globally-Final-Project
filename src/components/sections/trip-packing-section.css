@@ -1,0 +1,455 @@
+/* Packing list — dashboard + three accordions of tickable kit.
+
+   Vocabulary borrowed on purpose from `key-takeaways.css` and `trip-audience.css`, so the section
+   reads as part of the same page rather than a widget dropped into it:
+
+     - the shell of each group is a white sheet on ONE warm hairline, with no shadow;
+     - a short ember rule is filed along its top-left corner when the group is open;
+     - each header carries a square icon chip, a quiet count and a chevron;
+     - the dashboard is a single hairline grid above the lists, so the readouts sit over the kit
+       the way the hero's fact strip sits under the trip title.
+
+   Every value is a token from `globals.css` — no literal colours, sizes or radii. The only motion
+   is a 300–400ms `--ease-brand` transition on the tick, the bar and the icon chip;
+   `prefers-reduced-motion` removes it at the bottom of the file.
+
+   SELECTOR NOTE — every rule is scoped to `#packing-list`, the section's own id. Two of the shared
+   controls this section reuses come with Tailwind utilities that would otherwise win on source
+   order (the accordion item's `last:border-b-0` would erase the last card's frame, the trigger's
+   `py-5` would fight the row padding). A single id keeps these rules unconditional and readable
+   instead of scattering `!important` through the file. */
+
+/* ----------------------------------------------------------------------------
+   Shell
+   ---------------------------------------------------------------------------- */
+
+#packing-list {
+  /* The list reflows on the *column* it is given, not the viewport: the trip body column narrows
+     once the sticky booking card appears at `lg`, and a two-column checklist must not be forced
+     into it. */
+  container-type: inline-size;
+  container-name: packing;
+}
+
+#packing-list .packing-standfirst {
+  margin-top: 1rem;
+  max-width: 46rem;
+  color: var(--color-ink-60);
+  font-size: var(--text-lead);
+  line-height: var(--text-lead--line-height);
+}
+
+/* ----------------------------------------------------------------------------
+   Dashboard
+   ---------------------------------------------------------------------------- */
+
+#packing-list .packing-dashboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1px;
+  margin-bottom: clamp(1.25rem, 2.5vw, 1.75rem);
+  border: 0.0625rem solid var(--color-slate-20);
+  background: var(--color-slate-20);
+}
+
+#packing-list .packing-dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  background: var(--color-slate-20);
+}
+
+#packing-list .packing-stat {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: var(--color-paper);
+  padding: 1rem 1.1rem;
+}
+
+#packing-list .packing-stat dt {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--color-slate-80);
+  font-family: var(--font-heading);
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+#packing-list .packing-stat dt svg {
+  color: var(--color-deep);
+}
+
+#packing-list .packing-stat dd {
+  margin: 0;
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: var(--text-card);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+#packing-list .packing-stat-of {
+  color: var(--color-slate-80);
+  font-family: var(--font-heading);
+  font-size: var(--text-ui);
+  font-weight: 500;
+}
+
+/* --- progress ------------------------------------------------------------- */
+
+#packing-list .packing-dashboard-progress {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.65rem;
+  background: var(--color-paper);
+  padding: 1rem 1.1rem 1.1rem;
+}
+
+/* Counters on the left, progress on the right, from the moment the column can hold both
+   (~34rem). Below that the progress strip sits under the counters, still full width. */
+@container packing (min-width: 34rem) {
+  #packing-list .packing-dashboard {
+    grid-template-columns: minmax(0, 17rem) minmax(0, 1fr);
+  }
+}
+
+#packing-list .packing-progress-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+#packing-list .packing-progress-label {
+  margin: 0;
+  color: var(--color-ink);
+  font-family: var(--font-heading);
+  font-size: var(--text-ui);
+  font-weight: 600;
+}
+
+#packing-list .packing-progress-value {
+  margin: 0;
+  color: var(--color-ink);
+  font-family: var(--font-heading);
+  font-size: var(--text-ui);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A 6px track: ember fill on the same quiet mist plate used elsewhere. `appearance: none` strips
+   the native look so WebKit and Gecko render identically. */
+#packing-list .packing-progress-bar {
+  display: block;
+  width: 100%;
+  height: 0.375rem;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  appearance: none;
+  background: var(--color-mist);
+}
+
+#packing-list .packing-progress-bar::-webkit-progress-bar {
+  background: var(--color-mist);
+}
+
+#packing-list .packing-progress-bar::-webkit-progress-value {
+  background: var(--color-sage);
+  transition: width 400ms var(--ease-brand);
+}
+
+#packing-list .packing-progress-bar::-moz-progress-bar {
+  background: var(--color-sage);
+  transition: width 400ms var(--ease-brand);
+}
+
+#packing-list .packing-progress-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+#packing-list .packing-progress-note {
+  margin: 0;
+  min-width: 0;
+  flex: 1 1 12rem;
+  color: var(--color-ink-60);
+  font-size: var(--text-ui);
+  line-height: 1.5;
+}
+
+#packing-list .packing-reset {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.375rem;
+  border: 0.0625rem solid var(--color-slate-40);
+  background: var(--color-paper);
+  padding: 0.3rem 0.6rem;
+  color: var(--color-ink);
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition:
+    border-color 200ms ease,
+    color 200ms ease;
+}
+
+#packing-list .packing-reset:hover:not(:disabled) {
+  border-color: var(--color-deep);
+  color: var(--color-deep);
+}
+
+#packing-list .packing-reset:focus-visible {
+  outline: 0.1875rem solid var(--color-deep-20);
+  outline-offset: 0.125rem;
+}
+
+#packing-list .packing-reset:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+/* ----------------------------------------------------------------------------
+   Accordions
+   ---------------------------------------------------------------------------- */
+
+#packing-list .packing-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 1.6vw, 1rem);
+}
+
+/* Each group is its own sheet. `position: relative` anchors the ember corner rule; the frame is
+   drawn here (not on the item's default `border-b`) so all four sides match. */
+#packing-list .packing-group {
+  position: relative;
+  overflow: hidden;
+  border: 0.0625rem solid var(--color-slate-20);
+  background: var(--color-paper);
+  scroll-margin-top: 6rem;
+}
+
+#packing-list .packing-group::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4.25rem;
+  height: 0.125rem;
+  background: var(--color-sage);
+  content: '';
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 240ms ease;
+}
+
+#packing-list .packing-group[data-state='open']::before {
+  opacity: 1;
+}
+
+/* [icon + title/blurb] … [count] [chevron] — the whole row is the hit area. */
+#packing-list .packing-group-trigger {
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem clamp(1rem, 2.2vw, 1.5rem);
+}
+
+#packing-list .packing-group[data-state='open'] .packing-group-trigger {
+  border-bottom: 0.0625rem solid var(--color-slate-20);
+}
+
+#packing-list .packing-group-head {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+@container packing (min-width: 30rem) {
+  #packing-list .packing-group-head {
+    align-items: center;
+    gap: 0.875rem;
+  }
+}
+
+#packing-list .packing-group-icon {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: 0 0 2.5rem;
+  place-items: center;
+  border: 0.0625rem solid var(--color-haze-40);
+  background: var(--color-haze-20);
+  color: var(--color-ink);
+  transition:
+    border-color 240ms ease,
+    background 240ms ease,
+    color 240ms ease;
+}
+
+#packing-list .packing-group[data-state='open'] .packing-group-icon {
+  border-color: var(--color-sage-40);
+  background: var(--color-sage-20);
+  color: var(--color-sage-90);
+}
+
+#packing-list .packing-group-title {
+  display: block;
+  color: var(--color-ink);
+  font-family: var(--font-heading);
+  font-size: var(--text-subhead);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* The guidance line is a luxury on a phone: at 390px it wraps to four lines and pushes the
+   actual list below the fold, so it is clamped to two lines there and shown in full as soon as
+   the column has room (the same container query, not a viewport one). */
+#packing-list .packing-group-blurb {
+  display: -webkit-box;
+  margin-top: 0.2rem;
+  max-width: 42rem;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--color-ink-60);
+  font-family: var(--font-sans);
+  font-size: var(--text-ui);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+@container packing (min-width: 30rem) {
+  #packing-list .packing-group-blurb {
+    display: block;
+    overflow: visible;
+  }
+}
+
+#packing-list .packing-group-count {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  border: 0.0625rem solid var(--color-slate-20);
+  background: var(--color-mist);
+  padding: 0.2rem 0.5rem;
+  color: var(--color-ink);
+  font-family: var(--font-heading);
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+/* --- items ---------------------------------------------------------------- */
+
+#packing-list .packing-items {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.4rem 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Two columns once the sheet itself is wide enough — again a container query, so the checklist
+   follows the column rather than the viewport. */
+@container packing (min-width: 40rem) {
+  #packing-list .packing-items {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+#packing-list .packing-item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.5rem 0.6rem;
+  cursor: pointer;
+  transition: background 180ms ease;
+}
+
+#packing-list .packing-item:hover {
+  background: var(--color-mist-40);
+}
+
+/* The real checkbox, visually hidden but focusable: native semantics, keyboard support and form
+   state are all preserved; `.packing-item-box` is the drawn square. */
+#packing-list .packing-item-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#packing-list .packing-item-box {
+  display: grid;
+  width: 1.125rem;
+  height: 1.125rem;
+  flex: 0 0 1.125rem;
+  place-items: center;
+  margin-top: 0.15rem;
+  border: 0.0625rem solid var(--color-slate-40);
+  background: var(--color-paper);
+  color: transparent;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    color 180ms ease;
+}
+
+#packing-list .packing-item-input:checked + .packing-item-box {
+  border-color: var(--color-deep);
+  background: var(--color-deep);
+  color: var(--color-paper);
+}
+
+#packing-list .packing-item-input:focus-visible + .packing-item-box {
+  outline: 0.1875rem solid var(--color-deep-20);
+  outline-offset: 0.125rem;
+}
+
+#packing-list .packing-item-text {
+  min-width: 0;
+  color: var(--color-ink-80);
+  font-size: var(--text-ui);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  transition: color 180ms ease;
+}
+
+/* Ticked rows recede — struck through and quieted, but still readable, because a checklist gets
+   re-read before something is subtracted from the bag. */
+#packing-list .packing-item[data-checked] .packing-item-text {
+  color: var(--color-slate-80);
+  text-decoration: line-through;
+  text-decoration-color: var(--color-slate-40);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #packing-list .packing-group::before,
+  #packing-list .packing-group-icon,
+  #packing-list .packing-item,
+  #packing-list .packing-item-box,
+  #packing-list .packing-item-text,
+  #packing-list .packing-progress-bar::-webkit-progress-value,
+  #packing-list .packing-progress-bar::-moz-progress-bar {
+    transition: none;
+  }
+}

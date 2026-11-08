@@ -54,7 +54,11 @@ function AccordionTrigger({
         <AccordionPrimitive.Trigger
           data-slot="accordion-trigger"
           className={cn(
-            'focus-visible:ring-deep/35 flex flex-1 items-start justify-between gap-4 py-5 text-left text-ink transition-colors outline-none hover:text-deep focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50',
+            // `group/accordion` is what the indicator badges below react to. The previous
+            // variants (`[[data-state=open]>span>&]`) pointed at a wrapper <span> that does not
+            // exist — the state attribute sits on the trigger itself — so the chevron and the
+            // plus/× never changed when a row opened.
+            'group/accordion focus-visible:ring-deep/35 flex flex-1 items-start justify-between gap-4 py-5 text-left text-ink transition-colors outline-none hover:text-deep focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50',
             typography,
             className,
           )}
@@ -64,20 +68,20 @@ function AccordionTrigger({
           {indicator === 'plus-minus' ? (
             <span className="grid size-10 shrink-0 place-items-center rounded-full border border-slate-40 bg-white text-slate-80 [&>svg]:col-start-1 [&>svg]:row-start-1 [&>svg]:size-4">
               <PlusIcon
-                className="transition-opacity duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] [[data-state=open]>span>&]:opacity-0"
+                className="transition-opacity duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[state=open]/accordion:opacity-0"
                 aria-hidden
               />
               <MinusIcon
-                className="opacity-0 transition-opacity duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] [[data-state=open]>span>&]:opacity-100"
+                className="opacity-0 transition-opacity duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[state=open]/accordion:opacity-100"
                 aria-hidden
               />
             </span>
           ) : indicator === 'chevron' ? (
-            <span className="grid size-10 shrink-0 place-items-center rounded-full border border-slate-40 bg-white text-slate-80 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] [&>svg]:size-4 [[data-state=open]>span>&]:rotate-180">
+            <span className="grid size-10 shrink-0 place-items-center rounded-full border border-slate-40 bg-white text-slate-80 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[state=open]/accordion:rotate-180 [&>svg]:size-4">
               <ChevronDownIcon aria-hidden />
             </span>
           ) : (
-            <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full border border-slate-40 text-deep transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] [&>svg]:size-3.5 [[data-state=open]>span>&]:rotate-45">
+            <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full border border-slate-40 text-deep transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[state=open]/accordion:rotate-45 [&>svg]:size-3.5">
               <PlusIcon className="transition-transform duration-300" aria-hidden />
             </span>
           )}

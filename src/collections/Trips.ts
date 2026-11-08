@@ -740,9 +740,37 @@ export const Trips: CollectionConfig = {
           labels: { singular: 'Packing item', plural: 'Packing list items' },
           admin: {
             description:
-              'List the personal gear and essentials travellers should bring for this trip.',
+              'Personal gear and essentials travellers should bring. Each item is filed under one of the three accordions on the trip page — Clothing and Footwear, Trekking Equipment, Personal Items.',
           },
-          fields: [{ name: 'item', type: 'text', required: true }],
+          fields: [
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'item',
+                  type: 'text',
+                  required: true,
+                  admin: { width: '60%' },
+                },
+                {
+                  name: 'category',
+                  type: 'select',
+                  // Optional in the schema (a localized required select would block saving a
+                  // language until every row was re-tagged) but defaulted in the editor, so new
+                  // rows are filed the moment they are added. Rows saved before categories
+                  // existed fall into a group by keyword on the frontend — see
+                  // src/lib/trip-packing.ts.
+                  defaultValue: 'trekking-equipment',
+                  options: [
+                    { label: 'Clothing and Footwear', value: 'clothing-footwear' },
+                    { label: 'Trekking Equipment', value: 'trekking-equipment' },
+                    { label: 'Personal Items', value: 'personal-items' },
+                  ],
+                  admin: { width: '40%' },
+                },
+              ],
+            },
+          ],
         },
       ],
     },
