@@ -4,6 +4,7 @@ import { dictionary, t } from '@/i18n/dictionaries'
 import { routes, sitePath } from '@/i18n/config'
 import { getAllPageSlugs, getFooter, getSettings } from '@/lib/data'
 import { resolveLink, type ResolvedLink } from '@/lib/links'
+import { mailtoHref, protectedEmailHtmlProps } from '@/lib/public-email'
 import type { Setting } from '@/payload-types'
 
 import './footer.css'
@@ -26,7 +27,17 @@ import './footer.css'
 
 type SocialPlatform = NonNullable<Setting['socials']>[number]['platform']
 
-type FooterColumn = { heading: string; links: ResolvedLink[] }
+/**
+ * A resolved link, plus — for the contact address — the pre-built HTML for its label.
+ *
+ * The label of a `mailto:` link has to bypass JSX text nodes so Cloudflare's `email_off` comment
+ * markers survive into the response (see `src/lib/public-email.ts`).
+ */
+type FooterLinkItem = ResolvedLink & {
+  emailHtml?: { dangerouslySetInnerHTML: { __html: string } }
+}
+
+type FooterColumn = { heading: string; links: FooterLinkItem[] }
 
 /* -------------------------------------------------------------------------- */
 /* Social glyphs — one per platform the CMS offers. Facebook / Instagram /     */
@@ -115,13 +126,22 @@ const canPrefetchInternalHref = (
   return segments.length === 1 && publishedPageSlugs.has(segments[0]!)
 }
 
-/** External/protocol links use plain `<a>`; internal routes use `next/link` with safe prefetching. */
+/**
+ * External/protocol links use plain `<a>`; internal routes use `next/link` with safe prefetching.
+ *
+ * `emailHtml` is set for the contact address only. Cloudflare rewrites a `mailto:` link into a
+ * `/cdn-cgi/l/email-protection` placeholder unless the visible address is wrapped in its opt-out
+ * comments, and React drops comment nodes from JSX — so that one label is injected as raw HTML.
+ * See `src/lib/public-email.ts`.
+ */
 function FooterLink({
   link,
   publishedPageSlugs,
+  emailHtml,
 }: {
   link: ResolvedLink
   publishedPageSlugs: ReadonlySet<string>
+  emailHtml?: { dangerouslySetInnerHTML: { __html: string } }
 }) {
   const external = /^https?:\/\//.test(link.href)
   const nonHttpProtocol = /^(?:mailto|tel):/i.test(link.href)
@@ -138,8 +158,8 @@ function FooterLink({
 
   if (nonHttpProtocol) {
     return (
-      <a href={link.href} className={className}>
-        {link.label}
+      <a href={link.href} className={className} {...emailHtml}>
+        {emailHtml ? null : link.label}
       </a>
     )
   }
@@ -166,7 +186,11 @@ function FooterColumnBlock({
       <ul className="mt-4 space-y-2.5">
         {column.links.map((link) => (
           <li key={`${link.href}-${link.label}`}>
-            <FooterLink link={link} publishedPageSlugs={publishedPageSlugs} />
+            <FooterLink
+              link={link}
+              publishedPageSlugs={publishedPageSlugs}
+              emailHtml={link.emailHtml}
+            />
           </li>
         ))}
       </ul>
@@ -249,9 +273,22 @@ export async function Footer() {
   ]
 
   /* --- Contact column: the `settings` global ------------------------------- */
-  const contactLinks: ResolvedLink[] = [
+  /* The email label is HTML, not a JSX text node, so Cloudflare's `email_off` comments reach the
+     browser and it leaves the `mailto:` link alone (see `src/lib/public-email.ts`). */
+  const contactEmailHref = mailtoHref(settings.email)
+
+  const contactLinks: FooterLinkItem[] = [
     { href: sitePath('/contact'), label: dict.nav.inquiry, newTab: false },
-    { href: `mailto:${settings.email}`, label: settings.email, newTab: false },
+    ...(contactEmailHref
+      ? [
+          {
+            href: contactEmailHref,
+            label: settings.email,
+            newTab: false,
+            emailHtml: protectedEmailHtmlProps(settings.email),
+          },
+        ]
+      : []),
     ...(settings.phone
       ? [
           {

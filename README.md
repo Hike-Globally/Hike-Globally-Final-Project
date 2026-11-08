@@ -52,6 +52,23 @@ Both cloud modes serve files from the same `/api/media/file/<filename>` URLs, so
 rules; `src/storage/` holds the Postgres adapter. On Vercel, note that a function request body is
 capped at ~4.5 MB — larger originals need Blob plus `BLOB_CLIENT_UPLOADS=true`.
 
+**A Blob store connected in the dashboard is not automatically `BLOB_READ_WRITE_TOKEN`.** Vercel names
+the variable after the store — this project has `HikeGlobally_READ_WRITE_TOKEN` — so the mode stays
+`database`, the startup log says no external storage is configured, and every upload lands in
+Postgres while the Blob store sits empty. That is deliberate: files already in Postgres are served
+only by the database adapter, so flipping the mode because a variable was renamed would 404 every
+image already on the site. `src/lib/media-storage.ts` now says which variable it found and what to do:
+
+```
+[media] storage mode: database — … (set BLOB_READ_WRITE_TOKEN to move them to Vercel Blob)
+        — HikeGlobally_READ_WRITE_TOKEN is present but this app reads BLOB_READ_WRITE_TOKEN;
+          rename it, or set MEDIA_STORAGE=blob to switch once existing files are moved to the store
+```
+
+To move to Blob: rename the variable to `BLOB_READ_WRITE_TOKEN` in Vercel (Settings → Environment
+Variables), re-upload the existing media through the admin (an upload re-writes the row and its URL),
+then drop `MEDIA_STORAGE` if you set it.
+
 ## Scripts
 
 | Script                                                           | Description                                                                                                                 |
@@ -136,8 +153,47 @@ rule holds for pages written later, not just the ones written today.
 | A CMS page whose slug a route owns is not listed | `home` is served at `/`, `trips` at `/trips`, and so on (`src/lib/site-routes.ts`, shared with `[slug]/page.tsx`). Listing the page anyway would print a URL the sitemap already contains.                                       |
 | Publishing rebuilds it immediately               | Payload's revalidation hooks purge `/sitemap.xml` next to the page they changed, so a trip published now is in the sitemap now — not after the 1-hour fallback window. `npm test` covers the rules in `src/lib/sitemap.test.ts`. |
 
-`/robots.txt` (`src/app/robots.ts`) is the other half: it allows everything except `/admin`, `/api/`
-and `/preview/`, sets `Host`, and points crawlers at the sitemap.
+`/robots.txt` (`src/app/robots.ts`) is the other half: it allows everything except `/admin`, `/api/`,
+`/preview/` and `/cdn-cgi/`, sets `Host`, and points crawlers at the sitemap.
+
+### Email links and Cloudflare Email Address Obfuscation
+
+If Semrush (or Ahrefs, Screaming Frog, or Search Console) reports
+`https://hikeglobally.com/cdn-cgi/l/email-protection` as a **broken internal link on every page**, the
+site is not broken — Cloudflare is rewriting the `mailto:` links. Email Address Obfuscation is on by
+default on every Cloudflare zone: at the edge it replaces each address with a
+`<a href="/cdn-cgi/l/email-protection#…">` placeholder, injects `email-decode.min.js` to put the real
+address back in a browser, and moves on. Humans with JavaScript see a working link; crawlers that
+read HTML without running that script follow a path with nothing behind it, which is why the footer
+(and therefore every page) carries that one "broken" URL.
+
+The fix is in the markup, in `src/lib/public-email.ts`, and it does not need the dashboard:
+
+| Layer                   | Where                          | What it does                                                                                                                                                                                    |
+| ----------------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Opt the address out     | `src/lib/public-email.ts`      | Renders the visible address as `<a href="mailto:…"><!--email_off-->you@example.com<!--/email_off--></a>`. Cloudflare documents that it leaves addresses inside those comments alone, so the `mailto:` survives and crawlers get a link they understand. |
+| Keep crawlers off it    | `src/app/robots.ts`            | `Disallow: /cdn-cgi/` covers any address an editor pastes into rich text, where we do not control the surrounding markup.                                                                       |
+| Redirect the leftovers  | `next.config.mjs`              | `/cdn-cgi/l/email-protection` → 308 `/contact`, for URLs already in an index or a bookmark.                                                                                                      |
+
+Two implementation details matter and are easy to undo by accident:
+
+- **The label is HTML, not a JSX text node.** React drops comment nodes, so `{settings.email}` can
+  never carry the `email_off` pair. Every public address is rendered through
+  `protectedEmailHtmlProps(email)`, which pairs the markers with `dangerouslySetInnerHTML`.
+  `npm test` enforces both this and "no hand-written `` `mailto:${…}` ``" in
+  `src/lib/public-email-usage.test.ts`, so a new component cannot quietly reintroduce the placeholder.
+- **Do not paste the address into a `title=`, `alt=` or `aria-label=`** if avoiding scraping matters.
+  Cloudflare explicitly does not obfuscate addresses in tag attributes, so those are already exposed.
+
+Turning the feature off in Cloudflare is still worthwhile and takes a moment — **Security → Settings →
+Email Address Obfuscation → Off** (or `PATCH …/zones/<zone>/settings/email_obfuscation` with
+`{"value":"off"}`). The markup above is correct either way; the dashboard toggle additionally stops
+`email-decode.min.js` from loading. Verify with a plain GET, which is what a crawler does:
+
+```bash
+curl -sSL https://www.hikeglobally.com/ | grep -c 'cdn-cgi/l/email-protection'   # expect 0
+curl -sSL https://www.hikeglobally.com/ | grep -o 'href="mailto:[^"]*"'          # expect the address
+```
 
 ### Keywords
 
@@ -276,11 +332,11 @@ also stalls indexing of the sitemap.
 
 Vercel + hosted Postgres + Vercel Blob for media (without a Blob store the deployment falls back to
 Postgres storage — see [Media storage](#media-storage)). `package.json` pins `engines.node` to
-`>=20.9.0 <25` and `.nvmrc` says `24`: an open-ended range lets Vercel pick the newest Node major
-(26.x at the time of writing) regardless of the project's own Node setting, which is a build that
-nothing here has been tested against. Both `BLOB_READ_WRITE_TOKEN` and the store-prefixed name
-Vercel generates for a custom store (e.g. `HikeGlobally_READ_WRITE_TOKEN`) are accepted, so
-connecting a Blob store actually switches media to the CDN. See
+`24.x` and `.nvmrc` says `24`: an open-ended range lets Vercel ignore the project's own Node setting
+and build on the newest major (26.x at the time of writing), which is a build nothing here has been
+tested against. A Blob store named after the project arrives as `HikeGlobally_READ_WRITE_TOKEN`;
+that is reported at startup rather than silently used, because switching storage would strand the
+files already in Postgres (see [Media storage](#media-storage) for the two-line fix). See
 [§9 of the implementation plan](docs/IMPLEMENTATION-PLAN.md#9-deployment); the short version is
 `npm ci && npm run build`, with the four environment variables above set. `npm run build` applies
 pending migrations **before** it builds (`payload generate:importmap && node
@@ -329,6 +385,32 @@ left behind. On a healthy database it costs one catalogue query and no DDL.
 `node_modules`, and the import map (`src/app/(payload)/admin/importMap.js`) is deliberately not
 committed — regenerating it in the build step is what keeps a cache-hit install from failing with
 `Module not found: Can't resolve './admin/importMap'`.
+
+### Node version is pinned, not ranged
+
+`package.json` declares `"engines": { "node": "24.x" }`. A range such as `">=20.9.0"` makes Vercel
+ignore the Node version in Project Settings and build on the newest major it has — the build log says
+so explicitly —
+
+```
+Warning: Due to "engines": { "node": ">=20.9.0" } in your `package.json` file, the Node.js Version
+defined in your Project Settings ("24.x") will not apply, Node.js Version "26.x" will be used instead.
+```
+
+— so the runtime your build was tested against and the one it deploys on drift apart whenever Vercel
+adds a major. That is the classic "it built last week, it fails today" deploy failure. Pinning the
+major keeps the build, the function runtime and Project Settings on the same version. `npm ci` on the
+build image then installs it, and the warning disappears.
+
+### `@payloadcms` packages must all be the same version
+
+`payload`, `@payloadcms/db-postgres`, `@payloadcms/next`, `@payloadcms/richtext-lexical`,
+`@payloadcms/ui`, `@payloadcms/storage-vercel-blob` and `@payloadcms/plugin-cloud-storage` are
+pinned to the same `3.90.2` on purpose, and `patches/` contains `patch-package` diffs against that
+exact version. Bumping one of them — or letting a `^` range resolve a newer one — is a deploy
+failure waiting to happen: `patch-package` fails the `postinstall` step when the patched file is not
+the shape it expects, and the build stops before `next build` starts. Change them together, then run
+`npx patch-package` and refresh the patches in the same commit.
 
 ### Commit author must be a real GitHub account
 

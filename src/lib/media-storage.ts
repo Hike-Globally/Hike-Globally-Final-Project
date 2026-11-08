@@ -18,6 +18,10 @@
  * flow are built around. `database` is the fallback that keeps a serverless deployment working
  * *today* with no extra configuration, by using the Postgres database the CMS already needs.
  *
+ * A store-named token (`HikeGlobally_READ_WRITE_TOKEN`, the name Vercel gives a Blob store connected
+ * from the dashboard) is reported in `reason` but never switches the mode on its own — see
+ * `automaticDecision` for why that would break files already stored in Postgres.
+ *
  * `MEDIA_STORAGE` can override the automatic choice (`blob` | `database` | `local`) — the escape
  * hatch for unusual hosts. A request that cannot be honoured (e.g. `blob` without a token) falls
  * back to the automatic mode with an explanation in `reason`, so the startup log always tells the
@@ -32,7 +36,6 @@ export type MediaStorageMode = 'blob' | 'database' | 'local'
 export type MediaStorageEnv = {
   /** Vercel Blob read/write token. Present and non-empty ⇒ Blob storage is usable. */
   BLOB_READ_WRITE_TOKEN?: string
-
   /** Optional explicit override: `blob`, `database` or `local`. */
   MEDIA_STORAGE?: string
   /** Set to `1` by every Vercel deployment (build and runtime). */
@@ -41,7 +44,10 @@ export type MediaStorageEnv = {
   VERCEL_ENV?: string
   /** Vercel's Node.js runtime is a Lambda function, and this is set there too. */
   AWS_LAMBDA_FUNCTION_NAME?: string
-  /** Keeps `process.env` assignable, and lets tests pass any environment shape. */
+  /**
+   * Any other variable in the environment. Read only to *report* a store-named Blob token (see
+   * `blobTokenVariable`) — never to switch modes.
+   */
   [key: string]: string | undefined
 }
 
@@ -62,55 +68,65 @@ export const isServerlessHost = (env: MediaStorageEnv): boolean =>
   isSet(env.VERCEL) || isSet(env.AWS_LAMBDA_FUNCTION_NAME)
 
 /**
- * The Vercel Blob token, under either name Vercel uses.
+ * The environment variable holding the Vercel Blob token, or `null` when there is none.
  *
- * When a Blob store is connected, Vercel injects `BLOB_READ_WRITE_TOKEN` only if the store is named
- * `BLOB`; a store called `HikeGlobally` produces `HikeGlobally_READ_WRITE_TOKEN`. Reading just the
- * canonical name therefore made a connected store invisible: production silently fell back to the
- * Postgres media table (logged as `storage mode: database`) while the Blob dashboard showed an empty,
- * unused store. Any `*_READ_WRITE_TOKEN` is accepted, with `BLOB_READ_WRITE_TOKEN` taking priority.
+ * `BLOB_READ_WRITE_TOKEN` is the conventional name this project's docs and the Payload plugin
+ * expect. Vercel names the variable after the store when one is connected from the dashboard,
+ * though — the store in this project is called `HikeGlobally`, so the variable is
+ * `HikeGlobally_READ_WRITE_TOKEN`. Nothing read that, the startup log said "no external storage is
+ * configured", and every upload went to Postgres while the Blob store sat empty.
+ *
+ * So the store-named variable is reported, and the operator is told exactly what to do about it.
+ * It is not silently used (see `automaticDecision`): flipping storage mode is a decision about
+ * existing files, not something a variable rename should do behind one's back.
+ *
+ * Only names ending in `_READ_WRITE_TOKEN` are considered, so an unrelated credential sharing the
+ * suffix is the only thing this could pick up by accident. The exact conventional name wins, then
+ * the first store-prefixed one alphabetically, so the answer is deterministic.
  */
-const blobTokenEntry = (
-  env: MediaStorageEnv,
-): { key: string; token: string } | undefined => {
-  if (isSet(env.BLOB_READ_WRITE_TOKEN)) {
-    return { key: 'BLOB_READ_WRITE_TOKEN', token: (env.BLOB_READ_WRITE_TOKEN ?? '').trim() }
-  }
+export const blobTokenVariable = (env: MediaStorageEnv = process.env): string | null => {
+  if (isSet(env.BLOB_READ_WRITE_TOKEN)) return 'BLOB_READ_WRITE_TOKEN'
 
-  for (const [key, value] of Object.entries(env)) {
-    if (key.endsWith('_READ_WRITE_TOKEN') && isSet(value)) {
-      return { key, token: (value ?? '').trim() }
-    }
-  }
-
-  return undefined
+  return (
+    Object.keys(env)
+      .filter((key) => key !== 'BLOB_READ_WRITE_TOKEN' && key.endsWith('_READ_WRITE_TOKEN'))
+      .sort()
+      .find((key) => isSet(env[key])) ?? null
+  )
 }
 
-export const resolveBlobToken = (env: MediaStorageEnv = process.env): string | undefined =>
-  blobTokenEntry(env)?.token
-
 const automaticDecision = (env: MediaStorageEnv): MediaStorageDecision => {
-  const blob = blobTokenEntry(env)
-
-  if (blob) {
+  if (isSet(env.BLOB_READ_WRITE_TOKEN)) {
     return {
       mode: 'blob',
-      reason: `${blob.key} is set — files are stored in Vercel Blob`,
+      reason: 'BLOB_READ_WRITE_TOKEN is set — files are stored in Vercel Blob',
     }
   }
+
+  // A store-named token (`HikeGlobally_READ_WRITE_TOKEN`, the name Vercel gives a Blob store
+  // connected from the dashboard) is deliberately NOT treated as an automatic switch. Existing
+  // uploads already live in Postgres under `/api/media/file/<name>` URLs that only the Postgres
+  // adapter serves, so flipping the mode on a variable rename would 404 every image already on the
+  // site. Say so instead of guessing — the operator flips it with MEDIA_STORAGE=blob after moving
+  // the files, which is a decision, not a side effect.
+  const storeNamedToken = blobTokenVariable(env)
+  const mismatch = storeNamedToken
+    ? ` — ${storeNamedToken} is present but this app reads BLOB_READ_WRITE_TOKEN; rename it, or set ` +
+      'MEDIA_STORAGE=blob to switch once existing files are moved to the store'
+    : ''
 
   if (isServerlessHost(env)) {
     return {
       mode: 'database',
       reason:
         'no external storage is configured and this host has a read-only filesystem — files are ' +
-        'stored in Postgres (set BLOB_READ_WRITE_TOKEN to move them to Vercel Blob)',
+        `stored in Postgres (set BLOB_READ_WRITE_TOKEN to move them to Vercel Blob)${mismatch}`,
     }
   }
 
   return {
     mode: 'local',
-    reason: 'no external storage is configured — files are written to public/media',
+    reason: `no external storage is configured — files are written to public/media${mismatch}`,
   }
 }
 
@@ -140,7 +156,7 @@ export const resolveMediaStorage = (env: MediaStorageEnv = process.env): MediaSt
 
   // Blob without a token cannot work: Payload's Blob plugin disables itself and the upload would
   // fall back to a filesystem that is not there. Warn via `reason` and use the automatic mode.
-  if (requested === 'blob' && !resolveBlobToken(env)) {
+  if (requested === 'blob' && !blobTokenVariable(env)) {
     return {
       mode: automatic.mode,
       reason: `${automatic.reason} (MEDIA_STORAGE=blob needs BLOB_READ_WRITE_TOKEN)`,
