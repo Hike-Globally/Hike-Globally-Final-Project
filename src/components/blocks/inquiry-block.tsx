@@ -5,6 +5,7 @@ import { Mail, MessageCircle, Phone } from 'lucide-react'
 import { InquiryForm } from '@/components/forms/inquiry-form'
 import { SectionHeading } from '@/components/sections/section-heading'
 import { getSettings, getTripOptions } from '@/lib/data'
+import { mailtoHref, protectedEmailHtmlProps } from '@/lib/public-email'
 import type { InquiryBlock } from '@/payload-types'
 import { cn } from '@/lib/utils'
 
@@ -22,6 +23,11 @@ export async function InquirySection({ block }: { block: InquiryBlock }) {
 
   const email =
     settings.formsubmitEmail || process.env.NEXT_PUBLIC_FORMSUBMIT_EMAIL || settings.email
+
+  /* Raw HTML rather than a JSX text node, so Cloudflare's email_off comments reach the browser and
+     the mailto: link is not rewritten — see src/lib/public-email.ts. */
+  const contactEmailHref = mailtoHref(settings.email)
+  const contactEmailHtml = protectedEmailHtmlProps(settings.email)
 
   // When the block sits on a trip page, pre-select that trip in the form.
   const defaultTrip = block.trip && typeof block.trip !== 'number' ? block.trip : null
@@ -44,12 +50,10 @@ export async function InquirySection({ block }: { block: InquiryBlock }) {
             />
 
             <ul className={cn('space-y-3 text-ui', dark ? 'text-mist/80' : 'text-ink-70')}>
-              {settings.email ? (
+              {contactEmailHref ? (
                 <li className="flex items-center gap-3">
                   <Mail className="size-4 shrink-0 text-sage" aria-hidden />
-                  <a href={`mailto:${settings.email}`} className="hover:underline">
-                    {settings.email}
-                  </a>
+                  <a href={contactEmailHref} className="hover:underline" {...contactEmailHtml} />
                 </li>
               ) : null}
               {settings.phone ? (

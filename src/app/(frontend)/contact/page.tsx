@@ -6,6 +6,7 @@ import { InquiryForm } from '@/components/forms/inquiry-form'
 import { Breadcrumbs } from '@/components/sections/breadcrumbs'
 import { JsonLd } from '@/components/seo/json-ld'
 import { getSettings, getTripOptions } from '@/lib/data'
+import { mailtoHref, protectedEmailHtmlProps } from '@/lib/public-email'
 import { breadcrumbJsonLd, buildMetadata, webPageJsonLd } from '@/lib/seo'
 import '../information.css'
 
@@ -26,6 +27,11 @@ export default async function ContactPage() {
   const [settings, trips] = await Promise.all([getSettings(), getTripOptions()])
   const email =
     settings.formsubmitEmail || process.env.NEXT_PUBLIC_FORMSUBMIT_EMAIL || settings.email
+
+  /* The address is rendered as raw HTML so Cloudflare's email_off comments survive into the
+     response and it leaves the mailto: link alone — see src/lib/public-email.ts. */
+  const contactEmailHref = mailtoHref(settings.email)
+  const contactEmailHtml = protectedEmailHtmlProps(settings.email)
   return (
     <div className="info-page">
       <section className="info-hero info-hero--contact" data-header-hero>
@@ -79,12 +85,12 @@ export default async function ContactPage() {
           </p>
           <div className="contact-details">
             <p className="info-kicker">OTHER WAYS TO REACH US</p>
-            {settings.email && (
-              <a href={`mailto:${settings.email}`}>
+            {contactEmailHref && (
+              <a href={contactEmailHref}>
                 <Mail size={18} aria-hidden />
                 <span>
                   <small>EMAIL US</small>
-                  {settings.email}
+                  <span {...contactEmailHtml} />
                 </span>
                 <ArrowUpRight size={16} aria-hidden />
               </a>

@@ -58,7 +58,7 @@ const nextConfig = {
     // Retire the legacy `/en`, `/de` and `/fr` locale prefixes with CDN-level 308 redirects
     // (preserving query strings automatically) so `src/middleware.ts` does not have to run Fluid
     // Compute CPU on every public storefront request.
-    return [
+    const localeRedirects = [
       {
         source: '/:locale(en|de|fr)',
         destination: '/',
@@ -70,6 +70,24 @@ const nextConfig = {
         permanent: true,
       },
     ]
+
+    // `/cdn-cgi/*` belongs to Cloudflare, not to this app. Email Address Obfuscation (on by default
+    // on every Cloudflare zone) rewrites `mailto:` links to `/cdn-cgi/l/email-protection`, a path
+    // with no document behind it — so crawlers follow a dead link on every page and file it as
+    // broken (Semrush) or as a soft 404 (Search Console).
+    //
+    // `src/lib/public-email.ts` is the real fix: the pages no longer emit that link, so nothing new
+    // points here. This redirect is the safety net for URLs already in crawler indexes and in other
+    // people's bookmarks — they land on the contact page, which carries the form and the address,
+    // instead of on a dead end. It only fires if the request reaches Next.js at all; when Cloudflare
+    // proxies the zone the edge normally answers first.
+    const cloudflareEmailProtection = {
+      source: '/cdn-cgi/l/email-protection',
+      destination: '/contact',
+      permanent: true,
+    }
+
+    return [...localeRedirects, cloudflareEmailProtection]
   },
 
   async headers() {
