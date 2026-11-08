@@ -3,7 +3,13 @@ import { notFound } from 'next/navigation'
 
 import { PostDetail } from '@/components/views/post-detail'
 import { sitePath } from '@/i18n/config'
-import { getAllPostSlugs, getPost, getRelatedPosts, getSettings } from '@/lib/data'
+import {
+  createInternalLinker,
+  getAllPostSlugs,
+  getPost,
+  getRelatedPosts,
+  getSettings,
+} from '@/lib/data'
 import { isLivePreviewRequest } from '@/lib/live-preview-access'
 import { buildMetadata, seoFromDoc } from '@/lib/seo'
 
@@ -55,7 +61,16 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   if (!post) notFound()
 
-  const [related, settings] = await Promise.all([getRelatedPosts(post, 3), getSettings()])
+  const [related, settings, linker] = await Promise.all([
+    getRelatedPosts(post, 3),
+    getSettings(),
+    /**
+     * Automated internal keyword linking (see `src/lib/internal-links.ts`): mentions of other
+     * documents' target phrases in this post's body become real links, under a per-page budget.
+     * Passing the post as `self` is what stops it linking to itself.
+     */
+    createInternalLinker({ collection: 'blog', id: post.id }),
+  ])
 
-  return <PostDetail post={post} related={related} siteName={settings.siteName} />
+  return <PostDetail post={post} related={related} siteName={settings.siteName} linker={linker} />
 }

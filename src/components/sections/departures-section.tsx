@@ -2,6 +2,7 @@ import { RichText } from '@/components/content/rich-text'
 import { dictionary } from '@/i18n/dictionaries'
 import { normalizeDepartures } from '@/lib/departures'
 import { hasRichTextContent } from '@/lib/rich-text-content'
+import type { InternalLinker } from '@/lib/internal-links'
 import { cn } from '@/lib/utils'
 import type { Trip } from '@/payload-types'
 
@@ -19,10 +20,13 @@ export function DeparturesSection({
   bookingHref,
   hasExternalBookingLink,
   className = 'py-16 md:py-24',
+  linker,
 }: {
   trip: Trip
   bookingHref: string
   hasExternalBookingLink: boolean
+  /** The page's automated internal linking (see `src/lib/internal-links.ts`). */
+  linker?: InternalLinker | null
   className?: string
 }) {
   const departures = normalizeDepartures(trip.departureDates, {
@@ -52,7 +56,7 @@ export function DeparturesSection({
 
       {hasNotes ? (
         <div className={cn('overflow-x-auto', departures.length ? 'mt-8' : '')}>
-          <RichText content={trip.departures} />
+          <RichText content={trip.departures} linker={linker} />
         </div>
       ) : null}
     </section>

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Clock, Compass, MapPin } from 'lucide-react'
 
 import { RichText } from '@/components/content/rich-text'
+import type { InternalLinker } from '@/lib/internal-links'
 import { DestinationCard } from '@/components/cards/destination-card'
 import { TripCard } from '@/components/cards/trip-card'
 import { Reveal } from '@/components/motion/reveal'
@@ -25,10 +26,13 @@ export function DestinationDetail({
   destination,
   trips,
   otherDestinations,
+  linker,
 }: {
   destination: Destination
   trips: TripCardData[]
   otherDestinations: DestinationCardData[]
+  /** The page's automated internal keyword linking (see `src/lib/internal-links.ts`). */
+  linker?: InternalLinker | null
 }) {
   const dict = dictionary
 
@@ -118,14 +122,14 @@ export function DestinationDetail({
               {dict.destinations.about} {destination.name}
             </h2>
             <div className="mt-6">
-              <RichText content={destination.description} />
+              <RichText content={destination.description} linker={linker} />
             </div>
 
             {destination.gettingThere ? (
               <div className="mt-12">
                 <h3 className="heading-md">{dict.destinations.gettingThere}</h3>
                 <div className="mt-5">
-                  <RichText content={destination.gettingThere} />
+                  <RichText content={destination.gettingThere} linker={linker} />
                 </div>
               </div>
             ) : null}

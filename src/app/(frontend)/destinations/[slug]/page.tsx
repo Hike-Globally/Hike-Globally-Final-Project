@@ -3,7 +3,12 @@ import { notFound } from 'next/navigation'
 
 import { DestinationDetail } from '@/components/views/destination-detail'
 import { sitePath } from '@/i18n/config'
-import { getAllDestinationSlugs, getDestination, getDestinations } from '@/lib/data'
+import {
+  createInternalLinker,
+  getAllDestinationSlugs,
+  getDestination,
+  getDestinations,
+} from '@/lib/data'
 import { isLivePreviewRequest } from '@/lib/live-preview-access'
 import type { TripCard } from '@/lib/data'
 import { buildMetadata, seoFromDoc } from '@/lib/seo'
@@ -57,11 +62,19 @@ export default async function DestinationPage({ params }: { params: Promise<{ sl
 
   const otherDestinations = allDestinations.filter((item) => item.id !== destination.id).slice(0, 3)
 
+  /**
+   * Automated internal keyword linking (see `src/lib/internal-links.ts`): a destination's
+   * description and getting-there copy link to the trips and posts they mention. Passing the
+   * destination as `self` is what stops it linking to itself.
+   */
+  const linker = await createInternalLinker({ collection: 'destinations', id: destination.id })
+
   return (
     <DestinationDetail
       destination={destination}
       trips={trips}
       otherDestinations={otherDestinations}
+      linker={linker}
     />
   )
 }
