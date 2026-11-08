@@ -157,6 +157,51 @@ output is the same whether an editor used the chip input or pasted a spreadsheet
 ignored the meta tag as a ranking signal for years; treat the list as a record of intent that keeps
 the title, the copy, Bing/Yandex and internal search pointed at the same terms.
 
+### Redirections
+
+**Admin → SEO → Redirections** manages the rules that send an old URL to its new home. Each rule
+is one row in the `redirections` table: a source path, a destination (an internal path or a full
+`http(s)` URL), a status code (`301`, `302`, `307` or `308`), an active flag and an optional note.
+Deactivating a rule keeps it without serving it.
+
+| What an admin gets | Where it lives |
+| ------------------ | ---------------------------------------------------------------------------------------- |
+| List with search, sortable columns, pagination, quick status/active filters | Payload's list view + `src/components/admin/redirections-toolbar.tsx` |
+| Activate/deactivate in place, edit and delete (with confirmation) on each row | `redirection-active-cell.tsx`, `redirection-row-actions.tsx` |
+| Bulk activate / deactivate / delete selected | `/api/redirections/bulk` |
+| CSV import & export (`source,destination,status_code,is_active,note`) with an added/skipped/failed summary and reasons | `/api/redirections/import`, `/api/redirections/export` |
+| Live loop/chain feedback while editing | `/api/redirections/analyse`, `redirection-check-field.tsx` |
+
+**Matching.** The proxy (`src/proxy.ts`) compares the incoming *path* — lowercased, with the
+trailing slash dropped — against the active rules. The visitor's query string is kept and appended
+to the destination (`/old?utm=x` → `/new?utm=x`), and the stored status code is used for the
+response. Admin, API, `_next`, `images`, `media`, `preview`, `robots.txt`, `sitemap.xml`, the
+homepage and anything with a file extension never take part.
+
+**Validation.** A rule is refused when the source is duplicated, when it points at itself, when it
+would create a loop (A→B with B→A, or longer cycles) or when the source is a system route. A
+*chain* (A→B while B→C exists) is allowed but the editor is told to point A straight at C.
+`src/lib/redirections.ts` holds these rules as pure functions; the Payload hook, the live form
+hint, the CSV import and the tests all call the same code.
+
+**Caching.** The proxy keeps the compiled rule map in memory and refreshes it from
+`GET /api/redirections/rules` once per TTL (`REDIRECTIONS_CACHE_TTL_MS`, 30 s default). Saving,
+deleting or bulk-updating a rule clears the cache of the process that handled the write, and purges
+the `redirections` revalidation tag — but the proxy is bundled separately from the routes, so its
+copy is refreshed by the TTL: expect a saved rule to go live within 30 s (and a deactivated one to
+stop serving within 30 s) rather than instantly. Lower `REDIRECTIONS_CACHE_TTL_MS` if a site needs
+that tighter; it is the only dial. Hit counters are batched in memory and written by
+`POST /api/redirections/hit` — a redirect never waits for a write.
+
+Apply the schema with:
+
+```bash
+npm run migrate          # applies 20261108_150000_redirections
+npm run migrate:status   # confirm it is recorded
+```
+
+`npm run build` already runs the migrations before `next build`, so a deploy needs no extra step.
+
 ### Open Graph and structured data
 
 Every page builds its metadata with `buildMetadata()` — canonical, `og:*`, `twitter:*`, robots — and
@@ -230,7 +275,12 @@ also stalls indexing of the sitemap.
 ## Deployment
 
 Vercel + hosted Postgres + Vercel Blob for media (without a Blob store the deployment falls back to
-Postgres storage — see [Media storage](#media-storage)). See
+Postgres storage — see [Media storage](#media-storage)). `package.json` pins `engines.node` to
+`>=20.9.0 <25` and `.nvmrc` says `24`: an open-ended range lets Vercel pick the newest Node major
+(26.x at the time of writing) regardless of the project's own Node setting, which is a build that
+nothing here has been tested against. Both `BLOB_READ_WRITE_TOKEN` and the store-prefixed name
+Vercel generates for a custom store (e.g. `HikeGlobally_READ_WRITE_TOKEN`) are accepted, so
+connecting a Blob store actually switches media to the CDN. See
 [§9 of the implementation plan](docs/IMPLEMENTATION-PLAN.md#9-deployment); the short version is
 `npm ci && npm run build`, with the four environment variables above set. `npm run build` applies
 pending migrations **before** it builds (`payload generate:importmap && node
@@ -261,6 +311,15 @@ Both failure modes this prevents are real, not theoretical: unwrapped, the worke
 `column "…" already exists` (`0ace700`'s deploy); with a session-level lock, two workers spent the
 full 120s unable to take it and exited, failing the build (2026-11-07). Migration files need no
 changes of their own: anything added to `src/migrations/index.ts` is covered automatically.
+
+**Nothing but migrations may sit in `src/migrations/`.** `payload migrate` imports *every* `.ts` /
+`.js` file in that directory (`readdirSync` plus an extension filter) and names each one after the
+text before its first dot — so a co-located `20261107_120000_trip_audience.test.ts` was loaded *next
+to* its migration: same name, no `up`, and Node's test runner started inside the CLI. `npm run
+migrate` printed TAP output and then never exited, and because `migrate-for-build.mjs` waits for that
+child process, the deploy hangs instead of failing. Migration tests therefore live in
+`src/migrations/tests/`, which the directory scan skips, and `npm test` points at that folder. Keep
+it that way: a `*.test.ts` file in `src/migrations/` breaks the migration command.
 
 A boot-time repair (`src/lib/schema-repair.ts`) also completes the trip brochure columns if a
 database has the migration recorded but is missing some of its columns — the state the failed build

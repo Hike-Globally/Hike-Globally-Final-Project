@@ -47,3 +47,21 @@ export const adminOrSelf: Access = ({ req: { user } }) => {
 
 /** Field-level guard: only admins may flip sensitive flags (featured, roles, …). */
 export const adminFieldLevel: FieldAccess = ({ req: { user } }) => isAdmin(user)
+
+/**
+ * `manage redirections` — the permission behind the SEO → Redirections module.
+ *
+ * This workspace authorises by role (`users.roles`: `admin` | `editor`), not by a granular
+ * permission list, so the permission is expressed the way every other privileged action is:
+ * admins only. Redirects change where a visitor lands and can take a public URL out of service, so
+ * they sit with user management rather than with content editing.
+ *
+ * Everything that can be routed around the UI — the collection's own CRUD access, the custom
+ * endpoints (bulk, import, export, analyse) and the proxy's rule data — asks this one question, so
+ * an editor cannot reach the module through the API when the admin panel hides it.
+ */
+export const REDIRECTIONS_PERMISSION = 'manage redirections' as const
+
+export const canManageRedirections = (user: unknown): boolean => isAdmin(user)
+
+export const manageRedirections: Access = ({ req: { user } }) => canManageRedirections(user)

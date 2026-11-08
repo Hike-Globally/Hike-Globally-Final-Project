@@ -23,6 +23,11 @@ export const CACHE_TAG = {
   header: 'global:header',
   footer: 'global:footer',
   settings: 'global:settings',
+  /**
+   * SEO → Redirections. The proxy keeps its own in-memory map (the request path cannot wait for a
+   * tag read); this tag covers anything that reads the table through Next's data cache.
+   */
+  redirections: 'redirections',
 } as const
 
 /** Safety net: even if a webhook is missed, content is refreshed at most this often. */

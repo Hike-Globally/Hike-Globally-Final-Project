@@ -3,7 +3,7 @@ import test from 'node:test'
 
 import { PgDialect } from 'drizzle-orm/pg-core'
 
-import { up } from './20261108_120000_trip_packing_categories'
+import { up } from '../20261108_120000_trip_packing_categories'
 
 /**
  * The packing-category migration is the deploy-critical half of the packing-list accordions: if the

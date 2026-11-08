@@ -32,6 +32,7 @@ export type MediaStorageMode = 'blob' | 'database' | 'local'
 export type MediaStorageEnv = {
   /** Vercel Blob read/write token. Present and non-empty ⇒ Blob storage is usable. */
   BLOB_READ_WRITE_TOKEN?: string
+
   /** Optional explicit override: `blob`, `database` or `local`. */
   MEDIA_STORAGE?: string
   /** Set to `1` by every Vercel deployment (build and runtime). */
@@ -60,11 +61,41 @@ const isSet = (value: string | undefined): boolean =>
 export const isServerlessHost = (env: MediaStorageEnv): boolean =>
   isSet(env.VERCEL) || isSet(env.AWS_LAMBDA_FUNCTION_NAME)
 
-const automaticDecision = (env: MediaStorageEnv): MediaStorageDecision => {
+/**
+ * The Vercel Blob token, under either name Vercel uses.
+ *
+ * When a Blob store is connected, Vercel injects `BLOB_READ_WRITE_TOKEN` only if the store is named
+ * `BLOB`; a store called `HikeGlobally` produces `HikeGlobally_READ_WRITE_TOKEN`. Reading just the
+ * canonical name therefore made a connected store invisible: production silently fell back to the
+ * Postgres media table (logged as `storage mode: database`) while the Blob dashboard showed an empty,
+ * unused store. Any `*_READ_WRITE_TOKEN` is accepted, with `BLOB_READ_WRITE_TOKEN` taking priority.
+ */
+const blobTokenEntry = (
+  env: MediaStorageEnv,
+): { key: string; token: string } | undefined => {
   if (isSet(env.BLOB_READ_WRITE_TOKEN)) {
+    return { key: 'BLOB_READ_WRITE_TOKEN', token: (env.BLOB_READ_WRITE_TOKEN ?? '').trim() }
+  }
+
+  for (const [key, value] of Object.entries(env)) {
+    if (key.endsWith('_READ_WRITE_TOKEN') && isSet(value)) {
+      return { key, token: (value ?? '').trim() }
+    }
+  }
+
+  return undefined
+}
+
+export const resolveBlobToken = (env: MediaStorageEnv = process.env): string | undefined =>
+  blobTokenEntry(env)?.token
+
+const automaticDecision = (env: MediaStorageEnv): MediaStorageDecision => {
+  const blob = blobTokenEntry(env)
+
+  if (blob) {
     return {
       mode: 'blob',
-      reason: 'BLOB_READ_WRITE_TOKEN is set — files are stored in Vercel Blob',
+      reason: `${blob.key} is set — files are stored in Vercel Blob`,
     }
   }
 
@@ -109,7 +140,7 @@ export const resolveMediaStorage = (env: MediaStorageEnv = process.env): MediaSt
 
   // Blob without a token cannot work: Payload's Blob plugin disables itself and the upload would
   // fall back to a filesystem that is not there. Warn via `reason` and use the automatic mode.
-  if (requested === 'blob' && !isSet(env.BLOB_READ_WRITE_TOKEN)) {
+  if (requested === 'blob' && !resolveBlobToken(env)) {
     return {
       mode: automatic.mode,
       reason: `${automatic.reason} (MEDIA_STORAGE=blob needs BLOB_READ_WRITE_TOKEN)`,

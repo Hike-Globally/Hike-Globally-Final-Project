@@ -73,6 +73,7 @@ export interface Config {
     trips: Trip;
     blog: Blog;
     pages: Page;
+    redirections: Redirection;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -90,6 +91,7 @@ export interface Config {
     trips: TripsSelect<false> | TripsSelect<true>;
     blog: BlogSelect<false> | BlogSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
+    redirections: RedirectionsSelect<false> | RedirectionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -1385,6 +1387,42 @@ export interface CtaBlock {
   blockType: 'cta';
 }
 /**
+ * Send an old URL to its new home. Active rules are matched on the path only (a trailing slash is ignored) and the visitor’s query string is kept.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirections".
+ */
+export interface Redirection {
+  id: number;
+  /**
+   * The URL visitors still request. A pasted full URL is reduced to its path, and the value is lowercased; a trailing slash is ignored when matching.
+   */
+  sourcePath: string;
+  /**
+   * An internal path on this site, or a full http(s) URL.
+   */
+  destinationUrl: string;
+  /**
+   * 301 and 308 are permanent (search engines transfer the ranking); 302 and 307 are temporary. 307/308 keep the request method.
+   */
+  statusCode: '301' | '302' | '307' | '308';
+  /**
+   * Inactive rules are kept but never served.
+   */
+  isActive?: boolean | null;
+  /**
+   * Optional. For other admins only — never shown to visitors.
+   */
+  note?: string | null;
+  /**
+   * How many times the redirect has been served.
+   */
+  hitCount?: number | null;
+  lastHitAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -1431,6 +1469,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'pages';
         value: number | Page;
+      } | null)
+    | ({
+        relationTo: 'redirections';
+        value: number | Redirection;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -2136,6 +2178,21 @@ export interface CtaBlockSelect<T extends boolean = true> {
   variant?: T;
   id?: T;
   blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirections_select".
+ */
+export interface RedirectionsSelect<T extends boolean = true> {
+  sourcePath?: T;
+  destinationUrl?: T;
+  statusCode?: T;
+  isActive?: T;
+  note?: T;
+  hitCount?: T;
+  lastHitAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -15,7 +15,7 @@ import { cloudStoragePlugin } from '@payloadcms/plugin-cloud-storage'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import type { Config, Payload, Plugin } from 'payload'
 
-import { resolveMediaStorage, type MediaStorageMode } from '../lib/media-storage'
+import { resolveBlobToken, resolveMediaStorage, type MediaStorageMode } from '../lib/media-storage'
 import { databaseStorageAdapter, ensureMediaStorageSchema } from './database-adapter'
 
 /**
@@ -28,7 +28,9 @@ const blobPlugin = (): Plugin =>
   vercelBlobStorage({
     collections: { media: { disablePayloadAccessControl: true } },
     clientUploads: process.env.BLOB_CLIENT_UPLOADS === 'true',
-    token: process.env.BLOB_READ_WRITE_TOKEN,
+    // `BLOB_READ_WRITE_TOKEN`, or the store-prefixed name Vercel uses for a custom store name
+    // (`HikeGlobally_READ_WRITE_TOKEN`). See `resolveBlobToken`.
+    token: resolveBlobToken(),
     addRandomSuffix: false,
     cacheControlMaxAge: 60 * 60 * 24 * 365,
     alwaysInsertFields: true,

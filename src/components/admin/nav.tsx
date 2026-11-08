@@ -26,7 +26,7 @@ import type { RailIconName } from './rail-icons'
 
 type AdminNavProps = { req?: PayloadRequest } & ServerProps
 
-type SectionId = 'content' | 'library' | 'site' | 'team'
+type SectionId = 'content' | 'library' | 'seo' | 'site' | 'team'
 
 type Placement = {
   icon: RailIconName
@@ -42,6 +42,7 @@ const PLACEMENTS: Record<string, Placement> = {
   'collections:destinations': { icon: 'destinations', order: 20, section: 'content' },
   'collections:blog': { icon: 'blog', order: 30, section: 'content' },
   'collections:pages': { icon: 'pages', order: 40, section: 'content' },
+  'collections:redirections': { icon: 'redirects', order: 10, section: 'seo' },
   'collections:media': { icon: 'media', order: 10, section: 'library' },
   'collections:users': { icon: 'users', order: 10, section: 'team' },
   'globals:header': { icon: 'panel-top', order: 10, section: 'site' },
@@ -49,11 +50,12 @@ const PLACEMENTS: Record<string, Placement> = {
   'globals:settings': { icon: 'settings', order: 30, section: 'site' },
 }
 
-const SECTION_ORDER: SectionId[] = ['content', 'library', 'team', 'site']
+const SECTION_ORDER: SectionId[] = ['content', 'library', 'seo', 'team', 'site']
 
 const SECTION_LABELS: Record<SectionId, string> = {
   content: 'Content',
   library: 'Library',
+  seo: 'SEO',
   site: 'Site',
   team: 'Team',
 }
@@ -99,6 +101,7 @@ export default function AdminNav({
   const buckets: Record<SectionId, OrderedNavItem[]> = {
     content: [],
     library: [],
+    seo: [],
     site: [],
     team: [],
   }

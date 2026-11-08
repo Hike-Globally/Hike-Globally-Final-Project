@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 
-import { isServerlessHost, resolveMediaStorage } from './media-storage'
+import {
+  isServerlessHost,
+  resolveBlobToken,
+  resolveMediaStorage,
+} from './media-storage'
 
 describe('resolveMediaStorage', () => {
   it('prefers Vercel Blob whenever a token is configured', () => {
@@ -75,5 +79,44 @@ describe('resolveMediaStorage', () => {
 
   it('is case-insensitive about MEDIA_STORAGE', () => {
     assert.equal(resolveMediaStorage({ MEDIA_STORAGE: 'Database' }).mode, 'database')
+  })
+})
+
+describe('the Blob token env var name', () => {
+  it('accepts the store-prefixed name Vercel uses for a custom store name', () => {
+    // This is the shape a store called "HikeGlobally" produces in production, and the reason the
+    // deployment silently used the Postgres media table while the Blob store sat empty.
+    const env = { HikeGlobally_READ_WRITE_TOKEN: 'vercel_blob_rw_store_abc', VERCEL: '1' }
+
+    assert.equal(resolveBlobToken(env), 'vercel_blob_rw_store_abc')
+
+    const decision = resolveMediaStorage(env)
+    assert.equal(decision.mode, 'blob')
+    assert.match(decision.reason, /HikeGlobally_READ_WRITE_TOKEN/)
+  })
+
+  it('prefers the canonical BLOB_READ_WRITE_TOKEN when both exist', () => {
+    assert.equal(
+      resolveBlobToken({
+        BLOB_READ_WRITE_TOKEN: 'canonical',
+        HikeGlobally_READ_WRITE_TOKEN: 'prefixed',
+      }),
+      'canonical',
+    )
+  })
+
+  it('honours MEDIA_STORAGE=blob with only the prefixed token', () => {
+    const decision = resolveMediaStorage({
+      MEDIA_STORAGE: 'blob',
+      HikeGlobally_READ_WRITE_TOKEN: 'vercel_blob_rw_store_abc',
+      VERCEL: '1',
+    })
+
+    assert.equal(decision.mode, 'blob')
+  })
+
+  it('still falls back to Postgres when no token of either name is set', () => {
+    assert.equal(resolveBlobToken({ VERCEL: '1' }), undefined)
+    assert.equal(resolveMediaStorage({ VERCEL: '1' }).mode, 'database')
   })
 })

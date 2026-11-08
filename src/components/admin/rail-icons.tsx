@@ -14,6 +14,7 @@ import {
   PanelTop,
   Search,
   Settings,
+  Signpost,
   UserRound,
   Users,
   X,
@@ -45,6 +46,7 @@ export type RailIconName =
   | 'pages'
   | 'panel-bottom'
   | 'panel-top'
+  | 'redirects'
   | 'search'
   | 'settings'
   | 'sign-out'
@@ -65,6 +67,7 @@ const icons: Record<RailIconName, LucideIcon> = {
   pages: FileText,
   'panel-bottom': PanelBottom,
   'panel-top': PanelTop,
+  redirects: Signpost,
   search: Search,
   settings: Settings,
   'sign-out': LogOut,
