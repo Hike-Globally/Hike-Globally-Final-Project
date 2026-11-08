@@ -156,6 +156,38 @@ rule holds for pages written later, not just the ones written today.
 `/robots.txt` (`src/app/robots.ts`) is the other half: it allows everything except `/admin`, `/api/`,
 `/preview/` and `/cdn-cgi/`, sets `Host`, and points crawlers at the sitemap.
 
+### llms.txt
+
+`/llms.txt` is the same site described to a language model instead of to a crawler. The proposal at
+[llmstxt.org](https://llmstxt.org) asks for one Markdown file at the root: an `#` heading naming the
+site, a blockquote summary, a few paragraphs of detail, then `##` sections of links an assistant can
+follow instead of crawling every page.
+
+**It is generated, not checked in.** Two thirds of the file is a list of published trips,
+destinations, posts and pages, so a hand-written copy would be wrong the moment an editor publishes
+something — the failure mode the sitemap avoids by being a route. `src/app/llms.txt/route.ts` serves
+it; `src/lib/llms-txt.ts` owns the rules:
+
+| Rule                                          | Why                                                                                                                                                                                                |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Links come from `canonicalUrl()`              | A line here and the page's `<link rel="canonical">` are the identical string, so no two lists can disagree about a URL.                                                                            |
+| Only published, indexable documents           | Drafts and anything whose SEO panel is set to noindex are skipped — the sitemap's rule. A file that advertises a URL the site hides is worse than no file.                                         |
+| A CMS page whose slug a route owns is skipped | `home`, `about`, `trips` … already have a URL; printing `/${slug}` for them would list a duplicate. The About and Contact entries come from the route table.                                       |
+| Every line carries its own facts              | A trip prints type, duration, difficulty, maximum altitude and price before its summary; a destination its tagline; a post its excerpt — enough for a model to decide which page is worth opening. |
+| Rebuilt on publish                            | Payload's revalidation hooks purge `/llms.txt` next to `/sitemap.xml` (`src/hooks/revalidate.ts`), so a trip published now is in the file now rather than after the 1-hour fallback window.        |
+
+The prose at the top — what the site is, what a trip page contains, how to make contact — lives in
+`buildLlmsTxt()` in `src/lib/llms-txt.ts`. The heading, blockquote and contact address come from the
+CMS settings, so renaming the site or editing the tagline in the admin changes the file too.
+
+`npm test` covers it in `src/lib/llms-txt.test.ts`: one line per published URL, canonical spelling,
+nothing noindex, no empty sections, and copy that is long or multi-line can never break the list it
+sits in. Check a running site with:
+
+```bash
+curl -s http://localhost:3000/llms.txt
+```
+
 ### Email links and Cloudflare Email Address Obfuscation
 
 If Semrush (or Ahrefs, Screaming Frog, or Search Console) reports

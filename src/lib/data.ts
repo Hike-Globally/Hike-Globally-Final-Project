@@ -23,6 +23,7 @@ import type {
   Trip,
   User,
 } from '@/payload-types'
+import type { LlmsTxtDocument, LlmsTxtSources } from './llms-txt'
 import { getPayloadClient, isDatabaseConfigured } from './payload'
 import { isReservedPageSlug } from './site-routes'
 import type { SitemapDocument, SitemapSources } from './sitemap'
@@ -1156,6 +1157,165 @@ export const getSitemapSources = async (): Promise<SitemapSources> => {
     getDestinationRecords(),
     getPostRecords(),
     getPageRecords(),
+  ])
+
+  return { trips, destinations, posts, pages }
+}
+
+/* -------------------------------------------------------------------------- */
+/* llms.txt                                                                    */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * A `select`ed row as the four collections spell it: a trip has `title`/`summary`, a destination
+ * `name`/`tagline`, a post `excerpt`, and every collection carries `meta.noIndex` plus the meta
+ * description an editor may have written.
+ */
+type LlmsTxtRecord = {
+  title?: string | null
+  name?: string | null
+  slug?: string | null
+  summary?: string | null
+  tagline?: string | null
+  excerpt?: string | null
+  tripType?: string | null
+  durationDays?: number | null
+  difficulty?: string | null
+  maxAltitude?: number | null
+  priceFrom?: number | null
+  priceCurrency?: string | null
+  meta?: { noIndex?: boolean | null; description?: string | null } | null
+}
+
+/**
+ * Reduces one row to the fields `/llms.txt` prints. The fallbacks are the point: each collection
+ * names its one-line description differently, and a model reading the file should not care which
+ * — a destination's tagline, a post's excerpt and a page's meta description all arrive as
+ * `summary`.
+ */
+const toLlmsTxtDocument = (doc: unknown): LlmsTxtDocument => {
+  const record = doc as LlmsTxtRecord
+
+  return {
+    title: record.title ?? record.name ?? null,
+    slug: record.slug ?? null,
+    summary: record.summary ?? record.tagline ?? record.excerpt ?? record.meta?.description ?? null,
+    noIndex: record.meta?.noIndex ?? false,
+    tripType: record.tripType ?? null,
+    durationDays: record.durationDays ?? null,
+    difficulty: record.difficulty ?? null,
+    maxAltitude: record.maxAltitude ?? null,
+    priceFrom: record.priceFrom ?? null,
+    priceCurrency: record.priceCurrency ?? null,
+  }
+}
+
+/**
+ * Published trips, reduced to the facts `/llms.txt` prints on a trip line (duration, type,
+ * difficulty, altitude, price) plus the summary.
+ *
+ * A separate reader from the sitemap's rather than a wider `slugSelect`: that one feeds
+ * `generateStaticParams()` and is hit on every cold route, while this one is fetched when something
+ * asks for `/llms.txt`. Keeping them apart means adding a field here cannot quietly make every
+ * page's slug query heavier.
+ */
+const readLlmsTxtTrips = unstable_cache(
+  async () => {
+    const payload = await getPayloadClient()
+    const response = await payload.find({
+      collection: 'trips',
+      locale: SITE_LOCALE,
+      depth: 0,
+      limit: 1000,
+      select: {
+        title: true,
+        slug: true,
+        summary: true,
+        tripType: true,
+        durationDays: true,
+        difficulty: true,
+        maxAltitude: true,
+        priceFrom: true,
+        priceCurrency: true,
+        meta: true,
+      },
+      where: { _status: { equals: 'published' } },
+    })
+
+    return response.docs.map(toLlmsTxtDocument)
+  },
+  ['llms-txt-trips'],
+  { tags: [CACHE_TAG.trips], revalidate: REVALIDATE_SECONDS },
+)
+
+const readLlmsTxtDestinations = unstable_cache(
+  async () => {
+    const payload = await getPayloadClient()
+    const response = await payload.find({
+      collection: 'destinations',
+      locale: SITE_LOCALE,
+      depth: 0,
+      limit: 1000,
+      select: { name: true, slug: true, tagline: true, meta: true },
+      where: { _status: { equals: 'published' } },
+    })
+
+    return response.docs.map(toLlmsTxtDocument)
+  },
+  ['llms-txt-destinations'],
+  { tags: [CACHE_TAG.destinations], revalidate: REVALIDATE_SECONDS },
+)
+
+const readLlmsTxtPosts = unstable_cache(
+  async () => {
+    const payload = await getPayloadClient()
+    const response = await payload.find({
+      collection: 'blog',
+      locale: SITE_LOCALE,
+      depth: 0,
+      limit: 1000,
+      select: { title: true, slug: true, excerpt: true, meta: true },
+      where: { _status: { equals: 'published' } },
+    })
+
+    return response.docs.map(toLlmsTxtDocument)
+  },
+  ['llms-txt-posts'],
+  { tags: [CACHE_TAG.posts], revalidate: REVALIDATE_SECONDS },
+)
+
+const readLlmsTxtPages = unstable_cache(
+  async () => {
+    const payload = await getPayloadClient()
+    const response = await payload.find({
+      collection: 'pages',
+      locale: SITE_LOCALE,
+      depth: 0,
+      limit: 1000,
+      select: { title: true, slug: true, meta: true },
+      where: { _status: { equals: 'published' } },
+    })
+
+    return response.docs.map(toLlmsTxtDocument)
+  },
+  ['llms-txt-pages'],
+  { tags: [CACHE_TAG.pages], revalidate: REVALIDATE_SECONDS },
+)
+
+/**
+ * Everything `/llms.txt` lists: each published trip, destination, post and page with the one line
+ * that describes it, and its `noIndex` flag (a page told to stay out of the index must not be
+ * advertised in this file either).
+ *
+ * Like the sitemap's reader, this degrades to an empty list on a database-less build, so the route
+ * still answers with the static pages instead of failing the build.
+ */
+export const getLlmsTxtSources = async (): Promise<LlmsTxtSources> => {
+  const [trips, destinations, posts, pages] = await Promise.all([
+    safeQuery(readLlmsTxtTrips, []),
+    safeQuery(readLlmsTxtDestinations, []),
+    safeQuery(readLlmsTxtPosts, []),
+    safeQuery(readLlmsTxtPages, []),
   ])
 
   return { trips, destinations, posts, pages }

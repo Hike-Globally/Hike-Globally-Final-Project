@@ -37,7 +37,7 @@ src/
     api/[...slug]                Payload REST
     api/graphql                  Payload GraphQL
     api/revalidate               on-demand cache invalidation (Bearer protected)
-    sitemap.ts, robots.ts
+    sitemap.ts, robots.ts, llms.txt/route.ts
   collections/                   Media, Destinations, Trips, Blog, Pages, Users
   globals/                       Header, Footer, Settings
   blocks/                        11 page blocks used by Pages
@@ -207,7 +207,7 @@ be changed without a deploy.
    and thank-you page.
 
 Then: seed content (4 destinations, 6 trips, 5 journal posts, 2 flexible pages, 12 images), SEO
-(sitemap, robots, JSON-LD), and a production build.
+(sitemap, robots, llms.txt, JSON-LD), and a production build.
 
 ---
 
