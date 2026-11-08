@@ -23,9 +23,22 @@ import { databaseStorageAdapter, ensureMediaStorageSchema } from './database-ada
  * assets straight from Vercel Blob's edge CDN (zero serverless invocations or Active CPU).
  * `clientUploads` is opt-in (`BLOB_CLIENT_UPLOADS=true`) to bypass Vercel's ~4.5 MB function body
  * ceiling once CORS is configured on the store.
+ *
+ * The token is read from `BLOB_READ_WRITE_TOKEN` — the name `media-storage.ts` keys the mode on, so
+ * the mode the startup log announces is the mode actually wired up. A store-named variable
+ * (`HikeGlobally_READ_WRITE_TOKEN`, what Vercel creates for a store connected in the dashboard) is
+ * reported there rather than silently used; rename it or set MEDIA_STORAGE=blob once the existing
+ * files are moved, because the ones already in Postgres are only served by the database adapter.
  */
-const blobPlugin = (): Plugin =>
-  vercelBlobStorage({
+const blobPlugin = (): Plugin => {
+  if (!process.env.BLOB_READ_WRITE_TOKEN?.trim()) {
+    throw new Error(
+      '[media] the blob storage mode was selected but BLOB_READ_WRITE_TOKEN is not set. ' +
+        'Rename the store token, or set MEDIA_STORAGE=database.',
+    )
+  }
+
+  return vercelBlobStorage({
     collections: { media: { disablePayloadAccessControl: true } },
     clientUploads: process.env.BLOB_CLIENT_UPLOADS === 'true',
     token: process.env.BLOB_READ_WRITE_TOKEN,
@@ -33,6 +46,7 @@ const blobPlugin = (): Plugin =>
     cacheControlMaxAge: 60 * 60 * 24 * 365,
     alwaysInsertFields: true,
   })
+}
 
 /** The Postgres fallback: uploads land in the `media_files` table of the CMS database. */
 const databasePlugin = (): Plugin =>
