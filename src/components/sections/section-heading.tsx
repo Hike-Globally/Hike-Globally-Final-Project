@@ -46,7 +46,12 @@ export function SectionHeading({
         className,
       )}
     >
-      <div className={align === 'center' ? 'max-w-2xl' : 'max-w-2xl'}>
+      {/* `.section-heading-copy` is the responsive measure for this block: it is
+          never narrower than the design's 42rem, and above the laptop canvas it
+          takes a share of the page column instead (`max(42rem, 58%)` in
+          `globals.css`) so a 2560px or 4K screen does not leave the title in a
+          672px strip with a 2,000px gap before the "view all" link. */}
+      <div className="section-heading-copy">
         {eyebrow ? (
           <p className={cn('eyebrow mb-3', variant === 'light' ? 'text-mist' : 'text-slate-80')}>
             {eyebrow}

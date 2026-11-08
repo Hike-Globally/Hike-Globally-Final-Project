@@ -52,8 +52,8 @@
     display: block;
     position: absolute;
     inset: 0;
-    border: 1px solid var(--color-slate-40);
-    transform: translate(12px, -12px);
+    border: 0.0625rem solid var(--color-slate-40);
+    transform: translate(0.75rem, -0.75rem);
     pointer-events: none;
   }
 }
@@ -79,7 +79,7 @@
   top: 0;
   right: 0;
   left: 0;
-  height: 2px;
+  height: 0.125rem;
   background: linear-gradient(90deg, #80c7de, #e9c998, transparent);
 }
 
@@ -106,7 +106,7 @@
 [data-cta-card] .cta-card__eyebrow::before {
   content: '';
   width: 2.25rem;
-  height: 1px;
+  height: 0.0625rem;
   background: currentColor;
 }
 
@@ -116,7 +116,7 @@
   width: 0.4375rem;
   height: 0.4375rem;
   flex-shrink: 0;
-  border-radius: 9999px;
+  border-radius: 624.938rem;
   background: currentColor;
 }
 
@@ -145,9 +145,9 @@
   color: var(--cta-accent);
 }
 
-/* The description under the headline — fixed at 16px, overriding the fluid
-   `lead` scale (15–20px) the class would otherwise apply. Unlayered, so it
-   wins over the Tailwind utility without `!important`. */
+/* The description under the headline uses the shared body role (16px at the
+   reference canvas, scaled with the root rem size on large displays). This
+   unlayered declaration wins over the Tailwind lead utility. */
 [data-cta-card] .cta-card__text {
   font-size: var(--text-body);
   line-height: 1.7;
@@ -168,7 +168,7 @@
   /* Sized so the brand line fills the r=45 ring (circumference ≈ 283 units). */
   font-size: var(--text-label);
   font-weight: 600;
-  letter-spacing: 2.2px;
+  letter-spacing: 0.1375rem;
   text-transform: uppercase;
   fill: var(--cta-fg);
 }
@@ -177,7 +177,7 @@
 [data-cta-card] .cta-card__stamp-disc {
   position: absolute;
   inset: 0.4rem;
-  border-radius: 9999px;
+  border-radius: 624.938rem;
   background: color-mix(in srgb, var(--color-ink) 34%, transparent);
 }
 
@@ -214,7 +214,7 @@
 [data-cta-card] .cta-card__trust {
   position: relative;
   z-index: 2;
-  border-top: 1px solid var(--cta-line);
+  border-top: 0.0625rem solid var(--cta-line);
   color: var(--cta-muted);
 }
 

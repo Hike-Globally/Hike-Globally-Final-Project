@@ -1,25 +1,13 @@
 /* ============================================================================
-   TRIPS LISTING — copy sizes on `/trips`
+   TRIPS LISTING TYPE
    ----------------------------------------------------------------------------
-     .trips-card-summary   16px  description on every trip card in the grid
-
-   The hero standfirst is no longer sized here: every hero on the site — this one
-   included — reads `.hero-description` (17px → 18px), the homepage hero's lead
-   size, from `globals.css`. Only the cards keep a page-local pin.
-
-   The scope is `[data-trips-page]`, set once in `src/app/(frontend)/trips/page.tsx`,
-   so no other surface that renders the shared `TripCard` (homepage, destination and
-   trip detail pages) or the `lead` utility picks these sizes up.
-
-   These rules are intentionally *unlayered* plain CSS: real (unlayered) rules beat
-   anything inside `@layer`, which includes the Tailwind v4 `lead` and
-   `card-description-copy` utilities in `globals.css` and the responsive
-   `--font-size-description` scale they read — so these fixed sizes win at every
-   viewport without `!important`. The same technique `homepage.css` and
-   `curated-trips-section.css` rely on.
+   Trip-card summaries use the shared body role: 16px on the 1440px reference
+   canvas and scaled with the root rem size on large displays. The page scope
+   avoids changing other uses of the shared TripCard; the hero continues to
+   read `.hero-description` from globals.css. These unlayered rules keep the
+   intended page-level treatment ahead of Tailwind utilities.
    ========================================================================== */
 
-/* Trip card description — 16px, all viewports. */
 [data-trips-page] .trips-card-summary {
   font-size: var(--text-body);
 }

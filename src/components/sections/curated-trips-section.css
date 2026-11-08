@@ -11,7 +11,8 @@
    picks these sizes up:
 
      .ct-card-title          the trip-card headings are gently reduced to 19–22px.
-     .ct-card-summary        the trip-card summaries (excerpts) stay at 16px.
+     .ct-card-summary        the trip-card summaries use the body role (16px at
+                             reference size, scaled for large canvases).
      .ct-description         layout only — the intro is held to three quarters of
                              the heading column.
 
@@ -26,7 +27,7 @@
   font-size: clamp(1.1875rem, 1.125rem + 0.25vw, 1.375rem);
 }
 
-/* Card excerpt — 16px, all viewports. */
+/* Card excerpt — shared body role, scaled with the canvas. */
 [data-curated-trips] .ct-card-summary {
   font-size: var(--text-body);
 }

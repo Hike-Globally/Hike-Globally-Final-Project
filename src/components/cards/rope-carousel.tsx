@@ -123,10 +123,13 @@ type Layout = {
   pathD: string
 }
 
-function computeDims(width: number): Dims {
-  const W = Math.max(260, width)
-  const maxCard = width >= 3840 ? 560 : width >= 2560 ? 480 : width >= 1920 ? 420 : 350
-  const minCard = Math.min(230, Math.max(168, W * 0.68))
+function computeDims(width: number, remScale = 1): Dims {
+  const W = Math.max(260 * remScale, width)
+  /* The rest of the page follows the root-rem canvas scale in globals.css.
+     Keep the rope cards and their inter-card rhythm in step, too; otherwise
+     the copy grows at 4K while the images stay at their laptop dimensions. */
+  const maxCard = (width >= 3840 ? 560 : width >= 2560 ? 480 : width >= 1920 ? 420 : 350) * remScale
+  const minCard = Math.min(230 * remScale, Math.max(168 * remScale, W * 0.68))
   const cardW = Math.min(maxCard, Math.max(minCard, W * 0.72))
   const cardH = cardW / RATIO
   const pivot = PIVOT_RATIO * cardW
@@ -139,7 +142,7 @@ function computeDims(width: number): Dims {
     H,
     cardW,
     cardH,
-    spacing: cardW + GAP,
+    spacing: cardW + GAP * remScale,
     pivot,
     anchorY,
     sag,
@@ -276,6 +279,7 @@ export function RopeCarousel({
   )
   const layoutRef = useRef(layout)
   const lastWidthRef = useRef(0)
+  const lastRemScaleRef = useRef(1)
 
   useEffect(() => {
     layoutRef.current = layout
@@ -287,17 +291,27 @@ export function RopeCarousel({
     if (!root) return
 
     const apply = (width: number) => {
-      if (Math.abs(width - lastWidthRef.current) < 1) return
+      const remScale = Math.max(1, parseFloat(getComputedStyle(document.documentElement).fontSize) / 16)
+      if (
+        Math.abs(width - lastWidthRef.current) < 1 &&
+        Math.abs(remScale - lastRemScaleRef.current) < 0.005
+      ) {
+        return
+      }
       lastWidthRef.current = width
-      setLayout(computeLayout(computeDims(width), Math.max(1, items.length)))
+      lastRemScaleRef.current = remScale
+      setLayout(computeLayout(computeDims(width, remScale), Math.max(1, items.length)))
     }
 
-    apply(root.getBoundingClientRect().width)
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) apply(entry.contentRect.width)
-    })
+    const measure = () => apply(root.getBoundingClientRect().width)
+    measure()
+    const observer = new ResizeObserver(measure)
     observer.observe(root)
-    return () => observer.disconnect()
+    window.addEventListener('resize', measure, { passive: true })
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', measure)
+    }
   }, [items.length])
 
   /* ---- environment flags ------------------------------------------------- */

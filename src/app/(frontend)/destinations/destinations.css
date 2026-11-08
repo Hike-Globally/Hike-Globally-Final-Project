@@ -1,43 +1,16 @@
 /* ============================================================================
-   DESTINATIONS LISTING TYPE SCALE — fixed description sizes on `/destinations`
+   DESTINATIONS LISTING TYPE
    ----------------------------------------------------------------------------
-   The atlas page draws its own cards (`AtlasCard` in `page.tsx`) instead of the shared
-   `DestinationCard`, so its two lines of running copy inherit the fluid
-   `--font-size-description` scale in `globals.css` — a size that keeps climbing with
-   the canvas. On a 1440px screen the hero description sits at ~19.6px and a card
-   description at ~17.6px; on a Full-HD/TV canvas (`3xl`, where the scale re-bases
-   itself) they reach ~21px and ~19px. Both are pinned to 16px here, which is also the
-   size the same copy already carries everywhere else a destination card appears — the
-   homepage (`--home-destination-card-description-size` in `homepage.css`) and the
-   curated-trips card summaries (`curated-trips-section.css`) — so 16px stays the
-   site's one description size for card copy, rather than a page-local preference:
-
-     .destination-card-description    16px  atlas card description (the region tagline)
-
-   The hero standfirst is not pinned here: every hero on the site, this one
-   included, reads `.hero-description` (17px → 18px) from `globals.css` — the
-   homepage hero's lead size.
-
-   Fixed pixels, not clamps: one legible size at any canvas — the same call the card
-   tiers above make. On a phone this raises the pair slightly (15px → 16px for the
-   hero, 13px → 16px for a card), which is the point of pinning a size the design
-   calls legible at every width. Headlines, eyebrows and the "Explore region" CTA are
-   deliberately untouched; only the two descriptions move.
-
-   The scope is `[data-destinations-page]`, set once on the wrapper in `page.tsx`, so
-   nothing outside this page picks these sizes up. `destination-card-description` is a
-   shared hook on purpose — the homepage styles the very same class for its own cards —
-   and `lead` / `card-description-copy` keep their fluid scale on every other page.
-
-   These rules are intentionally *unlayered* plain CSS: real (unlayered) rules beat
-   anything inside `@layer`, which includes every Tailwind v4 `@utility` in
-   `globals.css` (`lead`, `card-description-copy`) and their own media queries — so a
-   class here overrides a utility's `font-size` without `!important` and without
-   fighting source order. The same technique `homepage.css` relies on.
+   Destination-card descriptions use the shared body role: 16px on the 1440px
+   reference canvas and scaled with the root rem size on larger displays. This
+   keeps atlas, homepage and curated-trip cards consistent without leaving
+   running copy undersized on a wide monitor. The hero standfirst continues to
+   use the shared `.hero-description` role. The selector is scoped to this page
+   and remains unlayered so it can intentionally override Tailwind utilities.
    ==========================================================================*/
 
 [data-destinations-page] {
-  /* 16px — every atlas-card description. */
+  /* Shared body role — scales with the canvas from the 16px reference size. */
   --destinations-card-description-size: var(--text-body);
 }
 

@@ -130,18 +130,22 @@
      clamp()s that land on the mobile size at 375px and the desktop size at
      1440px, so they scale smoothly between the two:
 
-       role        mobile / desktop   line-height   weight
-       hero        36px / 56px  (H1, one per page)   1.1   500
-       section     28px / 40px  (H2)                1.15  500
-       card        20px / 24px  (card H3)           1.3   500
-       subhead     17px / 18px  (small H4)          1.4   600
-       lead        17px / 18px  (lead paragraph)    1.7   400
-       lead-tight  16px / 17px  (lead minus 1px —   1.7   400
-                                 long day-by-day copy)
-       body        16px fixed  (all copy)           1.7   400
-       small       14px fixed                      1.6   400
-       label       12px fixed, uppercase, 0.14em   1.4   600
-       ui          15px fixed  (buttons, nav)       1.5   500
+     role        reference size (375px → 1440px) line-height weight
+     hero        36px → 56px (H1, one per page)   1.1   500
+     section     28px → 40px (H2)                1.15  500
+     card        20px → 24px (card H3)           1.3   500
+     subhead     17px → 18px (small H4)          1.4   600
+     lead        17px → 18px (lead paragraph)    1.7   400
+     lead-tight  16px → 17px (long itinerary)    1.7   400
+     body        16px at reference canvas        1.7   400
+     small       14px at reference canvas        1.6   400
+     label       12px at reference, uppercase    1.4   600
+     ui          15px at reference (buttons/nav) 1.5   500
+
+     Above 1440 CSS pixels the root `rem` unit scales gradually to 26px at
+     3840px. Every rem-based role therefore grows proportionally for distance
+     viewing on large monitors/TVs, while the layout and breakpoint rules
+     continue to use viewport width.
 
      Weights are set with font-normal (400) / font-medium (500) /
      font-semibold (600) — three weights in total, alongside the two
@@ -162,7 +166,7 @@
      18px lead feels oversized next to the day heading. */
   --text-lead-tight: calc(var(--text-lead) - 1px);
   --text-lead-tight--line-height: 1.7;
-  --text-body: 1rem; /* 16px at every canvas */
+  --text-body: 1rem; /* 16px at reference size; rem-scaled on large canvases */
   --text-body--line-height: 1.7;
   --text-small: 0.875rem; /* 14px */
   --text-small--line-height: 1.6;
@@ -445,6 +449,42 @@
   }
 
   html {
+    /* ---------------------------------------------------------------------
+       THE CANVAS SCALE — 5" phone → 100" display
+       ---------------------------------------------------------------------
+       The whole design is authored in `rem`: type roles, gutters, section
+       rhythm, card padding, every Tailwind `p-*` / `gap-*` / `max-w-*`, and
+       the measure caps on headlines. Keeping the root at 16px is right up to
+       a laptop (1440px), but past that the canvas grows and the design does
+       not: on a 2560px monitor the site became a 16px strip with enormous
+       empty margins, and on a 4K / 100-inch display it read as a postage
+       stamp.
+
+       So the root itself scales with the viewport from 1440px onward:
+
+         1440px → 16px    (laptop — unchanged, this is the design's reference)
+         1600px → 16.7px  (20" 1600×900)
+         1920px → 18px    (24" Full HD)
+         2560px → 20.7px  (27–32" QHD)
+         3440px → 24.3px  (ultrawide)
+         3840px → 26px    (4K / 100-inch — capped here)
+         5120px → 26px    (5K ultrawide — type scale remains capped)
+
+       Because every token and utility is rem-based, this scales the *design*
+       proportionally instead of scaling a handful of hand-picked sizes: type,
+       gutters, 1px-relative rhythm, card padding, the `max-w-*` column caps on
+       headlines and the gaps between cards all keep their intended ratios at
+       every one of those canvases. Most fixed component dimensions in
+       page/component stylesheets use rem, so spacing and hit areas follow the
+       same scale; viewport breakpoints, focus strokes and hairlines remain
+       in CSS pixels.
+
+       `100%` is the floor, not `16px`: a visitor who has raised their browser's
+       default text size keeps that preference, and the scale only ever grows
+       from it. Nothing below 1440px changes: the preferred value there is
+       below 16px, so the clamp resolves to the floor. */
+    font-size: clamp(100%, calc(10px + 0.41667vw), 26px);
+
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
     overflow-x: clip;
@@ -708,6 +748,22 @@
 
 @utility photo-scrim {
   background-image: var(--scrim-ink);
+}
+
+/* ==========================================================================
+   Large-canvas measures
+   --------------------------------------------------------------------------
+   Text blocks that sit beside something else (a section's "view all" link, a
+   set of carousel arrows) cannot use a fixed `rem` cap on a very wide canvas:
+   the type grows with the rem scale, but the block would stay a fixed 672px
+   strip and the space between it and the control opposite would open into a
+   hole. This measure keeps the design's 42rem floor and then takes a share of
+   the column, so the gap stays in proportion at 1600px … 3840px.
+   ========================================================================== */
+@layer components {
+  .section-heading-copy {
+    max-width: min(100%, max(42rem, 58%));
+  }
 }
 
 /* ==========================================================================
@@ -980,37 +1036,31 @@
    TV is not looking at a 1280px strip, while `--container-prose` stays a
    reading measure. Type continues to climb after 1920px so copy remains
    legible from sofa distance.
+
+   Two levers do the work together:
+
+     1. the root font-size clamp in `@layer base` (the rem scale), which makes
+        every token, gap, padding and `max-w-*` cap grow with the canvas;
+     2. the layout column, which — from 1536px up — is a share of the viewport
+        (`90vw`) rather than a fixed rem value, so the page keeps filling the
+        screen instead of stepping between a handful of widths.
+
+   They are deliberately independent: the rem scale keeps text legible from a
+   sofa, the vw column keeps the composition the same proportion as the
+   reference 1440px canvas.
    ========================================================================== */
 
-/* 2xl — 1536px laptops / small TVs */
+/* 2xl — 1536px laptops / small TVs and up ----------------------------------
+   Switch to a fluid column before the 1920px breakpoint. This avoids a second
+   width jump at Full HD: the same 90vw column is already in place there, then
+   follows the screen smoothly — 2304px at 2560, 3096px at 3440, 3456px at
+   3840 and 4608px at 5120. The 200rem ceiling prevents an 8K panel from
+   stretching the page without limit. `--container-prose` stays at its 65ch
+   reading measure; `ch` grows in pixels with the root scale while line length
+   remains readable. */
 @media (width >= 96rem) {
   :root {
-    --container-content: 90rem;
-  }
-}
-
-/* 3xl — 1920px Full HD / most TVs */
-@media (width >= 120rem) {
-  :root {
-    --container-content: 108rem;
-    /* Reading measure stays 65 characters at every canvas. */
-    --container-prose: 65ch;
-  }
-}
-
-/* 4xl — 2560px QHD / large TVs */
-@media (width >= 160rem) {
-  :root {
-    --container-content: 128rem;
-    --container-prose: 65ch;
-  }
-}
-
-/* tv — 3840px 4K / 100-inch canvases */
-@media (width >= 240rem) {
-  :root {
-    --container-content: 160rem;
-    --container-prose: 65ch;
+    --container-content: min(90vw, 200rem);
   }
 }
 
@@ -1063,6 +1113,16 @@
 
 .hero-title {
   font-size: var(--hero-title-size);
+  /* The headline's measure. Two floors, whichever is larger:
+       · 12.5em  — the headline's own width (≈ the 896px `max-w-4xl` cap the
+                   markup carries at the 72px desktop size), so the column
+                   never gets narrower than the type needs;
+       · 68%     — a share of the page column, so on a 2560px or 4K canvas the
+                   headline uses the screen instead of staying a 900px strip.
+     Never more than the column itself. The `max-w-*` utility in the markup
+     stays underneath as a fallback (this rule is unlayered, so it wins
+     wherever both apply). */
+  max-width: min(100%, max(12.5em, 68%));
 }
 
 /* The emphasized part of a hero heading — the homepage's second line.
@@ -1091,6 +1151,10 @@
 .hero-description {
   font-size: var(--text-lead);
   line-height: var(--text-lead--line-height);
+  /* Standfirst measure, also in `em`: ~38 characters per line more than the
+     672px `max-w-2xl` cap the markup carries, and it scales with the type on
+     large canvases instead of staying a fixed column. */
+  max-width: min(100%, 38em);
 }
 
 /* Short landscape phones (5–6" rotated): a full-screen band has very little

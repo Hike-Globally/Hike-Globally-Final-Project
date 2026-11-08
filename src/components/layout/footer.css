@@ -13,14 +13,13 @@
   width: 100%;
   overflow: hidden;
   color: var(--color-mist);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0rem);
   background-color: var(--color-ink);
-  border-top: 1px solid color-mix(in srgb, var(--color-haze) 24%, transparent);
+  border-top: 0.0625rem solid color-mix(in srgb, var(--color-haze) 24%, transparent);
 }
 
-/* The About statement is set at a fixed 16px rather than the fluid description
-   scale — the footer is a compact block, and 16px keeps it readable from a
-   phone right up to a TV. */
+/* The About statement uses the shared body role: 16px at the reference canvas,
+   scaling with the root rem size for comfortable reading on large displays. */
 .hg-footer__description {
   font-size: var(--text-body);
 }
@@ -38,7 +37,7 @@
 
 /* A hairline between the link row and the legal bar. */
 .hg-footer__rule {
-  height: 1px;
+  height: 0.0625rem;
   background-color: color-mix(in srgb, var(--color-haze) 20%, transparent);
 }
 
@@ -49,7 +48,7 @@
   width: 2.25rem;
   height: 2.25rem;
   flex-shrink: 0;
-  border: 1px solid color-mix(in srgb, var(--color-haze) 34%, transparent);
+  border: 0.0625rem solid color-mix(in srgb, var(--color-haze) 34%, transparent);
   color: var(--color-mist);
   transition:
     border-color 0.2s var(--ease-brand),

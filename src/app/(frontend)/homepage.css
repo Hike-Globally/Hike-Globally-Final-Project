@@ -18,23 +18,19 @@
   /* 16px — section intros. */
   --home-intro-size: var(--text-lead);
 
-  /* Fixed homepage destination-card sizes. */
+  /* Shared destination-card roles; body copy scales with the canvas rem size. */
   --home-destination-card-title-size: var(--text-card);
   --home-destination-card-description-size: var(--text-body);
 
-  /* 40px — the lead story of the "Latest Blogs and Stories" board. One step
-     below the section headline (50px) and one above a card title (23px), so
-     the board reads as headline → lead story → index without any of the three
-     competing. Grows again from the 3xl canvas up, where the column is 108rem
-     wide — the same move `heading-lg` makes in `globals.css`. */
+  /* Lead story of the "Latest Blogs and Stories" board: one step below the
+     section headline and one above a card title. It uses the shared section
+     role, so it grows in step with the large-canvas rem scale. */
   --home-blog-lead-title-size: var(--text-section);
 
-  /* 23px — the journal board's index-row titles: the card tier of the scale,
-     matching `.destination-card-title` exactly so every card-level heading on
-     the homepage is the same size. */
+  /* Journal index rows use the same card tier as destination-card titles. */
   --home-blog-row-title-size: var(--text-card);
 
-  /* 16px — descriptions on the lead story and every index-row card. */
+  /* Body role — 16px at the reference canvas, scales on large displays. */
   --home-blog-description-size: var(--text-body);
 }
 
@@ -92,9 +88,7 @@
   font-size: var(--home-intro-size);
 }
 
-/* ---------------------------------------------------------------------------
-   Destination cards — fixed at 23px / 16px on the homepage
-   --------------------------------------------------------------------------- */
+/* Destination cards — shared type roles, scaled with the canvas. */
 [data-homepage] .destination-card-title {
   font-size: var(--home-destination-card-title-size);
 }
@@ -103,9 +97,7 @@
   font-size: var(--home-destination-card-description-size);
 }
 
-/* ---------------------------------------------------------------------------
-   Journal board — 40px lead story / 23px index rows
-   --------------------------------------------------------------------------- */
+/* Journal board — lead story and index rows use shared heading roles. */
 [data-homepage] .home-blog-lead-title {
   font-family: var(--font-display);
   font-size: var(--home-blog-lead-title-size);
