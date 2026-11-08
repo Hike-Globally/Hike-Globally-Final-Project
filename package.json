@@ -12,7 +12,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "node scripts/typecheck-build.mjs",
-    "test": "node --import tsx --test src/lib/*.test.ts src/storage/*.test.ts src/components/sections/*.test.ts src/components/sections/globe/*.test.ts src/migrations/*.test.ts scripts/*.test.mjs",
+    "test": "node --import tsx --test src/lib/*.test.ts src/storage/*.test.ts src/components/sections/*.test.ts src/components/sections/globe/*.test.ts src/migrations/tests/*.test.ts scripts/*.test.mjs",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "generate:types": "payload generate:types",
     "generate:importmap": "payload generate:importmap",

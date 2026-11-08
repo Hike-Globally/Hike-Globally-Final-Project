@@ -3,7 +3,7 @@ import test from 'node:test'
 
 import { PgDialect } from 'drizzle-orm/pg-core'
 
-import { up } from './20261107_120000_trip_audience'
+import { up } from '../20261107_120000_trip_audience'
 
 test('trip audience migration normalizes legacy layout kinds before enum casts', async () => {
   const statements: string[] = []
