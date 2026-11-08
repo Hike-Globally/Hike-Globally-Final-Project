@@ -120,6 +120,23 @@ const richText = (...nodes: LexicalNode[]): RichTextValue => ({
   root: { type: 'root', format: '', indent: 0, version: 1, direction: 'ltr', children: nodes },
 })
 
+/**
+ * A packing list filed into the three accordions the trip page renders — Clothing and Footwear,
+ * Trekking Equipment, Personal Items. Seeded this way so a fresh install demonstrates the grouped
+ * view instead of a wall of untagged rows.
+ */
+const packingList = (
+  groups: {
+    clothing?: string[]
+    equipment?: string[]
+    personal?: string[]
+  },
+) => [
+  ...(groups.clothing ?? []).map((item) => ({ item, category: 'clothing-footwear' as const })),
+  ...(groups.equipment ?? []).map((item) => ({ item, category: 'trekking-equipment' as const })),
+  ...(groups.personal ?? []).map((item) => ({ item, category: 'personal-items' as const })),
+]
+
 /* -------------------------------------------------------------------------- */
 /* Image generation                                                            */
 /* -------------------------------------------------------------------------- */
@@ -527,6 +544,39 @@ const run = async () => {
         'Hot showers, device charging and Wi-Fi in the lodges',
         'Gratuities for guide and porters',
       ].map((value) => ({ item: value })),
+      packingList: packingList({
+        clothing: [
+          'Trekking boots, broken in — never new',
+          'Down jacket rated to −15 °C (rentable in Kathmandu)',
+          'Fleece or soft-shell mid layer',
+          'Two base-layer tops, merino preferred',
+          'Trekking trousers and one pair of shorts',
+          'Five pairs of wool-blend socks plus liner socks',
+          'Warm hat, sun cap, buff and sunglasses (category 4)',
+          'Insulated and liner gloves, waterproof mittens above 4,500 m',
+          'Gaiters and a waterproof outer shell',
+        ],
+        equipment: [
+          '65–75 L duffel for the porter, 25–35 L daypack for you',
+          'Sleeping bag rated to −15 °C with a silk liner',
+          'Trekking poles, aluminium or carbon',
+          'Headtorch with spare batteries',
+          'Insulated flask and a 2 L water bladder',
+          'Rain cover for the daypack and a dry bag for documents',
+          'Microspikes for the Khumbu glacier section in shoulder season',
+        ],
+        personal: [
+          'Passport (six months validity), visa and four photos',
+          'Insurance policy that explicitly covers trekking to 6,000 m',
+          'Diamox, ibuprofen, rehydration salts and personal medication',
+          'Water purification tablets or a filter bottle',
+          'SPF 50 sunscreen, lip balm and a small first-aid kit',
+          'Toiletries, quick-dry towel and hand sanitiser',
+          'Power bank, spare camera battery and a universal adapter',
+          'Cash in rupees for hot showers, charging and tips',
+          'A book, notebook and pen for the lodge evenings',
+        ],
+      }),
       faqs: [
         {
           question: 'How fit do I need to be?',

@@ -124,8 +124,12 @@ test('every section is open on load and uses an accessible +/- button', () => {
   assert.equal((html.match(/lucide-minus/g) ?? []).length, contentSections.length)
   assert.equal((html.match(/lucide-plus/g) ?? []).length, contentSections.length)
   assert.doesNotMatch(html, /lucide-chevron/)
-  assert.match(html, /lucide-plus[^"]*\]:opacity-0/)
-  assert.match(html, /lucide-minus[^"]*\]:opacity-100/)
+  // The swap is driven by the `group/accordion` marker on the trigger (Tailwind's data-state
+  // group variant), not by a self-targeting arbitrary variant — the old `[[data-state=open]>span>&]`
+  // selector pointed at a wrapper <span> that does not exist, so the icon never actually changed.
+  assert.match(html, /data-state="open"[^>]*class="[^"]*group\/accordion/)
+  assert.match(html, /lucide-plus[^"]*group-data-\[state=open\]\/accordion:opacity-0/)
+  assert.match(html, /lucide-minus[^"]*group-data-\[state=open\]\/accordion:opacity-100/)
 
   // Content is present in the HTML on first load (not collapsed/hidden server-side).
   assert.match(html, /Bring a base layer and a shell\./)

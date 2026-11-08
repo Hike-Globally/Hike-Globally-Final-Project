@@ -107,6 +107,23 @@ const en = {
     included: "What's included",
     notIncluded: "What's not included",
     packingList: 'Packing list',
+    /** Standfirst under the packing-list heading. */
+    packingListIntro:
+      'Everything a porter will carry and everything you keep on your back, split into three bags. Tick items off as you pack — the checklist stays in this browser.',
+    packingItemsStat: 'Items',
+    packingGroupsStat: 'Groups',
+    packingPackedStat: 'Packed',
+    packingStartTicking: 'Start ticking items off',
+    packingAllPacked: 'Everything packed — see you on the trail',
+    packingYourProgress: 'Your packing',
+    packingLocalNote: 'Saved in this browser only — nothing is sent to us.',
+    packingReset: 'Reset',
+    packingBlurbClothing:
+      'Layers you can shed at lunchtime and put back on before dawn. Boots broken in, never new.',
+    packingBlurbEquipment:
+      'The kit that carries you and keeps you dry. Rentable in Kathmandu if you would rather travel light.',
+    packingBlurbPersonal:
+      'Documents, medicine and the small comforts that make a teahouse feel like home.',
     gallery: 'Gallery',
     faqs: 'Frequently Asked Questions',
     related: 'You may also like',

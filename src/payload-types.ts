@@ -733,11 +733,12 @@ export interface Trip {
       }[]
     | null;
   /**
-   * List the personal gear and essentials travellers should bring for this trip.
+   * Personal gear and essentials travellers should bring. Each item is filed under one of the three accordions on the trip page — Clothing and Footwear, Trekking Equipment, Personal Items.
    */
   packingList?:
     | {
         item: string;
+        category?: ('clothing-footwear' | 'trekking-equipment' | 'personal-items') | null;
         id?: string | null;
       }[]
     | null;
@@ -1763,6 +1764,7 @@ export interface TripsSelect<T extends boolean = true> {
     | T
     | {
         item?: T;
+        category?: T;
         id?: T;
       };
   gallery?:
