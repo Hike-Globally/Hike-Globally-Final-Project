@@ -9,6 +9,7 @@ import { SmoothScroll } from '@/components/providers/smooth-scroll'
 import { dictionary } from '@/i18n/dictionaries'
 import { htmlLang, ogLocale } from '@/i18n/config'
 import { getSettings } from '@/lib/data'
+import { faviconIcons } from '@/lib/favicon'
 import { imageUrl } from '@/lib/seo'
 import { resolveSiteUrlObject } from '@/lib/site-url'
 import './globals.css'
@@ -94,7 +95,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: settings.tagline ?? undefined,
       images: defaultOgImage ? [defaultOgImage] : undefined,
     },
-    icons: { icon: '/images/logo.svg' },
+    icons: faviconIcons,
     formatDetection: { telephone: false },
     other: {
       'theme-color': '#183144',

@@ -22,6 +22,7 @@ import { Header } from './globals/Header'
 import { Settings } from './globals/Settings'
 import { defaultLocale, localeMeta, locales } from './i18n/config'
 import { migrations } from './migrations'
+import { faviconIcons } from './lib/favicon'
 import { resolveMediaStorage } from './lib/media-storage'
 import { serialiseMigrations } from './lib/migration-guard'
 import { ensureTripBrochureSchema } from './lib/schema-repair'
@@ -89,6 +90,7 @@ export default buildConfig({
     meta: {
       titleSuffix: ' · Hike Globally',
       robots: 'noindex, nofollow',
+      icons: faviconIcons,
     },
     livePreview: {
       // Closed until an editor clicks "Expand preview", avoiding automatic background RSC
