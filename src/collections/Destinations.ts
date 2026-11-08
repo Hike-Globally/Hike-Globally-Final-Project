@@ -130,8 +130,13 @@ export const Destinations: CollectionConfig = {
     {
       /**
        * JOIN FIELD — a read-only, database-level view of every trip whose `destination`
-       * relationship points here. This is why the destination page needs no extra query to
-       * list its trips, and why it can never get out of sync.
+       * relationship points here, so the list can never get out of sync.
+       *
+       * WATCH OUT: joined documents are populated only as deep as this field's `maxDepth`.
+       * At the default of 1 each joined trip still has `heroImage` (and its own `destination`)
+       * as a bare ID, so anything that draws a trip CARD must not read it from here — the
+       * frontend reads trips directly at depth 1 instead (`getDestinationTrips` in
+       * `src/lib/data.ts`). Raise `maxDepth` only together with the query's `depth`.
        */
       name: 'trips',
       type: 'join',

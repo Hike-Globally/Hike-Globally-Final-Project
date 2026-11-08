@@ -807,7 +807,6 @@ export const getDestination = cache(
           limit: 1,
           draft: true,
           overrideAccess: true,
-          joins: { trips: { limit: 50, sort: '-featured' } },
           where: { slug: { equals: slug } },
         })
         return (result.docs[0] as Destination | undefined) ?? null
@@ -826,9 +825,6 @@ export const getDestination = cache(
             locale: SITE_LOCALE,
             depth: 1,
             limit: 1,
-            // `joins` resolves the `trips` join field in the same round trip as the document,
-            // so the destination page needs exactly ONE database query.
-            joins: { trips: { limit: 50, sort: '-featured' } },
             where: { and: [{ _status: { equals: 'published' } }, { slug: { equals: slug } }] },
           })
           return (result.docs[0] as Destination | undefined) ?? null
@@ -843,6 +839,67 @@ export const getDestination = cache(
     )
   },
 )
+
+/**
+ * The trips a destination page lists at the bottom, in the card shape.
+ *
+ * This is deliberately a normal `trips` read rather than the destination's `trips` join field.
+ * A join populates its documents at the join field's own `maxDepth` (1 by default), which leaves
+ * every relationship *inside* the joined trip as a bare ID — `heroImage` came back as a number and
+ * `PayloadImageFill` rendered nothing, so the cards had no photograph. Reading the trips directly
+ * at depth 1 populates `heroImage` (and `destination`) exactly like `/trips` does.
+ *
+ * Preview (`includeDraft`) reads without the Data Cache so unpublished trips show up immediately;
+ * the published read is cached under the same `trips` tag as every other trip listing.
+ */
+export const getDestinationTrips = (
+  destinationId: number,
+  { includeDraft = false, limit = 50 }: { includeDraft?: boolean; limit?: number } = {},
+): Promise<TripCard[]> => {
+  if (includeDraft) {
+    return safeQuery(async () => {
+      const payload = await getPayloadClient()
+      const result = await payload.find({
+        collection: 'trips',
+        locale: SITE_LOCALE,
+        depth: 1,
+        limit,
+        sort: '-featured',
+        draft: true,
+        overrideAccess: true,
+        select: tripCardSelect,
+        where: { destination: { equals: destinationId } },
+      })
+      return result.docs as unknown as TripCard[]
+    }, [])
+  }
+
+  return safeQuery(
+    unstable_cache(
+      async () => {
+        const payload = await getPayloadClient()
+        const result = await payload.find({
+          collection: 'trips',
+          locale: SITE_LOCALE,
+          depth: 1,
+          limit,
+          sort: '-featured',
+          select: tripCardSelect,
+          where: {
+            and: [
+              { _status: { equals: 'published' } },
+              { destination: { equals: destinationId } },
+            ],
+          },
+        })
+        return result.docs as unknown as TripCard[]
+      },
+      ['trips', 'destination', String(destinationId), String(limit)],
+      { tags: [CACHE_TAG.trips, CACHE_TAG.destinations], revalidate: REVALIDATE_SECONDS },
+    ),
+    [],
+  )
+}
 
 /**
  * Every published destination, reduced to what the slug readers and the sitemap need.
