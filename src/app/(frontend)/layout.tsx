@@ -159,6 +159,31 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2988608851561676"
           crossOrigin="anonymous"
         ></script>
+        {/* Travelpayouts affiliate tag (from Travelpayouts.txt) — the inline loader appends the
+            https://tpembars.com/NDgxMjc5.js?t=481279 <script> to document.head at runtime.
+            `nowprocket` is a WP Rocket delay-exclusion flag with no equivalent here, so it is
+            spread in rather than written as a literal prop (React has no type for it and would
+            otherwise reject the attribute); the remaining cache/defer flags are emitted verbatim. */}
+        <script
+          {...{ nowprocket: '' }}
+          data-noptimize="1"
+          data-cfasync="false"
+          data-wpfc-render="false"
+          seraph-accel-crit="1"
+          data-no-defer="1"
+          data-cmp-ab="2"
+          dangerouslySetInnerHTML={{
+            __html: `
+  (function () {
+      var script = document.createElement("script");
+      script.async = 1;
+      script.setAttribute("data-cmp-ab","2");
+      script.src = 'https://tpembars.com/NDgxMjc5.js?t=481279';
+      document.head.appendChild(script);
+  })();
+`,
+          }}
+        ></script>
       </head>
       <body className="flex min-h-dvh min-w-0 flex-col overflow-x-clip bg-background text-foreground">
         <LivePreviewRefresh />
