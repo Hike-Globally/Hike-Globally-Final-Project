@@ -116,7 +116,7 @@ function TripBookingCard({
               {dict.trip.difficultyLevel}
             </dt>
             <dd>
-              <span className="bg-sage-90 px-3 py-1 text-small font-medium text-white">
+              <span className="px-3 py-1 text-small font-medium text-white">
                 {difficultyLabel(trip.difficulty)}
               </span>
             </dd>
