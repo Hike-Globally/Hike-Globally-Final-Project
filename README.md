@@ -389,6 +389,18 @@ layer:
 Note that a challenge here is not only an analytics problem: it blocks Googlebot the same way, so it
 also stalls indexing of the sitemap.
 
+## Affiliate tag (Travelpayouts)
+
+The Travelpayouts tag sits in the same `<head>` block, immediately after the Google AdSense
+snippet. It is the verbatim contents of [`Travelpayouts.txt`](Travelpayouts.txt) at the repo root:
+an inline loader that appends `https://tpembars.com/NDgxMjc5.js?t=481279` to `document.head` at
+runtime. Keep the two in sync, or change both together.
+
+`nowprocket` and the other `data-cfasync` / `data-wpfc-render` / `seraph-accel-crit` attributes are
+WordPress, Cloudflare and server-cache hints. They are carried over unchanged so the markup matches
+the file you were given, and they are inert in Next.js — the only part that has to work is the small
+inline loader and the `src` it injects.
+
 ## Deployment
 
 Vercel + hosted Postgres + Vercel Blob for media (without a Blob store the deployment falls back to
