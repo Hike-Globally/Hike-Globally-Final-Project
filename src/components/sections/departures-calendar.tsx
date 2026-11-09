@@ -433,7 +433,13 @@ export function DeparturesCalendar({
                             asChild
                             size="sm"
                             variant={isSelected ? 'default' : 'sage'}
-                            className="shrink-0"
+                            /* The label must be white on the blue fill. `text-white!`
+                               rather than `text-white`: `cn()` ends in `twMerge`, and
+                               tailwind-merge reads this project's custom type tokens
+                               (`text-small`, `text-ui`, …) as colours — so a plain
+                               `text-white` from the variant is merged *away* by the
+                               size's `text-small`. The important flag puts it back. */
+                            className="shrink-0 text-white!"
                           >
                             <Link
                               href={buildBookingHref(departure)}
