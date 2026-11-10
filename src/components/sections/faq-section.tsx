@@ -41,7 +41,7 @@ export function FaqSection({
           {groups.map(({ field, heading, faqs }) => (
             <div key={field}>
               <h3 className="heading-md mb-4">{heading}</h3>
-              <Accordion type="multiple" className="space-y-4">
+              <Accordion type="multiple" className="space-y-3">
                 {faqs.map((faq, index) => (
                   <AccordionItem
                     key={faq.id ?? index}
@@ -50,13 +50,13 @@ export function FaqSection({
                   >
                     <AccordionTrigger
                       headingLevel="h4"
-                      className="items-center py-6 hover:no-underline md:py-7"
+                      className="items-center py-3 hover:no-underline md:py-4"
                     >
                       <span className="min-w-0 text-left font-heading text-subhead font-semibold text-ink">
                         {faq.question}
                       </span>
                     </AccordionTrigger>
-                    <AccordionContent>
+                    <AccordionContent className="pb-4">
                       <p className="max-w-3xl text-lead leading-relaxed whitespace-pre-line text-ink-70">
                         {faq.answer}
                       </p>
