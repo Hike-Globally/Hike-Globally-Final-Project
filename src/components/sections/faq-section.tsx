@@ -57,7 +57,7 @@ export function FaqSection({
                       </span>
                     </AccordionTrigger>
                     <AccordionContent className="pb-4">
-                      <p className="max-w-3xl text-lead leading-relaxed whitespace-pre-line text-ink-70">
+                      <p className="description-copy max-w-3xl leading-relaxed whitespace-pre-line text-ink-70">
                         {faq.answer}
                       </p>
                     </AccordionContent>
