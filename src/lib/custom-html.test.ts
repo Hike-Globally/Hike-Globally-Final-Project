@@ -4,52 +4,87 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 
 import { CustomHtmlSection } from '../components/content/custom-html-section'
-import { sanitizeCustomHtml } from './custom-html'
+import { isExecutableScriptType } from './custom-html'
 
-test('preserves content HTML, tables, images, relative links and safe formatting', () => {
-  const html = sanitizeCustomHtml(
-    '<h3>Gear</h3><p style="color:#123456;text-align:center">Pack light</p><ul><li>Boots</li></ul><table><tr><th scope="col">Item</th><td colspan="2">Tent</td></tr></table><img src="/media/gear.jpg" alt="Gear"><a href="/trips" target="_blank">Trips</a>',
+/**
+ * Custom HTML is trusted, editor-written code: it is published exactly as pasted, scripts included.
+ * These tests lock in both halves of that promise — the server-rendered markup keeps every tag an
+ * editor wrote, and only real JavaScript `type`s are treated as runnable (a `application/ld+json`
+ * data block must reach the page but never execute).
+ */
+const render = (heading: string | null, html: string) =>
+  renderToStaticMarkup(
+    createElement(CustomHtmlSection, { section: { kind: 'html', heading, html } }),
   )
-  assert.match(html, /<h3>Gear<\/h3>/)
-  assert.match(html, /style="color:#123456;text-align:center"/)
-  assert.match(html, /<th scope="col">Item<\/th>/)
-  assert.match(html, /<td colspan="2">Tent<\/td>/)
-  assert.match(html, /src="\/media\/gear.jpg"/)
-  assert.match(html, /loading="lazy"/)
-  assert.match(html, /href="\/trips"/)
-  assert.match(html, /rel="noopener noreferrer"/)
+
+test('publishes scripts, styles, embeds, forms and event handlers exactly as pasted', () => {
+  const html = render(
+    null,
+    '<script src="https://cdn.example/widget.js" defer data-cfasync="false"></script>' +
+      '<script>(function(){window.tp=1})()</script>' +
+      '<style>.tp-widget{color:#123456}</style>' +
+      '<iframe src="https://map.example/embed" loading="lazy"></iframe>' +
+      '<form action="/subscribe"><input name="email" onfocus="track()"></form>' +
+      '<a href="javascript:void(0)">Go</a>' +
+      '<img src="data:image/svg+xml,ok" onerror="fallback()">',
+  )
+  assert.match(html, /<script src="https:\/\/cdn\.example\/widget\.js" defer data-cfasync="false">/)
+  assert.match(html, /<script>\(function\(\)\{window\.tp=1\}\)\(\)<\/script>/)
+  assert.match(html, /<style>\.tp-widget\{color:#123456\}<\/style>/)
+  assert.match(html, /<iframe src="https:\/\/map\.example\/embed" loading="lazy">/)
+  assert.match(html, /<form action="\/subscribe"><input name="email" onfocus="track\(\)">/)
+  assert.match(html, /href="javascript:void\(0\)"/)
+  assert.match(html, /src="data:image\/svg\+xml,ok" onerror="fallback\(\)"/)
 })
 
-test('removes executable tags, event handlers, embeds and unsafe URL schemes', () => {
-  const html = sanitizeCustomHtml(
-    '<script>alert(1)</script><style>body{display:none}</style><iframe src="https://evil.test"></iframe><object data="evil"></object><svg onload="alert(1)"></svg><img src="javascript:alert(1)" onerror="alert(1)"><a href="java&#x73;cript:alert(1)">Bad</a><img src="data:image/svg+xml,evil"><form action="https://evil.test"><input name="password"></form>',
-  )
-  assert.doesNotMatch(
-    html,
-    /script|alert|onload|onerror|iframe|object|svg|<style|<form|<input|javascript:|data:/i,
-  )
-  assert.match(html, />Bad<\/a>/)
+test('keeps a pasted affiliate loader byte-for-byte and in source order', () => {
+  // The Travelpayouts tag from the repo root is the shape editors actually paste.
+  const snippet =
+    '<script nowprocket data-noptimize="1" data-cfasync="false" data-cmp-ab="2">' +
+    'var s=document.createElement("script");s.src="https://tpembars.com/NDgxMjc5.js?t=481279";' +
+    'document.head.appendChild(s);</script>'
+  const html = render(null, `<div id="tp-host">Search</div>${snippet}`)
+  assert.match(html, /<div id="tp-host">Search<\/div>/)
+  assert.ok(html.indexOf('tp-host') < html.indexOf('nowprocket'), 'markup stays before its script')
+  assert.match(html, /nowprocket data-noptimize="1" data-cfasync="false" data-cmp-ab="2"/)
+  assert.match(html, /https:\/\/tpembars\.com\/NDgxMjc5\.js\?t=481279/)
 })
 
-test('does not allow page-covering or network-loading inline CSS', () => {
-  const html = sanitizeCustomHtml(
-    '<p style="position:fixed;inset:0;z-index:999999;background-image:url(https://evil.test/track);color:red; width:expression(alert(1))">Safe</p>',
-  )
-  assert.equal(html, '<p style="color:red">Safe</p>')
-})
-
-test('renders actual HTML, escapes the heading, and omits empty/unsafe-only sections', () => {
-  const render = (heading: string | null, html: string) =>
-    renderToStaticMarkup(
-      createElement(CustomHtmlSection, {
-        section: { kind: 'html', heading, html },
-      }),
-    )
+test('renders actual HTML, escapes the heading, and omits empty sections', () => {
   assert.match(
     render('<b>Heading</b>', '<p><strong>Body</strong></p>'),
     /&lt;b&gt;Heading&lt;\/b&gt;/,
   )
   assert.match(render(null, '<p><strong>Body</strong></p>'), /<p><strong>Body<\/strong><\/p>/)
+  assert.match(render('Heading only', ''), /Heading only/)
   assert.equal(render(null, ''), '')
-  assert.equal(render(null, '<script>alert(1)</script>'), '')
+  assert.equal(render(null, '   '), '')
+})
+
+test('only JavaScript script types are runnable; data blocks are not', () => {
+  for (const type of [
+    undefined,
+    null,
+    '',
+    '   ',
+    'text/javascript',
+    'TEXT/JAVASCRIPT',
+    'text/javascript; charset=utf-8',
+    'application/javascript',
+    'module',
+    'Module',
+  ]) {
+    assert.equal(isExecutableScriptType(type), true, `${JSON.stringify(type)} should run`)
+  }
+  for (const type of [
+    'application/ld+json',
+    'application/json',
+    'text/plain',
+    'text/template',
+    'text/html',
+    'importmap',
+    'speculationrules',
+  ]) {
+    assert.equal(isExecutableScriptType(type), false, `${JSON.stringify(type)} must not run`)
+  }
 })

@@ -46,14 +46,14 @@ export function pageSectionsField(options: { label: string; value: string }[]): 
       },
       {
         name: 'html',
-        label: 'Custom HTML',
+        label: 'Custom HTML / code',
         type: 'code',
         required: true,
         admin: {
           language: 'html',
           condition: (_, siblingData) => siblingData.kind === 'html',
           description:
-            'Paste an HTML fragment, not a full document. Headings, text, links, images, lists, tables and safe inline styles are supported. Scripts, event handlers, forms, embeds and unsafe URLs/styles are removed when displayed.',
+            'Published exactly as written: <script> tags, <style> blocks, iframes, forms and any other embed are kept and run on the public page. External scripts load in the order you paste them, so a widget’s loader can be followed by its init call. Only paste code you trust — it runs for every visitor with this site’s full rights. The optional heading above is the one thing rendered as plain text.',
         },
       },
     ],
