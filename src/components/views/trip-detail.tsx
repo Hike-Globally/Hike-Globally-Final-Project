@@ -304,10 +304,10 @@ export function TripDetail({
                     <fact.icon className="size-4" aria-hidden />
                   </span>
                   <div className="min-w-0">
-                    <dt className="text-label tracking-[0.14em] text-mist/75 uppercase">
+                    <dt className="text-[0.625rem] leading-[1.4] tracking-[0.14em] text-mist/75 uppercase md:text-label">
                       {fact.label}
                     </dt>
-                    <dd className="mt-1 truncate font-heading text-ui font-semibold text-white">
+                    <dd className="mt-1 truncate font-heading text-[0.8125rem] leading-[1.5] font-semibold text-white md:text-ui">
                       {fact.value}
                     </dd>
                   </div>
