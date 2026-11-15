@@ -56,6 +56,19 @@ export type PageSection = {
   linkPreviewOriginalPrice?: string | null
 }
 
+/**
+ * The sections a page may hold more than one of.
+ *
+ * Custom HTML rows were always repeatable — a page can carry several snippets. **Link preview**
+ * rows are repeatable too: a trip or post often points at more than one place (the operator, a
+ * partner's booking page, a related guide), and each row keeps its own URL and card details, so
+ * the cards can sit at different points in the layout.
+ *
+ * Every other built-in section reads the document itself (`itinerary`, `faqs`, `hero`, …) and can
+ * only be placed once; adding it a second time would show the same content twice.
+ */
+export const REPEATABLE_SECTION_KINDS: ReadonlySet<string> = new Set(['html', 'linkPreview'])
+
 export function defaultPageSections(options: { value: string }[]): PageSection[] {
   return options.map(({ value }) => ({ kind: value }))
 }
@@ -69,7 +82,10 @@ export function resolvePageSections(
   const seen = new Set<string>()
   return (sections?.length ? sections : defaultPageSections(options)).filter(({ kind }) => {
     if (kind === 'html') return true
-    if (!allowed.has(kind) || seen.has(kind)) return false
+    if (!allowed.has(kind)) return false
+    // Repeatable rows are kept in the order they were saved, however many there are.
+    if (REPEATABLE_SECTION_KINDS.has(kind)) return true
+    if (seen.has(kind)) return false
     seen.add(kind)
     return true
   })
@@ -91,12 +107,36 @@ export function resolveSectionContent(
   return typeof entry === 'function' ? entry(section) : entry
 }
 
+/**
+ * The address a Link preview row points at, shortened for the admin's row label:
+ * `https://www.booking.com/hotel/np/…` → `booking.com`, while a site path stays as it is. `null`
+ * until the editor has typed a URL, so two empty rows still read the same.
+ */
+export function linkPreviewAddress(url: string | null | undefined): string | null {
+  const value = url?.trim()
+  if (!value) return null
+  if (value.startsWith('/')) return value
+  try {
+    return new URL(value).host.replace(/^www\./, '')
+  } catch {
+    return value
+  }
+}
+
+/**
+ * The admin-side rule: a built-in section may only be placed once, because it renders the document
+ * itself and a second copy would repeat that content. Custom HTML and Link preview rows are
+ * repeatable (see `REPEATABLE_SECTION_KINDS`) — each one carries its own content, so several of
+ * them are several different sections.
+ */
 export function validatePageSections(value: unknown): true | string {
   if (!Array.isArray(value)) return true
   const seen = new Set<string>()
   for (const section of value as PageSection[]) {
-    if (!section.kind || section.kind === 'html') continue
-    if (seen.has(section.kind)) return 'Each existing page section can only be added once.'
+    if (!section.kind || REPEATABLE_SECTION_KINDS.has(section.kind)) continue
+    if (seen.has(section.kind)) {
+      return 'This section can only be added once. Custom HTML and Link preview rows can be repeated.'
+    }
     seen.add(section.kind)
   }
   return true

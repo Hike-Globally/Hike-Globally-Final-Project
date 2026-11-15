@@ -5,6 +5,7 @@ import {
   blogSectionOptions,
   defaultPageSections,
   groupPageSections,
+  linkPreviewAddress,
   resolvePageSections,
   resolveSectionContent,
   tripSectionOptions,
@@ -83,6 +84,39 @@ test('rejects duplicate built-ins, allows any number of distinct HTML sections',
       tripSectionOptions,
     ),
     [{ kind: 'hero' }, { kind: 'html', html: 'ok' }],
+  )
+})
+
+test('Link preview rows can be repeated, each carrying its own card', () => {
+  const sections = [
+    { kind: 'hero' },
+    { id: 'a', kind: 'linkPreview', linkPreviewUrl: 'https://www.booking.com/hotel/np/annapurna' },
+    { id: 'b', kind: 'linkPreview', linkPreviewUrl: '/blog/altitude' },
+    // An empty row is kept too, so an editor can add one now and fill it in later.
+    { id: 'c', kind: 'linkPreview' },
+  ]
+
+  for (const options of [tripSectionOptions, blogSectionOptions]) {
+    assert.equal(validatePageSections(sections), true)
+    assert.deepEqual(resolvePageSections(sections, options), sections)
+  }
+
+  // Everything else still reads the document, so it can only be placed once.
+  assert.equal(
+    typeof validatePageSections([
+      { kind: 'linkPreview' },
+      { kind: 'linkPreview' },
+      { kind: 'faqs' },
+      { kind: 'faqs' },
+    ]),
+    'string',
+  )
+  assert.deepEqual(
+    resolvePageSections(
+      [{ kind: 'linkPreview' }, { kind: 'faqs' }, { kind: 'linkPreview' }, { kind: 'faqs' }],
+      tripSectionOptions,
+    ),
+    [{ kind: 'linkPreview' }, { kind: 'faqs' }, { kind: 'linkPreview' }],
   )
 })
 
@@ -216,4 +250,12 @@ test('a section can be rendered from its own row', () => {
     'card:/trips/a',
   )
   assert.equal(resolveSectionContent(content, { kind: 'unknown' }), undefined)
+})
+
+test('repeated Link preview rows are told apart by the address they point at', () => {
+  assert.equal(linkPreviewAddress('https://www.booking.com/hotel/np/annapurna'), 'booking.com')
+  assert.equal(linkPreviewAddress('  https://guide.example.com/a  '), 'guide.example.com')
+  assert.equal(linkPreviewAddress('/blog/altitude'), '/blog/altitude')
+  assert.equal(linkPreviewAddress(''), null)
+  assert.equal(linkPreviewAddress(null), null)
 })

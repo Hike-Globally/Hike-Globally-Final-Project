@@ -44,7 +44,8 @@ export async function LinkPreviewSection({ source }: { source: LinkPreviewSource
   const hasPrice = Boolean(card.price || card.originalPrice)
 
   return (
-    <section id="link-preview" className="link-preview-section scroll-mt-24 pb-16 md:pb-24">
+    // No `id`: a page can now hold several Link preview rows, and one id cannot be shared.
+    <section className="link-preview-section scroll-mt-24 pb-16 md:pb-24">
       <Reveal>
         <a
           className="link-preview-card"
