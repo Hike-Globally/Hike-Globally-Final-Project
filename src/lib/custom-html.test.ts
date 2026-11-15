@@ -12,7 +12,7 @@ import { isExecutableScriptType } from './custom-html'
  * editor wrote, and only real JavaScript `type`s are treated as runnable (a `application/ld+json`
  * data block must reach the page but never execute).
  */
-const render = (heading: string | null, html: string, variant?: 'default' | 'trip') =>
+const render = (heading: string | null, html: string, variant?: 'default' | 'editorial') =>
   renderToStaticMarkup(
     createElement(CustomHtmlSection, { section: { kind: 'html', heading, html }, variant }),
   )
@@ -61,11 +61,11 @@ test('renders actual HTML, escapes the heading, and omits empty sections', () =>
   assert.equal(render(null, '   '), '')
 })
 
-test('trip custom HTML gets a branded responsive frame without altering its embed markup', () => {
+test('editorial custom HTML gets a branded responsive frame without altering its embed markup', () => {
   const html = '<div id="klook-widget">Cards</div><script>window.loaded = true</script>'
-  const markup = render('Trips You May Like', html, 'trip')
+  const markup = render('Trips You May Like', html, 'editorial')
 
-  assert.match(markup, /custom-html-section--trip/)
+  assert.match(markup, /custom-html-section--editorial/)
   assert.match(markup, /custom-html-section__heading/)
   assert.match(markup, /custom-html-section__embed/)
   assert.doesNotMatch(markup, /prose-hg/, 'third-party markup avoids rich-text styling')

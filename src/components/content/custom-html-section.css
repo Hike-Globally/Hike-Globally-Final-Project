@@ -1,6 +1,6 @@
-/* Trip embeds are third-party content, so their saved HTML and scripts stay untouched. The
-   surrounding section gives them a clear, responsive home in the page's own visual language. */
-.custom-html-section--trip {
+/* Trip and blog embeds are third-party content, so their saved HTML and scripts stay untouched.
+   The surrounding section gives them a clear, responsive home in the site's visual language. */
+.custom-html-section--editorial {
   padding-block: clamp(3.25rem, 4.5vw, 5.5rem);
   border-block: 1px solid var(--color-slate-20);
   background: var(--color-mist);
@@ -84,7 +84,7 @@
 }
 
 @media (max-width: 639px) {
-  .custom-html-section--trip {
+  .custom-html-section--editorial {
     padding-block: 2.75rem;
   }
 

@@ -12,15 +12,15 @@ export function CustomHtmlSection({
   variant = 'default',
 }: {
   section: PageSection
-  /** Trip embeds get an editorial, full-width frame without changing their saved HTML. */
-  variant?: 'default' | 'trip'
+  /** Trip and blog embeds get an editorial, full-width frame without changing their saved HTML. */
+  variant?: 'default' | 'editorial'
 }) {
   const html = section.html ?? ''
   if (!html.trim() && !section.heading?.trim()) return null
 
-  const isTrip = variant === 'trip'
+  const hasEditorialFrame = variant === 'editorial'
   const heading = section.heading ? (
-    isTrip ? (
+    hasEditorialFrame ? (
       <header className="custom-html-section__heading">
         <span className="custom-html-section__accent" aria-hidden="true" />
         <h2 className="heading-lg custom-html-section__title">{section.heading}</h2>
@@ -34,16 +34,19 @@ export function CustomHtmlSection({
       html={html}
       className={cn(
         'max-w-none overflow-x-auto break-words [&_img]:max-w-full',
-        isTrip ? 'custom-html-section__embed' : 'prose-hg',
+        hasEditorialFrame ? 'custom-html-section__embed' : 'prose-hg',
       )}
     />
   )
 
   return (
     <section
-      className={cn('custom-html-section', isTrip ? 'custom-html-section--trip' : 'py-12 md:py-16')}
+      className={cn(
+        'custom-html-section',
+        hasEditorialFrame ? 'custom-html-section--editorial' : 'py-12 md:py-16',
+      )}
     >
-      {isTrip ? (
+      {hasEditorialFrame ? (
         <div className="container-content custom-html-section__inner">
           {heading}
           {embed}

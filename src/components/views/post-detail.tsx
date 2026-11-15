@@ -308,7 +308,9 @@ export function PostDetail({
       </>
     ),
   }
-  const groups = groupPageSections(sections, ['hero', 'planning', 'related'])
+  // Custom embeds use the same full-width editorial frame as trip widgets, rather than being
+  // constrained to the article reading measure or the outline column.
+  const groups = groupPageSections(sections, ['hero', 'planning', 'related', 'html'])
 
   return (
     <>
@@ -318,7 +320,7 @@ export function PostDetail({
           const content = group.sections.map((section, index) => (
             <Fragment key={section.id ?? `${section.kind}-${index}`}>
               {section.kind === 'html' ? (
-                <CustomHtmlSection section={section} />
+                <CustomHtmlSection section={section} variant="editorial" />
               ) : (
                 sectionContent[section.kind]
               )}
