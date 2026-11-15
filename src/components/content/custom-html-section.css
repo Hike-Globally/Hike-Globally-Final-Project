@@ -1,0 +1,98 @@
+/* Trip embeds are third-party content, so their saved HTML and scripts stay untouched. The
+   surrounding section gives them a clear, responsive home in the page's own visual language. */
+.custom-html-section--trip {
+  padding-block: clamp(3.25rem, 4.5vw, 5.5rem);
+  border-block: 1px solid var(--color-slate-20);
+  background: var(--color-mist);
+}
+
+.custom-html-section__inner {
+  display: grid;
+  justify-items: center;
+  gap: clamp(1.5rem, 2.8vw, 2.75rem);
+  min-width: 0;
+}
+
+.custom-html-section__heading {
+  display: grid;
+  justify-items: center;
+  gap: 0.875rem;
+  width: 100%;
+  text-align: center;
+}
+
+.custom-html-section__accent {
+  display: block;
+  width: 2.75rem;
+  height: 2px;
+  background: var(--color-sage);
+}
+
+.custom-html-section__title {
+  max-width: 24ch;
+  margin: 0;
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+
+/* Keep the host centered and let the widget use its full available width. A fixed-width iframe
+   is capped to the viewport so it cannot push a phone layout sideways; its own document remains
+   responsible for reflowing its internal contents. Tables or other intentionally wide embeds can
+   still be scrolled inside this viewport instead of widening the page itself. */
+.custom-html-section__embed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-color: var(--color-slate-40) transparent;
+  scrollbar-width: thin;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+}
+
+.custom-html-section__embed > * {
+  max-width: 100%;
+}
+
+.custom-html-section__embed :is(iframe, embed, object, video, img, svg) {
+  max-width: 100%;
+}
+
+.custom-html-section__embed :is(img, svg) {
+  height: auto;
+}
+
+.custom-html-section__embed iframe {
+  display: block;
+  margin-inline: auto;
+  border: 0;
+}
+
+/* Klook's affiliate iframe otherwise keeps its desktop pixel width, even inside a wider section.
+   Make the frame follow this column so Klook can respond to the viewport it is given. */
+.custom-html-section__embed iframe[src*='klook'] {
+  width: 100% !important;
+  max-width: 100%;
+}
+
+@media (max-width: 639px) {
+  .custom-html-section--trip {
+    padding-block: 2.75rem;
+  }
+
+  .custom-html-section__inner {
+    gap: 1.5rem;
+  }
+
+  .custom-html-section__heading {
+    gap: 0.75rem;
+  }
+}

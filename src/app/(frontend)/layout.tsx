@@ -12,6 +12,7 @@ import { getSettings } from '@/lib/data'
 import { faviconIcons } from '@/lib/favicon'
 import { imageUrl } from '@/lib/seo'
 import { resolveSiteUrlObject } from '@/lib/site-url'
+import '@/components/content/custom-html-section.css'
 import './globals.css'
 
 /**

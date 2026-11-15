@@ -464,7 +464,9 @@ export function TripDetail({
       </>
     ),
   }
-  const groups = groupPageSections(sections, ['hero', 'inquiry', 'related'])
+  // Custom embeds are given their own full-width band: third-party widgets need the breathing room
+  // to center and adapt, rather than being squeezed beside the sticky booking card.
+  const groups = groupPageSections(sections, ['hero', 'inquiry', 'related', 'html'])
 
   const bookingAnchor =
     sections.find(({ kind }) => kind === 'highlights') ??
@@ -477,7 +479,7 @@ export function TripDetail({
         const content = group.sections.map((section, index) => (
           <Fragment key={section.id ?? `${section.kind}-${index}`}>
             {section.kind === 'html' ? (
-              <CustomHtmlSection section={section} />
+              <CustomHtmlSection section={section} variant="trip" />
             ) : (
               sectionContent[section.kind]
             )}

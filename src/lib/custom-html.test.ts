@@ -12,9 +12,9 @@ import { isExecutableScriptType } from './custom-html'
  * editor wrote, and only real JavaScript `type`s are treated as runnable (a `application/ld+json`
  * data block must reach the page but never execute).
  */
-const render = (heading: string | null, html: string) =>
+const render = (heading: string | null, html: string, variant?: 'default' | 'trip') =>
   renderToStaticMarkup(
-    createElement(CustomHtmlSection, { section: { kind: 'html', heading, html } }),
+    createElement(CustomHtmlSection, { section: { kind: 'html', heading, html }, variant }),
   )
 
 test('publishes scripts, styles, embeds, forms and event handlers exactly as pasted', () => {
@@ -59,6 +59,17 @@ test('renders actual HTML, escapes the heading, and omits empty sections', () =>
   assert.match(render('Heading only', ''), /Heading only/)
   assert.equal(render(null, ''), '')
   assert.equal(render(null, '   '), '')
+})
+
+test('trip custom HTML gets a branded responsive frame without altering its embed markup', () => {
+  const html = '<div id="klook-widget">Cards</div><script>window.loaded = true</script>'
+  const markup = render('Trips You May Like', html, 'trip')
+
+  assert.match(markup, /custom-html-section--trip/)
+  assert.match(markup, /custom-html-section__heading/)
+  assert.match(markup, /custom-html-section__embed/)
+  assert.doesNotMatch(markup, /prose-hg/, 'third-party markup avoids rich-text styling')
+  assert.match(markup, /<div id="klook-widget">Cards<\/div><script>window\.loaded = true<\/script>/)
 })
 
 test('only JavaScript script types are runnable; data blocks are not', () => {
