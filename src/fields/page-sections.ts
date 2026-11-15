@@ -2,6 +2,7 @@ import type { ArrayField } from 'payload'
 import { array } from 'payload/shared'
 
 import { defaultPageSections, validatePageSections } from '../lib/page-sections'
+import { linkPreviewSectionFields } from './link-preview'
 
 /** Payload arrays provide persisted drag handles, move controls, and draft/live-preview support. */
 export function pageSectionsField(options: { label: string; value: string }[]): ArrayField {
@@ -56,6 +57,9 @@ export function pageSectionsField(options: { label: string; value: string }[]): 
             'Published exactly as written: <script> tags, <style> blocks, iframes, forms and any other embed are kept and run on the public page. External scripts load in the order you paste them, so a widget’s loader can be followed by its init call. Only paste code you trust — it runs for every visitor with this site’s full rights. The optional heading above is the one thing rendered as plain text.',
         },
       },
+      /* A Link preview row holds its own URL and card details, right here in the row. See
+         src/fields/link-preview.ts. */
+      ...linkPreviewSectionFields(),
     ],
   }
 }

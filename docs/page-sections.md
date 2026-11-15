@@ -25,16 +25,18 @@ The section's position comes from the **FAQs** row in Page sections, which sits 
 
 ## Link preview
 
-Trips and blog posts both have a **Link preview** panel (below **Who Is This Trip Not For** on trips, and below **FAQs** on posts) and a **Link preview** row in Page sections. Paste a URL in the panel and the row shows a card for that page wherever it sits in the layout. With no URL the row renders nothing.
+Trips and blog posts both have a **Link preview** row in Page sections. Choose **Link preview** in a row's **Section** select and a **URL** box appears in that row; the row shows a card for that page, wherever it sits in the layout. With no URL the row renders nothing.
 
-- **URL** can be a full `https://` address to any page, or a path on this site such as `/trips/annapurna-base-camp`. Pages on other sites open in a new tab; this site's own pages open in the same tab.
-- **Image, title and description** are read from the page's own metadata (Open Graph, then Twitter tags, then the `<title>` and description). The title and description can be overridden in the panel. The metadata is fetched on the server with a five-second timeout and cached for an hour; if the page cannot be read, the card still shows the editor's title and text.
+The URL and the card's details live in the row, not in a panel elsewhere on the form, so the card is edited in the one place it is placed. Being part of the (per-language) Page sections array, it is ordered, versioned and translated with the rest of the layout like any other section.
+
+- **URL** — the only field that matters — can be a full `https://` address to any page, or a path on this site such as `/trips/annapurna-base-camp`. Pages on other sites open in a new tab; this site's own pages open in the same tab.
+- **Image, title and description** are read from the page's own metadata (Open Graph, then Twitter tags, then the `<title>` and description). The title and description can be overridden in the row. The metadata is fetched on the server with a five-second timeout and cached for an hour; if the page cannot be read, the card still shows the editor's title and text.
 - **Rating, number of reviews, price and original price** are typed in, since they are not part of a page's metadata. The rating is capped at 5. The original price is shown struck through before the price.
 - The card deliberately has **no badges or ribbons** (no “Best seller”, no “Save US$ …”, no “Group discount” pill). It is the same card on trips and blog posts, and is styled in `src/components/sections/link-preview.css`.
 
-The row can be dragged like any other section, and it is part of version history. Migration `20261115_180000_link_preview` adds the row to every saved layout (after **Who is this trip for / not for** on trips, when present, and directly after the article body on posts). It does not change anything on a page until a URL is entered.
+The row can be dragged like any other section, and it is part of version history. Migration `20261115_180000_link_preview` adds the row to every saved layout (after **Who is this trip for / not for** on trips, when present, and directly after the article body on posts). It does not change anything on a page until a URL is entered. Migration `20261115_200000_link_preview_in_page_section` then moves the URL and the card's details from the old document panel into that row (copying any card already filled in, then dropping the panel's columns) — see [Deployment](#deployment).
 
-Implementation: `src/lib/link-preview.ts` (URL validation, metadata parsing, merge rules), `src/fields/link-preview.ts` (the admin panel), `src/components/sections/link-preview-section.tsx` (the card).
+Implementation: `src/lib/link-preview.ts` (URL validation, metadata parsing, merge rules), `src/fields/link-preview.ts` (the row's fields, spread into the row by `src/fields/page-sections.ts`), `src/components/sections/link-preview-section.tsx` (the card, which reads the row it is rendered from).
 
 ## Custom HTML, CSS and JavaScript
 
@@ -83,6 +85,8 @@ saved markup, and any `<script>` that was previously stripped on the way out now
 Run `npm run migrate` before deploying the updated application. Migration `20261014_142919_page_sections` adds localized ordered rows for both collections and their version tables; it does not replace or delete existing content. Existing documents without a layout retain their original section order and show those defaults in the editor. New documents start with the same default rows.
 
 Migration `20261115_180000_link_preview` adds the Link preview fields and enum values, and the **Link preview** row to saved layouts (see the Link preview section above). Nothing changes on a public page until a URL is entered.
+
+Migration `20261115_200000_link_preview_in_page_section` moves the card's **URL, title, description, rating, review count and prices from the document into the Link preview row**, so the row an editor adds has a URL box in it instead of only a Section select. Every value already typed into the old panel is copied into the `linkPreview` row of each locale, live and versioned, and only then are the old document columns dropped — no published card changes on deploy. Run `npm run migrate` before deploying the updated application, as usual.
 
 Migration `20261019_045205_blog_faqs` adds the blog FAQ fields and a **FAQs** row to every blog layout that was already saved — right after the article body (or at the end if that row was removed), in the live post and its version history. Nothing changes on screen until a post has questions.
 

@@ -1,7 +1,13 @@
-import { Fragment, type ReactNode } from 'react'
+import { Fragment } from 'react'
 import { CustomHtmlSection } from '@/components/content/custom-html-section'
 import type { InternalLinker } from '@/lib/internal-links'
-import { groupPageSections, resolvePageSections, tripSectionOptions } from '@/lib/page-sections'
+import {
+  groupPageSections,
+  resolvePageSections,
+  resolveSectionContent,
+  tripSectionOptions,
+  type PageSectionContent,
+} from '@/lib/page-sections'
 import Link from 'next/link'
 import {
   ArrowRight,
@@ -250,7 +256,7 @@ export function TripDetail({
   const highlights = trip.highlights?.filter(({ text }) => text.trim())
   const brochure = resolveTripBrochure(trip, trip.slug, dict.trip.downloadBrochure)
 
-  const sectionContent: Record<string, ReactNode> = {
+  const sectionContent: Record<string, PageSectionContent> = {
     hero: (
       <>
         <section
@@ -361,7 +367,8 @@ export function TripDetail({
       </section>
     ) : null,
     audience: <TripAudienceSection trip={trip} linker={linker} />,
-    linkPreview: <LinkPreviewSection source={trip} />,
+    // The card's URL lives in its own row, so the row is what the section reads.
+    linkPreview: (section) => <LinkPreviewSection source={section} />,
     itinerary: <>{trip.itinerary?.length ? <ItinerarySection days={trip.itinerary} /> : null}</>,
     information: (
       <EssentialInformationSection
@@ -483,7 +490,7 @@ export function TripDetail({
             {section.kind === 'html' ? (
               <CustomHtmlSection section={section} variant="trip" />
             ) : (
-              sectionContent[section.kind]
+              resolveSectionContent(sectionContent, section)
             )}
             {section === bookingAnchor ? (
               <div className="mb-16 lg:hidden">

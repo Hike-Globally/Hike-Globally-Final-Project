@@ -21,6 +21,7 @@ import * as migration_20261108_120000_trip_packing_categories from './20261108_1
 import * as migration_20261108_150000_redirections from './20261108_150000_redirections'
 import * as migration_20261115_120000_home_hero_split_heading from './20261115_120000_home_hero_split_heading'
 import * as migration_20261115_180000_link_preview from './20261115_180000_link_preview'
+import * as migration_20261115_200000_link_preview_in_page_section from './20261115_200000_link_preview_in_page_section'
 
 export const migrations = [
   {
@@ -137,5 +138,10 @@ export const migrations = [
     up: migration_20261115_180000_link_preview.up,
     down: migration_20261115_180000_link_preview.down,
     name: '20261115_180000_link_preview',
+  },
+  {
+    up: migration_20261115_200000_link_preview_in_page_section.up,
+    down: migration_20261115_200000_link_preview_in_page_section.down,
+    name: '20261115_200000_link_preview_in_page_section',
   },
 ]
