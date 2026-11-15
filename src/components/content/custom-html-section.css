@@ -1,5 +1,5 @@
-/* The Key Highlights / Key Takeaways card supplies the visual frame. These rules only constrain
-   arbitrary CMS embeds so their content stays inside that frame at every viewport size. */
+/* The Key Highlights / Key Takeaways card supplies the visual frame. These rules stretch arbitrary
+   CMS embeds across the available card width while keeping them responsive. */
 .custom-html-section {
   min-width: 0;
 }
@@ -9,6 +9,7 @@
 }
 
 .custom-html-section__content {
+  width: 100%;
   min-width: 0;
   padding-top: 0.4rem;
 }
@@ -28,27 +29,26 @@
   line-height: var(--text-body--line-height);
 }
 
-.custom-html-section__embed > * {
-  max-width: 100%;
+/* Top-level widget containers should fill the card's content width using CSS only; the saved HTML
+   and scripts remain untouched. */
+.custom-html-section__embed
+  > :is(div, section, article, aside, main, form, table, iframe, embed, object, video, figure) {
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
-.custom-html-section__embed :is(iframe, embed, object, video, img, svg) {
-  max-width: 100%;
+.custom-html-section__embed :is(iframe, embed, object, video) {
+  display: block;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 .custom-html-section__embed :is(img, svg) {
+  max-width: 100%;
   height: auto;
 }
 
 .custom-html-section__embed iframe {
-  display: block;
   margin-inline: auto;
   border: 0;
-}
-
-/* Keep Klook's widget responsive within the same card instead of letting its desktop iframe
-   width push the main trip column wider than the booking sidebar allows. */
-.custom-html-section__embed iframe[src*='klook'] {
-  width: 100% !important;
-  max-width: 100%;
 }

@@ -1,10 +1,16 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 
 import { CustomHtmlSection } from '../components/content/custom-html-section'
 import { isExecutableScriptType } from './custom-html'
+
+const customHtmlStyles = readFileSync(
+  new URL('../components/content/custom-html-section.css', import.meta.url),
+  'utf8',
+)
 
 /**
  * Custom HTML is trusted, editor-written code: it is published exactly as pasted, scripts included.
@@ -59,6 +65,19 @@ test('renders actual HTML, escapes the heading, and omits empty sections', () =>
   assert.match(render('Heading only', ''), /Heading only/)
   assert.equal(render(null, ''), '')
   assert.equal(render(null, '   '), '')
+})
+
+test('custom HTML widget containers fill the card without changing the saved markup', () => {
+  assert.match(customHtmlStyles, /\.custom-html-section__content\s*\{[^}]*width:\s*100%;/)
+  assert.match(customHtmlStyles, /\.custom-html-section__embed\s*\{[^}]*width:\s*100%;/)
+  assert.match(
+    customHtmlStyles,
+    /\.custom-html-section__embed\s*>\s*:is\([^)]*\)\s*\{[^}]*width:\s*100%\s*!important;/,
+  )
+  assert.match(
+    customHtmlStyles,
+    /\.custom-html-section__embed\s+:is\(iframe, embed, object, video\)\s*\{[^}]*width:\s*100%\s*!important;/,
+  )
 })
 
 test('trip and blog custom HTML use the Key Highlights card without altering the embed markup', () => {
