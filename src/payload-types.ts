@@ -870,7 +870,7 @@ export interface HeroBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap part of the heading in <i>…</i> to set it in the italic accent face: it becomes its own second line, in Instrument Serif italic at the same size as the headline — e.g. "Walk Where The <i>Map Runs Out of Names</i>". Every hero on the site sets it the same way. Only <i> and <em> are recognised; every other tag is shown as plain text.
+   * The headline. Every hero is set the same way, so the homepage and a page hero cannot drift apart: wrap the second line in <i>…</i> to set it in the Instrument Serif italic accent face at headline size, e.g. "Discover Global <i>Adventures with Hike Globally</i>". The homepage hero additionally sets the first line in Cal Sans, so there it reads as two faces; on every other hero the whole heading stays Instrument Serif. Only <i> and <em> are recognised; every other tag — <br> included, so two lines are always the <i> pair — is shown as plain text.
    */
   heading: string;
   subheading?: string | null;

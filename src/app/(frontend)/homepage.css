@@ -5,7 +5,12 @@
    The hero itself is no longer homepage-only: its height and type live in
    `globals.css` (`--hero-min-height`, `--hero-title-size`, `.hero-region`,
    `.hero-title`, `.hero-description`) and every page's hero reads the same
-   tokens. What stays here is the rest of the homepage's type scale. */
+   tokens. What stays here is the rest of the homepage's type scale.
+
+   One hero rule *is* homepage-only: `Hero` adds `hero-title--cal` to this
+   page's h1, so the first line ("Discover Global") is Cal Sans up there while
+   the `<i>` accent line under it stays Instrument Serif. Every other hero is
+   all Instrument Serif. */
 
 [data-homepage] {
   /* Larger responsive headlines, without changing body or card typography. */

@@ -1674,7 +1674,9 @@ const run = async () => {
   const homeBlocks = (): Page['blocks'] => {
     const copy = {
       eyebrow: 'Nepal · Himalaya',
-      heading: 'Discover Global Adventures with Hike Globally',
+      // The `<i>` is the hero's accent line: Instrument Serif italic under the
+      // Cal Sans first line on the homepage (see `.hero-title--cal`).
+      heading: 'Discover Global <i>Adventures with Hike Globally</i>',
       subheading:
         'Explore family tours, trekking adventures, and practical travel guides to inspire your next journey across Nepal and destinations worldwide.',
       primary: 'Browse all trips',

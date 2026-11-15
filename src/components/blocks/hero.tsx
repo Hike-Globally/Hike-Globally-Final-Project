@@ -89,6 +89,9 @@ export function Hero({
           <h1
             className={cn(
               'heading-display hero-title max-w-4xl 3xl:max-w-5xl',
+              // The homepage hero's first line is Cal Sans; its `<i>` accent line
+              // stays Instrument Serif (see `.hero-title--cal` in globals.css).
+              homepage && 'hero-title--cal',
               hasImage ? 'text-white' : 'text-ink',
             )}
           >
