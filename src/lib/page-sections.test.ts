@@ -61,8 +61,15 @@ test('blog: the FAQs section follows the article body by default', () => {
   // 20261019_045205_blog_faqs); never-saved layouts get it from these defaults.
   assert.deepEqual(
     defaultPageSections(blogSectionOptions).map(({ kind }) => kind),
-    ['hero', 'content', 'faqs', 'author', 'navigation', 'planning', 'related'],
+    ['hero', 'content', 'linkPreview', 'faqs', 'author', 'navigation', 'planning', 'related'],
   )
+})
+
+test('blog: Link preview sits straight after the article body and can be hidden', () => {
+  const layout = defaultPageSections(blogSectionOptions)
+  assert.equal(layout[layout.findIndex(({ kind }) => kind === 'linkPreview') - 1].kind, 'content')
+  const hidden = layout.filter(({ kind }) => kind !== 'linkPreview')
+  assert.deepEqual(resolvePageSections(hidden, blogSectionOptions), hidden)
 })
 
 test('rejects duplicate built-ins, allows any number of distinct HTML sections', () => {
@@ -104,7 +111,8 @@ test('trip: new content sections have the requested default positions', () => {
   const kinds = defaultPageSections(tripSectionOptions).map(({ kind }) => kind)
   assert.equal(kinds[kinds.indexOf('highlights') - 1], 'whyChoose')
   assert.equal(kinds[kinds.indexOf('highlights') + 1], 'audience')
-  assert.equal(kinds[kinds.indexOf('audience') + 1], 'routeMap')
+  assert.equal(kinds[kinds.indexOf('audience') + 1], 'linkPreview')
+  assert.equal(kinds[kinds.indexOf('linkPreview') + 1], 'routeMap')
   assert.equal(kinds[kinds.indexOf('itinerary') + 1], 'departures')
   for (const kind of ['whyChoose', 'routeMap', 'departures']) {
     const hidden = defaultPageSections(tripSectionOptions).filter((row) => row.kind !== kind)

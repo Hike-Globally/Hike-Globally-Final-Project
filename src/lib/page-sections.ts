@@ -8,6 +8,9 @@ export const tripSectionOptions = [
   // Added after page layouts shipped: migration 20261107_120000_trip_audience inserts this row
   // right after Highlights in every layout saved before it existed.
   { label: 'Who is this trip for / not for', value: 'audience' },
+  // Added with the link preview card: migration 20261115_180000_link_preview inserts this row
+  // after the audience pair (or after Highlights / Overview) in every layout saved before it.
+  { label: 'Link preview', value: 'linkPreview' },
   { label: 'Original route map and altitude chart', value: 'routeMap' },
   { label: 'Itinerary', value: 'itinerary' },
   { label: 'Departures', value: 'departures' },
@@ -23,6 +26,9 @@ export const tripSectionOptions = [
 export const blogSectionOptions = [
   { label: 'Hero & post details', value: 'hero' },
   { label: 'Article body & table of contents', value: 'content' },
+  // Added with the link preview card: migration 20261115_180000_link_preview inserts this row
+  // straight after the article body in every layout saved before it.
+  { label: 'Link preview', value: 'linkPreview' },
   // Added after page layouts shipped: migration 20261019_045205_blog_faqs inserts this row
   // after the article body in every layout saved before it existed, so older posts get it too.
   { label: 'FAQs', value: 'faqs' },

@@ -28,6 +28,7 @@ import { FaqSection } from '@/components/sections/faq-section'
 import { DeparturesSection } from '@/components/sections/departures-section'
 import { KeyTakeawaysSection } from '@/components/sections/key-takeaways-section'
 import { TripAudienceSection } from '@/components/sections/trip-audience-section'
+import { LinkPreviewSection } from '@/components/sections/link-preview-section'
 import { TripPackingSection } from '@/components/sections/trip-packing-section'
 import { KeyPointsPanel } from '@/components/sections/key-points-panel'
 import { ItinerarySection } from '@/components/sections/itinerary-section'
@@ -360,6 +361,7 @@ export function TripDetail({
       </section>
     ) : null,
     audience: <TripAudienceSection trip={trip} linker={linker} />,
+    linkPreview: <LinkPreviewSection source={trip} />,
     itinerary: <>{trip.itinerary?.length ? <ItinerarySection days={trip.itinerary} /> : null}</>,
     information: (
       <EssentialInformationSection

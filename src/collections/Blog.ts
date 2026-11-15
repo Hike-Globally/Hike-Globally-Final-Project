@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { adminOrEditor, publishedOrSignedIn } from '../access'
 import { faqFields } from '../fields/faqs'
+import { linkPreviewPanel } from '../fields/link-preview'
 import { pageSectionsField } from '../fields/page-sections'
 import { blogSectionOptions } from '../lib/page-sections'
 import { keywordsSection } from '../fields/keywords'
@@ -79,6 +80,8 @@ export const Blog: CollectionConfig = {
       },
       fields: faqFields(),
     },
+    /* Link preview — a card for another page, placed by the "Link preview" row in Page sections. */
+    linkPreviewPanel(),
     {
       type: 'row',
       fields: [

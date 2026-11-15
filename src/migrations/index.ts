@@ -20,6 +20,7 @@ import * as migration_20261107_120000_trip_audience from './20261107_120000_trip
 import * as migration_20261108_120000_trip_packing_categories from './20261108_120000_trip_packing_categories'
 import * as migration_20261108_150000_redirections from './20261108_150000_redirections'
 import * as migration_20261115_120000_home_hero_split_heading from './20261115_120000_home_hero_split_heading'
+import * as migration_20261115_180000_link_preview from './20261115_180000_link_preview'
 
 export const migrations = [
   {
@@ -131,5 +132,10 @@ export const migrations = [
     up: migration_20261115_120000_home_hero_split_heading.up,
     down: migration_20261115_120000_home_hero_split_heading.down,
     name: '20261115_120000_home_hero_split_heading',
+  },
+  {
+    up: migration_20261115_180000_link_preview.up,
+    down: migration_20261115_180000_link_preview.down,
+    name: '20261115_180000_link_preview',
   },
 ]
