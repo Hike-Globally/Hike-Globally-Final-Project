@@ -21,6 +21,18 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
  *   · both the published rows and the draft/version rows, so the admin and the live page agree.
  *
  * Re-runnable by construction: after the first run the heading no longer matches the guard.
+ *
+ * ---------------------------------------------------------------------------
+ * Where the heading actually lives
+ * ---------------------------------------------------------------------------
+ * A block whose own fields are localised keeps them **on the block table**, one row per `_locale`
+ * — there is no `pages_blocks_hero_locales` / `_pages_v_blocks_hero_locales` sibling. Those two
+ * tables existed only in the first cut of the schema and were dropped by
+ * `20261003_084733_localize_blocks`, which folded the columns back into `pages_blocks_hero` and
+ * `_pages_v_blocks_hero` (see the `_locale` + `heading` columns in
+ * `20261115_180000_link_preview.json`). This migration shipped addressing the dropped tables and
+ * failed production builds with `relation "pages_blocks_hero_locales" does not exist`, so the
+ * statements below target the block tables directly — the same rows Payload reads and writes.
  */
 
 const NEW_HEADING = 'Discover Global <i>Adventures with Hike Globally</i>'
@@ -33,30 +45,32 @@ const OLD_HEADINGS = [
 ]
 
 /**
- * `EXISTS` rather than a join to `pages_locales`: it cannot match a hero block twice, and it states
- * the intent — "this block belongs to the home page" — in one clause. The parent ids line up
- * without a cast (`pages_blocks_hero.id` / `pages_blocks_hero_locales._parent_id` are both varchar,
- * the versioned pair both integer), and keeping the localisation tables out of the UPDATE's FROM
- * list is what keeps the statement a single, obvious rewrite.
+ * `EXISTS` rather than a join to `pages_locales` in the UPDATE's FROM list: it cannot match a hero
+ * block twice — a duplicate `pages_locales` row would otherwise make `SET` pick an arbitrary one —
+ * and it states the intent of the statement in one clause: "this block belongs to the home page".
+ * `pages_blocks_hero._parent_id` is an integer FK to `pages.id`, so the correlation needs no cast.
  */
 const IS_HOME_HERO = sql.raw(`
   EXISTS (
     SELECT 1
-    FROM "pages_blocks_hero" AS "hero"
-    JOIN "pages" AS "page" ON "page"."id" = "hero"."_parent_id"
-    JOIN "pages_locales" AS "page_locale" ON "page_locale"."_parent_id" = "page"."id"
-    WHERE "hero"."id" = "locales"."_parent_id" AND "page_locale"."slug" = 'home'
+    FROM "pages_locales" AS "page_locale"
+    WHERE "page_locale"."_parent_id" = "hero"."_parent_id"
+      AND "page_locale"."slug" = 'home'
   )
 `)
 
+/**
+ * Drafts are version rows: `_pages_v_blocks_hero._parent_id` points at a `_pages_v` row, and the
+ * page it belongs to comes from `_pages_v.parent_id`. The version tables do not carry `slug`
+ * themselves, so the home-page test has to go through `pages_locales` as well.
+ */
 const IS_VERSIONED_HOME_HERO = sql.raw(`
   EXISTS (
     SELECT 1
-    FROM "_pages_v_blocks_hero" AS "hero"
-    JOIN "_pages_v" AS "version" ON "version"."id" = "hero"."_parent_id"
-    JOIN "pages" AS "page" ON "page"."id" = "version"."parent_id"
-    JOIN "pages_locales" AS "page_locale" ON "page_locale"."_parent_id" = "page"."id"
-    WHERE "hero"."id" = "locales"."_parent_id" AND "page_locale"."slug" = 'home'
+    FROM "_pages_v" AS "version"
+    JOIN "pages_locales" AS "page_locale" ON "page_locale"."_parent_id" = "version"."parent_id"
+    WHERE "version"."id" = "hero"."_parent_id"
+      AND "page_locale"."slug" = 'home'
   )
 `)
 
@@ -68,17 +82,17 @@ const oldHeadings = () =>
 
 export async function up({ db }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
-    UPDATE "pages_blocks_hero_locales" AS "locales"
+    UPDATE "pages_blocks_hero" AS "hero"
     SET "heading" = ${NEW_HEADING}
     WHERE ${IS_HOME_HERO}
-      AND "locales"."heading" IN (${oldHeadings()});
+      AND "hero"."heading" IN (${oldHeadings()});
   `)
 
   await db.execute(sql`
-    UPDATE "_pages_v_blocks_hero_locales" AS "locales"
+    UPDATE "_pages_v_blocks_hero" AS "hero"
     SET "heading" = ${NEW_HEADING}
     WHERE ${IS_VERSIONED_HOME_HERO}
-      AND "locales"."heading" IN (${oldHeadings()});
+      AND "hero"."heading" IN (${oldHeadings()});
   `)
 }
 
@@ -88,16 +102,16 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   const previous = OLD_HEADINGS[0]!
 
   await db.execute(sql`
-    UPDATE "pages_blocks_hero_locales" AS "locales"
+    UPDATE "pages_blocks_hero" AS "hero"
     SET "heading" = ${previous}
     WHERE ${IS_HOME_HERO}
-      AND "locales"."heading" = ${NEW_HEADING};
+      AND "hero"."heading" = ${NEW_HEADING};
   `)
 
   await db.execute(sql`
-    UPDATE "_pages_v_blocks_hero_locales" AS "locales"
+    UPDATE "_pages_v_blocks_hero" AS "hero"
     SET "heading" = ${previous}
     WHERE ${IS_VERSIONED_HOME_HERO}
-      AND "locales"."heading" = ${NEW_HEADING};
+      AND "hero"."heading" = ${NEW_HEADING};
   `)
 }
