@@ -373,7 +373,7 @@ export interface Trip {
    */
   slug?: string | null;
   /**
-   * Drag the row handles to set the order on this page, or use each row’s Move Up / Move Down controls. Add a Custom HTML row anywhere. Existing section content is edited in the fields below; empty sections do not display. Removing a row hides that section without deleting its content. The booking card and article outline stay beside their content.
+   * Drag the row handles to set the order on this page, or use each row’s Move Up / Move Down controls. Add as many Custom HTML or Link preview rows as the page needs — each one carries its own content, so a page can point at several places. Every other section reads the fields below and can be placed once; empty sections do not display. Removing a row hides that section without deleting its content. The booking card and article outline stay beside their content.
    */
   pageSections?:
     | {
@@ -976,7 +976,7 @@ export interface Blog {
    */
   slug?: string | null;
   /**
-   * Drag the row handles to set the order on this page, or use each row’s Move Up / Move Down controls. Add a Custom HTML row anywhere. Existing section content is edited in the fields below; empty sections do not display. Removing a row hides that section without deleting its content. The booking card and article outline stay beside their content.
+   * Drag the row handles to set the order on this page, or use each row’s Move Up / Move Down controls. Add as many Custom HTML or Link preview rows as the page needs — each one carries its own content, so a page can point at several places. Every other section reads the fields below and can be placed once; empty sections do not display. Removing a row hides that section without deleting its content. The booking card and article outline stay beside their content.
    */
   pageSections?:
     | {
