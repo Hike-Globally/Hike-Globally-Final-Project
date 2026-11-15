@@ -4,6 +4,11 @@
  * parts that could silently rot: the `<i>` marker the renderer understands, the narrow WHERE clause
  * (it may only touch the homepage's hero blocks, and only the shipped wordings), and the fact that
  * drafts are updated alongside the published rows.
+ *
+ * The table names are pinned too. A localised block keeps its columns on the block table itself
+ * (`pages_blocks_hero`, one row per `_locale`); the `…_locales` siblings were dropped in
+ * `20261003_084733_localize_blocks`, and a migration that still addressed them failed the
+ * production build with `relation "pages_blocks_hero_locales" does not exist`.
  */
 
 import assert from 'node:assert/strict'
@@ -35,8 +40,6 @@ const collect = async (run: (args: never) => Promise<void>): Promise<Statement[]
 
 const sqlText = (statements: Statement[]) => statements.map((s) => s.sql).join('\n')
 
-const paramsOf = (statements: Statement[]) => statements.flatMap((s) => s.params)
-
 test('rewrites the homepage hero heading into the two-line, two-face form', async () => {
   const statements = await collect(up as never)
 
@@ -49,8 +52,19 @@ test('rewrites the homepage hero heading into the two-line, two-face form', asyn
 test('touches both the published and the draft hero rows', async () => {
   const sqls = sqlText(await collect(up as never))
 
-  assert.match(sqls, /UPDATE "pages_blocks_hero_locales"/)
-  assert.match(sqls, /UPDATE "_pages_v_blocks_hero_locales"/)
+  assert.match(sqls, /UPDATE "pages_blocks_hero"/)
+  assert.match(sqls, /UPDATE "_pages_v_blocks_hero"/)
+})
+
+test('targets the block tables, never the dropped locale siblings', async () => {
+  for (const statements of [await collect(up as never), await collect(down as never)]) {
+    const sqls = sqlText(statements)
+
+    // `pages_blocks_hero_locales` / `_pages_v_blocks_hero_locales` do not exist in the migrated
+    // schema; naming them here is what broke the deploy.
+    assert.doesNotMatch(sqls, /pages_blocks_hero_locales/)
+    assert.doesNotMatch(sqls, /_pages_v_blocks_hero_locales/)
+  }
 })
 
 test('only replaces the shipped wordings on the page whose slug is home', async () => {
@@ -58,7 +72,7 @@ test('only replaces the shipped wordings on the page whose slug is home', async 
 
   for (const { sql, params } of statements) {
     assert.match(sql, /"page_locale"\."slug" = 'home'/)
-    assert.match(sql, /AND "locales"\."heading" IN \(\$\d+/)
+    assert.match(sql, /AND "hero"\."heading" IN \(\$\d+/)
     // The replacement is bound first, the wordings it may replace follow.
     assert.deepEqual(params.slice(1), [
       'Discover Global Adventures with Hike Globally',
@@ -72,8 +86,8 @@ test('down() collapses the accent line back into the single-line wording', async
   const statements = await collect(down as never)
   const sqls = sqlText(statements)
 
-  assert.match(sqls, /UPDATE "pages_blocks_hero_locales"/)
-  assert.match(sqls, /UPDATE "_pages_v_blocks_hero_locales"/)
+  assert.match(sqls, /UPDATE "pages_blocks_hero"/)
+  assert.match(sqls, /UPDATE "_pages_v_blocks_hero"/)
 
   for (const { sql, params } of statements) {
     // The *written* value is the single-line wording — never the `<i>` form.
