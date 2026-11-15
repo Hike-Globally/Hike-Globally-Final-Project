@@ -26,7 +26,6 @@ const nepalRegion = (
   heroImage: photo(image, `${name} landscape`),
   region: 'annapurna',
   featured: true,
-  href: '/destinations',
 })
 
 const continent = (id: number, name: string, tagline: string, image: string): DestinationCard => ({
@@ -38,7 +37,6 @@ const continent = (id: number, name: string, tagline: string, image: string): De
   heroImage: photo(image, `${name} landscape`),
   region: 'annapurna',
   featured: true,
-  href: '/contact',
 })
 
 export const NEPAL_REGION_CARDS: DestinationCard[] = [
