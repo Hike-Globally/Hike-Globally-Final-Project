@@ -183,10 +183,10 @@ export function DeparturesCalendar({
           onClick={() => handleSelectMonthFilter('all')}
           aria-pressed={activeMonthFilter === 'all'}
           className={cn(
-            'shrink-0 cursor-pointer border px-3.5 py-2 font-heading text-label font-semibold tracking-[0.08em] uppercase transition-colors',
+            'shrink-0 cursor-pointer rounded-[7px] border px-3.5 py-2 font-heading text-label font-semibold tracking-[0.08em] uppercase transition-[background-color,border-color,color,box-shadow]',
             activeMonthFilter === 'all'
-              ? 'border-ink bg-ink text-white'
-              : 'border-slate-20 bg-white text-ink-80 hover:border-slate-40 hover:text-ink',
+              ? 'border-btn-primary bg-btn-primary text-white shadow-2xs'
+              : 'border-ink/18 bg-white text-ink-80 hover:border-ink/45 hover:bg-mist hover:text-ink',
           )}
         >
           {dict.trip.allDates} ({departures.length})
@@ -201,10 +201,10 @@ export function DeparturesCalendar({
               onClick={() => handleSelectMonthFilter(month.monthKey)}
               aria-pressed={active}
               className={cn(
-                'shrink-0 cursor-pointer border px-3.5 py-2 font-heading text-label font-semibold tracking-[0.08em] uppercase transition-colors',
+                'shrink-0 cursor-pointer rounded-[7px] border px-3.5 py-2 font-heading text-label font-semibold tracking-[0.08em] uppercase transition-[background-color,border-color,color,box-shadow]',
                 active
-                  ? 'border-ink bg-ink text-white'
-                  : 'border-slate-20 bg-white text-ink-80 hover:border-slate-40 hover:text-ink',
+                  ? 'border-btn-primary bg-btn-primary text-white shadow-2xs'
+                  : 'border-ink/18 bg-white text-ink-80 hover:border-ink/45 hover:bg-mist hover:text-ink',
               )}
             >
               {month.shortLabel} ({month.count})
@@ -222,7 +222,7 @@ export function DeparturesCalendar({
               type="button"
               onClick={() => handleStepCalendarMonth(-1)}
               aria-label={dict.trip.previousMonth}
-              className="grid size-9 shrink-0 cursor-pointer place-items-center border border-slate-20 bg-white text-ink transition-colors hover:border-ink hover:bg-ink hover:text-white"
+              className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-[7px] border border-ink/20 bg-white text-ink shadow-2xs transition-colors hover:border-btn-primary hover:bg-btn-primary hover:text-white"
             >
               <ChevronLeft className="size-4" aria-hidden />
             </button>
@@ -242,7 +242,7 @@ export function DeparturesCalendar({
               type="button"
               onClick={() => handleStepCalendarMonth(1)}
               aria-label={dict.trip.nextMonth}
-              className="grid size-9 shrink-0 cursor-pointer place-items-center border border-slate-20 bg-white text-ink transition-colors hover:border-ink hover:bg-ink hover:text-white"
+              className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-[7px] border border-ink/20 bg-white text-ink shadow-2xs transition-colors hover:border-btn-primary hover:bg-btn-primary hover:text-white"
             >
               <ChevronRight className="size-4" aria-hidden />
             </button>
@@ -292,10 +292,10 @@ export function DeparturesCalendar({
                     aria-label={`${formatDepartureDate(cell.dateKey)} — ${departureStatusLabel(primaryDeparture.status)}, ${formatPrice(primaryDeparture.price, priceCurrency)}`}
                     onClick={() => handleSelectDeparture(primaryDeparture)}
                     className={cn(
-                      'relative flex h-10 flex-col items-center justify-center font-heading text-small font-semibold transition-colors cursor-pointer',
+                      'relative flex h-10 cursor-pointer flex-col items-center justify-center rounded-[7px] font-heading text-small font-semibold transition-colors',
                       !cell.inCurrentMonth && !isSelectedStart && 'opacity-65',
                       isSelectedStart
-                        ? 'bg-ink text-white'
+                        ? 'bg-btn-primary text-white'
                         : allSoldOut
                           ? 'bg-mist text-ink-70 line-through ring-1 ring-slate-20 hover:bg-mist-60'
                           : 'bg-sage-20 text-ink ring-1 ring-sage-40 hover:bg-sage-40',
@@ -317,7 +317,7 @@ export function DeparturesCalendar({
                 <span
                   key={cell.dateKey}
                   className={cn(
-                    'grid h-10 place-items-center text-small',
+                    'grid h-10 place-items-center rounded-[7px] text-small',
                     inSelectedWindow
                       ? isSelectedEnd
                         ? 'bg-haze-20 font-heading font-semibold text-deep-90 ring-1 ring-haze-40'
@@ -398,7 +398,7 @@ export function DeparturesCalendar({
                               event.stopPropagation()
                               handleSelectDeparture(departure)
                             }}
-                            className="cursor-pointer text-left font-heading text-subhead font-semibold text-ink hover:text-deep"
+                            className="cursor-pointer rounded-[7px] text-left font-heading text-subhead font-semibold text-ink hover:text-deep"
                           >
                             {formatDepartureRange(departure.startDateKey, departure.endDateKey)}
                           </button>
@@ -425,7 +425,7 @@ export function DeparturesCalendar({
                         </div>
 
                         {soldOut ? (
-                          <span className="inline-flex h-9 items-center border border-slate-20 bg-mist px-4 font-heading text-label font-semibold tracking-[0.08em] text-ink-60 uppercase">
+                          <span className="inline-flex h-8 items-center rounded-[7px] border border-slate-20 bg-mist px-3.5 font-heading text-label font-semibold tracking-[0.08em] text-ink-60 uppercase">
                             {departureStatusLabel('sold-out')}
                           </span>
                         ) : (
@@ -433,13 +433,7 @@ export function DeparturesCalendar({
                             asChild
                             size="sm"
                             variant={isSelected ? 'default' : 'sage'}
-                            /* The label must be white on the blue fill. `text-white!`
-                               rather than `text-white`: `cn()` ends in `twMerge`, and
-                               tailwind-merge reads this project's custom type tokens
-                               (`text-small`, `text-ui`, …) as colours — so a plain
-                               `text-white` from the variant is merged *away* by the
-                               size's `text-small`. The important flag puts it back. */
-                            className="shrink-0 text-white!"
+                            className="shrink-0"
                           >
                             <Link
                               href={buildBookingHref(departure)}

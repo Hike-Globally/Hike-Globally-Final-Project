@@ -155,7 +155,7 @@ html[data-theme='dark'] {
   /* ------------------------------------------------------------------------
      7. RADII — two shapes, one pill
      ------------------------------------------------------------------------ */
-  --hg-radius-control: 6px; /* inputs, buttons, compact controls */
+  --hg-radius-control: 7px; /* inputs, buttons, compact controls */
   --hg-radius-card: 10px; /* cards, panels, tables, modals */
   --hg-radius-pill: 999px;
 

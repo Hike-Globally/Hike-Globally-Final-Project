@@ -79,7 +79,7 @@ tables), `--hg-lh-normal` 1.6 (prose).
 Spacing is a strict 4px grid: `--hg-space-1` 4, `-2` 8, `-3` 12, `-4` 16,
 `-5` 24, `-6` 32, `-7` 48.
 
-Radii: `--hg-radius-control` 6px (inputs, buttons, small controls),
+Radii: `--hg-radius-control` 7px (inputs, buttons, small controls),
 `--hg-radius-card` 10px (cards, tables, modals, drawers), `--hg-radius-pill`
 999px (status badges, avatars).
 

@@ -153,7 +153,7 @@ export function CtaCard({
                         <Button
                           asChild
                           size="lg"
-                          variant="default"
+                          variant={variant === 'light' ? 'default' : 'paper'}
                           className="cta-card__button group h-[3.25rem] px-8 text-body"
                         >
                           {external || link.newTab ? (

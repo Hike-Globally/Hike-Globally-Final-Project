@@ -113,7 +113,7 @@ export function TripCard({
           </p>
           <span
             aria-hidden
-            className="grid size-9 place-items-center rounded-full border border-slate-40 text-ink transition-colors duration-300 group-hover:border-ink group-hover:bg-ink group-hover:text-white"
+            className="grid size-9 place-items-center rounded-[7px] border border-ink/20 bg-paper text-ink transition-colors duration-300 group-hover:border-btn-primary group-hover:bg-btn-primary group-hover:text-white"
           >
             <ArrowUpRight className="size-4" />
           </span>

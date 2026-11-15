@@ -242,16 +242,30 @@
   display: inline-flex;
   align-items: center;
   gap: 2.1875rem;
-  background: var(--color-ink);
-  color: white;
+  border: 0.0625rem solid var(--color-btn-primary);
+  border-radius: var(--radius-button);
+  background: var(--color-btn-primary);
+  box-shadow: var(--shadow-xs);
+  color: var(--color-paper);
   padding: 1.125rem 1.375rem;
   margin-top: 1.875rem;
   font-size: 0.875rem;
   font-weight: 600;
-  transition: background 0.2s;
+  transition:
+    background-color 0.25s var(--ease-brand),
+    border-color 0.25s var(--ease-brand),
+    box-shadow 0.25s var(--ease-brand),
+    transform 0.25s var(--ease-brand);
 }
 .info-button:hover {
-  background: var(--color-deep-90);
+  border-color: var(--color-btn-primary-hover);
+  background: var(--color-btn-primary-hover);
+  box-shadow: var(--shadow-sm);
+}
+.info-button:active {
+  border-color: var(--color-btn-primary-active);
+  background: var(--color-btn-primary-active);
+  transform: translateY(1px);
 }
 .contact-section {
   display: grid;

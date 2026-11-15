@@ -3839,6 +3839,7 @@ $hg-icon-audience-not-for: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 }
 
 /* "View live" & "Expand preview" outline actions */
+.preview-btn,
 .hg-live-preview-toggle,
 .hg-view-live {
   display: inline-flex;
@@ -3864,6 +3865,7 @@ $hg-icon-audience-not-for: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
     color var(--hg-transition);
 }
 
+.preview-btn:hover,
 .hg-live-preview-toggle:hover,
 .hg-view-live:hover {
   border-color: var(--hg-border-accent);
@@ -3871,12 +3873,14 @@ $hg-icon-audience-not-for: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   color: var(--hg-primary);
 }
 
+.preview-btn:focus-visible,
 .hg-live-preview-toggle:focus-visible,
 .hg-view-live:focus-visible {
   outline: var(--hg-focus-outline);
   outline-offset: var(--hg-focus-outline-offset);
 }
 
+.preview-btn svg,
 .hg-live-preview-toggle svg,
 .hg-view-live svg {
   width: var(--hg-space-4);
@@ -4198,6 +4202,7 @@ button.hg-departure-picker__day:hover:not(:disabled):not(.hg-departure-picker__d
   height: var(--hg-control-height-sm);
   padding: 0 var(--hg-space-2);
   border: 0;
+  border-radius: var(--hg-radius-control);
   background: none;
   color: var(--hg-text-link);
   cursor: pointer;
@@ -4307,6 +4312,7 @@ button.hg-departure-picker__day:hover:not(:disabled):not(.hg-departure-picker__d
 .hg-redirects__summary-close {
   margin-left: auto;
   border: 0;
+  border-radius: var(--hg-radius-control);
   background: none;
   color: var(--hg-text-muted);
   cursor: pointer;
@@ -4435,6 +4441,7 @@ button.hg-departure-picker__day:hover:not(:disabled):not(.hg-departure-picker__d
 .hg-redirect-actions__link {
   padding: 0;
   border: 0;
+  border-radius: var(--hg-radius-control);
   background: none;
   color: var(--hg-text-link);
   cursor: pointer;
@@ -4502,6 +4509,7 @@ button.hg-departure-picker__day:hover:not(:disabled):not(.hg-departure-picker__d
   margin-left: var(--hg-space-2);
   padding: 0;
   border: 0;
+  border-radius: var(--hg-radius-control);
   background: none;
   color: var(--hg-text-link);
   cursor: pointer;

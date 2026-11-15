@@ -31,7 +31,7 @@ function SelectTrigger({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        'border-input data-[placeholder]:text-muted-foreground focus-visible:border-deep focus-visible:ring-[3px] focus-visible:ring-deep/20 flex w-full items-center justify-between gap-2 border bg-white px-4 py-2.5 text-small whitespace-nowrap transition-[color,box-shadow,border-color] outline-none disabled:cursor-not-allowed disabled:opacity-50 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2',
+        'border-input data-[placeholder]:text-muted-foreground focus-visible:border-deep focus-visible:ring-[3px] focus-visible:ring-deep/20 flex w-full cursor-pointer items-center justify-between gap-2 rounded-[7px] border bg-white px-4 py-2.5 text-small whitespace-nowrap transition-[color,box-shadow,border-color] outline-none disabled:cursor-not-allowed disabled:opacity-50 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2',
         size === 'default' ? 'h-11' : 'h-9',
         className,
       )}

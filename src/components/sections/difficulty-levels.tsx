@@ -209,7 +209,7 @@ function CarouselArrow({
       onClick={onClick}
       disabled={disabled}
       aria-label={direction === 'left' ? 'Previous difficulty levels' : 'Next difficulty levels'}
-      className="inline-flex size-11 items-center justify-center rounded-full border border-[#206CA4] bg-[#206CA4] text-white transition duration-300 hover:border-ink hover:bg-ink hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-deep disabled:cursor-not-allowed disabled:border-slate-20 disabled:bg-slate-20 disabled:text-slate-80 disabled:hover:border-slate-20 disabled:hover:bg-slate-20 disabled:hover:text-slate-40"
+      className="inline-flex size-11 cursor-pointer items-center justify-center rounded-[7px] border border-ink/22 bg-paper text-ink shadow-2xs transition-[background-color,border-color,color,box-shadow,transform] duration-250 ease-[var(--ease-brand)] hover:border-btn-primary hover:bg-btn-primary hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-deep active:translate-y-px disabled:cursor-not-allowed disabled:border-slate-20 disabled:bg-mist disabled:text-slate-40 disabled:shadow-none disabled:hover:border-slate-20 disabled:hover:bg-mist disabled:hover:text-slate-40"
     >
       <Icon className="size-4" aria-hidden="true" />
     </button>

@@ -52,10 +52,10 @@ export function BlogExplorer({ posts }: { posts: PostCardData[] }) {
           type="button"
           onClick={() => setCategory('all')}
           className={cn(
-            'border px-4 py-2 text-small transition-colors',
+            'cursor-pointer rounded-[7px] border px-4 py-2 text-small font-medium transition-[background-color,border-color,color,box-shadow] duration-250 ease-[var(--ease-brand)]',
             category === 'all'
-              ? 'border-ink bg-ink text-white'
-              : 'border-slate-20 text-ink-70 hover:border-slate-40 hover:text-ink',
+              ? 'border-btn-primary bg-btn-primary text-white shadow-2xs'
+              : 'border-ink/18 bg-paper text-ink-80 hover:border-ink/45 hover:bg-mist hover:text-ink',
           )}
         >
           {dict.blog.allCategories}
@@ -66,10 +66,10 @@ export function BlogExplorer({ posts }: { posts: PostCardData[] }) {
             type="button"
             onClick={() => setCategory(value)}
             className={cn(
-              'border px-4 py-2 text-small transition-colors',
+              'cursor-pointer rounded-[7px] border px-4 py-2 text-small font-medium transition-[background-color,border-color,color,box-shadow] duration-250 ease-[var(--ease-brand)]',
               category === value
-                ? 'border-ink bg-ink text-white'
-                : 'border-slate-20 text-ink-70 hover:border-slate-40 hover:text-ink',
+                ? 'border-btn-primary bg-btn-primary text-white shadow-2xs'
+                : 'border-ink/18 bg-paper text-ink-80 hover:border-ink/45 hover:bg-mist hover:text-ink',
             )}
           >
             {label(value)}
