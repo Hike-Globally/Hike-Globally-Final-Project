@@ -41,15 +41,12 @@ export async function HomeFallback() {
             standfirst capped at the same ~576px measure it always had. */}
         <div className="max-w-none min-w-0">
           {showHeroEyebrow ? <p className="eyebrow mb-5 text-mist">{heroEyebrow}</p> : null}
-          {/* The `<i>` is the accent line — Instrument Serif italic under the
-              headline (see `.hero-title` in `globals.css`). CMS-driven pages reach
-              it by writing the same tag into the hero heading field. */}
           <h1 className="heading-display hero-title max-w-4xl text-white 3xl:max-w-5xl">
-            Walk Where The <i>Map Runs Out of Names</i>
+            Discover Global Adventures with Hike Globally
           </h1>
           <p className="lead hero-description mt-6 max-w-[36rem] text-mist">
-            Small-group treks and expeditions across Nepal, led by guides who grew up on these
-            trails. Tell us what you are dreaming of — we will build the itinerary around it.
+            Explore family tours, trekking adventures, and practical travel guides to inspire your
+            next journey across Nepal and destinations worldwide.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Button asChild size="lg" variant="paper">

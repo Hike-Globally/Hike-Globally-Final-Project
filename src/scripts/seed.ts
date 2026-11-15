@@ -1674,12 +1674,9 @@ const run = async () => {
   const homeBlocks = (): Page['blocks'] => {
     const copy = {
       eyebrow: 'Nepal · Himalaya',
-      // `<i>…</i>` is the hero heading's emphasis marker — it renders as the second
-      // line in Instrument Serif italic at 90px, under "Walk Where The" at 120px.
-      // See src/lib/inline-emphasis.ts and src/app/(frontend)/homepage.css.
-      heading: 'Walk Where The <i> Map Runs Out of Names</i>',
+      heading: 'Discover Global Adventures with Hike Globally',
       subheading:
-        'Small-group treks and expeditions across the Himalaya, led by guides who grew up on these trails. Fourteen years, one country, no reselling.',
+        'Explore family tours, trekking adventures, and practical travel guides to inspire your next journey across Nepal and destinations worldwide.',
       primary: 'Browse all trips',
       secondary: 'Plan your trip',
       stats: 'Why people keep coming back',
