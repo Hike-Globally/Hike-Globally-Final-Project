@@ -9,6 +9,7 @@ import test from 'node:test'
 
 import {
   decodeHtmlEntities,
+  fetchLinkPreviewMetadata,
   parseLinkPreviewMetadata,
   resolveLinkPreview,
   validateLinkPreviewUrl,
@@ -186,4 +187,204 @@ test('ratings are capped at 5 and bad numbers are dropped', async () => {
     async () => null,
   )
   assert.equal(nan?.rating, null)
+})
+
+/* ------------------------------------------------------------------------------------------------
+ * Other people's pages: JSON-LD, link tags and body images, since a card that only understands
+ * Open Graph on our own site is not a link preview.
+ * ---------------------------------------------------------------------------------------------- */
+
+test('JSON-LD is read when a page carries no Open Graph at all', () => {
+  const html = `<html><head>
+    <script type="application/ld+json">
+      {"@context":"https://schema.org","@graph":[
+        {"@type":"WebSite","name":"Example Travel"},
+        {"@type":"BlogPosting","headline":"Annapurna in November","description":"Cold, clear, quiet.",
+         "image":{"@type":"ImageObject","url":"/media/annapurna.jpg"}}
+      ]}
+    </script>
+  </head><body></body></html>`
+  const meta = parseLinkPreviewMetadata(html, PAGE)
+  assert.equal(meta.title, 'Annapurna in November')
+  assert.equal(meta.description, 'Cold, clear, quiet.')
+  assert.equal(meta.image, 'https://www.example.com/media/annapurna.jpg')
+})
+
+test('JSON-LD survives broken blocks, quoted entities and an image given as a list', () => {
+  const html = `<script type="application/ld+json">{not json}</script>
+    <script type="application/ld+json">
+      {"@type":"Product","name":"Sleeping bag &amp; liner","image":["/a.jpg","/b.jpg"]}
+    </script>`
+  const meta = parseLinkPreviewMetadata(html, PAGE)
+  assert.equal(meta.title, 'Sleeping bag & liner')
+  assert.equal(meta.image, 'https://www.example.com/a.jpg')
+})
+
+test('every declared image form is understood, best first', () => {
+  const secure = parseLinkPreviewMetadata(
+    `<meta property="og:image:secure_url" content="https://files.example.com/a.jpg">`,
+    PAGE,
+  )
+  assert.equal(secure.image, 'https://files.example.com/a.jpg')
+
+  const protocolRelative = parseLinkPreviewMetadata(
+    `<meta property="twitter:image" content="//cdn.example.com/b.jpg">`,
+    PAGE,
+  )
+  assert.equal(protocolRelative.image, 'https://cdn.example.com/b.jpg')
+
+  const imageSrc = parseLinkPreviewMetadata(`<link rel="image_src" href="/c.jpg">`, PAGE)
+  assert.equal(imageSrc.image, 'https://www.example.com/c.jpg')
+
+  const touchIcon = parseLinkPreviewMetadata(
+    `<link rel="apple-touch-icon" sizes="180x180" href="/touch.png">`,
+    PAGE,
+  )
+  assert.equal(touchIcon.image, 'https://www.example.com/touch.png')
+
+  const itemprop = parseLinkPreviewMetadata(
+    `<meta itemprop="image" content="https://cdn.example.com/d.png">`,
+    PAGE,
+  )
+  assert.equal(itemprop.image, 'https://cdn.example.com/d.png')
+
+  const openGraphWins = parseLinkPreviewMetadata(
+    `<meta property="og:image" content="https://cdn.example.com/hero.jpg">
+     <meta property="twitter:image" content="https://cdn.example.com/small.jpg">`,
+    PAGE,
+  )
+  assert.equal(openGraphWins.image, 'https://cdn.example.com/hero.jpg')
+})
+
+test('the first usable body image is the last resort, skipping pixels, icons and inline data', () => {
+  const html = `<html><head><title>No tags</title></head><body>
+    <img src="data:image/gif;base64,R0lGOD" width="1" height="1">
+    <img src="/img/pixel.gif">
+    <img src="/img/logo.svg">
+    <img src="/img/site-logo.png">
+    <img src="https://cdn.example.com/hero.jpg" alt="">
+  </body></html>`
+  const meta = parseLinkPreviewMetadata(html, PAGE)
+  assert.equal(meta.image, 'https://cdn.example.com/hero.jpg')
+})
+
+test('an unusable image address is dropped rather than shown', () => {
+  for (const content of ['data:image/png;base64,AAAA', 'javascript:alert(1)', 'http://[broken']) {
+    const meta = parseLinkPreviewMetadata(`<meta property="og:image" content="${content}">`, PAGE)
+    assert.equal(meta.image, undefined, content)
+  }
+})
+
+test('og:site_name is a title only when the page names nothing else', () => {
+  const onlySite = parseLinkPreviewMetadata(
+    `<meta property="og:site_name" content="Example Travel">`,
+    PAGE,
+  )
+  assert.equal(onlySite.title, 'Example Travel')
+
+  const withTitle = parseLinkPreviewMetadata(
+    `<title>Annapurna Base Camp</title><meta property="og:site_name" content="Example Travel">`,
+    PAGE,
+  )
+  assert.equal(withTitle.title, 'Annapurna Base Camp')
+})
+
+/* ------------------------------------------------------------------------------------------------
+ * The request itself. `fetch` is stubbed, so these run offline but exercise the real read path.
+ * ---------------------------------------------------------------------------------------------- */
+
+const withFetch = async (impl: typeof fetch, run: () => Promise<void>): Promise<void> => {
+  const original = globalThis.fetch
+  globalThis.fetch = impl
+  try {
+    await run()
+  } finally {
+    globalThis.fetch = original
+  }
+}
+
+const htmlResponse = (html: string, headers: Record<string, string> = {}) =>
+  new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8', ...headers } })
+
+test('a blocked host, an API endpoint or a network error all resolve to null', async () => {
+  await withFetch(
+    async () => new Response('Forbidden', { status: 403 }),
+    async () => {
+      assert.equal(await fetchLinkPreviewMetadata(PAGE), null)
+    },
+  )
+
+  await withFetch(
+    async () => new Response('{"a":1}', { headers: { 'content-type': 'application/json' } }),
+    async () => {
+      assert.equal(await fetchLinkPreviewMetadata(PAGE), null)
+    },
+  )
+
+  await withFetch(
+    async () => {
+      throw new Error('ECONNREFUSED')
+    },
+    async () => {
+      assert.equal(await fetchLinkPreviewMetadata(PAGE), null)
+    },
+  )
+})
+
+test('the page is requested the way a browser would ask for it', async () => {
+  let sent: Headers | undefined
+  await withFetch(
+    async (_input, init) => {
+      sent = new Headers(init?.headers)
+      return htmlResponse('<title>Hello</title>')
+    },
+    async () => {
+      await fetchLinkPreviewMetadata(PAGE)
+    },
+  )
+
+  assert.match(sent?.get('user-agent') ?? '', /Mozilla\/5\.0/)
+  assert.match(sent?.get('accept') ?? '', /text\/html/)
+  assert.match(sent?.get('accept-language') ?? '', /en/)
+})
+
+test('a page whose head declares no image is read a little way into the body', async () => {
+  const body = `<html><head><title>Field notes</title><meta name="description" content="From the trail"></head>
+    <body><main><img src="/media/hero.jpg" alt=""></main></body></html>`
+
+  await withFetch(
+    async () => htmlResponse(body),
+    async () => {
+      const meta = await fetchLinkPreviewMetadata(PAGE)
+      assert.equal(meta?.title, 'Field notes')
+      assert.equal(meta?.description, 'From the trail')
+      assert.equal(meta?.image, 'https://www.example.com/media/hero.jpg')
+    },
+  )
+})
+
+test('an image declared in the head wins over anything in the body', async () => {
+  const html = `<html><head><meta property="og:image" content="/a.jpg"></head>
+    <body><img src="/b.jpg"></body></html>`
+
+  await withFetch(
+    async () => htmlResponse(html),
+    async () => {
+      const meta = await fetchLinkPreviewMetadata(PAGE)
+      assert.equal(meta?.image, 'https://www.example.com/a.jpg')
+    },
+  )
+})
+
+test('a page that declares a non-UTF-8 charset is decoded with it', async () => {
+  const latin1 = Buffer.from('<html><head><title>Caf\u00e9 au lait</title></head></html>', 'latin1')
+
+  await withFetch(
+    async () =>
+      new Response(latin1, { headers: { 'content-type': 'text/html; charset=iso-8859-1' } }),
+    async () => {
+      const meta = await fetchLinkPreviewMetadata(PAGE)
+      assert.equal(meta?.title, 'Café au lait')
+    },
+  )
 })
