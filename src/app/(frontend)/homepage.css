@@ -16,12 +16,12 @@
   /* Larger responsive headlines, without changing body or card typography. */
   --home-section-title-size: clamp(2rem, 1.6rem + 1.7vw, 3.125rem);
 
-  /* 17px — the About Hike Globally lead (and every other section lead). The
-     hero standfirst reads the shared `.hero-description` instead. */
-  --home-lead-size: var(--text-lead);
-
-  /* 16px — section intros. */
-  --home-intro-size: var(--text-lead);
+  /* 16px — the homepage hero standfirst, About Hike Globally lead and section
+     intros step down from `--text-lead` (17 → 18px) to the body role, while
+     other pages retain the shared `.hero-description` lead size. */
+  --home-hero-description-size: var(--text-body);
+  --home-lead-size: var(--text-body);
+  --home-intro-size: var(--text-body);
 
   /* Shared destination-card roles; body copy scales with the canvas rem size. */
   --home-destination-card-title-size: var(--text-card);
@@ -51,9 +51,13 @@
    ---------------------------------------------------------------------------
    Every hero on the site reads `.hero-region`, `.hero-title` and
    `.hero-description` from `globals.css`: one full-screen band, the 42 → 72px
-   display headline, its Instrument Serif italic accent line and the 17px → 18px
-   standfirst. The homepage's hero is simply the first one — nothing about its
-   type is page-local any more, so this file only styles the sections below it. */
+   display headline and its Instrument Serif italic accent line. On the
+   homepage, the hero standfirst steps down from `--text-lead` to `--text-body`
+   to match the reduced section intros below it. */
+[data-homepage] .hero-description {
+  font-size: var(--home-hero-description-size);
+  line-height: var(--text-body--line-height);
+}
 
 /* ---------------------------------------------------------------------------
    Section headlines — responsive display serif, in the case they were written
@@ -83,14 +87,16 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Section body copy — 17px (lead) / 16px (intro)
+   Section body copy — 16px (`--text-body` role, stepped down from `--text-lead`)
    --------------------------------------------------------------------------- */
 [data-homepage] .home-section-lead {
   font-size: var(--home-lead-size);
+  line-height: var(--text-body--line-height);
 }
 
 [data-homepage] .home-section-intro {
   font-size: var(--home-intro-size);
+  line-height: var(--text-body--line-height);
 }
 
 /* Destination cards — shared type roles, scaled with the canvas. */
