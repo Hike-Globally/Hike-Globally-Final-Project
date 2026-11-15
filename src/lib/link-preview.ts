@@ -4,9 +4,26 @@ import { resolveSiteUrl } from './site-url'
  * The "Link preview" section on trips and blog posts: an admin pastes a URL and the public page
  * shows a compact card for it (thumbnail, title, description, rating, prices).
  *
- * Only the URL is required. Title, description and image come from the page's own metadata
- * (Open Graph / Twitter / <title>) and can be overridden by the editor. Rating, review count and
- * prices are typed in, since they are not part of any page's metadata.
+ * Only the URL is required. Title, description and image come from the page's own metadata, so the
+ * card looks the same whether the address is another page on this site or somebody else's — the
+ * reader should not have to know which. Read, in order of preference:
+ *
+ *   title        `og:title` → `twitter:title` → JSON-LD `headline`/`name` → `<title>` → `og:site_name`
+ *   description  `og:description` → `twitter:description` → `<meta name="description">` → JSON-LD
+ *   image        `og:image` (and its `:url` / `:secure_url` forms) → `twitter:image` → `image_src`
+ *                link → JSON-LD `image` → `apple-touch-icon` → the first usable `<img>` in the page
+ *
+ * Rating, review count and prices are typed in, since no page's metadata carries them. Editors can
+ * override the title and description from the admin panel; the image is always the linked page's.
+ *
+ * Two things make that work on other people's sites rather than only on our own:
+ *
+ *   · **A real browser is the client.** Many hosts answer a bot-looking User-Agent with a 403, a
+ *     consent wall or an empty page, so the request carries a current desktop Chrome UA and the
+ *     usual `Accept` / `Accept-Language` headers.
+ *   · **The head is not the whole story.** Open Graph tags win when they exist, but plenty of pages
+ *     ship only JSON-LD, only a `rel="image_src"` link, or nothing but a first content image. When
+ *     the head declares no image, a little of the body is read too, which is where that image is.
  */
 
 /** The fields an editor fills in on a trip or post (see `src/fields/link-preview.ts`). */
@@ -40,10 +57,24 @@ export type ResolvedLinkPreview = {
   originalPrice: string | null
 }
 
-const FETCH_TIMEOUT_MS = 5000
+/** Desktop Chrome, which is what most hosts expect to serve a preview card to. */
+const USER_AGENT =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
+const ACCEPT = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+/** Long enough for a slow host to answer, short enough not to hold a page render hostage. */
+const FETCH_TIMEOUT_MS = 8000
 /** Metadata sits in the document head; there is no reason to download a whole page. */
 const MAX_HEAD_BYTES = 256 * 1024
-const USER_AGENT = 'HikeGloballyLinkPreview/1.0 (+https://hikeglobally.com)'
+/** Read past `</head>` for a content image only when the head declared none at all. */
+const MAX_BODY_BYTES_FOR_IMAGE = 64 * 1024
+
+/** Anything here means the head already says (or implies) what the card's image is. */
+const IMAGE_HINT =
+  /(?:og:image|twitter:image|image_src|apple-touch-icon|application\/ld\+json|itemprop=["']image)/i
+
+/** Images that are never a card thumbnail: tracking pixels, spacers, sprites, inline data. */
+const UNUSABLE_IMAGE =
+  /(?:^data:|sprite|spacer|pixel|blank\.(?:gif|png)|\.svg(?:[?#]|$)|logo|icon)/i
 
 /**
  * Accepts an absolute http(s) URL, or a root-relative path such as `/trips/annapurna-base-camp`.
@@ -99,45 +130,186 @@ function readAttributes(tag: string): Record<string, string> {
   return attributes
 }
 
-/**
- * Reads title, description and image from an HTML document. Open Graph wins over Twitter cards,
- * which win over the plain `<title>` and `description` tags. Relative image URLs are resolved
- * against the page's own address.
- */
-export function parseLinkPreviewMetadata(html: string, pageUrl: string): LinkPreviewMetadata {
-  const head = html.slice(0, MAX_HEAD_BYTES)
+/** `<meta>` values keyed by `property`, `name` or `itemprop`, all lower-cased; first one wins. */
+function readMetaTags(html: string): Record<string, string> {
   const meta: Record<string, string> = {}
-
-  for (const tag of head.match(/<meta\b[^>]*>/gi) ?? []) {
+  for (const tag of html.match(/<meta\b[^>]*>/gi) ?? []) {
     const attributes = readAttributes(tag)
-    const key = (attributes.property ?? attributes.name ?? '').toLowerCase()
-    const content = attributes.content?.trim()
+    const key = (attributes.property ?? attributes.name ?? attributes.itemprop ?? '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase()
+    const content = attributes.content?.replace(/\s+/g, ' ').trim()
     if (key && content && !(key in meta)) meta[key] = content
   }
+  return meta
+}
 
-  const titleTag = head.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]
-  const title =
-    meta['og:title'] ??
-    meta['twitter:title'] ??
-    (titleTag ? decodeHtmlEntities(titleTag).replace(/\s+/g, ' ').trim() : undefined)
-  const description =
-    meta['og:description'] ?? meta['twitter:description'] ?? meta.description ?? undefined
-  const rawImage = meta['og:image'] ?? meta['og:image:url'] ?? meta['twitter:image']
+/** `<link>` targets keyed by each rel token (`image_src`, `apple-touch-icon`, …); first one wins. */
+function readLinkHrefs(html: string): Record<string, string> {
+  const hrefs: Record<string, string> = {}
+  for (const tag of html.match(/<link\b[^>]*>/gi) ?? []) {
+    const attributes = readAttributes(tag)
+    const href = attributes.href?.trim()
+    if (!href) continue
+    for (const rel of (attributes.rel ?? '').toLowerCase().split(/\s+/)) {
+      if (rel && !(rel in hrefs)) hrefs[rel] = href
+    }
+  }
+  return hrefs
+}
 
-  let image: string | undefined
-  if (rawImage) {
+/** A non-empty, single-line string, or `undefined`. */
+function textOf(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined
+  const text = decodeHtmlEntities(value).replace(/\s+/g, ' ').trim()
+  return text || undefined
+}
+
+/** The first value that carries text. */
+function firstText(...values: (string | undefined)[]): string | undefined {
+  for (const value of values) {
+    const text = textOf(value)
+    if (text) return text
+  }
+  return undefined
+}
+
+/** A JSON-LD `image` may be a string, an array, or an object with `url` / `contentUrl`. */
+function jsonLdImage(value: unknown): string | undefined {
+  if (typeof value === 'string') return textOf(value)
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const found = jsonLdImage(item)
+      if (found) return found
+    }
+    return undefined
+  }
+  if (value && typeof value === 'object') {
+    const record = value as Record<string, unknown>
+    return jsonLdImage(record.url ?? record.contentUrl ?? record['@id'])
+  }
+  return undefined
+}
+
+/**
+ * Structured data, which is the only metadata some pages carry: `schema.org` blocks are walked
+ * breadth-first for the first node that names an image, falling back to the first that carries a
+ * name or description.
+ */
+function readJsonLd(html: string): LinkPreviewMetadata {
+  let fallback: LinkPreviewMetadata | null = null
+
+  for (const block of html.matchAll(
+    /<script\b[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi,
+  )) {
+    let parsed: unknown
     try {
-      image = new URL(rawImage, pageUrl).toString()
+      parsed = JSON.parse(block[1]!.trim())
     } catch {
-      image = undefined
+      continue
+    }
+
+    const queue: unknown[] = Array.isArray(parsed) ? [...parsed] : [parsed]
+    while (queue.length) {
+      const node = queue.shift()
+      if (Array.isArray(node)) {
+        queue.push(...node)
+        continue
+      }
+      if (!node || typeof node !== 'object') continue
+
+      const record = node as Record<string, unknown>
+      if (Array.isArray(record['@graph'])) queue.push(...record['@graph'])
+
+      const image = jsonLdImage(record.image ?? record.thumbnailUrl)
+      const title = textOf(record.headline ?? record.name)
+      const description = textOf(record.description)
+      if (image) return { title, description, image }
+      if (!fallback && (title || description)) fallback = { title, description }
+
+      for (const value of Object.values(record)) {
+        if (value && typeof value === 'object') queue.push(value)
+      }
     }
   }
 
-  return {
-    title: title || undefined,
-    description: description || undefined,
-    image,
+  return fallback ?? {}
+}
+
+/** Resolves an image address against the page it was found on; `undefined` if it is unusable. */
+function resolveImageUrl(raw: string | undefined, pageUrl: string): string | undefined {
+  const value = raw?.trim()
+  if (!value || /^data:/i.test(value)) return undefined
+  try {
+    const url = new URL(value, pageUrl)
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return undefined
+    return url.toString()
+  } catch {
+    return undefined
   }
+}
+
+/**
+ * The first `<img>` that could stand in for a thumbnail. Only reached when the page declares no
+ * image of its own, so it is a last resort: tracking pixels, spacers, sprites, icons and inline data
+ * are skipped, and relative addresses are resolved against the page.
+ */
+function firstContentImage(html: string, pageUrl: string): string | undefined {
+  for (const tag of html.match(/<img\b[^>]*>/gi) ?? []) {
+    const attributes = readAttributes(tag)
+    const raw = attributes.src ?? attributes['data-src'] ?? attributes['data-lazy-src']
+    if (!raw || UNUSABLE_IMAGE.test(raw)) continue
+    if (attributes.width === '1' || attributes.height === '1') continue
+    const image = resolveImageUrl(raw, pageUrl)
+    if (image) return image
+  }
+  return undefined
+}
+
+/**
+ * Reads title, description and image from an HTML document, however the page chose to declare them
+ * (see the header for the order). Relative image addresses are resolved against the page's own
+ * address, and empty or broken values are dropped rather than shown.
+ */
+export function parseLinkPreviewMetadata(html: string, pageUrl: string): LinkPreviewMetadata {
+  const head = html.slice(0, MAX_HEAD_BYTES)
+  const meta = readMetaTags(head)
+  const links = readLinkHrefs(head)
+  const structured = readJsonLd(head)
+
+  const titleTag = head.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]
+  const title = firstText(
+    meta['og:title'],
+    meta['twitter:title'],
+    structured.title,
+    titleTag,
+    meta['og:site_name'],
+    meta['application-name'],
+  )
+  const description = firstText(
+    meta['og:description'],
+    meta['twitter:description'],
+    meta.description,
+    structured.description,
+  )
+  const rawImage = firstText(
+    meta['og:image'],
+    meta['og:image:url'],
+    meta['og:image:secure_url'],
+    meta['twitter:image'],
+    meta['twitter:image:src'],
+    meta['thumbnail'],
+    meta['image'],
+    links['image_src'],
+    structured.image,
+    links['apple-touch-icon'],
+    links['apple-touch-icon-precomposed'],
+    // Last: an image in the body, which is only in `html` when the head named none.
+    firstContentImage(html, pageUrl),
+  )
+
+  return { title, description, image: resolveImageUrl(rawImage, pageUrl) }
 }
 
 /** Turns an editor's value into an absolute URL for fetching; `null` when it is not usable. */
@@ -154,6 +326,11 @@ export function absoluteLinkPreviewUrl(value: string): string | null {
   }
 }
 
+/** `charset` from a `Content-Type`, when the server bothered to send one. */
+function charsetOf(contentType: string): string | undefined {
+  return contentType.match(/charset\s*=\s*["']?([\w-]+)/i)?.[1]
+}
+
 /**
  * Downloads the page's metadata. Any failure (timeout, non-HTML, network error) resolves to
  * `null`, so the card still renders from the editor's own fields. Cached by Next's Data Cache
@@ -164,36 +341,71 @@ export async function fetchLinkPreviewMetadata(
 ): Promise<LinkPreviewMetadata | null> {
   try {
     const response = await fetch(absoluteUrl, {
-      headers: { 'user-agent': USER_AGENT, accept: 'text/html,application/xhtml+xml' },
+      headers: {
+        'user-agent': USER_AGENT,
+        accept: ACCEPT,
+        'accept-language': 'en-US,en;q=0.9',
+      },
       redirect: 'follow',
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
       next: { revalidate: 3600 },
     })
     if (!response.ok) return null
-    const type = response.headers.get('content-type') ?? ''
-    if (!/text\/html|application\/xhtml/i.test(type)) return null
-    const html = await readHead(response)
+
+    // A server that sends no `Content-Type` at all is rare but real; only reject what is clearly
+    // not a page (an image, a PDF, JSON from an API endpoint).
+    const contentType = response.headers.get('content-type') ?? ''
+    if (contentType && !/html|xml/i.test(contentType)) return null
+
+    const html = await readHtml(response, charsetOf(contentType))
     return parseLinkPreviewMetadata(html, response.url || absoluteUrl)
   } catch {
     return null
   }
 }
 
-async function readHead(response: Response): Promise<string> {
+/**
+ * Reads just enough of the response to describe it: the head, plus — when the head declares no
+ * image — a short stretch of the body, where a content image usually is.
+ */
+async function readHtml(response: Response, charset: string | undefined): Promise<string> {
   if (!response.body) return ''
-  const reader = response.body.getReader()
-  const decoder = new TextDecoder()
-  let received = 0
-  let text = ''
-  while (received < MAX_HEAD_BYTES) {
-    const { done, value } = await reader.read()
-    if (done) break
-    received += value.byteLength
-    text += decoder.decode(value, { stream: true })
-    // Stop early once the head has closed: nothing useful follows it.
-    if (/<\/head>/i.test(text)) break
+
+  let decoder: TextDecoder
+  try {
+    decoder = new TextDecoder(charset ?? 'utf-8')
+  } catch {
+    decoder = new TextDecoder('utf-8')
   }
-  await reader.cancel().catch(() => undefined)
+
+  const reader = response.body.getReader()
+  let received = 0
+  let headEnd = -1
+  let text = ''
+
+  try {
+    while (received < MAX_HEAD_BYTES) {
+      const { done, value } = await reader.read()
+      if (done) break
+      received += value.byteLength
+      text += decoder.decode(value, { stream: true })
+
+      if (headEnd < 0) {
+        const close = text.search(/<\/head>/i)
+        if (close >= 0) {
+          headEnd = received
+          // Nothing after the head can beat what the head already declared.
+          if (IMAGE_HINT.test(text.slice(0, close))) break
+        }
+      } else if (received - headEnd > MAX_BODY_BYTES_FOR_IMAGE) {
+        break
+      }
+    }
+    text += decoder.decode()
+  } finally {
+    await reader.cancel().catch(() => undefined)
+  }
+
   return text
 }
 

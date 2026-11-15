@@ -3,6 +3,7 @@ import { Star } from 'lucide-react'
 import { Reveal } from '@/components/motion/reveal'
 import { resolveLinkPreview, type LinkPreviewSource } from '@/lib/link-preview'
 
+import { LinkPreviewThumb } from './link-preview-thumb'
 import './link-preview.css'
 
 const STARS = [0, 1, 2, 3, 4]
@@ -52,11 +53,7 @@ export async function LinkPreviewSection({ source }: { source: LinkPreviewSource
           rel={card.external ? 'noopener noreferrer' : undefined}
         >
           <span className="link-preview-thumb" aria-hidden="true">
-            {card.image ? (
-              // Remote images come from whichever page was linked, so they bypass the optimizer.
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={card.image} alt="" loading="lazy" decoding="async" />
-            ) : null}
+            <LinkPreviewThumb image={card.image} host={card.host} />
           </span>
 
           <span className="link-preview-body">
