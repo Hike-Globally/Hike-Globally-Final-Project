@@ -57,8 +57,11 @@ export type ResolvedLinkPreview = {
   originalPrice: string | null
 }
 
-/** Desktop Chrome, which is what most hosts expect to serve a preview card to. */
-const USER_AGENT =
+/**
+ * Desktop Chrome, which is what most hosts expect to serve a preview card to. Shared with the
+ * image proxy, so the card is read and its picture fetched as the same client.
+ */
+export const LINK_PREVIEW_USER_AGENT =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
 const ACCEPT = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
 /** Long enough for a slow host to answer, short enough not to hold a page render hostage. */
@@ -342,7 +345,7 @@ export async function fetchLinkPreviewMetadata(
   try {
     const response = await fetch(absoluteUrl, {
       headers: {
-        'user-agent': USER_AGENT,
+        'user-agent': LINK_PREVIEW_USER_AGENT,
         accept: ACCEPT,
         'accept-language': 'en-US,en;q=0.9',
       },
