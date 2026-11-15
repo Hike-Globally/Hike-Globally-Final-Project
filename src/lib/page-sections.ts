@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 /** Shared by the CMS and public/preview renderers. Order is document-specific. */
 export const tripSectionOptions = [
   { label: 'Hero & trip facts', value: 'hero' },
@@ -43,6 +45,15 @@ export type PageSection = {
   kind: string
   heading?: string | null
   html?: string | null
+  /* A Link preview row carries the card's own content (src/fields/link-preview.ts). The page
+     sections array is localized, so each language keeps its own copy of the row. */
+  linkPreviewUrl?: string | null
+  linkPreviewTitle?: string | null
+  linkPreviewDescription?: string | null
+  linkPreviewRating?: number | null
+  linkPreviewReviewCount?: number | null
+  linkPreviewPrice?: string | null
+  linkPreviewOriginalPrice?: string | null
 }
 
 export function defaultPageSections(options: { value: string }[]): PageSection[] {
@@ -62,6 +73,22 @@ export function resolvePageSections(
     seen.add(kind)
     return true
   })
+}
+
+/**
+ * A page section's rendered node. Usually the node itself, because most sections read the document
+ * (a trip's itinerary, a post's body); `linkPreview` is a function because its content belongs to
+ * the row — the URL and card details an editor typed into that page section.
+ */
+export type PageSectionContent = ReactNode | ((section: PageSection) => ReactNode)
+
+/** The node for `section`, calling the entry when that section needs the row it came from. */
+export function resolveSectionContent(
+  content: Record<string, PageSectionContent>,
+  section: PageSection,
+): ReactNode {
+  const entry = content[section.kind]
+  return typeof entry === 'function' ? entry(section) : entry
 }
 
 export function validatePageSections(value: unknown): true | string {

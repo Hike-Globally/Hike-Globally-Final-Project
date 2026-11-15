@@ -6,8 +6,10 @@ import {
   defaultPageSections,
   groupPageSections,
   resolvePageSections,
+  resolveSectionContent,
   tripSectionOptions,
   validatePageSections,
+  type PageSection,
 } from './page-sections'
 import { pageSectionsField } from '../fields/page-sections'
 
@@ -140,4 +142,78 @@ test('trip: Who is this trip for / not for sits immediately after Highlights and
     ),
     true,
   )
+})
+
+test('the Link preview row owns the card, so it is a URL field inside the row', () => {
+  const CARD_FIELDS = [
+    'linkPreviewUrl',
+    'linkPreviewTitle',
+    'linkPreviewDescription',
+    'linkPreviewRating',
+    'linkPreviewReviewCount',
+    'linkPreviewPrice',
+    'linkPreviewOriginalPrice',
+  ]
+
+  type FieldLike = {
+    type: string
+    name?: string
+    admin?: { condition?: (...args: unknown[]) => boolean }
+    fields?: FieldLike[]
+  }
+
+  /**
+   * Every field in the row, with the condition that decides whether it is shown: its own, or the
+   * one on the layout row it sits in (Payload hides a row's children with the row).
+   */
+  const walk = (
+    fields: FieldLike[],
+    inherited?: (siblingData: Record<string, unknown>) => boolean,
+  ): { name?: string; show: (siblingData: Record<string, unknown>) => boolean }[] =>
+    fields.flatMap((field) => {
+      const own = field.admin?.condition as
+        ((data: unknown, siblingData: Record<string, unknown>) => boolean) | undefined
+      const show = (siblingData: Record<string, unknown>) =>
+        (inherited?.(siblingData) ?? true) && (own ? own(undefined, siblingData) : true)
+      return [{ name: field.name, show }, ...(field.fields ? walk(field.fields, show) : [])]
+    })
+
+  for (const [name, options] of [
+    ['trip', tripSectionOptions],
+    ['blog', blogSectionOptions],
+  ] as const) {
+    const rowFields = walk(pageSectionsField(options).fields as unknown as FieldLike[])
+
+    for (const cardField of CARD_FIELDS) {
+      const field = rowFields.find((candidate) => candidate.name === cardField)
+      assert.ok(field, `${name}: ${cardField} is a page-section row field`)
+      // Shown on the row that places the card…
+      assert.equal(field.show({ kind: 'linkPreview' }), true, `${name}: ${cardField} shown there`)
+      // …and nowhere else: the Custom HTML row an editor adds by default must not grow a URL box.
+      assert.equal(field.show({ kind: 'html' }), false, `${name}: ${cardField} hidden on HTML rows`)
+      assert.equal(
+        field.show({ kind: 'overview' }),
+        false,
+        `${name}: ${cardField} hidden elsewhere`,
+      )
+    }
+
+    // The reverse still holds: Custom HTML keeps its code editor, and only that.
+    const html = rowFields.find((candidate) => candidate.name === 'html')
+    assert.equal(html?.show({ kind: 'html' }), true, `${name}: Custom HTML keeps its editor`)
+    assert.equal(html?.show({ kind: 'linkPreview' }), false, `${name}: no code box on a card row`)
+  }
+})
+
+test('a section can be rendered from its own row', () => {
+  const content = {
+    overview: 'plain',
+    linkPreview: (section: PageSection) => `card:${section.linkPreviewUrl}`,
+  }
+  assert.equal(resolveSectionContent(content, { kind: 'overview' }), 'plain')
+  assert.equal(
+    resolveSectionContent(content, { kind: 'linkPreview', linkPreviewUrl: '/trips/a' }),
+    'card:/trips/a',
+  )
+  assert.equal(resolveSectionContent(content, { kind: 'unknown' }), undefined)
 })

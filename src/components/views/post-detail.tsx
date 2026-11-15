@@ -1,6 +1,12 @@
-import { Fragment, type ReactNode } from 'react'
+import { Fragment } from 'react'
 import { CustomHtmlSection } from '@/components/content/custom-html-section'
-import { blogSectionOptions, groupPageSections, resolvePageSections } from '@/lib/page-sections'
+import {
+  blogSectionOptions,
+  groupPageSections,
+  resolvePageSections,
+  resolveSectionContent,
+  type PageSectionContent,
+} from '@/lib/page-sections'
 import Link from 'next/link'
 import { ArrowLeft, ArrowUpRight, CalendarDays, Clock } from 'lucide-react'
 
@@ -96,7 +102,7 @@ export function PostDetail({
       ] ?? category)
     : null
 
-  const sectionContent: Record<string, ReactNode> = {
+  const sectionContent: Record<string, PageSectionContent> = {
     hero: (
       <>
         <header
@@ -216,7 +222,8 @@ export function PostDetail({
         />
       </>
     ),
-    linkPreview: <LinkPreviewSection source={post} />,
+    // The card's URL lives in its own row, so the row is what the section reads.
+    linkPreview: (section) => <LinkPreviewSection source={section} />,
     // Same section as the trip page. Margins rather than the trip's padding, so the gap to the
     // article body and author box collapses into one, whichever order the editor chooses.
     faqs: (
@@ -324,7 +331,7 @@ export function PostDetail({
               {section.kind === 'html' ? (
                 <CustomHtmlSection section={section} variant="blog" />
               ) : (
-                sectionContent[section.kind]
+                resolveSectionContent(sectionContent, section)
               )}
             </Fragment>
           ))
