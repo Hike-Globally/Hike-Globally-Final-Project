@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { dictionary, t } from '@/i18n/dictionaries'
 import { routes, sitePath } from '@/i18n/config'
 import { getAllPageSlugs, getFooter, getSettings } from '@/lib/data'
+import { footerSocials } from '@/lib/footer-socials'
 import { resolveLink, type ResolvedLink } from '@/lib/links'
 import { mailtoHref, protectedEmailHtmlProps } from '@/lib/public-email'
 import type { Setting } from '@/payload-types'
@@ -42,7 +43,9 @@ type FooterColumn = { heading: string; links: FooterLinkItem[] }
 /* -------------------------------------------------------------------------- */
 /* Social glyphs — one per platform the CMS offers. Facebook / Instagram /     */
 /* YouTube / LinkedIn use lucide-style strokes; X and TikTok are brand glyphs  */
-/* (lucide has no mark for them), both optically sized to the same box.        */
+/* (lucide has no mark for them), both optically sized to the same box. The    */
+/* switch covers the whole platform union; the footer itself never renders     */
+/* LinkedIn, because `footerSocials` maps that row to X.                       */
 /* -------------------------------------------------------------------------- */
 function SocialIcon({ platform }: { platform: SocialPlatform }) {
   const stroke = {
@@ -221,18 +224,12 @@ export async function Footer() {
   /* --- About column: CMS introduction + the social chips ------------------ */
   const introduction = footer.introduction ?? dict.footer.introductionFallback
 
-  /* Facebook, Instagram and LinkedIn are the three channels the footer shows.
-     Profiles edited in the CMS still drive the row (and can add others), but a
-     YouTube entry is left out, and with nothing usable stored — or a database
-     that has not been seeded — the trio above is rendered rather than no icons. */
-  const cmsSocials = (settings.socials ?? []).filter((social) => social.platform !== 'youtube')
-  const socials: NonNullable<Setting['socials']> = cmsSocials.length
-    ? cmsSocials
-    : [
-        { platform: 'facebook', url: 'https://facebook.com/hikeglobally' },
-        { platform: 'instagram', url: 'https://instagram.com/hikeglobally' },
-        { platform: 'linkedin', url: 'https://linkedin.com/company/hikeglobally' },
-      ]
+  /* Facebook, Instagram and X are the three channels the footer shows. Profiles
+     edited in the CMS still drive the row (and can add others), but a YouTube
+     entry is left out and a LinkedIn entry is shown as X — the channel that
+     replaced it — and with nothing usable stored, or a database that has not
+     been seeded, that same trio is rendered rather than no icons. */
+  const socials = footerSocials(settings.socials)
 
   /* --- Sitemap-style columns: CMS `columns`, falling back like the header - */
   const cmsColumns: FooterColumn[] = (footer.columns ?? [])

@@ -19,6 +19,7 @@ import { getPayload, type RequiredDataFromCollectionSlug } from 'payload'
 
 import config from '../payload.config'
 import { BRAND, mixHex } from '../lib/brand-colors'
+import { X_PROFILE } from '../lib/footer-socials'
 import type { Page } from '../payload-types'
 
 /* -------------------------------------------------------------------------- */
@@ -2057,7 +2058,9 @@ const run = async () => {
       socials: [
         { platform: 'facebook', url: 'https://facebook.com/hikeglobally' },
         { platform: 'instagram', url: 'https://instagram.com/hikeglobally' },
-        { platform: 'linkedin', url: 'https://linkedin.com/company/hikeglobally' },
+        /* X replaced LinkedIn as the brand's third channel; `X_PROFILE` keeps the
+           profile URL in one place with the footer's own chips. */
+        { ...X_PROFILE },
       ],
       defaultOgImage: imageAt(0),
     },
