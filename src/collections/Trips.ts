@@ -6,6 +6,7 @@ import { pageSectionsField } from '../fields/page-sections'
 import { tripSectionOptions } from '../lib/page-sections'
 import { keywordsSection } from '../fields/keywords'
 import { linkField } from '../fields/link'
+import { linkPreviewPanel } from '../fields/link-preview'
 import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
 import { viewLiveField } from '../fields/view-live'
@@ -426,6 +427,12 @@ export const Trips: CollectionConfig = {
         },
       ],
     },
+
+    /* --------------------------------------------------------------------------
+       Link preview — a card for another page (a trip, a post, or any address), placed by the
+       "Link preview" row in Page sections. See src/fields/link-preview.ts.
+       -------------------------------------------------------------------------- */
+    linkPreviewPanel(),
 
     {
       type: 'collapsible',

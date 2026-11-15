@@ -384,6 +384,7 @@ export interface Trip {
           | 'whyChoose'
           | 'highlights'
           | 'audience'
+          | 'linkPreview'
           | 'routeMap'
           | 'itinerary'
           | 'departures'
@@ -536,6 +537,31 @@ export interface Trip {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * A full address, or a path on this site such as /trips/annapurna-base-camp. Pages on other sites open in a new tab.
+   */
+  linkPreviewUrl?: string | null;
+  /**
+   * Leave empty to use the page’s own title.
+   */
+  linkPreviewTitle?: string | null;
+  /**
+   * Leave empty to use the page’s own description. Shown on one line.
+   */
+  linkPreviewDescription?: string | null;
+  /**
+   * Out of 5, e.g. 4.8. Leave empty to hide the stars.
+   */
+  linkPreviewRating?: number | null;
+  linkPreviewReviewCount?: number | null;
+  /**
+   * Shown in bold. Written exactly as it should appear.
+   */
+  linkPreviewPrice?: string | null;
+  /**
+   * Optional. Shown struck through before the price.
+   */
+  linkPreviewOriginalPrice?: string | null;
   /**
    * One entry per day. Day-level content is translated per language.
    */
@@ -954,7 +980,7 @@ export interface Blog {
    */
   pageSections?:
     | {
-        kind: 'hero' | 'content' | 'faqs' | 'author' | 'navigation' | 'planning' | 'related' | 'html';
+        kind: 'hero' | 'content' | 'linkPreview' | 'faqs' | 'author' | 'navigation' | 'planning' | 'related' | 'html';
         heading?: string | null;
         /**
          * Published exactly as written: <script> tags, <style> blocks, iframes, forms and any other embed are kept and run on the public page. External scripts load in the order you paste them, so a widget’s loader can be followed by its init call. Only paste code you trust — it runs for every visitor with this site’s full rights. The optional heading above is the one thing rendered as plain text.
@@ -1035,6 +1061,31 @@ export interface Blog {
         id?: string | null;
       }[]
     | null;
+  /**
+   * A full address, or a path on this site such as /trips/annapurna-base-camp. Pages on other sites open in a new tab.
+   */
+  linkPreviewUrl?: string | null;
+  /**
+   * Leave empty to use the page’s own title.
+   */
+  linkPreviewTitle?: string | null;
+  /**
+   * Leave empty to use the page’s own description. Shown on one line.
+   */
+  linkPreviewDescription?: string | null;
+  /**
+   * Out of 5, e.g. 4.8. Leave empty to hide the stars.
+   */
+  linkPreviewRating?: number | null;
+  linkPreviewReviewCount?: number | null;
+  /**
+   * Shown in bold. Written exactly as it should appear.
+   */
+  linkPreviewPrice?: string | null;
+  /**
+   * Optional. Shown struck through before the price.
+   */
+  linkPreviewOriginalPrice?: string | null;
   author: number | User;
   publishedAt?: string | null;
   /**
@@ -1708,6 +1759,13 @@ export interface TripsSelect<T extends boolean = true> {
   tripForDescription?: T;
   tripNotForHeading?: T;
   tripNotForDescription?: T;
+  linkPreviewUrl?: T;
+  linkPreviewTitle?: T;
+  linkPreviewDescription?: T;
+  linkPreviewRating?: T;
+  linkPreviewReviewCount?: T;
+  linkPreviewPrice?: T;
+  linkPreviewOriginalPrice?: T;
   itinerary?:
     | T
     | {
@@ -1909,6 +1967,13 @@ export interface BlogSelect<T extends boolean = true> {
         answer?: T;
         id?: T;
       };
+  linkPreviewUrl?: T;
+  linkPreviewTitle?: T;
+  linkPreviewDescription?: T;
+  linkPreviewRating?: T;
+  linkPreviewReviewCount?: T;
+  linkPreviewPrice?: T;
+  linkPreviewOriginalPrice?: T;
   author?: T;
   publishedAt?: T;
   categories?: T;
