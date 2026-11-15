@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
 import { resolveRedirection, shouldCheckRedirection } from '@/lib/redirections'
+import { legacyMediaRedirect } from '@/lib/legacy-media-redirect'
 import { redirectionRuntime } from '@/lib/redirections-runtime'
 import { trustedOrigins } from '@/lib/trusted-origins'
 
@@ -105,6 +106,15 @@ const serveRedirect = async (
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl
 
+  // Old public media URLs predate the Blob migration. Only redirect in Blob mode; all other
+  // requests continue to Payload unchanged, including uploads and database/local media.
+  const mediaDestination = legacyMediaRedirect(request.url, request.method)
+  if (mediaDestination) {
+    const response = NextResponse.redirect(mediaDestination, 307)
+    response.headers.set('Cache-Control', 'no-store')
+    return response
+  }
+
   // Payload's REST API and admin server functions authenticate with the `payload-token` cookie.
   if (pathname === '/api' || pathname.startsWith('/api/')) return trustSameOrigin(request)
   if (pathname === '/admin' || pathname.startsWith('/admin/')) return trustSameOrigin(request)
@@ -132,8 +142,8 @@ export async function proxy(request: NextRequest) {
 export const config = {
   // Two groups, both deliberate:
   //
-  //  - `/admin` and `/api` handle Payload's same-origin authentication. `/api/media/file/*` is
-  //    excluded because those are byte streams that must not pass through the proxy at all.
+  //  - `/admin` and `/api` handle Payload's same-origin authentication. Legacy media GET/HEAD
+  //    requests also enter the proxy so Blob mode can redirect them to the public store.
   //  - everything else *except* API, admin, Next.js internals, static asset directories, the
   //    generated routes and any file with an extension — the only requests a redirect rule can
   //    answer. The storefront now pays one Map lookup per request and nothing else.
@@ -142,6 +152,7 @@ export const config = {
     '/admin/:path*',
     '/api',
     '/api/((?!media/file/).*)',
+    '/api/media/file/:path*',
     '/((?!api(?:/|$)|admin(?:/|$)|_next(?:/|$)|images(?:/|$)|media(?:/|$)|preview(?:/|$)|favicon\\.ico$|robots\\.txt$|sitemap\\.xml$|ads\\.txt$|.*\\.[a-zA-Z0-9]+$).*)',
   ],
 }
