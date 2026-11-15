@@ -308,8 +308,8 @@ export function PostDetail({
       </>
     ),
   }
-  // Custom embeds use the same full-width editorial frame as trip widgets, rather than being
-  // constrained to the article reading measure or the outline column.
+  // Blog embeds keep their own full-width section, while sharing the Key Highlights card frame
+  // used by trip custom HTML.
   const groups = groupPageSections(sections, ['hero', 'planning', 'related', 'html'])
 
   return (
