@@ -1,4 +1,5 @@
 import { CustomHtml } from '@/components/content/custom-html'
+import { KeyPointsCard } from '@/components/sections/key-points-card'
 import type { PageSection } from '@/lib/page-sections'
 import { cn } from '@/lib/utils'
 
@@ -9,57 +10,28 @@ import { cn } from '@/lib/utils'
  */
 export function CustomHtmlSection({
   section,
-  variant = 'default',
+  variant,
 }: {
   section: PageSection
-  /** Trip and blog embeds get a category tag and paper card without changing their saved HTML. */
-  variant?: 'default' | 'trip' | 'blog'
+  /** Blog embeds need their own content-width wrapper; trip embeds already sit in the body column. */
+  variant: 'trip' | 'blog'
 }) {
   const html = section.html ?? ''
-  if (!html.trim() && !section.heading?.trim()) return null
-
-  const hasEditorialFrame = variant !== 'default'
-  const label = variant === 'trip' ? 'TRIP' : variant === 'blog' ? 'BLOG' : null
-  const heading = section.heading ? (
-    hasEditorialFrame ? (
-      <header className="custom-html-section__heading">
-        <h2 className="heading-lg custom-html-section__title">{section.heading}</h2>
-      </header>
-    ) : (
-      <h2 className="heading-lg mb-8">{section.heading}</h2>
-    )
-  ) : null
-  const embed = (
-    <CustomHtml
-      html={html}
-      className={cn(
-        'max-w-none overflow-x-auto break-words [&_img]:max-w-full',
-        hasEditorialFrame ? 'custom-html-section__embed' : 'prose-hg',
-      )}
-    />
-  )
+  const heading = section.heading?.trim() ? section.heading : undefined
+  if (!html.trim() && !heading) return null
 
   return (
-    <section
-      className={cn(
-        'custom-html-section',
-        hasEditorialFrame ? 'custom-html-section--editorial' : 'py-12 md:py-16',
-      )}
-    >
-      {hasEditorialFrame ? (
-        <div className="container-content custom-html-section__inner">
-          {label ? <span className="custom-html-section__label">{label}</span> : null}
-          <div className="custom-html-section__card">
-            {heading}
-            {embed}
+    <section className="key-points-section custom-html-section py-12 md:py-16">
+      <div className={cn(variant === 'blog' && 'container-content')}>
+        <KeyPointsCard title={heading} className="custom-html-section__card">
+          <div className="custom-html-section__content">
+            <CustomHtml
+              html={html}
+              className="custom-html-section__embed max-w-none overflow-x-auto break-words [&_img]:max-w-full"
+            />
           </div>
-        </div>
-      ) : (
-        <>
-          {heading}
-          {embed}
-        </>
-      )}
+        </KeyPointsCard>
+      </div>
     </section>
   )
 }

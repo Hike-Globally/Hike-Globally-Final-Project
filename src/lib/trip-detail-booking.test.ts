@@ -40,6 +40,27 @@ const trip: Trip = {
   updatedAt: '2026-01-01T00:00:00.000Z',
 }
 
+test('custom HTML stays in the trip body column and keeps one sticky booking sidebar', () => {
+  const html = renderToStaticMarkup(
+    createElement(TripDetail, {
+      trip: {
+        ...trip,
+        pageSections: [
+          { kind: 'overview' },
+          { kind: 'html', heading: 'Trips You May Like', html: '<div>Widget</div>' },
+          { kind: 'itinerary' },
+        ],
+      },
+      related: [],
+    }),
+  )
+
+  assert.equal((html.match(/<aside class="hidden lg:sticky/g) ?? []).length, 1)
+  assert.equal((html.match(/Book This Trek/g) ?? []).length, 2, 'one mobile card and one sidebar')
+  assert.match(html, /key-points-card custom-html-section__card/)
+  assert.match(html, /<div>Widget<\/div>/)
+})
+
 test('booking cards show every difficulty level without a text background', () => {
   for (const level of DIFFICULTY_LEVELS) {
     const html = renderToStaticMarkup(

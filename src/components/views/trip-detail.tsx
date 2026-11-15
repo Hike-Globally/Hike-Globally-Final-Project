@@ -464,9 +464,9 @@ export function TripDetail({
       </>
     ),
   }
-  // Custom embeds are given their own full-width band: third-party widgets need the breathing room
-  // to center and adapt, rather than being squeezed beside the sticky booking card.
-  const groups = groupPageSections(sections, ['hero', 'inquiry', 'related', 'html'])
+  // Custom HTML stays with the body sections so it uses the same main column and single sticky
+  // booking sidebar instead of splitting the page into another full-width group.
+  const groups = groupPageSections(sections, ['hero', 'inquiry', 'related'])
 
   const bookingAnchor =
     sections.find(({ kind }) => kind === 'highlights') ??

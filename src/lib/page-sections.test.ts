@@ -87,17 +87,17 @@ test('full-width sections can be interleaved with body sections without changing
     { kind: 'overview' },
     { kind: 'related' },
   ]
-  const groups = groupPageSections(sections, ['hero', 'inquiry', 'related', 'html'])
+  const groups = groupPageSections(sections, ['hero', 'inquiry', 'related'])
   assert.deepEqual(
     groups.map(({ fullWidth }) => fullWidth),
-    [true, true, false, true, true, false, true],
+    [false, true, false, true, false, true],
   )
   assert.deepEqual(
     groups.flatMap(({ sections }) => sections),
     sections,
   )
-  assert.deepEqual(groups[2].sections, [{ kind: 'itinerary' }])
-  assert.deepEqual(groups[3].sections, [{ kind: 'html' }])
+  assert.deepEqual(groups[0].sections, [{ kind: 'html' }])
+  assert.deepEqual(groups[2].sections, [{ kind: 'itinerary' }, { kind: 'html' }])
 })
 
 test('trip: new content sections have the requested default positions', () => {

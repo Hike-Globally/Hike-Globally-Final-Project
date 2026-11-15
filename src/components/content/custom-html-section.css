@@ -1,57 +1,18 @@
-/* A restrained outer frame for CMS-authored embeds: soft paper-grey ground, an outlined
-   category label and a white inset card. The pasted HTML itself remains untouched. */
-.custom-html-section--editorial {
-  padding-block: clamp(2rem, 3.2vw, 3.25rem);
-  background: var(--color-mist);
-}
-
-.custom-html-section__inner {
-  display: grid;
-  gap: 0.75rem;
+/* The Key Highlights / Key Takeaways card supplies the visual frame. These rules only constrain
+   arbitrary CMS embeds so their content stays inside that frame at every viewport size. */
+.custom-html-section {
   min-width: 0;
-}
-
-.custom-html-section__label {
-  display: inline-flex;
-  align-items: center;
-  justify-self: start;
-  min-height: 1.125rem;
-  padding: 0.125rem 0.3rem;
-  border: 1px solid var(--color-ink-70);
-  color: var(--color-ink);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  line-height: 1;
 }
 
 .custom-html-section__card {
-  display: grid;
-  gap: clamp(1rem, 2vw, 1.5rem);
-  width: 100%;
   min-width: 0;
-  padding: clamp(1rem, 2.2vw, 1.75rem);
-  border: 1px solid var(--color-slate-20);
-  background: var(--color-paper);
 }
 
-.custom-html-section__heading {
+.custom-html-section__content {
   min-width: 0;
-  padding-bottom: clamp(0.875rem, 1.5vw, 1.25rem);
-  border-bottom: 1px solid var(--color-slate-20);
+  padding-top: 0.4rem;
 }
 
-.custom-html-section__title {
-  max-width: 100%;
-  margin: 0;
-  color: var(--color-ink);
-  text-align: left;
-  text-wrap: balance;
-}
-
-/* Keep the embed within the white card. Wide tables or widgets may scroll here instead of
-   widening the page; images and frames are capped to the card's available width. */
 .custom-html-section__embed {
   width: 100%;
   min-width: 0;
@@ -61,7 +22,7 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-color: var(--color-slate-40) transparent;
   scrollbar-width: thin;
-  color: var(--color-ink);
+  color: var(--color-ink-80);
   font-family: var(--font-sans);
   font-size: var(--text-body);
   line-height: var(--text-body--line-height);
@@ -85,23 +46,9 @@
   border: 0;
 }
 
-/* Let Klook use the full responsive card width rather than its fixed desktop iframe width. */
+/* Keep Klook's widget responsive within the same card instead of letting its desktop iframe
+   width push the main trip column wider than the booking sidebar allows. */
 .custom-html-section__embed iframe[src*='klook'] {
   width: 100% !important;
   max-width: 100%;
-}
-
-@media (max-width: 639px) {
-  .custom-html-section--editorial {
-    padding-block: 1.75rem;
-  }
-
-  .custom-html-section__inner {
-    gap: 0.625rem;
-  }
-
-  .custom-html-section__card {
-    gap: 1rem;
-    padding: 1rem;
-  }
 }
