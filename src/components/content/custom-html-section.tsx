@@ -12,17 +12,17 @@ export function CustomHtmlSection({
   variant = 'default',
 }: {
   section: PageSection
-  /** Trip and blog embeds get an editorial, full-width frame without changing their saved HTML. */
-  variant?: 'default' | 'editorial'
+  /** Trip and blog embeds get a category tag and paper card without changing their saved HTML. */
+  variant?: 'default' | 'trip' | 'blog'
 }) {
   const html = section.html ?? ''
   if (!html.trim() && !section.heading?.trim()) return null
 
-  const hasEditorialFrame = variant === 'editorial'
+  const hasEditorialFrame = variant !== 'default'
+  const label = variant === 'trip' ? 'TRIP' : variant === 'blog' ? 'BLOG' : null
   const heading = section.heading ? (
     hasEditorialFrame ? (
       <header className="custom-html-section__heading">
-        <span className="custom-html-section__accent" aria-hidden="true" />
         <h2 className="heading-lg custom-html-section__title">{section.heading}</h2>
       </header>
     ) : (
@@ -48,8 +48,11 @@ export function CustomHtmlSection({
     >
       {hasEditorialFrame ? (
         <div className="container-content custom-html-section__inner">
-          {heading}
-          {embed}
+          {label ? <span className="custom-html-section__label">{label}</span> : null}
+          <div className="custom-html-section__card">
+            {heading}
+            {embed}
+          </div>
         </div>
       ) : (
         <>

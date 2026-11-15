@@ -479,7 +479,7 @@ export function TripDetail({
         const content = group.sections.map((section, index) => (
           <Fragment key={section.id ?? `${section.kind}-${index}`}>
             {section.kind === 'html' ? (
-              <CustomHtmlSection section={section} variant="editorial" />
+              <CustomHtmlSection section={section} variant="trip" />
             ) : (
               sectionContent[section.kind]
             )}
