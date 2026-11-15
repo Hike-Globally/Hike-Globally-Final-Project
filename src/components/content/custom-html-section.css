@@ -1,49 +1,58 @@
-/* Trip and blog embeds are third-party content, so their saved HTML and scripts stay untouched.
-   The surrounding section gives them a clear, responsive home in the site's visual language. */
+/* A restrained outer frame for CMS-authored embeds: soft paper-grey ground, an outlined
+   category label and a white inset card. The pasted HTML itself remains untouched. */
 .custom-html-section--editorial {
-  padding-block: clamp(3.25rem, 4.5vw, 5.5rem);
-  border-block: 1px solid var(--color-slate-20);
+  padding-block: clamp(2rem, 3.2vw, 3.25rem);
   background: var(--color-mist);
 }
 
 .custom-html-section__inner {
   display: grid;
-  justify-items: center;
-  gap: clamp(1.5rem, 2.8vw, 2.75rem);
+  gap: 0.75rem;
   min-width: 0;
 }
 
-.custom-html-section__heading {
-  display: grid;
-  justify-items: center;
-  gap: 0.875rem;
-  width: 100%;
-  text-align: center;
+.custom-html-section__label {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-height: 1.125rem;
+  padding: 0.125rem 0.3rem;
+  border: 1px solid var(--color-ink-70);
+  color: var(--color-ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  line-height: 1;
 }
 
-.custom-html-section__accent {
-  display: block;
-  width: 2.75rem;
-  height: 2px;
-  background: var(--color-sage);
+.custom-html-section__card {
+  display: grid;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  width: 100%;
+  min-width: 0;
+  padding: clamp(1rem, 2.2vw, 1.75rem);
+  border: 1px solid var(--color-slate-20);
+  background: var(--color-paper);
+}
+
+.custom-html-section__heading {
+  min-width: 0;
+  padding-bottom: clamp(0.875rem, 1.5vw, 1.25rem);
+  border-bottom: 1px solid var(--color-slate-20);
 }
 
 .custom-html-section__title {
-  max-width: 24ch;
+  max-width: 100%;
   margin: 0;
   color: var(--color-ink);
+  text-align: left;
   text-wrap: balance;
 }
 
-/* Keep the host centered and let the widget use its full available width. A fixed-width iframe
-   is capped to the viewport so it cannot push a phone layout sideways; its own document remains
-   responsible for reflowing its internal contents. Tables or other intentionally wide embeds can
-   still be scrolled inside this viewport instead of widening the page itself. */
+/* Keep the embed within the white card. Wide tables or widgets may scroll here instead of
+   widening the page; images and frames are capped to the card's available width. */
 .custom-html-section__embed {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
   width: 100%;
   min-width: 0;
   max-width: 100%;
@@ -76,8 +85,7 @@
   border: 0;
 }
 
-/* Klook's affiliate iframe otherwise keeps its desktop pixel width, even inside a wider section.
-   Make the frame follow this column so Klook can respond to the viewport it is given. */
+/* Let Klook use the full responsive card width rather than its fixed desktop iframe width. */
 .custom-html-section__embed iframe[src*='klook'] {
   width: 100% !important;
   max-width: 100%;
@@ -85,14 +93,15 @@
 
 @media (max-width: 639px) {
   .custom-html-section--editorial {
-    padding-block: 2.75rem;
+    padding-block: 1.75rem;
   }
 
   .custom-html-section__inner {
-    gap: 1.5rem;
+    gap: 0.625rem;
   }
 
-  .custom-html-section__heading {
-    gap: 0.75rem;
+  .custom-html-section__card {
+    gap: 1rem;
+    padding: 1rem;
   }
 }

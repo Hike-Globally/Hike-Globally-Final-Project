@@ -12,7 +12,7 @@ import { isExecutableScriptType } from './custom-html'
  * editor wrote, and only real JavaScript `type`s are treated as runnable (a `application/ld+json`
  * data block must reach the page but never execute).
  */
-const render = (heading: string | null, html: string, variant?: 'default' | 'editorial') =>
+const render = (heading: string | null, html: string, variant?: 'default' | 'trip' | 'blog') =>
   renderToStaticMarkup(
     createElement(CustomHtmlSection, { section: { kind: 'html', heading, html }, variant }),
   )
@@ -61,15 +61,26 @@ test('renders actual HTML, escapes the heading, and omits empty sections', () =>
   assert.equal(render(null, '   '), '')
 })
 
-test('editorial custom HTML gets a branded responsive frame without altering its embed markup', () => {
+test('trip and blog custom HTML get a tagged paper card without altering the embed markup', () => {
   const html = '<div id="klook-widget">Cards</div><script>window.loaded = true</script>'
-  const markup = render('Trips You May Like', html, 'editorial')
+  const tripMarkup = render('Trips You May Like', html, 'trip')
+  const blogMarkup = render('Recommended reading', html, 'blog')
 
-  assert.match(markup, /custom-html-section--editorial/)
-  assert.match(markup, /custom-html-section__heading/)
-  assert.match(markup, /custom-html-section__embed/)
-  assert.doesNotMatch(markup, /prose-hg/, 'third-party markup avoids rich-text styling')
-  assert.match(markup, /<div id="klook-widget">Cards<\/div><script>window\.loaded = true<\/script>/)
+  for (const markup of [tripMarkup, blogMarkup]) {
+    assert.match(markup, /custom-html-section--editorial/)
+    assert.match(markup, /custom-html-section__label/)
+    assert.match(markup, /custom-html-section__card/)
+    assert.match(markup, /custom-html-section__heading/)
+    assert.match(markup, /custom-html-section__embed/)
+    assert.doesNotMatch(markup, /prose-hg/, 'third-party markup avoids rich-text styling')
+    assert.match(
+      markup,
+      /<div id="klook-widget">Cards<\/div><script>window\.loaded = true<\/script>/,
+    )
+  }
+
+  assert.match(tripMarkup, /custom-html-section__label[^>]*>TRIP<\/span>/)
+  assert.match(blogMarkup, /custom-html-section__label[^>]*>BLOG<\/span>/)
 })
 
 test('only JavaScript script types are runnable; data blocks are not', () => {
