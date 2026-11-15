@@ -58,6 +58,29 @@ export type ResolvedLinkPreview = {
 }
 
 /**
+ * What this site's own CMS knows about a page, for a link that points at this site. Read by
+ * `link-preview-internal.ts`: the document's title, its one-line summary, and — the part that
+ * matters most — the image the document is actually illustrated with, i.e. a trip's hero image or
+ * a post's featured image.
+ */
+export type InternalLinkPreview = {
+  title: string | null
+  description: string | null
+  image: string | null
+}
+
+/**
+ * The two places a card's details can come from. Both are injectable so the merge rules can be
+ * tested without a network or a database.
+ */
+export type LinkPreviewResolvers = {
+  /** Reads the linked page over the network (`og:` tags, JSON-LD, …). */
+  metadata?: (url: string) => Promise<LinkPreviewMetadata | null>
+  /** Reads our own CMS when the link points at a page on this site. */
+  internal?: (url: string) => Promise<InternalLinkPreview | null>
+}
+
+/**
  * Desktop Chrome, which is what most hosts expect to serve a preview card to. Shared with the
  * image proxy, so the card is read and its picture fetched as the same client.
  */
@@ -431,12 +454,29 @@ function cleanNumber(value: number | null | undefined, max?: number): number | n
 }
 
 /**
+ * An image that lives on this site — our own media, which is what a featured image is — is handed
+ * to the card as a path. The card then loads it directly instead of through the image proxy: there
+ * is no hotlink protection to dodge on our own origin, the extra function call disappears, and a
+ * relative address keeps working on preview hosts and custom domains.
+ */
+function firstPartyPath(image: string | null): string | null {
+  if (!image) return null
+  const origin = resolveSiteUrl().replace(/\/+$/, '')
+  return image.startsWith(`${origin}/`) ? image.slice(origin.length) : image
+}
+
+/**
  * Builds the card for a page. Returns `null` when no URL is set, which hides the section.
- * `metadata` is injectable so the merge rules can be tested without the network.
+ *
+ * A link to a page on **this** site is answered from the CMS, not from the network: the card then
+ * carries the document's own featured image (a trip's hero image, a post's featured image) rather
+ * than whatever a scrape of our own page happened to return — and the render makes no self-request
+ * at all. Every other site is read over the network as before, and the CMS is only asked when the
+ * scrape has no picture to offer.
  */
 export async function resolveLinkPreview(
   source: LinkPreviewSource,
-  metadata?: (url: string) => Promise<LinkPreviewMetadata | null>,
+  resolvers: LinkPreviewResolvers = {},
 ): Promise<ResolvedLinkPreview | null> {
   const rawUrl = cleanText(source.linkPreviewUrl)
   if (!rawUrl || validateLinkPreviewUrl(rawUrl) !== true) return null
@@ -444,17 +484,23 @@ export async function resolveLinkPreview(
   const absolute = absoluteLinkPreviewUrl(rawUrl)
   if (!absolute) return null
 
-  const fetched = await (metadata ?? fetchLinkPreviewMetadata)(absolute)
   const host = hostOf(absolute)
   const siteHost = hostOf(resolveSiteUrl())
+
+  const own = host === siteHost && resolvers.internal ? await resolvers.internal(absolute) : null
+  // Nothing left to learn from the network when the CMS already knows the page's picture.
+  const fetched = own?.image
+    ? null
+    : await (resolvers.metadata ?? fetchLinkPreviewMetadata)(absolute)
 
   return {
     href: rawUrl.startsWith('/') ? rawUrl : absolute,
     external: host !== siteHost,
     host,
-    title: cleanText(source.linkPreviewTitle) ?? fetched?.title ?? host,
-    description: cleanText(source.linkPreviewDescription) ?? fetched?.description ?? '',
-    image: fetched?.image ?? null,
+    title: cleanText(source.linkPreviewTitle) ?? own?.title ?? fetched?.title ?? host,
+    description:
+      cleanText(source.linkPreviewDescription) ?? own?.description ?? fetched?.description ?? '',
+    image: firstPartyPath(own?.image ?? fetched?.image ?? null),
     rating: cleanNumber(source.linkPreviewRating, 5),
     reviewCount: cleanNumber(source.linkPreviewReviewCount),
     price: cleanText(source.linkPreviewPrice),

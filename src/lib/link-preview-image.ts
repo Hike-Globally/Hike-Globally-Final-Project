@@ -131,7 +131,14 @@ export function linkPreviewImageCandidates(
   host: string,
 ): LinkPreviewImageCandidate[] {
   const candidates: LinkPreviewImageCandidate[] = []
-  if (image) candidates.push({ src: imageProxyUrl(image), icon: false })
+  // A path is one of our own images: it is served from this origin already, so it is used as it
+  // is rather than pushed through the proxy (see `firstPartyPath` in `link-preview.ts`).
+  if (image) {
+    candidates.push({
+      src: image.startsWith('/') && !image.startsWith('//') ? image : imageProxyUrl(image),
+      icon: false,
+    })
+  }
   for (const path of ICON_PATHS) {
     candidates.push({ src: imageProxyUrl(`https://${host}${path}`), icon: true })
   }
