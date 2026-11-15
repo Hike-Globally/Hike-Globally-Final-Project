@@ -17,18 +17,20 @@ import '@/components/sections/key-takeaways.css'
 import './globals.css'
 
 /**
- * Two typefaces, both self-hosted from node_modules (@fontsource) instead of
+ * Three typefaces, all self-hosted from node_modules (@fontsource) instead of
  * fetched from fonts.googleapis.com:
  *
  *   · Archivo (variable)     — body copy, sub-headings, eyebrows, navigation, buttons
  *   · Instrument Serif       — display tier: hero, section and page headlines,
  *                              pull quotes, oversized numerals (plus the italic
  *                              accent line an editor writes with `<i>…</i>`)
+ *   · Cal Sans               — the homepage hero's first line, the geometric
+ *                              partner to the Instrument Serif second line
  *
- * Next preloads both, generates a size-adjusted fallback metric and serves them
- * from your own domain — which keeps third-party connections off the critical
- * path and eliminates the flash of unstyled text. The display face is preloaded
- * because the hero headline is the LCP element on the homepage.
+ * Next preloads all three, generates a size-adjusted fallback metric and serves
+ * them from your own domain — which keeps third-party connections off the
+ * critical path and eliminates the flash of unstyled text. The display faces
+ * are preloaded because the hero headline is the LCP element on the homepage.
  */
 const bodyFont = localFont({
   src: '../../../node_modules/@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2',
@@ -55,6 +57,18 @@ const displayFont = localFont({
   display: 'swap',
   preload: true,
   fallback: ['Georgia', 'Times New Roman', 'serif'],
+})
+
+/* Cal Sans ships a single 400 cut (see @fontsource/cal-sans). It is the
+   homepage hero's first line, so it is preloaded alongside the display face. */
+const calSansFont = localFont({
+  src: '../../../node_modules/@fontsource/cal-sans/files/cal-sans-latin-400-normal.woff2',
+  weight: '400',
+  style: 'normal',
+  variable: '--font-cal-sans',
+  display: 'swap',
+  preload: true,
+  fallback: ['system-ui', 'sans-serif'],
 })
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -135,7 +149,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang={htmlLang}
-      className={`${displayFont.variable} ${bodyFont.variable} overflow-x-clip`}
+      className={`${displayFont.variable} ${bodyFont.variable} ${calSansFont.variable} overflow-x-clip`}
     >
       {/* Google tag (gtag.js) & Google AdSense — verbatim from gtag.txt and ads.txt at the repo
           root. This root layout wraps every public page, so placing the snippets inside <head> is

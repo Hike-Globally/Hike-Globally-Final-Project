@@ -6,11 +6,13 @@
  * editor types shows up literally — `<i>` and all. Some headings nevertheless
  * need one part set in the accent face: the homepage hero reads
  *
- *     Walk Where The            ← heading font, 120px
- *     Map Runs Out of Names     ← Instrument Serif italic, 90px
+ *     Discover Global                  ← Cal Sans (homepage only), hero size
+ *     Adventures with Hike Globally    ← Instrument Serif italic, hero size
  *
  * and both lines live in the single `hero.heading` field, written as
- * `Walk Where The <i>Map Runs Out of Names</i>`.
+ * `Discover Global <i>Adventures with Hike Globally</i>`. The pair is what
+ * makes the second line a line: a literal `<br>` stays text, so two lines are
+ * always written with the accent tags.
  *
  * `splitInlineEmphasis()` is the bridge: it turns such a string into an ordered
  * list of plain / emphasized segments that a component maps to real elements.

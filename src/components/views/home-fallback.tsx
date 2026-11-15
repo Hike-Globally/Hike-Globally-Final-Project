@@ -41,8 +41,8 @@ export async function HomeFallback() {
             standfirst capped at the same ~576px measure it always had. */}
         <div className="max-w-none min-w-0">
           {showHeroEyebrow ? <p className="eyebrow mb-5 text-mist">{heroEyebrow}</p> : null}
-          <h1 className="heading-display hero-title max-w-4xl text-white 3xl:max-w-5xl">
-            Discover Global Adventures with Hike Globally
+          <h1 className="heading-display hero-title hero-title--cal max-w-4xl text-white 3xl:max-w-5xl">
+            Discover Global <i>Adventures with Hike Globally</i>
           </h1>
           <p className="lead hero-description mt-6 max-w-[36rem] text-mist">
             Explore family tours, trekking adventures, and practical travel guides to inspire your

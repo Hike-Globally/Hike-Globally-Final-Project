@@ -54,17 +54,21 @@
      mist 12.44 · white 13.45 · haze 5.45 · sage-light 5.13 are AA, while deep
      and slate are not used as text on dark surfaces.
 
-   Typography — two families only:
+   Typography — three families:
      Display  — Instrument Serif 400 (self-hosted): hero, section and page
                 headlines, pull quotes, oversized numerals.
      Text/UI  — Archivo variable 300/400/500/600 (self-hosted): body copy,
                 sub-headings, card titles, eyebrows, navigation, buttons.
+     Hero sans — Cal Sans 400 (self-hosted): only the homepage hero's *first*
+                line, under which the accent line sets the Instrument Serif
+                italic. Nowhere else — every other heading is the display face.
      The italic cut of Instrument Serif is the accent voice inside a display
      line (the `<i>` an editor writes into a heading).
 
-   Both families are self-hosted with next/font/local instead of loaded from
-   fonts.googleapis.com, which keeps them off the third-party critical path and
-   removes layout shift (they are preloaded and size-adjusted by Next).
+   All three families are self-hosted with next/font/local instead of loaded
+   from fonts.googleapis.com, which keeps them off the third-party critical
+   path and removes layout shift (they are preloaded and size-adjusted by
+   Next).
 
    Imagery — one treatment everywhere:
      photographs are graded with `--image-grade` (a whisper of desaturation and
@@ -118,6 +122,9 @@
   --font-display: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
   --font-heading: var(--font-archivo), 'Archivo', system-ui, sans-serif;
   --font-sans: var(--font-archivo), 'Archivo', system-ui, sans-serif;
+  /* Cal Sans — the geometric display sans for the homepage hero's first line,
+     paired with the Instrument Serif accent line below it. */
+  --font-cal: var(--font-cal-sans), 'Cal Sans', system-ui, sans-serif;
 
   /* Display serif kept under its historic name as well — the component
      stylesheets (`homepage.css`, `cta.css`, `latest-blogs-section.css`) refer
@@ -1136,6 +1143,14 @@
   font-weight: 400;
   letter-spacing: normal;
   line-height: 1.08;
+}
+
+/* The homepage hero's first line is set in Cal Sans; the `<i>` accent line
+   below it keeps the Instrument Serif italic treatment above. Cal Sans is a
+   display face drawn with tight spacing, so the headline's slight negative
+   tracking from `heading-display` is left in place. */
+.hero-title--cal {
+  font-family: var(--font-cal);
 }
 
 /* The hero standfirst. Pairs with the `lead` utility on the pages whose markup

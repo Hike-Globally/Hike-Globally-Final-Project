@@ -86,7 +86,9 @@ then drop `MEDIA_STORAGE` if you set it.
 ## Design tokens
 
 Headings **Instrument Serif 400**, body **Archivo** (self-hosted variable fonts). The single
-source of truth is `src/app/(frontend)/globals.css`.
+source of truth is `src/app/(frontend)/globals.css`. The homepage hero's first line is the one
+exception: `Cal Sans 400` (also self-hosted), under which the Instrument Serif italic accent line
+sets the second line.
 
 | Token   | Hex       |
 | ------- | --------- |
