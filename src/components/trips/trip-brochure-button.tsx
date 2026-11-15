@@ -37,16 +37,16 @@ export function TripBrochureButton({
         href={brochure.url}
         download={brochure.filename}
         className={cn(
-          'group flex h-13 w-full items-center justify-center gap-2.5 border border-mist/30 px-5',
+          'group flex h-13 w-full items-center justify-center gap-2.5 rounded-[7px] border border-white/30 bg-white/[0.06] px-5',
           'font-heading text-ui font-medium tracking-[0.01em] text-mist',
-          'transition-colors duration-300 hover:border-mist/60 hover:bg-white/5 hover:text-white',
-          'focus-visible:border-mist/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-haze/40',
+          'transition-[background-color,border-color,color,transform] duration-250 ease-[var(--ease-brand)] hover:border-white/80 hover:bg-paper hover:text-ink active:translate-y-px',
+          'focus-visible:border-white focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-haze/40',
         )}
       >
         <span className="min-w-0 truncate">{brochure.label}</span>
         <Download
           aria-hidden
-          className="size-4 shrink-0 text-mist/70 transition-[transform,color] duration-300 ease-[var(--ease-brand)] group-hover:translate-y-0.5 group-hover:text-white"
+          className="size-4 shrink-0 text-mist/75 transition-[transform,color] duration-250 ease-[var(--ease-brand)] group-hover:translate-y-0.5 group-hover:text-ink"
         />
       </a>
 

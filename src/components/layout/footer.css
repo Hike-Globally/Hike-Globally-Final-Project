@@ -49,6 +49,7 @@
   height: 2.25rem;
   flex-shrink: 0;
   border: 0.0625rem solid color-mix(in srgb, var(--color-haze) 34%, transparent);
+  border-radius: var(--radius-button);
   color: var(--color-mist);
   transition:
     border-color 0.2s var(--ease-brand),

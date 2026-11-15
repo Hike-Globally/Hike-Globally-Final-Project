@@ -335,7 +335,7 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
                       </span>
 
                       <span
-                        className="hidden size-9 shrink-0 place-items-center rounded-full border border-slate-40 text-ink transition-colors duration-300 group-hover:border-ink group-hover:bg-ink group-hover:text-white group-focus-within:border-ink group-focus-within:bg-ink group-focus-within:text-white sm:grid"
+                        className="hidden size-9 shrink-0 place-items-center rounded-[7px] border border-ink/20 bg-paper text-ink transition-colors duration-300 group-hover:border-btn-primary group-hover:bg-btn-primary group-hover:text-white group-focus-within:border-btn-primary group-focus-within:bg-btn-primary group-focus-within:text-white sm:grid"
                         aria-hidden="true"
                       >
                         <ArrowUpRight className="size-4" />

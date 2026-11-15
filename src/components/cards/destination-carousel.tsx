@@ -152,7 +152,7 @@ function CarouselArrow({
       onClick={onClick}
       disabled={disabled}
       aria-label={direction === 'left' ? 'Previous destinations' : 'Next destinations'}
-      className="inline-flex size-11 items-center justify-center rounded-full border border-[#206CA4] bg-[#206CA4] text-white transition-colors duration-300 hover:border-ink hover:bg-ink hover:text-white disabled:pointer-events-none disabled:border-slate-20 disabled:bg-slate-20 disabled:text-slate-80"
+      className="inline-flex size-11 cursor-pointer items-center justify-center rounded-[7px] border border-ink/22 bg-paper text-ink shadow-2xs transition-[background-color,border-color,color,box-shadow,transform] duration-250 ease-[var(--ease-brand)] hover:border-btn-primary hover:bg-btn-primary hover:text-white active:translate-y-px disabled:pointer-events-none disabled:border-slate-20 disabled:bg-mist disabled:text-slate-40 disabled:shadow-none"
     >
       <Icon className="size-4" aria-hidden="true" />
     </button>

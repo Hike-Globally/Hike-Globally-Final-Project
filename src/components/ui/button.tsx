@@ -5,22 +5,25 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  "inline-flex max-w-full items-center justify-center gap-2 whitespace-nowrap text-ui font-medium tracking-[0.01em] transition-[background-color,color,border-color] duration-300 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 outline-none focus-visible:ring-[3px] focus-visible:ring-deep/35 aria-invalid:ring-destructive/40",
+  "inline-flex max-w-full cursor-pointer items-center justify-center gap-2 rounded-[7px] whitespace-nowrap text-ui font-medium tracking-[0.01em] transition-[background-color,color,border-color,box-shadow,transform] duration-250 ease-[var(--ease-brand)] active:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 outline-none focus-visible:ring-[3px] focus-visible:ring-deep/35 aria-invalid:ring-destructive/40",
   {
     variants: {
       variant: {
-        default: 'bg-[#206CA4] text-white hover:bg-[#175780]',
-        sage: 'bg-[#206CA4] text-white hover:bg-[#175780]',
-        paper: 'bg-[#206CA4] text-white hover:bg-[#175780]',
-        // Keep the color override alongside the `text-ui` token appended by CVA.
-        haze: 'border border-haze bg-haze text-ink! hover:border-haze-40 hover:bg-haze-40',
+        default:
+          'border border-btn-primary bg-btn-primary text-white shadow-xs hover:border-btn-primary-hover hover:bg-btn-primary-hover hover:shadow-sm active:border-btn-primary-active active:bg-btn-primary-active',
+        sage: 'border border-white/15 bg-btn-accent text-white shadow-xs hover:border-white/25 hover:bg-btn-accent-hover hover:shadow-sm active:bg-btn-accent-active',
+        paper:
+          'border border-white bg-paper text-ink shadow-sm hover:border-haze-40 hover:bg-haze-20 hover:text-ink active:bg-mist',
+        haze: 'border border-haze/55 bg-haze/18 text-white backdrop-blur-[2px] hover:border-white hover:bg-paper hover:text-ink active:bg-mist',
         outline:
-          'border border-[#206CA4] bg-[#206CA4] text-white hover:border-[#175780] hover:bg-[#175780]',
+          'border border-ink/25 bg-paper text-ink shadow-2xs hover:border-btn-primary hover:bg-btn-primary hover:text-white active:bg-btn-primary-active',
         'outline-light':
-          'border border-[#206CA4] bg-[#206CA4] text-white hover:border-[#175780] hover:bg-[#175780]',
-        ghost: 'text-ink hover:bg-mist-60',
-        link: 'text-deep underline-offset-4 hover:text-deep-80 hover:underline',
-        destructive: 'bg-destructive text-destructive-foreground hover:bg-sage-80',
+          'border border-white/45 bg-white/10 text-white backdrop-blur-[2px] hover:border-white hover:bg-paper hover:text-ink active:bg-mist',
+        ghost:
+          'border border-transparent bg-transparent text-ink-80 hover:border-slate-20 hover:bg-mist hover:text-ink',
+        link: 'text-deep underline-offset-4 hover:text-btn-primary hover:underline',
+        destructive:
+          'border border-destructive bg-destructive text-destructive-foreground shadow-2xs hover:border-sage-80 hover:bg-sage-80',
       },
       size: {
         default: 'h-10 px-5 py-2 has-[>svg]:px-4',

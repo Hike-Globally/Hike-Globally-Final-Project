@@ -99,20 +99,20 @@ function ExpandAllSwitch({
       aria-checked={checked}
       onClick={() => onCheckedChange(!checked)}
       className={cn(
-        'group focus-visible:ring-ring/50 inline-flex shrink-0 cursor-pointer items-center gap-3 focus-visible:ring-[3px] focus-visible:outline-none',
+        'group focus-visible:ring-ring/50 inline-flex shrink-0 cursor-pointer items-center gap-3 rounded-[7px] focus-visible:ring-[3px] focus-visible:outline-none',
         className,
       )}
     >
       <span
         aria-hidden
         className={cn(
-          'flex h-6 w-11 shrink-0 items-center border p-0.5 transition-colors duration-300 ease-brand motion-reduce:transition-none',
-          checked ? 'border-deep bg-deep' : 'border-slate-40 bg-mist',
+          'flex h-6 w-11 shrink-0 items-center rounded-[7px] border p-0.5 transition-colors duration-300 ease-brand motion-reduce:transition-none',
+          checked ? 'border-btn-primary bg-btn-primary' : 'border-slate-40 bg-mist',
         )}
       >
         <span
           className={cn(
-            'block size-4 transition-transform duration-300 ease-brand motion-reduce:transition-none',
+            'block size-4 rounded-[4px] transition-transform duration-300 ease-brand motion-reduce:transition-none',
             checked ? 'translate-x-[1.375rem] bg-white' : 'translate-x-0 bg-slate',
           )}
         />
