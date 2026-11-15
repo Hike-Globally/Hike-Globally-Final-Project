@@ -61,6 +61,12 @@ test('the card always shows an image, fetched through this site', () => {
   assert.match(withoutImage, /src="\/api\/link-preview-image\?url=https%3A%2F%2Fbooking\.com%2F/)
 })
 
+test('a featured image from this site is loaded from this origin, not through the proxy', () => {
+  const html = render({ image: '/api/media/file/everest-hero.jpg' })
+  const src = html.match(/src="([^"]+)"/)?.[1]
+  assert.equal(src, '/api/media/file/everest-hero.jpg')
+})
+
 test('the price sits in the card row, between the body and the open arrow', () => {
   const html = render()
 

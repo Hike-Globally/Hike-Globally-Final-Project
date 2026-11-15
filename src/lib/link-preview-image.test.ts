@@ -134,6 +134,23 @@ test('every link card gets an image: the page art first, then the site icon', ()
   ])
 })
 
+test('an image on this origin is used directly, without a round trip through the proxy', () => {
+  assert.deepEqual(
+    linkPreviewImageCandidates('/api/media/file/everest-hero.jpg', 'hikeglobally.com')[0],
+    {
+      src: '/api/media/file/everest-hero.jpg',
+      icon: false,
+    },
+  )
+  // A protocol-relative address is still somebody else's, so it is proxied.
+  assert.equal(
+    linkPreviewImageCandidates('//cdn.example.com/a.jpg', 'example.com')[0]?.src.startsWith(
+      '/api/link-preview-image?url=',
+    ),
+    true,
+  )
+})
+
 test('a page with no Open Graph image still falls back to the site icon', () => {
   assert.deepEqual(linkPreviewImageCandidates(null, 'www.example.com'), [
     {

@@ -13,6 +13,7 @@ import {
   parseLinkPreviewMetadata,
   resolveLinkPreview,
   validateLinkPreviewUrl,
+  type InternalLinkPreview,
   type LinkPreviewMetadata,
   type LinkPreviewSource,
 } from './link-preview'
@@ -20,6 +21,16 @@ import {
 process.env.NEXT_PUBLIC_SITE_URL = 'https://hikeglobally.com'
 
 const PAGE = 'https://www.example.com/trek/annapurna'
+
+/**
+ * `resolveLinkPreview` with the network and the CMS both stubbed: the second argument reads the
+ * linked page, the third reads our own CMS (only consulted for links to this site).
+ */
+const resolve = (
+  source: LinkPreviewSource,
+  metadata?: (url: string) => Promise<LinkPreviewMetadata | null>,
+  internal?: (url: string) => Promise<InternalLinkPreview | null>,
+) => resolveLinkPreview(source, { metadata, internal })
 
 test('validateLinkPreviewUrl accepts empty values, absolute web addresses and site paths', () => {
   assert.equal(validateLinkPreviewUrl(''), true)
@@ -88,13 +99,13 @@ test('parseLinkPreviewMetadata ignores empty content and unusable image addresse
 
 test('resolveLinkPreview returns nothing without a URL, so the section stays hidden', async () => {
   const source: LinkPreviewSource = { linkPreviewUrl: '  ', linkPreviewTitle: 'Ignored' }
-  assert.equal(await resolveLinkPreview(source, async () => ({ title: 'x' })), null)
-  assert.equal(await resolveLinkPreview({}), null)
+  assert.equal(await resolve(source, async () => ({ title: 'x' })), null)
+  assert.equal(await resolve({}), null)
 })
 
 test('resolveLinkPreview returns nothing for an invalid URL instead of fetching it', async () => {
   let fetched = false
-  const result = await resolveLinkPreview({ linkPreviewUrl: 'javascript:void(0)' }, async () => {
+  const result = await resolve({ linkPreviewUrl: 'javascript:void(0)' }, async () => {
     fetched = true
     return null
   })
@@ -108,7 +119,7 @@ test('editor overrides win over the fetched page metadata', async () => {
     description: 'Page description',
     image: 'https://cdn.example.com/hero.jpg',
   }
-  const card = await resolveLinkPreview(
+  const card = await resolve(
     {
       linkPreviewUrl: PAGE,
       linkPreviewTitle: '  Annapurna Base Camp Trek - 11 Days  ',
@@ -126,7 +137,7 @@ test('editor overrides win over the fetched page metadata', async () => {
 })
 
 test('resolveLinkPreview still renders from the editor fields when the page cannot be read', async () => {
-  const card = await resolveLinkPreview(
+  const card = await resolve(
     {
       linkPreviewUrl: PAGE,
       linkPreviewTitle: 'Typed title',
@@ -148,14 +159,14 @@ test('resolveLinkPreview still renders from the editor fields when the page cann
 })
 
 test('with no title anywhere, the card falls back to the host name', async () => {
-  const card = await resolveLinkPreview({ linkPreviewUrl: PAGE }, async () => null)
+  const card = await resolve({ linkPreviewUrl: PAGE }, async () => null)
   assert.ok(card)
   assert.equal(card.title, 'example.com')
 })
 
 test('site paths stay in the same tab and resolve against the site origin', async () => {
   const seen: string[] = []
-  const card = await resolveLinkPreview({ linkPreviewUrl: '/trips/annapurna' }, async (url) => {
+  const card = await resolve({ linkPreviewUrl: '/trips/annapurna' }, async (url) => {
     seen.push(url)
     return null
   })
@@ -166,7 +177,7 @@ test('site paths stay in the same tab and resolve against the site origin', asyn
 })
 
 test('a link to this site’s own address is not treated as external', async () => {
-  const card = await resolveLinkPreview(
+  const card = await resolve(
     { linkPreviewUrl: 'https://hikeglobally.com/blog/altitude' },
     async () => null,
   )
@@ -174,15 +185,126 @@ test('a link to this site’s own address is not treated as external', async () 
   assert.equal(card.external, false)
 })
 
+/* ------------------------------------------------------------------------------------------------
+ * A link to a page on this site: the card shows that page's featured image, read from the CMS.
+ * ---------------------------------------------------------------------------------------------- */
+
+/** What the CMS stores (absolute) … */
+const FEATURED_ABSOLUTE = 'https://hikeglobally.com/api/media/file/everest-hero.jpg'
+/** … and what the card receives: a path, so the browser loads it from this origin directly. */
+const FEATURED = '/api/media/file/everest-hero.jpg'
+
+test('a link to one of our own pages shows that page’s featured image, with no network call', async () => {
+  const lookedUp: string[] = []
+  let networkCalled = false
+
+  const card = await resolve(
+    { linkPreviewUrl: '/trips/everest-base-camp' },
+    async () => {
+      networkCalled = true
+      return { title: 'Scraped title', image: 'https://hikeglobally.com/scraped.jpg' }
+    },
+    async (url) => {
+      lookedUp.push(url)
+      return {
+        title: 'Everest Base Camp Trek',
+        description: 'Twelve days.',
+        image: FEATURED_ABSOLUTE,
+      }
+    },
+  )
+
+  assert.ok(card)
+  assert.equal(card.image, FEATURED)
+  assert.equal(card.title, 'Everest Base Camp Trek')
+  assert.equal(card.description, 'Twelve days.')
+  assert.equal(card.external, false)
+  // The featured image answers everything, so our own page is never fetched.
+  assert.equal(networkCalled, false)
+  assert.deepEqual(lookedUp, ['https://hikeglobally.com/trips/everest-base-camp'])
+})
+
+test('a first-party image is handed to the card as a path, so it skips the proxy', async () => {
+  const card = await resolve(
+    { linkPreviewUrl: '/trips/everest-base-camp' },
+    undefined,
+    async () => ({ title: 'Trip', description: 'Summary', image: FEATURED_ABSOLUTE }),
+  )
+
+  // `/api/media/file/…` is served from this origin; only other people's images need proxying.
+  assert.equal(card?.image, '/api/media/file/everest-hero.jpg')
+})
+
+test('the CMS is not consulted for another site’s page', async () => {
+  let internalCalled = false
+
+  const card = await resolve(
+    { linkPreviewUrl: PAGE },
+    async () => ({ image: 'https://cdn.example.com/hero.jpg' }),
+    async () => {
+      internalCalled = true
+      return null
+    },
+  )
+
+  assert.equal(card?.image, 'https://cdn.example.com/hero.jpg')
+  assert.equal(internalCalled, false)
+})
+
+test('a document with no featured image still falls back to the page, keeping the CMS text', async () => {
+  const card = await resolve(
+    { linkPreviewUrl: '/blog/no-photo-yet' },
+    async () => ({
+      title: 'Scraped title',
+      description: 'Scraped description',
+      image: 'https://cdn.example.com/body.jpg',
+    }),
+    async () => ({ title: 'Post title', description: 'Post excerpt', image: null }),
+  )
+
+  assert.equal(card?.image, 'https://cdn.example.com/body.jpg')
+  assert.equal(card?.title, 'Post title')
+  assert.equal(card?.description, 'Post excerpt')
+})
+
+test('the row’s own title and description still win over the document', async () => {
+  const card = await resolve(
+    { linkPreviewUrl: '/trips/everest-base-camp', linkPreviewTitle: 'Typed title' },
+    undefined,
+    async () => ({ title: 'CMS title', description: 'CMS description', image: FEATURED_ABSOLUTE }),
+  )
+
+  assert.equal(card?.title, 'Typed title')
+  assert.equal(card?.description, 'CMS description')
+  assert.equal(card?.image, FEATURED)
+})
+
+test('an unknown or unpublished page falls back to reading the page itself', async () => {
+  const seen: string[] = []
+
+  const card = await resolve(
+    { linkPreviewUrl: '/trips/not-published' },
+    async (url) => {
+      seen.push(url)
+      return { image: 'https://hikeglobally.com/api/media/file/other.jpg' }
+    },
+    async () => null,
+  )
+
+  assert.deepEqual(seen, ['https://hikeglobally.com/trips/not-published'])
+  assert.equal(card?.image, '/api/media/file/other.jpg')
+  assert.equal(card?.title, 'hikeglobally.com')
+})
+
 test('ratings are capped at 5 and bad numbers are dropped', async () => {
-  const high = await resolveLinkPreview(
+  const high = await resolve(
     { linkPreviewUrl: PAGE, linkPreviewRating: 7, linkPreviewReviewCount: -3 },
     async () => null,
   )
   assert.equal(high?.rating, 5)
   assert.equal(high?.reviewCount, null)
 
-  const nan = await resolveLinkPreview(
+  const nan = await resolve(
     { linkPreviewUrl: PAGE, linkPreviewRating: Number.NaN },
     async () => null,
   )
