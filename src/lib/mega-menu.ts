@@ -1,15 +1,11 @@
 import { sitePath } from '@/i18n/config'
 import type { DestinationCard, TripCard } from '@/lib/data'
-import { DIFFICULTY_LEVELS, difficultyLabel, tripsByDifficultyPath } from '@/lib/difficulty'
 import { formatPrice } from '@/lib/format'
 import { localMediaUrl } from '@/lib/media-url'
 import {
-  SEASON_VALUES,
   TRIP_TYPE_VALUES,
-  seasonLabel,
   tripTypeLabel,
   tripsByDestinationPath,
-  tripsBySeasonPath,
   tripsByTypePath,
 } from '@/lib/trip-filters'
 import { pickAutomaticTrips } from '@/lib/trip-selection'
@@ -43,7 +39,6 @@ export type MegaMenuTrip = {
   destinationName: string | null
   durationDays: number
   maxAltitude: number | null
-  difficultyLabel: string
   priceFormatted: string
   featured: boolean
   image: MegaMenuImage | null
@@ -67,17 +62,13 @@ export type MegaMenuFacet = {
 export type MegaMenuData = {
   destinations: {
     items: MegaMenuDestination[]
-    totalCount: number
   }
   trips: {
     featuredTrips: MegaMenuTrip[]
     moreTrips: MegaMenuTripCompact[]
     isFeaturedHeading: boolean
     byDestination: MegaMenuFacet[]
-    byDifficulty: MegaMenuFacet[]
     byType: MegaMenuFacet[]
-    bySeason: MegaMenuFacet[]
-    totalCount: number
   }
 }
 
@@ -85,7 +76,6 @@ const MAX_DESTINATIONS_IN_MENU = 10
 const MAX_FEATURED_TRIPS_IN_MENU = 3
 const MAX_MORE_TRIPS_IN_MENU = 4
 const MAX_FACET_DESTINATIONS = 6
-const MAX_FACET_DIFFICULTIES = 6
 
 /** Strips query string, hash and trailing slash so `/trips/` and `/trips?sort=asc` both match `/trips`. */
 const normalizePath = (href: string): string => {
@@ -199,7 +189,6 @@ export const buildMegaMenuData = ({
       trip.destination && typeof trip.destination !== 'number' ? trip.destination.name : null,
     durationDays: trip.durationDays,
     maxAltitude: trip.maxAltitude ?? null,
-    difficultyLabel: difficultyLabel(trip.difficulty),
     priceFormatted: formatPrice(trip.priceFrom, trip.priceCurrency),
     featured: Boolean(trip.featured),
     image: resolveMenuImage(trip.heroImage, trip.title),
@@ -226,28 +215,11 @@ export const buildMegaMenuData = ({
     .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label))
     .slice(0, MAX_FACET_DESTINATIONS)
 
-  const difficultyCounts = new Map<string, number>()
   const typeCounts = new Map<string, number>()
-  const seasonCounts = new Map<string, number>()
 
   for (const trip of trips) {
-    difficultyCounts.set(trip.difficulty, (difficultyCounts.get(trip.difficulty) ?? 0) + 1)
     typeCounts.set(trip.tripType, (typeCounts.get(trip.tripType) ?? 0) + 1)
-    for (const season of trip.bestSeasons ?? []) {
-      seasonCounts.set(season, (seasonCounts.get(season) ?? 0) + 1)
-    }
   }
-
-  const byDifficulty: MegaMenuFacet[] = DIFFICULTY_LEVELS.filter(
-    (level) => (difficultyCounts.get(level.value) ?? 0) > 0,
-  )
-    .slice(0, MAX_FACET_DIFFICULTIES)
-    .map((level) => ({
-      value: level.value,
-      label: level.label,
-      href: tripsByDifficultyPath(level.value),
-      count: difficultyCounts.get(level.value) ?? 0,
-    }))
 
   const activeTypes: MegaMenuFacet[] = TRIP_TYPE_VALUES.filter(
     (type) => (typeCounts.get(type) ?? 0) > 0,
@@ -260,29 +232,16 @@ export const buildMegaMenuData = ({
   // Only surface the trip-style facet when published trips actually span multiple styles.
   const byType = activeTypes.length >= 2 ? activeTypes : []
 
-  const bySeason: MegaMenuFacet[] = SEASON_VALUES.filter(
-    (season) => (seasonCounts.get(season) ?? 0) > 0,
-  ).map((season) => ({
-    value: season,
-    label: seasonLabel(season),
-    href: tripsBySeasonPath(season),
-    count: seasonCounts.get(season) ?? 0,
-  }))
-
   return {
     destinations: {
       items: menuDestinations,
-      totalCount: destinations.length,
     },
     trips: {
       featuredTrips,
       moreTrips,
       isFeaturedHeading: flaggedFeatured.length > 0,
       byDestination,
-      byDifficulty,
       byType,
-      bySeason,
-      totalCount: trips.length,
     },
   }
 }

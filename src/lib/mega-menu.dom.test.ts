@@ -211,6 +211,14 @@ test('Destinations desktop mega menu lists regions, updates photo preview on hov
     // Custom non-duplicate link is preserved
     assert.match(host.container.textContent ?? '', /Meet our Sherpa guides/)
 
+    // Total region count badge/text is omitted from header and section head
+    assert.equal(host.container.querySelector('.pn-mega-count'), null)
+    assert.doesNotMatch(host.container.textContent ?? '', /\b\d+\s+regions?\b/i)
+    assert.equal(
+      host.container.querySelector('.pn-mega-touchbar-title-group')?.textContent,
+      'Destinations',
+    )
+
     // Featured showcase starts on Khumbu
     const showcaseTitle = () => host.container.querySelector('.pn-mega-dest-card-title')?.textContent
     const showcaseImg = () =>
@@ -257,7 +265,7 @@ test('Destinations desktop mega menu lists regions, updates photo preview on hov
   }
 })
 
-test('Trips desktop mega menu exposes region, difficulty, style, season facets, featured cards, and close button', () => {
+test('Trips desktop mega menu exposes region and style facets, featured cards, and close button without trip count, difficulty, or season sections', () => {
   let navigated = 0
   let closed = 0
   const host = mount()
@@ -285,12 +293,27 @@ test('Trips desktop mega menu exposes region, difficulty, style, season facets, 
     assert.match(tripCards[0]?.textContent ?? '', /5,364 m/)
     assert.match(tripCards[0]?.textContent ?? '', /\$1,850/)
 
+    // Total trip count beside "Trips", "By difficulty", and "Browse by season" are all omitted
+    assert.equal(
+      host.container.querySelector('.pn-mega-touchbar-title-group')?.textContent,
+      'Trips',
+    )
+    assert.equal(host.container.querySelector('.pn-mega-count'), null)
+    assert.doesNotMatch(host.container.textContent ?? '', /\b\d+\s+trips?\b/i)
+    assert.doesNotMatch(host.container.textContent ?? '', /By difficulty/i)
+    assert.doesNotMatch(
+      host.container.textContent ?? '',
+      /Easy - Moderate|Moderate - Challenging|Challenging|Strenuous - Extreme/i,
+    )
+    assert.doesNotMatch(host.container.textContent ?? '', /Browse by season/i)
+    assert.doesNotMatch(host.container.textContent ?? '', /\b(Spring|Autumn)\b/)
+
     const hrefs = Array.from(host.container.querySelectorAll('a')).map((a) => a.getAttribute('href'))
     assert.ok(hrefs.includes('/trips?destination=khumbu'))
-    assert.ok(hrefs.includes('/trips?difficulty=challenging'))
     assert.ok(hrefs.includes('/trips?type=cultural'))
-    assert.ok(hrefs.includes('/trips?season=autumn'))
     assert.ok(hrefs.includes('/trips'))
+    assert.equal(hrefs.some((href) => href?.includes('difficulty=')), false)
+    assert.equal(hrefs.some((href) => href?.includes('season=')), false)
 
     const closeBtn = host.container.querySelector<HTMLButtonElement>('.pn-mega-close')
     assert.equal(closeBtn?.getAttribute('aria-label'), 'Close trips menu')
@@ -334,16 +357,21 @@ test('Mobile mega menus render featured destination banner, trip cards, more iti
     assert.equal(moreRows.length, 1)
     assert.match(moreRows[0]?.textContent ?? '', /Ama Dablam Base Camp/)
 
-    // Mobile Trips menu exposes Region, Difficulty, Style, Season, and custom links
+    // Mobile Trips menu exposes Region, Style, and custom links, while omitting total count, Difficulty, and Season
+    assert.equal(host.container.querySelector('.pn-mega-count'), null)
+    assert.doesNotMatch(host.container.textContent ?? '', /\b\d+\s+trips?\b/i)
+    assert.doesNotMatch(host.container.textContent ?? '', /By difficulty/i)
+    assert.doesNotMatch(host.container.textContent ?? '', /By season/i)
+
     const tripHrefs = Array.from(host.container.querySelectorAll('a')).map((a) =>
       a.getAttribute('href'),
     )
     assert.ok(tripHrefs.includes('/trips?destination=khumbu'))
-    assert.ok(tripHrefs.includes('/trips?difficulty=challenging'))
     assert.ok(tripHrefs.includes('/trips?type=cultural'))
-    assert.ok(tripHrefs.includes('/trips?season=autumn'))
     assert.ok(tripHrefs.includes('/contact'))
     assert.ok(tripHrefs.includes('/trips'))
+    assert.equal(tripHrefs.some((href) => href?.includes('difficulty=')), false)
+    assert.equal(tripHrefs.some((href) => href?.includes('season=')), false)
 
     const viewAll = host.container.querySelector<HTMLAnchorElement>('.pn-mobile-mega-all')
     assert.equal(viewAll?.getAttribute('href'), '/trips')
@@ -378,12 +406,118 @@ test('Mobile mega menus render featured destination banner, trip cards, more iti
     assert.equal(destRows[0]?.getAttribute('data-active'), null)
     assert.equal(destRows[1]?.getAttribute('data-active'), 'true')
 
+    assert.equal(host.container.querySelector('.pn-mega-count'), null)
+    assert.doesNotMatch(host.container.textContent ?? '', /\b\d+\s+regions?\b/i)
+
     const destHrefs = Array.from(host.container.querySelectorAll('a')).map((a) =>
       a.getAttribute('href'),
     )
     assert.ok(destHrefs.includes('/destinations'))
     assert.ok(destHrefs.includes('/contact'))
     assert.ok(destHrefs.includes('/about'))
+  } finally {
+    host.unmount()
+  }
+})
+
+test('Live-scale catalog omits 6 trips, 11 regions, all By difficulty levels, and Browse by season: Spring Autumn', () => {
+  const elevenDestinations: DestinationCard[] = Array.from({ length: 11 }, (_, idx) => ({
+    id: 100 + idx,
+    name: `Region ${idx + 1}`,
+    slug: `region-${idx + 1}`,
+    country: 'Nepal',
+    tagline: `Alpine valley ${idx + 1}.`,
+    heroImage: media('/images/admin/himalaya-01.jpg', `Region ${idx + 1}`),
+    region: 'khumbu',
+    featured: idx === 0,
+  }))
+
+  const difficulties = [
+    'easy-moderate',
+    'moderate',
+    'moderate-challenging',
+    'challenging',
+    'strenuous-extreme',
+    'moderate',
+  ] as const
+
+  const sixTrips: TripCard[] = difficulties.map((difficulty, idx) => ({
+    id: 200 + idx,
+    title: `Himalayan Route ${idx + 1}`,
+    slug: `himalayan-route-${idx + 1}`,
+    summary: 'Guided mountain trek.',
+    heroImage: media('/images/admin/himalaya-01.jpg', `Route ${idx + 1}`),
+    tripType: 'trekking',
+    durationDays: 10 + idx,
+    maxAltitude: 4500,
+    difficulty,
+    bestSeasons: idx % 2 === 0 ? ['spring', 'autumn'] : ['autumn'],
+    priceFrom: 1500 + idx * 100,
+    priceCurrency: 'USD',
+    featured: idx < 3,
+    destination: {
+      id: elevenDestinations[idx]!.id,
+      name: elevenDestinations[idx]!.name,
+      slug: elevenDestinations[idx]!.slug,
+    },
+  }))
+
+  const catalogData = buildMegaMenuData({ destinations: elevenDestinations, trips: sixTrips })
+  const host = mount()
+
+  try {
+    for (const Component of [DesktopMegaMenu, MobileMegaMenu]) {
+      host.render(
+        createElement(Component, {
+          kind: 'trips',
+          data: catalogData,
+          customLinks: [],
+          pathname: '/',
+          onNavigate: () => {},
+        }),
+      )
+      const tripsText = host.container.textContent ?? ''
+      assert.doesNotMatch(tripsText, /6 trips/i)
+      assert.doesNotMatch(tripsText, /By difficulty/i)
+      for (const label of [
+        'Easy - Moderate',
+        'Moderate',
+        'Moderate - Challenging',
+        'Challenging',
+        'Strenuous - Extreme',
+      ]) {
+        assert.equal(tripsText.includes(label), false, `Unexpected difficulty label: ${label}`)
+      }
+      assert.doesNotMatch(tripsText, /Browse by season/i)
+      assert.doesNotMatch(tripsText, /By season/i)
+      assert.doesNotMatch(tripsText, /\b(Spring|Autumn)\b/)
+
+      host.render(
+        createElement(Component, {
+          kind: 'destinations',
+          data: catalogData,
+          customLinks: [],
+          pathname: '/',
+          onNavigate: () => {},
+        }),
+      )
+      const destText = host.container.textContent ?? ''
+      assert.doesNotMatch(destText, /11 regions/i)
+    }
+
+    // Empty rail collapses cleanly to single-column layout without an empty rail container
+    const emptyData = buildMegaMenuData({ destinations: [], trips: [] })
+    host.render(
+      createElement(DesktopMegaMenu, {
+        kind: 'trips',
+        data: emptyData,
+        customLinks: [],
+        pathname: '/',
+        onNavigate: () => {},
+      }),
+    )
+    assert.equal(host.container.querySelector('.pn-mega-rail'), null)
+    assert.ok(host.container.querySelector('.pn-mega-trips-body--single'))
   } finally {
     host.unmount()
   }
