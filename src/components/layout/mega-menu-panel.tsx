@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, ArrowUpRight, Clock, Mountain } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Clock, Mountain, X } from 'lucide-react'
 
 import { sitePath } from '@/i18n/config'
 import { dictionary, plural } from '@/i18n/dictionaries'
@@ -25,16 +25,57 @@ const linkTargetProps = (link: MegaMenuCustomLink) =>
 const tripCountLabel = (count: number) =>
   plural(dictionary.destinations as unknown as Record<string, string>, count)
 
+function TouchPanelHeader({
+  title,
+  countText,
+  allHref,
+  allLabel,
+  onNavigate,
+  onClose,
+}: {
+  title: string
+  countText?: string
+  allHref: string
+  allLabel: string
+  onNavigate: () => void
+  onClose: () => void
+}) {
+  return (
+    <div className="pn-mega-touchbar">
+      <div className="pn-mega-touchbar-title-group">
+        <span className="pn-mega-touchbar-title">{title}</span>
+        {countText ? <span className="pn-mega-count">{countText}</span> : null}
+      </div>
+      <div className="pn-mega-touchbar-actions">
+        <Link href={allHref} className="pn-mega-touchbar-all" onClick={onNavigate}>
+          <span>{allLabel}</span>
+          <ArrowRight className="size-3.5" aria-hidden="true" />
+        </Link>
+        <button
+          type="button"
+          className="pn-mega-close"
+          aria-label={`Close ${title.toLowerCase()} menu`}
+          onClick={onClose}
+        >
+          <X className="size-4" aria-hidden="true" />
+        </button>
+      </div>
+    </div>
+  )
+}
+
 function DestinationsDesktopMega({
   data,
   customLinks,
   pathname,
   onNavigate,
+  onClose,
 }: {
   data: MegaMenuData['destinations']
   customLinks: MegaMenuCustomLink[]
   pathname: string
   onNavigate: () => void
+  onClose: () => void
 }) {
   const defaultPreview = data.items[0] ?? null
   const [previewSlug, setPreviewSlug] = useState<string | null>(null)
@@ -45,18 +86,27 @@ function DestinationsDesktopMega({
 
   const existingHrefs = new Set(data.items.map((item) => item.href))
   const extraLinks = filterExtraCustomLinks(customLinks, existingHrefs, sitePath('/destinations'))
+  const regionCountText =
+    data.totalCount > 0
+      ? `${data.totalCount} ${data.totalCount === 1 ? 'region' : 'regions'}`
+      : undefined
 
   return (
     <div className="pn-mega-inner">
+      <TouchPanelHeader
+        title={dictionary.nav.destinations}
+        countText={regionCountText}
+        allHref={sitePath('/destinations')}
+        allLabel="All destinations"
+        onNavigate={onNavigate}
+        onClose={onClose}
+      />
+
       <div className="pn-mega-dest-body">
         <div className="pn-mega-dest-directory">
           <div className="pn-mega-section-head">
             <p className="pn-mega-eyebrow">Explore destinations</p>
-            {data.totalCount > 0 ? (
-              <span className="pn-mega-count">
-                {data.totalCount} {data.totalCount === 1 ? 'region' : 'regions'}
-              </span>
-            ) : null}
+            {regionCountText ? <span className="pn-mega-count">{regionCountText}</span> : null}
           </div>
 
           {data.items.length > 0 ? (
@@ -125,11 +175,7 @@ function DestinationsDesktopMega({
               </p>
             </div>
 
-            <Link
-              href={preview.href}
-              className="pn-mega-dest-card"
-              onClick={onNavigate}
-            >
+            <Link href={preview.href} className="pn-mega-dest-card" onClick={onNavigate}>
               {preview.image ? (
                 /* eslint-disable-next-line @next/next/no-img-element -- serves the original uploaded bytes matching PayloadImage/unoptimized policy */
                 <img
@@ -192,10 +238,12 @@ function TripsDesktopMega({
   data,
   customLinks,
   onNavigate,
+  onClose,
 }: {
   data: MegaMenuData['trips']
   customLinks: MegaMenuCustomLink[]
   onNavigate: () => void
+  onClose: () => void
 }) {
   const existingHrefs = new Set<string>([
     ...data.featuredTrips.map((trip) => trip.href),
@@ -206,9 +254,22 @@ function TripsDesktopMega({
     ...data.bySeason.map((facet) => facet.href),
   ])
   const extraLinks = filterExtraCustomLinks(customLinks, existingHrefs, sitePath('/trips'))
+  const tripCountText =
+    data.totalCount > 0
+      ? plural(dictionary.trips as unknown as Record<string, string>, data.totalCount)
+      : undefined
 
   return (
     <div className="pn-mega-inner">
+      <TouchPanelHeader
+        title={dictionary.nav.trips}
+        countText={tripCountText}
+        allHref={sitePath('/trips')}
+        allLabel="All trips"
+        onNavigate={onNavigate}
+        onClose={onClose}
+      />
+
       <div className="pn-mega-trips-body">
         <div className="pn-mega-rail">
           {data.byDestination.length > 0 ? (
@@ -291,11 +352,7 @@ function TripsDesktopMega({
             <p className="pn-mega-eyebrow">
               {data.isFeaturedHeading ? 'Featured trips' : 'Popular trips'}
             </p>
-            {data.totalCount > 0 ? (
-              <span className="pn-mega-count">
-                {plural(dictionary.trips as unknown as Record<string, string>, data.totalCount)}
-              </span>
-            ) : null}
+            {tripCountText ? <span className="pn-mega-count">{tripCountText}</span> : null}
           </div>
 
           {data.featuredTrips.length > 0 ? (
@@ -422,13 +479,17 @@ export function DesktopMegaMenu({
   customLinks,
   pathname,
   onNavigate,
+  onClose,
 }: {
   kind: MegaMenuKind
   data: MegaMenuData
   customLinks: MegaMenuCustomLink[]
   pathname: string
   onNavigate: () => void
+  onClose?: () => void
 }) {
+  const handleClose = onClose ?? onNavigate
+
   if (kind === 'destinations') {
     return (
       <DestinationsDesktopMega
@@ -436,25 +497,36 @@ export function DesktopMegaMenu({
         customLinks={customLinks}
         pathname={pathname}
         onNavigate={onNavigate}
+        onClose={handleClose}
       />
     )
   }
 
-  return <TripsDesktopMega data={data.trips} customLinks={customLinks} onNavigate={onNavigate} />
+  return (
+    <TripsDesktopMega
+      data={data.trips}
+      customLinks={customLinks}
+      onNavigate={onNavigate}
+      onClose={handleClose}
+    />
+  )
 }
 
 export function MobileMegaMenu({
   kind,
   data,
   customLinks,
+  pathname = '/',
   onNavigate,
 }: {
   kind: MegaMenuKind
   data: MegaMenuData
   customLinks: MegaMenuCustomLink[]
+  pathname?: string
   onNavigate: () => void
 }) {
   if (kind === 'destinations') {
+    const featuredDestination = data.destinations.items[0] ?? null
     const existingHrefs = new Set(data.destinations.items.map((item) => item.href))
     const extraLinks = filterExtraCustomLinks(
       customLinks,
@@ -464,36 +536,93 @@ export function MobileMegaMenu({
 
     return (
       <div className="pn-mobile-mega">
+        {featuredDestination ? (
+          <Link
+            href={featuredDestination.href}
+            className="pn-mobile-dest-hero"
+            onClick={onNavigate}
+          >
+            {featuredDestination.image ? (
+              /* eslint-disable-next-line @next/next/no-img-element -- serves original uploaded bytes matching PayloadImage/unoptimized policy */
+              <img
+                src={featuredDestination.image.src}
+                alt={featuredDestination.image.alt}
+                style={{ objectPosition: featuredDestination.image.objectPosition }}
+                className="pn-mega-dest-card-img"
+              />
+            ) : null}
+            <div className="pn-mega-dest-card-scrim" aria-hidden="true" />
+            {featuredDestination.tripCount > 0 ? (
+              <span className="pn-mega-dest-card-badge">
+                {tripCountLabel(featuredDestination.tripCount)}
+              </span>
+            ) : null}
+            <div className="pn-mobile-dest-hero-content">
+              <p className="pn-mega-dest-card-country">
+                Featured · {featuredDestination.country}
+              </p>
+              <p className="pn-mobile-dest-hero-title">{featuredDestination.name}</p>
+              {featuredDestination.tagline ? (
+                <p className="pn-mega-dest-card-tagline">{featuredDestination.tagline}</p>
+              ) : null}
+              <span className="pn-mega-dest-card-cta">
+                Explore region
+                <ArrowUpRight className="size-3.5" aria-hidden="true" />
+              </span>
+            </div>
+          </Link>
+        ) : null}
+
         {data.destinations.items.length > 0 ? (
-          <div className="pn-mobile-mega-list">
-            {data.destinations.items.map((destination) => (
-              <Link
-                key={destination.id}
-                href={destination.href}
-                className="pn-mobile-mega-row"
-                onClick={onNavigate}
-              >
-                <span className="pn-mobile-mega-title">{destination.name}</span>
-                <span className="pn-mobile-mega-sub">
-                  {destination.tripCount > 0
-                    ? tripCountLabel(destination.tripCount)
-                    : destination.country}
+          <div className="pn-mobile-mega-group">
+            <div className="pn-mega-section-head pn-mobile-section-head">
+              <p className="pn-mega-eyebrow">All regions</p>
+              {data.destinations.totalCount > 0 ? (
+                <span className="pn-mega-count">
+                  {data.destinations.totalCount}{' '}
+                  {data.destinations.totalCount === 1 ? 'region' : 'regions'}
                 </span>
-              </Link>
-            ))}
+              ) : null}
+            </div>
+            <div className="pn-mobile-dest-grid">
+              {data.destinations.items.map((destination) => {
+                const isRouteActive =
+                  pathname === destination.href || pathname.startsWith(`${destination.href}/`)
+                const meta =
+                  destination.tripCount > 0
+                    ? `${destination.country} · ${tripCountLabel(destination.tripCount)}`
+                    : destination.country
+
+                return (
+                  <Link
+                    key={destination.id}
+                    href={destination.href}
+                    className="pn-mobile-mega-row"
+                    data-active={isRouteActive || undefined}
+                    onClick={onNavigate}
+                  >
+                    <span className="pn-mobile-mega-row-copy">
+                      <span className="pn-mobile-mega-title">{destination.name}</span>
+                      <span className="pn-mobile-mega-sub">{meta}</span>
+                    </span>
+                    <ArrowUpRight className="pn-mega-arrow size-3.5" aria-hidden="true" />
+                  </Link>
+                )
+              })}
+            </div>
           </div>
         ) : null}
 
         {extraLinks.length > 0 ? (
           <div className="pn-mobile-mega-group">
             <p className="pn-mega-eyebrow">More links</p>
-            <div className="pn-mega-chips">
+            <div className="pn-mega-chips pn-mobile-chips">
               {extraLinks.map((child) => (
                 <Link
                   key={`${child.href}-${child.label}`}
                   href={child.href}
                   {...linkTargetProps(child)}
-                  className="pn-mega-chip"
+                  className="pn-mega-chip pn-mobile-chip"
                   onClick={onNavigate}
                 >
                   {child.label}
@@ -503,22 +632,34 @@ export function MobileMegaMenu({
           </div>
         ) : null}
 
-        <Link
-          href={sitePath('/destinations')}
-          className="pn-mobile-mega-all"
-          onClick={onNavigate}
-        >
-          <span>Explore all destinations</span>
-          <ArrowRight className="size-4" aria-hidden="true" />
-        </Link>
+        <div className="pn-mobile-mega-footer">
+          <Link
+            href={sitePath('/destinations')}
+            className="pn-mobile-mega-all"
+            onClick={onNavigate}
+          >
+            <span>Explore all destinations</span>
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+          <Link
+            href={sitePath('/contact')}
+            className="pn-mobile-mega-guide"
+            onClick={onNavigate}
+          >
+            Ask a local guide
+          </Link>
+        </div>
       </div>
     )
   }
 
   const existingHrefs = new Set<string>([
     ...data.trips.featuredTrips.map((trip) => trip.href),
+    ...data.trips.moreTrips.map((trip) => trip.href),
     ...data.trips.byDestination.map((facet) => facet.href),
     ...data.trips.byDifficulty.map((facet) => facet.href),
+    ...data.trips.byType.map((facet) => facet.href),
+    ...data.trips.bySeason.map((facet) => facet.href),
   ])
   const extraLinks = filterExtraCustomLinks(customLinks, existingHrefs, sitePath('/trips'))
 
@@ -526,10 +667,18 @@ export function MobileMegaMenu({
     <div className="pn-mobile-mega">
       {data.trips.featuredTrips.length > 0 ? (
         <div className="pn-mobile-mega-group">
-          <p className="pn-mega-eyebrow">
-            {data.trips.isFeaturedHeading ? 'Featured trips' : 'Popular trips'}
-          </p>
-          <div className="pn-mobile-mega-list">
+          <div className="pn-mega-section-head pn-mobile-section-head">
+            <p className="pn-mega-eyebrow">
+              {data.trips.isFeaturedHeading ? 'Featured trips' : 'Popular trips'}
+            </p>
+            {data.trips.totalCount > 0 ? (
+              <span className="pn-mega-count">
+                {plural(dictionary.trips as unknown as Record<string, string>, data.trips.totalCount)}
+              </span>
+            ) : null}
+          </div>
+
+          <div className="pn-mobile-trip-grid">
             {data.trips.featuredTrips.map((trip) => (
               <Link
                 key={trip.id}
@@ -537,22 +686,58 @@ export function MobileMegaMenu({
                 className="pn-mobile-mega-trip"
                 onClick={onNavigate}
               >
-                {trip.image ? (
-                  /* eslint-disable-next-line @next/next/no-img-element -- serves original uploaded bytes matching PayloadImage/unoptimized policy */
-                  <img
-                    src={trip.image.src}
-                    alt=""
-                    aria-hidden="true"
-                    style={{ objectPosition: trip.image.objectPosition }}
-                    className="pn-mobile-mega-thumb"
-                  />
-                ) : null}
-                <span className="pn-mobile-mega-trip-copy">
+                <div className="pn-mobile-trip-media">
+                  {trip.image ? (
+                    /* eslint-disable-next-line @next/next/no-img-element -- serves original uploaded bytes matching PayloadImage/unoptimized policy */
+                    <img
+                      src={trip.image.src}
+                      alt=""
+                      aria-hidden="true"
+                      style={{ objectPosition: trip.image.objectPosition }}
+                      className="pn-mobile-mega-thumb"
+                    />
+                  ) : null}
+                  {trip.destinationName ? (
+                    <span className="pn-mobile-trip-badge">{trip.destinationName}</span>
+                  ) : null}
+                </div>
+
+                <div className="pn-mobile-mega-trip-copy">
+                  {trip.destinationName ? (
+                    <span className="pn-mobile-trip-region">{trip.destinationName}</span>
+                  ) : null}
                   <span className="pn-mobile-mega-title">{trip.title}</span>
                   <span className="pn-mobile-mega-sub">
-                    {trip.durationDays} {dictionary.common.days} · {dictionary.common.from}{' '}
-                    {trip.priceFormatted}
+                    {trip.durationDays} {dictionary.common.days}
+                    {trip.maxAltitude ? ` · ${formatNumber(trip.maxAltitude)} m` : ''}
                   </span>
+                  <span className="pn-mobile-trip-price">
+                    <span>
+                      {dictionary.common.from} <strong>{trip.priceFormatted}</strong>
+                    </span>
+                    <ArrowUpRight className="pn-mega-arrow size-3.5" aria-hidden="true" />
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {data.trips.moreTrips.length > 0 ? (
+        <div className="pn-mobile-mega-group">
+          <p className="pn-mega-eyebrow">More itineraries</p>
+          <div className="pn-mobile-more-grid">
+            {data.trips.moreTrips.map((trip) => (
+              <Link
+                key={trip.id}
+                href={trip.href}
+                className="pn-mobile-mega-row"
+                onClick={onNavigate}
+              >
+                <span className="pn-mobile-mega-title">{trip.title}</span>
+                <span className="pn-mobile-mega-sub pn-mobile-no-shrink">
+                  {trip.durationDays}d · {trip.priceFormatted}
                 </span>
               </Link>
             ))}
@@ -563,15 +748,16 @@ export function MobileMegaMenu({
       {data.trips.byDestination.length > 0 ? (
         <div className="pn-mobile-mega-group">
           <p className="pn-mega-eyebrow">By region</p>
-          <div className="pn-mega-chips">
+          <div className="pn-mega-chips pn-mobile-chips">
             {data.trips.byDestination.map((facet) => (
               <Link
                 key={facet.value}
                 href={facet.href}
-                className="pn-mega-chip"
+                className="pn-mega-chip pn-mobile-chip"
                 onClick={onNavigate}
               >
-                {facet.label}
+                <span>{facet.label}</span>
+                <span className="pn-mobile-chip-count">{facet.count}</span>
               </Link>
             ))}
           </div>
@@ -581,12 +767,48 @@ export function MobileMegaMenu({
       {data.trips.byDifficulty.length > 0 ? (
         <div className="pn-mobile-mega-group">
           <p className="pn-mega-eyebrow">By difficulty</p>
-          <div className="pn-mega-chips">
+          <div className="pn-mega-chips pn-mobile-chips">
             {data.trips.byDifficulty.map((facet) => (
               <Link
                 key={facet.value}
                 href={facet.href}
-                className="pn-mega-chip"
+                className="pn-mega-chip pn-mobile-chip"
+                onClick={onNavigate}
+              >
+                {facet.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {data.trips.byType.length > 0 ? (
+        <div className="pn-mobile-mega-group">
+          <p className="pn-mega-eyebrow">By style</p>
+          <div className="pn-mega-chips pn-mobile-chips">
+            {data.trips.byType.map((facet) => (
+              <Link
+                key={facet.value}
+                href={facet.href}
+                className="pn-mega-chip pn-mobile-chip"
+                onClick={onNavigate}
+              >
+                {facet.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {data.trips.bySeason.length > 0 ? (
+        <div className="pn-mobile-mega-group">
+          <p className="pn-mega-eyebrow">By season</p>
+          <div className="pn-mega-chips pn-mobile-chips">
+            {data.trips.bySeason.map((facet) => (
+              <Link
+                key={facet.value}
+                href={facet.href}
+                className="pn-mega-chip pn-mobile-chip"
                 onClick={onNavigate}
               >
                 {facet.label}
@@ -599,13 +821,13 @@ export function MobileMegaMenu({
       {extraLinks.length > 0 ? (
         <div className="pn-mobile-mega-group">
           <p className="pn-mega-eyebrow">Quick links</p>
-          <div className="pn-mega-chips">
+          <div className="pn-mega-chips pn-mobile-chips">
             {extraLinks.map((child) => (
               <Link
                 key={`${child.href}-${child.label}`}
                 href={child.href}
                 {...linkTargetProps(child)}
-                className="pn-mega-chip"
+                className="pn-mega-chip pn-mobile-chip"
                 onClick={onNavigate}
               >
                 {child.label}
@@ -615,10 +837,12 @@ export function MobileMegaMenu({
         </div>
       ) : null}
 
-      <Link href={sitePath('/trips')} className="pn-mobile-mega-all" onClick={onNavigate}>
-        <span>View all trips</span>
-        <ArrowRight className="size-4" aria-hidden="true" />
-      </Link>
+      <div className="pn-mobile-mega-footer">
+        <Link href={sitePath('/trips')} className="pn-mobile-mega-all" onClick={onNavigate}>
+          <span>View all trips</span>
+          <ArrowRight className="size-4" aria-hidden="true" />
+        </Link>
+      </div>
     </div>
   )
 }

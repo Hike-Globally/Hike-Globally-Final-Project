@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
 
 import { JSDOM } from 'jsdom'
@@ -117,7 +118,44 @@ const trips: TripCard[] = [
   },
 ]
 
+const extraTrips: TripCard[] = [
+  ...trips,
+  {
+    id: 12,
+    title: 'Gokyo Lakes Circuit',
+    slug: 'gokyo-lakes',
+    summary: 'Turquoise glacial lakes and Renjo La.',
+    heroImage: media('/images/admin/himalaya-01.jpg', 'Gokyo'),
+    tripType: 'trekking',
+    durationDays: 13,
+    maxAltitude: 5357,
+    difficulty: 'challenging',
+    bestSeasons: ['spring', 'autumn'],
+    priceFrom: 1950,
+    priceCurrency: 'USD',
+    featured: true,
+    destination: { id: 1, name: 'Khumbu', slug: 'khumbu' },
+  },
+  {
+    id: 13,
+    title: 'Ama Dablam Base Camp',
+    slug: 'ama-dablam-base',
+    summary: 'Short scenic ridge trek in lower Khumbu.',
+    heroImage: media('/images/admin/himalaya-02.jpg', 'Ama Dablam'),
+    tripType: 'expedition',
+    durationDays: 10,
+    maxAltitude: 4600,
+    difficulty: 'moderate',
+    bestSeasons: ['autumn'],
+    priceFrom: 1650,
+    priceCurrency: 'USD',
+    featured: false,
+    destination: { id: 1, name: 'Khumbu', slug: 'khumbu' },
+  },
+]
+
 const megaData = buildMegaMenuData({ destinations, trips })
+const richMegaData = buildMegaMenuData({ destinations, trips: extraTrips })
 
 const mount = () => {
   const container = dom.window.document.createElement('div')
@@ -139,7 +177,8 @@ const mount = () => {
   }
 }
 
-test('Destinations desktop mega menu lists regions, updates photo preview on hover, and closes on click', () => {
+test('Destinations desktop mega menu lists regions, updates photo preview on hover, and exposes tablet close bar', () => {
+  let navigated = 0
   let closed = 0
   const host = mount()
 
@@ -154,6 +193,9 @@ test('Destinations desktop mega menu lists regions, updates photo preview on hov
         ],
         pathname: '/destinations/khumbu',
         onNavigate: () => {
+          navigated += 1
+        },
+        onClose: () => {
           closed += 1
         },
       }),
@@ -190,6 +232,17 @@ test('Destinations desktop mega menu lists regions, updates photo preview on hov
     assert.equal(showcaseTitle(), 'Khumbu')
     assert.equal(showcaseImg(), '/images/admin/himalaya-01.jpg')
 
+    // Touch / tablet close bar exposes quick "All destinations" link and dismiss button
+    const touchAll = host.container.querySelector<HTMLAnchorElement>('.pn-mega-touchbar-all')
+    assert.equal(touchAll?.getAttribute('href'), '/destinations')
+    const closeBtn = host.container.querySelector<HTMLButtonElement>('.pn-mega-close')
+    assert.ok(closeBtn)
+    assert.equal(closeBtn.getAttribute('aria-label'), 'Close destinations menu')
+    act(() => {
+      closeBtn.click()
+    })
+    assert.equal(closed, 1)
+
     // Clicking the footer CTA fires onNavigate
     const cta = host.container.querySelector<HTMLAnchorElement>('.pn-mega-footer-cta')
     assert.ok(cta)
@@ -198,13 +251,14 @@ test('Destinations desktop mega menu lists regions, updates photo preview on hov
     act(() => {
       cta.click()
     })
-    assert.equal(closed, 1)
+    assert.equal(navigated, 1)
   } finally {
     host.unmount()
   }
 })
 
-test('Trips desktop mega menu exposes region, difficulty, style, season facets and featured photo cards', () => {
+test('Trips desktop mega menu exposes region, difficulty, style, season facets, featured cards, and close button', () => {
+  let navigated = 0
   let closed = 0
   const host = mount()
 
@@ -216,6 +270,9 @@ test('Trips desktop mega menu exposes region, difficulty, style, season facets a
         customLinks: [{ href: '/trips', label: 'All trips', newTab: false }],
         pathname: '/',
         onNavigate: () => {
+          navigated += 1
+        },
+        onClose: () => {
           closed += 1
         },
       }),
@@ -235,18 +292,25 @@ test('Trips desktop mega menu exposes region, difficulty, style, season facets a
     assert.ok(hrefs.includes('/trips?season=autumn'))
     assert.ok(hrefs.includes('/trips'))
 
+    const closeBtn = host.container.querySelector<HTMLButtonElement>('.pn-mega-close')
+    assert.equal(closeBtn?.getAttribute('aria-label'), 'Close trips menu')
+    act(() => {
+      closeBtn?.click()
+    })
+    assert.equal(closed, 1)
+
     const firstTripCard = tripCards[0] as HTMLAnchorElement
     firstTripCard.addEventListener('click', (event) => event.preventDefault())
     act(() => {
       firstTripCard.click()
     })
-    assert.equal(closed, 1)
+    assert.equal(navigated, 1)
   } finally {
     host.unmount()
   }
 })
 
-test('Mobile mega menus render compact Destinations and Trips lists and close on navigation', () => {
+test('Mobile mega menus render featured destination banner, trip cards, more itineraries, and full filter chips', () => {
   let closed = 0
   const host = mount()
 
@@ -254,16 +318,33 @@ test('Mobile mega menus render compact Destinations and Trips lists and close on
     host.render(
       createElement(MobileMegaMenu, {
         kind: 'trips',
-        data: megaData,
-        customLinks: [],
+        data: richMegaData,
+        customLinks: [{ href: '/contact', label: 'Private departures', newTab: false }],
+        pathname: '/',
         onNavigate: () => {
           closed += 1
         },
       }),
     )
 
-    const tripRows = host.container.querySelectorAll('.pn-mobile-mega-trip')
-    assert.equal(tripRows.length, 2)
+    // 3 featured trip cards + 1 overflow itinerary row
+    const tripCards = host.container.querySelectorAll('.pn-mobile-mega-trip')
+    assert.equal(tripCards.length, 3)
+    const moreRows = host.container.querySelectorAll('.pn-mobile-more-grid .pn-mobile-mega-row')
+    assert.equal(moreRows.length, 1)
+    assert.match(moreRows[0]?.textContent ?? '', /Ama Dablam Base Camp/)
+
+    // Mobile Trips menu exposes Region, Difficulty, Style, Season, and custom links
+    const tripHrefs = Array.from(host.container.querySelectorAll('a')).map((a) =>
+      a.getAttribute('href'),
+    )
+    assert.ok(tripHrefs.includes('/trips?destination=khumbu'))
+    assert.ok(tripHrefs.includes('/trips?difficulty=challenging'))
+    assert.ok(tripHrefs.includes('/trips?type=cultural'))
+    assert.ok(tripHrefs.includes('/trips?season=autumn'))
+    assert.ok(tripHrefs.includes('/contact'))
+    assert.ok(tripHrefs.includes('/trips'))
+
     const viewAll = host.container.querySelector<HTMLAnchorElement>('.pn-mobile-mega-all')
     assert.equal(viewAll?.getAttribute('href'), '/trips')
     viewAll?.addEventListener('click', (event) => event.preventDefault())
@@ -273,24 +354,72 @@ test('Mobile mega menus render compact Destinations and Trips lists and close on
     })
     assert.equal(closed, 1)
 
+    // Mobile Destinations menu renders featured photo card + active route highlight + guide link
     host.render(
       createElement(MobileMegaMenu, {
         kind: 'destinations',
-        data: megaData,
-        customLinks: [],
+        data: richMegaData,
+        customLinks: [{ href: '/about', label: 'Local guides', newTab: false }],
+        pathname: '/destinations/mustang',
         onNavigate: () => {
           closed += 1
         },
       }),
     )
 
-    const destRows = host.container.querySelectorAll('.pn-mobile-mega-row')
-    assert.equal(destRows.length, 2)
-    assert.equal(
-      host.container.querySelector('.pn-mobile-mega-all')?.getAttribute('href'),
-      '/destinations',
+    const destHero = host.container.querySelector<HTMLAnchorElement>('.pn-mobile-dest-hero')
+    assert.equal(destHero?.getAttribute('href'), '/destinations/khumbu')
+    assert.match(destHero?.textContent ?? '', /Khumbu/)
+
+    const destRows = Array.from(
+      host.container.querySelectorAll<HTMLAnchorElement>('.pn-mobile-dest-grid .pn-mobile-mega-row'),
     )
+    assert.equal(destRows.length, 2)
+    assert.equal(destRows[0]?.getAttribute('data-active'), null)
+    assert.equal(destRows[1]?.getAttribute('data-active'), 'true')
+
+    const destHrefs = Array.from(host.container.querySelectorAll('a')).map((a) =>
+      a.getAttribute('href'),
+    )
+    assert.ok(destHrefs.includes('/destinations'))
+    assert.ok(destHrefs.includes('/contact'))
+    assert.ok(destHrefs.includes('/about'))
   } finally {
     host.unmount()
   }
+})
+
+test('Responsive mega-menu CSS and touch tablet navigation contracts hold across viewports', () => {
+  const megaCss = readFileSync(new URL('../components/layout/mega-menu.css', import.meta.url), 'utf8')
+  const pillNavSrc = readFileSync(new URL('../components/layout/pill-nav.tsx', import.meta.url), 'utf8')
+  const headerFrameSrc = readFileSync(
+    new URL('../components/layout/header-frame.tsx', import.meta.url),
+    'utf8',
+  )
+
+  // Never hide the 3rd featured trip card on tablets — promote it to a balanced full-width card
+  assert.doesNotMatch(
+    megaCss,
+    /\.pn-mega-trip-card:nth-child\(3\)[^{]*\{[^}]*display:\s*none/,
+  )
+  assert.match(megaCss, /\.pn-mega-trip-card:nth-child\(3\):last-child\s*\{[^}]*grid-column:\s*1 \/ -1/)
+
+  // Dedicated responsive tiers cover compact phones, large phones, portrait & landscape tablets, and coarse pointers
+  assert.match(megaCss, /@media \(max-width: 359\.98px\)/)
+  assert.match(megaCss, /@media \(min-width: 560px\) and \(max-width: 809\.98px\)/)
+  assert.match(megaCss, /@media \(min-width: 680px\) and \(max-width: 809\.98px\)/)
+  assert.match(megaCss, /@media \(min-width: 810px\) and \(max-width: 959\.98px\)/)
+  assert.match(megaCss, /@media \(min-width: 810px\) and \(max-width: 1140px\)/)
+  assert.match(megaCss, /\(hover:\s*none\)\s*or\s*\(pointer:\s*coarse\)/)
+
+  // Touch/pen tablets tap to toggle mega menus and clamp geometry to viewport bounds
+  assert.match(pillNavSrc, /isTouchLikePointer/)
+  assert.match(pillNavSrc, /TOUCH_MOUSE_GUARD_MS/)
+  assert.match(pillNavSrc, /--pn-mega-max-w/)
+  assert.match(pillNavSrc, /--pn-mega-max-h/)
+  assert.match(pillNavSrc, /--pn-mega-offset-x/)
+  assert.match(pillNavSrc, /data-panel-open/)
+
+  // Sticky header stays pinned while a desktop/tablet mega menu is open
+  assert.match(headerFrameSrc, /data-panel-open/)
 })
