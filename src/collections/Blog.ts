@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { adminOrEditor, publishedOrSignedIn } from '../access'
 import { faqFields } from '../fields/faqs'
+import { contentEditor } from '../fields/content-editor'
 import { pageSectionsField } from '../fields/page-sections'
 import { blogSectionOptions } from '../lib/page-sections'
 import { keywordsSection } from '../fields/keywords'
@@ -61,10 +62,11 @@ export const Blog: CollectionConfig = {
     {
       name: 'content',
       type: 'richText',
+      editor: contentEditor(),
       localized: true,
       admin: {
         description:
-          'The post body. Tables are available from the toolbar’s “+” menu (or type /table): pick rows and columns, then use the hover handles to add, remove, merge or resize. Handy for gear comparisons, cost breakdowns and at-a-glance facts.',
+          'The post body. Insert a Link preview from the toolbar’s block menu (or type /linkPreview) and paste a URL to place a card among your text. Tables are available from the toolbar’s “+” menu (or type /table): pick rows and columns, then use the hover handles to add, remove, merge or resize. Handy for gear comparisons, cost breakdowns and at-a-glance facts.',
       },
     },
     /* FAQs — the same categorised question lists as a trip (src/fields/faqs.ts), rendered as the

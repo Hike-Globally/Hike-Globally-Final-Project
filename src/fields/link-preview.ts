@@ -20,7 +20,8 @@ import { validateLinkPreviewUrl } from '../lib/link-preview'
 const whenLinkPreview = (_: unknown, siblingData: Record<string, unknown> | undefined) =>
   siblingData?.kind === 'linkPreview'
 
-export function linkPreviewSectionFields(): Field[] {
+export function linkPreviewSectionFields({ conditional = true }: { conditional?: boolean } = {}): Field[] {
+  const condition = conditional ? whenLinkPreview : undefined
   return [
     {
       name: 'linkPreviewUrl',
@@ -28,15 +29,15 @@ export function linkPreviewSectionFields(): Field[] {
       label: 'URL',
       validate: validateLinkPreviewUrl,
       admin: {
-        condition: whenLinkPreview,
+        condition,
         placeholder: 'https://example.com/trips/annapurna-base-camp',
         description:
-          'The page this card links to — the only field that matters here. Paste a full address, or a path on this site such as /trips/annapurna-base-camp. Image, title and description are read from that page. Leave it empty and the row renders nothing. Pages on other sites open in a new tab.',
+          'The page this card links to — the only field that matters here. Paste a full address, or a path on this site such as /trips/annapurna-base-camp. Image, title and description are read from that page. Leave it empty and no card is shown. Pages on other sites open in a new tab.',
       },
     },
     {
       type: 'row',
-      admin: { condition: whenLinkPreview },
+      admin: { condition },
       fields: [
         {
           name: 'linkPreviewTitle',
@@ -60,7 +61,7 @@ export function linkPreviewSectionFields(): Field[] {
     },
     {
       type: 'row',
-      admin: { condition: whenLinkPreview },
+      admin: { condition },
       fields: [
         {
           name: 'linkPreviewRating',

@@ -1,3 +1,4 @@
+import { InlineLinkPreview } from '@/components/sections/inline-link-preview'
 import Link from 'next/link'
 import type { CSSProperties, ReactNode } from 'react'
 
@@ -402,6 +403,11 @@ const renderNode = (node: RichTextNode, index: number, context: RenderContext): 
           {label}
         </Link>
       )
+    }
+
+    case 'block': {
+      if (node.fields?.blockType !== 'linkPreview') return null
+      return <InlineLinkPreview key={key} source={node.fields} />
     }
 
     case 'upload': {

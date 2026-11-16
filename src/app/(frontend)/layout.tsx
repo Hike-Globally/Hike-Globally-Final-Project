@@ -14,6 +14,7 @@ import { imageUrl } from '@/lib/seo'
 import { resolveSiteUrlObject } from '@/lib/site-url'
 import '@/components/content/custom-html-section.css'
 import '@/components/sections/key-takeaways.css'
+import '@/components/sections/link-preview.css'
 import './globals.css'
 
 /**
