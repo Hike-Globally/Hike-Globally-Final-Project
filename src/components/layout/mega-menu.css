@@ -156,14 +156,6 @@
   line-height: 1.2;
 }
 
-.pn-mega-count {
-  font-family: var(--font-sans);
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: color-mix(in srgb, var(--color-mist) 62%, transparent);
-  line-height: 1.2;
-}
-
 .pn-mega-empty {
   margin: 0.25rem 0 0;
   font-family: var(--font-sans);
@@ -391,6 +383,10 @@
   grid-template-columns: 13.75rem minmax(0, 1fr);
   gap: 1.5rem;
   padding: 1.375rem 1.5rem;
+}
+
+.pn-mega-trips-body.pn-mega-trips-body--single {
+  grid-template-columns: 1fr;
 }
 
 .pn-mega-rail {
@@ -1429,12 +1425,6 @@
     letter-spacing: -0.025em;
   }
 
-  .pn-mega-count {
-    color: #71828c;
-    font-size: 0.75rem;
-    font-variant-numeric: tabular-nums;
-  }
-
   .pn-mega-touchbar-all {
     min-height: 2.5rem;
     padding-inline: 0.875rem;
@@ -1575,6 +1565,10 @@
     grid-template-columns: 14.5rem minmax(0, 1fr);
     gap: 1.75rem;
     padding: 1.5rem 1.625rem;
+  }
+
+  .pn-mega-trips-body.pn-mega-trips-body--single {
+    grid-template-columns: 1fr;
   }
 
   .pn-mega-rail {

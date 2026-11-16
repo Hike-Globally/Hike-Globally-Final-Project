@@ -27,14 +27,12 @@ const tripCountLabel = (count: number) =>
 
 function TouchPanelHeader({
   title,
-  countText,
   allHref,
   allLabel,
   onNavigate,
   onClose,
 }: {
   title: string
-  countText?: string
   allHref: string
   allLabel: string
   onNavigate: () => void
@@ -44,7 +42,6 @@ function TouchPanelHeader({
     <div className="pn-mega-touchbar">
       <div className="pn-mega-touchbar-title-group">
         <span className="pn-mega-touchbar-title">{title}</span>
-        {countText ? <span className="pn-mega-count">{countText}</span> : null}
       </div>
       <div className="pn-mega-touchbar-actions">
         <Link href={allHref} className="pn-mega-touchbar-all" onClick={onNavigate}>
@@ -86,16 +83,11 @@ function DestinationsDesktopMega({
 
   const existingHrefs = new Set(data.items.map((item) => item.href))
   const extraLinks = filterExtraCustomLinks(customLinks, existingHrefs, sitePath('/destinations'))
-  const regionCountText =
-    data.totalCount > 0
-      ? `${data.totalCount} ${data.totalCount === 1 ? 'region' : 'regions'}`
-      : undefined
 
   return (
     <div className="pn-mega-inner">
       <TouchPanelHeader
         title={dictionary.nav.destinations}
-        countText={regionCountText}
         allHref={sitePath('/destinations')}
         allLabel="All destinations"
         onNavigate={onNavigate}
@@ -106,7 +98,6 @@ function DestinationsDesktopMega({
         <div className="pn-mega-dest-directory">
           <div className="pn-mega-section-head">
             <p className="pn-mega-eyebrow">Explore destinations</p>
-            {regionCountText ? <span className="pn-mega-count">{regionCountText}</span> : null}
           </div>
 
           {data.items.length > 0 ? (
@@ -249,110 +240,90 @@ function TripsDesktopMega({
     ...data.featuredTrips.map((trip) => trip.href),
     ...data.moreTrips.map((trip) => trip.href),
     ...data.byDestination.map((facet) => facet.href),
-    ...data.byDifficulty.map((facet) => facet.href),
     ...data.byType.map((facet) => facet.href),
-    ...data.bySeason.map((facet) => facet.href),
   ])
   const extraLinks = filterExtraCustomLinks(customLinks, existingHrefs, sitePath('/trips'))
-  const tripCountText =
-    data.totalCount > 0
-      ? plural(dictionary.trips as unknown as Record<string, string>, data.totalCount)
-      : undefined
+  const hasRail =
+    data.byDestination.length > 0 || data.byType.length > 0 || extraLinks.length > 0
 
   return (
     <div className="pn-mega-inner">
       <TouchPanelHeader
         title={dictionary.nav.trips}
-        countText={tripCountText}
         allHref={sitePath('/trips')}
         allLabel="All trips"
         onNavigate={onNavigate}
         onClose={onClose}
       />
 
-      <div className="pn-mega-trips-body">
-        <div className="pn-mega-rail">
-          {data.byDestination.length > 0 ? (
-            <div className="pn-mega-rail-group">
-              <p className="pn-mega-eyebrow">By region</p>
-              <div className="pn-mega-facet-list">
-                {data.byDestination.map((facet) => (
-                  <Link
-                    key={facet.value}
-                    href={facet.href}
-                    className="pn-mega-facet-link"
-                    onClick={onNavigate}
-                  >
-                    <span>{facet.label}</span>
-                    <span className="pn-mega-facet-count">{facet.count}</span>
-                  </Link>
-                ))}
+      <div
+        className={hasRail ? 'pn-mega-trips-body' : 'pn-mega-trips-body pn-mega-trips-body--single'}
+      >
+        {hasRail ? (
+          <div className="pn-mega-rail">
+            {data.byDestination.length > 0 ? (
+              <div className="pn-mega-rail-group">
+                <p className="pn-mega-eyebrow">By region</p>
+                <div className="pn-mega-facet-list">
+                  {data.byDestination.map((facet) => (
+                    <Link
+                      key={facet.value}
+                      href={facet.href}
+                      className="pn-mega-facet-link"
+                      onClick={onNavigate}
+                    >
+                      <span>{facet.label}</span>
+                      <span className="pn-mega-facet-count">{facet.count}</span>
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
-          ) : null}
+            ) : null}
 
-          {data.byDifficulty.length > 0 ? (
-            <div className="pn-mega-rail-group">
-              <p className="pn-mega-eyebrow">By difficulty</p>
-              <div className="pn-mega-chips">
-                {data.byDifficulty.map((facet) => (
-                  <Link
-                    key={facet.value}
-                    href={facet.href}
-                    className="pn-mega-chip"
-                    onClick={onNavigate}
-                  >
-                    {facet.label}
-                  </Link>
-                ))}
+            {data.byType.length > 0 ? (
+              <div className="pn-mega-rail-group">
+                <p className="pn-mega-eyebrow">By style</p>
+                <div className="pn-mega-chips">
+                  {data.byType.map((facet) => (
+                    <Link
+                      key={facet.value}
+                      href={facet.href}
+                      className="pn-mega-chip"
+                      onClick={onNavigate}
+                    >
+                      {facet.label}
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
-          ) : null}
+            ) : null}
 
-          {data.byType.length > 0 ? (
-            <div className="pn-mega-rail-group">
-              <p className="pn-mega-eyebrow">By style</p>
-              <div className="pn-mega-chips">
-                {data.byType.map((facet) => (
-                  <Link
-                    key={facet.value}
-                    href={facet.href}
-                    className="pn-mega-chip"
-                    onClick={onNavigate}
-                  >
-                    {facet.label}
-                  </Link>
-                ))}
+            {extraLinks.length > 0 ? (
+              <div className="pn-mega-rail-group">
+                <p className="pn-mega-eyebrow">Quick links</p>
+                <div className="pn-mega-facet-list">
+                  {extraLinks.map((child) => (
+                    <Link
+                      key={`${child.href}-${child.label}`}
+                      href={child.href}
+                      {...linkTargetProps(child)}
+                      className="pn-mega-facet-link"
+                      onClick={onNavigate}
+                    >
+                      <span>{child.label}</span>
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
-          ) : null}
-
-          {extraLinks.length > 0 ? (
-            <div className="pn-mega-rail-group">
-              <p className="pn-mega-eyebrow">Quick links</p>
-              <div className="pn-mega-facet-list">
-                {extraLinks.map((child) => (
-                  <Link
-                    key={`${child.href}-${child.label}`}
-                    href={child.href}
-                    {...linkTargetProps(child)}
-                    className="pn-mega-facet-link"
-                    onClick={onNavigate}
-                  >
-                    <span>{child.label}</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ) : null}
-        </div>
+            ) : null}
+          </div>
+        ) : null}
 
         <div className="pn-mega-trips-main">
           <div className="pn-mega-section-head">
             <p className="pn-mega-eyebrow">
               {data.isFeaturedHeading ? 'Featured trips' : 'Popular trips'}
             </p>
-            {tripCountText ? <span className="pn-mega-count">{tripCountText}</span> : null}
           </div>
 
           {data.featuredTrips.length > 0 ? (
@@ -437,33 +408,6 @@ function TripsDesktopMega({
       </div>
 
       <div className="pn-mega-footer">
-        {data.bySeason.length > 0 ? (
-          <div className="pn-mega-footer-note">
-            <span>Browse by season:</span>
-            {data.bySeason.map((season) => (
-              <Link
-                key={season.value}
-                href={season.href}
-                className="pn-mega-footer-inline"
-                onClick={onNavigate}
-              >
-                {season.label}
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <div className="pn-mega-footer-note">
-            <span>Looking for a custom itinerary?</span>
-            <Link
-              href={sitePath('/contact')}
-              className="pn-mega-footer-inline"
-              onClick={onNavigate}
-            >
-              Plan a private trip
-            </Link>
-          </div>
-        )}
-
         <Link href={sitePath('/trips')} className="pn-mega-footer-cta" onClick={onNavigate}>
           <span>View all trips</span>
           <ArrowRight className="size-4" aria-hidden="true" />
@@ -577,12 +521,6 @@ export function MobileMegaMenu({
           <div className="pn-mobile-mega-group">
             <div className="pn-mega-section-head pn-mobile-section-head">
               <p className="pn-mega-eyebrow">All regions</p>
-              {data.destinations.totalCount > 0 ? (
-                <span className="pn-mega-count">
-                  {data.destinations.totalCount}{' '}
-                  {data.destinations.totalCount === 1 ? 'region' : 'regions'}
-                </span>
-              ) : null}
             </div>
             <div className="pn-mobile-dest-grid">
               {data.destinations.items.map((destination) => {
@@ -657,9 +595,7 @@ export function MobileMegaMenu({
     ...data.trips.featuredTrips.map((trip) => trip.href),
     ...data.trips.moreTrips.map((trip) => trip.href),
     ...data.trips.byDestination.map((facet) => facet.href),
-    ...data.trips.byDifficulty.map((facet) => facet.href),
     ...data.trips.byType.map((facet) => facet.href),
-    ...data.trips.bySeason.map((facet) => facet.href),
   ])
   const extraLinks = filterExtraCustomLinks(customLinks, existingHrefs, sitePath('/trips'))
 
@@ -671,11 +607,6 @@ export function MobileMegaMenu({
             <p className="pn-mega-eyebrow">
               {data.trips.isFeaturedHeading ? 'Featured trips' : 'Popular trips'}
             </p>
-            {data.trips.totalCount > 0 ? (
-              <span className="pn-mega-count">
-                {plural(dictionary.trips as unknown as Record<string, string>, data.trips.totalCount)}
-              </span>
-            ) : null}
           </div>
 
           <div className="pn-mobile-trip-grid">
@@ -764,47 +695,11 @@ export function MobileMegaMenu({
         </div>
       ) : null}
 
-      {data.trips.byDifficulty.length > 0 ? (
-        <div className="pn-mobile-mega-group">
-          <p className="pn-mega-eyebrow">By difficulty</p>
-          <div className="pn-mega-chips pn-mobile-chips">
-            {data.trips.byDifficulty.map((facet) => (
-              <Link
-                key={facet.value}
-                href={facet.href}
-                className="pn-mega-chip pn-mobile-chip"
-                onClick={onNavigate}
-              >
-                {facet.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      ) : null}
-
       {data.trips.byType.length > 0 ? (
         <div className="pn-mobile-mega-group">
           <p className="pn-mega-eyebrow">By style</p>
           <div className="pn-mega-chips pn-mobile-chips">
             {data.trips.byType.map((facet) => (
-              <Link
-                key={facet.value}
-                href={facet.href}
-                className="pn-mega-chip pn-mobile-chip"
-                onClick={onNavigate}
-              >
-                {facet.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      ) : null}
-
-      {data.trips.bySeason.length > 0 ? (
-        <div className="pn-mobile-mega-group">
-          <p className="pn-mega-eyebrow">By season</p>
-          <div className="pn-mega-chips pn-mobile-chips">
-            {data.trips.bySeason.map((facet) => (
               <Link
                 key={facet.value}
                 href={facet.href}

@@ -158,7 +158,6 @@ test('buildMegaMenuData sorts destinations featured-first with live trip counts 
     trips: tripsFixture,
   })
 
-  assert.equal(data.destinations.totalCount, 3)
   assert.deepEqual(
     data.destinations.items.map((item) => [item.slug, item.tripCount]),
     [
@@ -172,13 +171,12 @@ test('buildMegaMenuData sorts destinations featured-first with live trip counts 
   assert.equal(data.destinations.items[0]?.image?.objectPosition, '50% 40%')
 })
 
-test('buildMegaMenuData picks featured trips, additional itineraries, and active facets', () => {
+test('buildMegaMenuData picks featured trips, additional itineraries, and active region/style facets', () => {
   const data = buildMegaMenuData({
     destinations: destinationsFixture,
     trips: tripsFixture,
   })
 
-  assert.equal(data.trips.totalCount, 5)
   assert.equal(data.trips.isFeaturedHeading, true)
   assert.deepEqual(
     data.trips.featuredTrips.map((trip) => trip.slug),
@@ -200,23 +198,17 @@ test('buildMegaMenuData picks featured trips, additional itineraries, and active
     ],
   )
 
-  // By difficulty stays ordered from Easy -> Extreme and includes only active levels
-  assert.deepEqual(
-    data.trips.byDifficulty.map((facet) => facet.value),
-    ['easy-moderate', 'moderate', 'challenging', 'strenuous'],
-  )
-
   // Multiple trip types present -> style facet is surfaced
   assert.deepEqual(
     data.trips.byType.map((facet) => facet.value),
     ['trekking', 'peak-climbing', 'cultural'],
   )
 
-  // Active seasons ordered Spring, Autumn, Winter, Summer
-  assert.deepEqual(
-    data.trips.bySeason.map((facet) => facet.value),
-    ['spring', 'autumn', 'winter', 'summer'],
-  )
+  // Difficulty, season, and total counts are excluded from mega-menu data
+  assert.equal('byDifficulty' in data.trips, false)
+  assert.equal('bySeason' in data.trips, false)
+  assert.equal('totalCount' in data.trips, false)
+  assert.equal('totalCount' in data.destinations, false)
 })
 
 test('buildMegaMenuData falls back to published trips when none are flagged featured and skips video thumbs', () => {
