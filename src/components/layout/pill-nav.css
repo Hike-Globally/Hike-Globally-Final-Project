@@ -155,8 +155,10 @@
   padding: 0.6875rem 1.125rem;
   border-radius: var(--radius-button);
   background-color: transparent;
+  color: var(--color-haze);
   cursor: pointer;
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 .pn-label {
@@ -172,9 +174,17 @@
   transition: color 0.2s ease;
 }
 
+.pn-tab:hover,
+.pn-tab:focus-visible,
+.pn-tab[data-active='true'],
+.pn-tab[aria-expanded='true'] {
+  color: var(--color-mist);
+}
+
 .pn-tab:hover .pn-label,
 .pn-tab:focus-visible .pn-label,
-.pn-tab[data-active='true'] .pn-label {
+.pn-tab[data-active='true'] .pn-label,
+.pn-tab[aria-expanded='true'] .pn-label {
   color: var(--color-mist);
 }
 
