@@ -361,3 +361,12 @@
     transition: none;
   }
 }
+
+/* Cards inside rich text keep their standalone appearance rather than inheriting link styling. */
+.inline-link-preview {
+  margin-block: 1.5rem;
+}
+.prose-hg a.link-preview-card {
+  color: var(--color-ink);
+  text-decoration: none;
+}

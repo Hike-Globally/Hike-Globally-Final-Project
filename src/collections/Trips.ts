@@ -1,3 +1,4 @@
+import { contentEditor } from '../fields/content-editor'
 import type { CollectionConfig } from 'payload'
 
 import { adminOrEditor, publishedOrSignedIn } from '../access'
@@ -514,11 +515,12 @@ export const Trips: CollectionConfig = {
             {
               name: 'content',
               type: 'richText',
+              editor: contentEditor(),
               required: true,
               admin: {
                 className: 'hg-trip-compact-editor',
                 description:
-                  'Write the section content using the same rich-text editor and formatting options as the Overview — including tables. Use the toolbar’s “+” menu (or type /table) to insert one: rows and columns first, then the hover handles to add, remove, merge or resize. Handy for cost breakdowns, gear lists and season comparisons.',
+                  'Insert a Link preview from the toolbar’s block menu (or type /linkPreview) and paste a URL to place a card among your text. Write the section content using the same rich-text editor and formatting options as the Overview — including tables. Use the toolbar’s “+” menu (or type /table) to insert one: rows and columns first, then the hover handles to add, remove, merge or resize. Handy for cost breakdowns, gear lists and season comparisons.',
               },
             },
           ],

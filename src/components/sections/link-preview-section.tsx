@@ -3,7 +3,6 @@ import { resolveLinkPreview, type LinkPreviewSource } from '@/lib/link-preview'
 import { lookupInternalLinkPreview } from '@/lib/link-preview-internal'
 
 import { LinkPreviewCard } from './link-preview-card'
-import './link-preview.css'
 
 /**
  * The link card placed by the "Link preview" row in Page sections. Shared by trips and blog posts;

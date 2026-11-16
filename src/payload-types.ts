@@ -402,7 +402,7 @@ export interface Trip {
          */
         html?: string | null;
         /**
-         * The page this card links to — the only field that matters here. Paste a full address, or a path on this site such as /trips/annapurna-base-camp. Image, title and description are read from that page. Leave it empty and the row renders nothing. Pages on other sites open in a new tab.
+         * The page this card links to — the only field that matters here. Paste a full address, or a path on this site such as /trips/annapurna-base-camp. Image, title and description are read from that page. Leave it empty and no card is shown. Pages on other sites open in a new tab.
          */
         linkPreviewUrl?: string | null;
         /**
@@ -595,7 +595,7 @@ export interface Trip {
          */
         heading: string;
         /**
-         * Write the section content using the same rich-text editor and formatting options as the Overview — including tables. Use the toolbar’s “+” menu (or type /table) to insert one: rows and columns first, then the hover handles to add, remove, merge or resize. Handy for cost breakdowns, gear lists and season comparisons.
+         * Insert a Link preview from the toolbar’s block menu (or type /linkPreview) and paste a URL to place a card among your text. Write the section content using the same rich-text editor and formatting options as the Overview — including tables. Use the toolbar’s “+” menu (or type /table) to insert one: rows and columns first, then the hover handles to add, remove, merge or resize. Handy for cost breakdowns, gear lists and season comparisons.
          */
         content: {
           root: {
@@ -987,7 +987,7 @@ export interface Blog {
          */
         html?: string | null;
         /**
-         * The page this card links to — the only field that matters here. Paste a full address, or a path on this site such as /trips/annapurna-base-camp. Image, title and description are read from that page. Leave it empty and the row renders nothing. Pages on other sites open in a new tab.
+         * The page this card links to — the only field that matters here. Paste a full address, or a path on this site such as /trips/annapurna-base-camp. Image, title and description are read from that page. Leave it empty and no card is shown. Pages on other sites open in a new tab.
          */
         linkPreviewUrl?: string | null;
         /**
@@ -1020,7 +1020,7 @@ export interface Blog {
   excerpt: string;
   featuredImage: number | Media;
   /**
-   * The post body. Tables are available from the toolbar’s “+” menu (or type /table): pick rows and columns, then use the hover handles to add, remove, merge or resize. Handy for gear comparisons, cost breakdowns and at-a-glance facts.
+   * The post body. Insert a Link preview from the toolbar’s block menu (or type /linkPreview) and paste a URL to place a card among your text. Tables are available from the toolbar’s “+” menu (or type /table): pick rows and columns, then use the hover handles to add, remove, merge or resize. Handy for gear comparisons, cost breakdowns and at-a-glance facts.
    */
   content?: {
     root: {
