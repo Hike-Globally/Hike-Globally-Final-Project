@@ -2,21 +2,29 @@ import { HeaderFrame } from './header-frame'
 import { PillNav, type PillNavLink } from './pill-nav'
 import { sitePath } from '@/i18n/config'
 import { dictionary } from '@/i18n/dictionaries'
-import { getHeader, getSettings } from '@/lib/data'
+import { getDestinations, getHeader, getSettings, getTrips } from '@/lib/data'
 import { resolveLink } from '@/lib/links'
+import { buildMegaMenuData } from '@/lib/mega-menu'
 
 /**
  * Site header — the pill dropdown nav ported from `Header-Sample.html`,
  * rendered once from the root layout so it is the global, sitewide header.
  *
  * Navigation still comes from the `header` + `settings` Payload globals:
- *   • navItems        → tabs (with optional `children` → dropdown panel)
- *   • actions[0]      → the white CTA pill at the right of the track
+ *   • navItems        → tabs (Destinations and Trips automatically open rich
+ *                       mega menus fed by published CMS content, while still
+ *                       preserving any custom dropdown links an editor adds)
+ *   • actions[0]      → the CTA pill at the right of the track
  *   • announcement    → slim floating bar above the track
  *   • settings.siteName → accessible label for the logo at the left of the track
  */
 export async function Header() {
-  const [header, settings] = await Promise.all([getHeader(), getSettings()])
+  const [header, settings, destinations, trips] = await Promise.all([
+    getHeader(),
+    getSettings(),
+    getDestinations(),
+    getTrips(),
+  ])
   const dict = dictionary
 
   const links: PillNavLink[] = (header.navItems ?? []).flatMap((item) => {
@@ -48,6 +56,8 @@ export async function Header() {
   const cta: PillNavLink | null =
     actions[0] ?? { href: sitePath('/contact'), label: dict.nav.inquiry, newTab: false }
 
+  const megaMenu = buildMegaMenuData({ destinations, trips })
+
   return (
     <HeaderFrame>
       {header.announcement ? (
@@ -61,6 +71,7 @@ export async function Header() {
         logoHref={sitePath('/')}
         links={fallbackLinks}
         cta={cta}
+        megaMenu={megaMenu}
       />
     </HeaderFrame>
   )
