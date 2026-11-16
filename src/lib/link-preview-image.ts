@@ -1,19 +1,7 @@
 /**
- * The link card's image, served through this site instead of straight from the linked host.
- *
- * A card is only worth placing if it shows the picture it promises, and pointing `<img>` at
- * somebody else's server is where that promise breaks: many hosts refuse to serve their images to
- * another site at all (hotlink protection, a `Referer` they don't like, a CDN that only answers
- * its own pages), and the browser then draws a broken image inside the card. Loading the image
- * through `/api/link-preview-image` means the browser only ever talks to this site, the bytes are
- * cached at the edge under our own header, and a page that has no Open Graph image can still show
- * something real — the site's own icon.
- *
- * The route is public, so it is also an SSRF surface: everything here is about only ever fetching
- * a plain `http(s)` image from a public address, and nothing else.
- *
- * This module is imported by the browser component too (for the candidate list and the URL
- * shape), so it stays free of Node-only APIs; the DNS re-check lives in the route handler.
+ * Image proxy safety checks and the ordered candidates for link-preview thumbnails. External
+ * images use the proxy first, with a direct browser retry when the proxy cannot serve the image.
+ * The public proxy rejects private addresses and unsafe types; this shared module stays browser-safe.
  */
 
 /**
@@ -112,35 +100,43 @@ export function imageProxyUrl(url: string): string {
   return `/api/link-preview-image?url=${encodeURIComponent(url)}`
 }
 
-/** Where an icon usually lives on any site; tried only when the page declares no image. */
-const ICON_PATHS = ['/apple-touch-icon.png', '/favicon.ico']
+/** A reliable generic travel photograph, used only when the linked page has no usable image. */
+export const LINK_PREVIEW_FALLBACK_IMAGE = '/images/trips/hero.jpg'
 
-/** One thing the thumbnail can try, and whether it is a site icon rather than page art. */
 export type LinkPreviewImageCandidate = { src: string; icon: boolean }
 
 /**
- * The images to try for a card, in order — the page's own image first, then the site's icon, which
- * is what makes an image *always* render: every site has at least a favicon. The last resort is the
- * letter tile in `link-preview-thumb.tsx`.
- *
- * `icon` tells the thumbnail how to frame the picture: art fills the tile, an icon is contained so
- * a small favicon is never blown up and cropped.
+ * Try the page's featured image first, then any other photographs found on the page. External
+ * images use the proxy first; the direct URL is a second chance for large images or CDNs that
+ * reject server-side requests. The final bundled photograph works without a third-party service.
  */
 export function linkPreviewImageCandidates(
   image: string | null,
-  host: string,
+  _host: string,
+  alternatives: readonly string[] = [],
 ): LinkPreviewImageCandidate[] {
   const candidates: LinkPreviewImageCandidate[] = []
-  // A path is one of our own images: it is served from this origin already, so it is used as it
-  // is rather than pushed through the proxy (see `firstPartyPath` in `link-preview.ts`).
-  if (image) {
-    candidates.push({
-      src: image.startsWith('/') && !image.startsWith('//') ? image : imageProxyUrl(image),
-      icon: false,
-    })
+  const seen = new Set<string>()
+  const add = (src: string) => {
+    if (!seen.has(src)) {
+      seen.add(src)
+      candidates.push({ src, icon: false })
+    }
   }
-  for (const path of ICON_PATHS) {
-    candidates.push({ src: imageProxyUrl(`https://${host}${path}`), icon: true })
+
+  for (const raw of [image, ...alternatives]) {
+    if (!raw) continue
+    if (raw.startsWith('/') && !raw.startsWith('//')) {
+      add(raw)
+      continue
+    }
+    const normalized = raw.startsWith('//') ? `https:${raw}` : raw
+    // Apply the same public URL restrictions to both the proxy and direct browser fallback.
+    const parsed = parseImageProxyUrl(normalized)
+    if (!parsed) continue
+    add(imageProxyUrl(parsed.href))
+    add(parsed.href)
   }
+  add(LINK_PREVIEW_FALLBACK_IMAGE)
   return candidates
 }
