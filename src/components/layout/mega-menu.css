@@ -1389,3 +1389,344 @@
     transform: none !important;
   }
 }
+/* ============================================================================
+   Premium desktop/tablet finish
+   A bright, editorial surface gives the CMS imagery room to breathe and creates
+   a deliberate contrast with the navy navigation pill. Mobile keeps its existing
+   full-screen navy treatment for continuity with the compact navigation sheet.
+   ========================================================================== */
+@media (min-width: 810px) {
+  .pn-mega-wrap--destinations {
+    --pn-mega-target-w: 56rem;
+  }
+
+  .pn-mega-wrap--trips {
+    --pn-mega-target-w: 66rem;
+  }
+
+  .pn-mega {
+    border: 1px solid #e5eaed;
+    border-radius: 1.125rem;
+    background: #fff;
+    box-shadow:
+      0 28px 80px -34px rgba(24, 49, 68, 0.34),
+      0 8px 24px -16px rgba(24, 49, 68, 0.18);
+    color: #183144;
+    scrollbar-color: #c9d6dc transparent;
+  }
+
+  .pn-mega-touchbar {
+    display: flex;
+    min-height: 4.125rem;
+    padding: 0.875rem 1.5rem;
+    border-bottom: 1px solid #e9eef0;
+    background: linear-gradient(110deg, #fff 0%, #f8fafb 100%);
+  }
+
+  .pn-mega-touchbar-title {
+    color: #183144;
+    font-size: 1.375rem;
+    letter-spacing: -0.025em;
+  }
+
+  .pn-mega-count {
+    color: #71828c;
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pn-mega-touchbar-all {
+    min-height: 2.5rem;
+    padding-inline: 0.875rem;
+    border-color: #dce5e9;
+    background: #fff;
+    color: #183144;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .pn-mega-touchbar-all:hover,
+  .pn-mega-touchbar-all:focus-visible {
+    border-color: #b7cbd4;
+    background: #f2f7f8;
+  }
+
+  .pn-mega-close {
+    display: none;
+  }
+
+  .pn-mega-section-head {
+    margin-bottom: 0.875rem;
+  }
+
+  .pn-mega-eyebrow {
+    color: #7a8d98;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+  }
+
+  .pn-mega-dest-body {
+    grid-template-columns: minmax(0, 1.12fr) minmax(18rem, 0.88fr);
+    gap: 1.75rem;
+    padding: 1.5rem 1.625rem;
+  }
+
+  .pn-mega-dest-grid {
+    gap: 0.25rem 0.375rem;
+  }
+
+  .pn-mega-dest-item {
+    min-height: 3.5rem;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid transparent;
+    border-radius: 0.625rem;
+    color: #183144;
+  }
+
+  .pn-mega-dest-item:hover,
+  .pn-mega-dest-item:focus-visible,
+  .pn-mega-dest-item[data-previewing='true'],
+  .pn-mega-dest-item[data-active='true'] {
+    border-color: #e5ecef;
+    background: #f5f8f9;
+  }
+
+  .pn-mega-dest-name {
+    color: #183144;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .pn-mega-dest-meta {
+    color: #788993;
+    font-size: 0.6875rem;
+  }
+
+  .pn-mega-arrow {
+    color: #80949e;
+  }
+
+  .pn-mega-dest-item:hover .pn-mega-arrow,
+  .pn-mega-dest-item:focus-visible .pn-mega-arrow,
+  .pn-mega-dest-item[data-previewing='true'] .pn-mega-arrow {
+    color: #183144;
+  }
+
+  .pn-mega-custom,
+  .pn-mega-more {
+    border-color: #e7edef;
+  }
+
+  .pn-mega-chip {
+    border-color: #e0e8eb;
+    background: #f7f9fa;
+    color: #435a67;
+  }
+
+  .pn-mega-chip:hover,
+  .pn-mega-chip:focus-visible {
+    border-color: #c7d7dd;
+    background: #edf3f5;
+    color: #183144;
+  }
+
+  .pn-mega-dest-showcase .pn-mega-section-head {
+    margin-bottom: 0.875rem;
+  }
+
+  .pn-mega-dest-card {
+    min-height: 17.5rem;
+    padding: 1.375rem;
+    border: 0;
+    border-radius: 0.75rem;
+    box-shadow: 0 12px 28px -20px rgba(12, 28, 38, 0.6);
+  }
+
+  .pn-mega-dest-card-scrim {
+    background: linear-gradient(
+      180deg,
+      rgba(14, 35, 48, 0.02) 15%,
+      rgba(14, 35, 48, 0.18) 43%,
+      rgba(14, 35, 48, 0.88) 100%
+    );
+  }
+
+  .pn-mega-dest-card-badge,
+  .pn-mega-trip-region {
+    border-color: rgba(255, 255, 255, 0.34);
+    background: rgba(17, 39, 52, 0.65);
+    backdrop-filter: blur(10px);
+  }
+
+  .pn-mega-dest-card-title {
+    font-size: 1.875rem;
+    letter-spacing: -0.02em;
+  }
+
+  .pn-mega-dest-card-cta {
+    width: fit-content;
+    padding-bottom: 0.2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.62);
+  }
+
+  .pn-mega-trips-body {
+    grid-template-columns: 14.5rem minmax(0, 1fr);
+    gap: 1.75rem;
+    padding: 1.5rem 1.625rem;
+  }
+
+  .pn-mega-rail {
+    gap: 1.375rem;
+    padding-right: 1.375rem;
+    border-color: #e7edef;
+  }
+
+  .pn-mega-facet-link,
+  .pn-mega-more-link {
+    color: #334d5a;
+  }
+
+  .pn-mega-facet-link:hover,
+  .pn-mega-facet-link:focus-visible,
+  .pn-mega-more-link:hover,
+  .pn-mega-more-link:focus-visible {
+    background: #f2f6f7;
+    color: #183144;
+  }
+
+  .pn-mega-facet-count,
+  .pn-mega-more-meta {
+    color: #84949c;
+  }
+
+  .pn-mega-trip-grid {
+    gap: 0.75rem;
+  }
+
+  .pn-mega-trip-card {
+    border-color: #e4eaed;
+    border-radius: 0.75rem;
+    background: #fff;
+    color: #183144;
+    box-shadow: 0 4px 12px -10px rgba(24, 49, 68, 0.25);
+  }
+
+  .pn-mega-trip-card:hover,
+  .pn-mega-trip-card:focus-visible {
+    border-color: #cbd9de;
+    background: #fff;
+    box-shadow: 0 12px 24px -18px rgba(24, 49, 68, 0.34);
+    transform: translateY(-2px);
+  }
+
+  .pn-mega-trip-media {
+    aspect-ratio: 16 / 9;
+    background: #e8eef0;
+  }
+
+  .pn-mega-trip-scrim {
+    background: linear-gradient(180deg, rgba(16, 38, 50, 0.08) 0%, transparent 62%);
+  }
+
+  .pn-mega-trip-body {
+    gap: 0.5rem;
+    padding: 0.8125rem 0.875rem 0.875rem;
+  }
+
+  .pn-mega-trip-title {
+    color: #183144;
+    font-size: 0.8125rem;
+    font-weight: 650;
+    line-height: 1.35;
+  }
+
+  .pn-mega-trip-stats {
+    color: #71828c;
+  }
+
+  .pn-mega-trip-foot {
+    border-color: #e9eef0;
+  }
+
+  .pn-mega-trip-price {
+    color: #71828c;
+  }
+
+  .pn-mega-trip-price strong {
+    color: #183144;
+  }
+
+  .pn-mega-more-link {
+    min-height: 2.5rem;
+  }
+
+  .pn-mega-footer {
+    min-height: 4.125rem;
+    padding: 0.8125rem 1.625rem;
+    border-color: #e9eef0;
+    background: #f8fafb;
+  }
+
+  .pn-mega-footer-note {
+    color: #6c7e88;
+  }
+
+  .pn-mega-footer-inline {
+    color: #294b5d;
+    text-decoration-color: #aebfc6;
+  }
+
+  .pn-mega-footer-inline:hover,
+  .pn-mega-footer-inline:focus-visible {
+    color: #183144;
+    text-decoration-color: #183144;
+  }
+
+  .pn-mega-footer-cta {
+    min-height: 2.625rem;
+    padding: 0.625rem 1rem;
+    border-radius: 0.5rem;
+    background: #183144;
+    color: #fff;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    box-shadow: 0 3px 8px -5px rgba(24, 49, 68, 0.75);
+  }
+
+  .pn-mega-footer-cta:hover,
+  .pn-mega-footer-cta:focus-visible {
+    background: #24506a;
+  }
+
+  .pn-mega a:focus-visible {
+    outline: 2px solid #2177b5;
+    outline-offset: 2px;
+  }
+}
+
+@media (min-width: 810px) and (max-width: 959.98px) {
+  .pn-mega-dest-card {
+    min-height: 12.5rem;
+  }
+}
+
+@media (min-width: 810px) and (max-width: 1140px) {
+  .pn-mega-dest-body,
+  .pn-mega-trips-body {
+    gap: 1.125rem;
+    padding: 1.125rem 1.25rem;
+  }
+
+  .pn-mega-footer {
+    padding-inline: 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pn-mega-trip-card:hover,
+  .pn-mega-trip-card:focus-visible {
+    transform: none;
+  }
+}
