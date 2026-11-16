@@ -69,10 +69,12 @@ export function HeaderFrame({ children }: { children: ReactNode }) {
   const [scrollRevealed, setScrollRevealed] = useState(false)
   /** Open mobile sheet: the menu must not slide away while it is being used. */
   const [menuOpen, setMenuOpen] = useState(false)
+  /** Open desktop/tablet dropdown or mega menu: keep the header pinned on touch tablets too. */
+  const [panelOpen, setPanelOpen] = useState(false)
   /** Travel distance when hiding — measured, so both breakpoints work. */
   const [hideDistance, setHideDistance] = useState(160)
 
-  const revealed = peeking || hovering || focused || scrollRevealed || menuOpen
+  const revealed = peeking || hovering || focused || scrollRevealed || menuOpen || panelOpen
   const hidden = !inHero && !revealed
 
   /* -- hero region --------------------------------------------------------- */
@@ -187,13 +189,20 @@ export function HeaderFrame({ children }: { children: ReactNode }) {
     const header = headerRef.current
     if (!header) return
 
-    // The pill nav toggles `data-open` on its own track; the header must stay put
-    // while that sheet is expanded, so mirror that attribute into local state.
-    const read = () => setMenuOpen(Boolean(header.querySelector('.pn-track[data-open="true"]')))
+    // The pill nav toggles `data-open` for the mobile sheet and `data-panel-open`
+    // for a desktop/tablet mega menu; the header must stay put while either is open.
+    const read = () => {
+      setMenuOpen(Boolean(header.querySelector('.pn-track[data-open="true"]')))
+      setPanelOpen(Boolean(header.querySelector('.pn-track[data-panel-open="true"]')))
+    }
     read()
 
     const observer = new MutationObserver(read)
-    observer.observe(header, { attributes: true, attributeFilter: ['data-open'], subtree: true })
+    observer.observe(header, {
+      attributes: true,
+      attributeFilter: ['data-open', 'data-panel-open'],
+      subtree: true,
+    })
     return () => observer.disconnect()
   }, [])
 

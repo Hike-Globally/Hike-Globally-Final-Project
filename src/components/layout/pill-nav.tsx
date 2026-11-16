@@ -6,7 +6,11 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  type CSSProperties,
   type FocusEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
+  type PointerEvent as ReactPointerEvent,
 } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -38,12 +42,25 @@ type PillNavProps = {
   megaMenu?: MegaMenuData
 }
 
+type MegaBounds = {
+  maxWidth: number
+  maxHeight: number
+  offsetX: number
+}
+
 const isActive = (pathname: string, href: string) =>
   href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`)
 
 /** Brief hover-exit grace window (ms) so diagonal pointer travel from a tab into
     the mega menu never accidentally dismisses the panel. */
 const HOVER_CLOSE_DELAY_MS = 140
+
+/** Window (ms) after a touch/pen pointer event during which synthetic mouseover/
+    mouseenter events emitted by mobile/tablet browsers are ignored. */
+const TOUCH_MOUSE_GUARD_MS = 650
+
+const isTouchLikePointer = (pointerType: string | undefined) =>
+  pointerType === 'touch' || pointerType === 'pen'
 
 function NavCaret() {
   return (
@@ -70,12 +87,13 @@ function NavCaret() {
 /**
  * Pill dropdown nav — keeps the exact floating pill bar, sliding highlight pill,
  * and mobile full-screen sheet while upgrading Destinations and Trips to rich
- * CMS-driven mega menus.
+ * CMS-driven, device-responsive mega menus.
  *
- * Desktop: a highlight pill rests on the tab matching the current route and
- * glides to whichever tab is hovered (spring). Hovering Destinations or Trips
- * opens a wide dark-navy mega menu directly under the track; any other tab with
- * manual children still uses the compact dropdown panel.
+ * Desktop & Tablet (>=810px): a highlight pill rests on the tab matching the
+ * current route and glides to whichever tab is hovered or tapped (spring).
+ * Hovering with a mouse or tapping with touch/pen on Destinations or Trips opens
+ * a viewport-clamped dark-navy mega menu directly under the track; any other tab
+ * with manual children still uses the compact dropdown panel.
  * Mobile (<810px): the track collapses to a 56×56 burger and opens into a
  * full-screen menu. Submenus expand independently of their parent links.
  */
@@ -90,6 +108,9 @@ export function PillNav({ logoLabel, logoHref, links, cta, megaMenu }: PillNavPr
   const tabRefs = useRef<(HTMLAnchorElement | null)[]>([])
   const panelRef = useRef<HTMLDivElement>(null)
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const touchGuardTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const touchGuardActiveRef = useRef(false)
+  const lastPointerTypeRef = useRef<string>('mouse')
 
   const [hovered, setHovered] = useState<number | null>(null)
   const [pill, setPill] = useState<{ left: number; width: number; visible: boolean }>({
@@ -98,6 +119,7 @@ export function PillNav({ logoLabel, logoHref, links, cta, megaMenu }: PillNavPr
     visible: false,
   })
   const [panelLeft, setPanelLeft] = useState(0)
+  const [megaBounds, setMegaBounds] = useState<MegaBounds | null>(null)
 
   /* The mobile sheet is keyed to the pathname it was opened on, so navigating
      closes it without any effect-time state resets. */
@@ -106,6 +128,23 @@ export function PillNav({ logoLabel, logoHref, links, cta, megaMenu }: PillNavPr
   const [isMobile, setIsMobile] = useState(
     () => typeof window !== 'undefined' && window.matchMedia('(max-width: 809.98px)').matches,
   )
+
+  const clearTouchGuardTimer = useCallback(() => {
+    if (touchGuardTimerRef.current !== null) {
+      clearTimeout(touchGuardTimerRef.current)
+      touchGuardTimerRef.current = null
+    }
+  }, [])
+
+  const markTouchInteraction = useCallback(() => {
+    lastPointerTypeRef.current = 'touch'
+    touchGuardActiveRef.current = true
+    clearTouchGuardTimer()
+    touchGuardTimerRef.current = setTimeout(() => {
+      touchGuardActiveRef.current = false
+      touchGuardTimerRef.current = null
+    }, TOUCH_MOUSE_GUARD_MS)
+  }, [clearTouchGuardTimer])
 
   const clearCloseTimer = useCallback(() => {
     if (closeTimerRef.current !== null) {
@@ -135,7 +174,13 @@ export function PillNav({ logoLabel, logoHref, links, cta, megaMenu }: PillNavPr
     }, HOVER_CLOSE_DELAY_MS)
   }, [clearCloseTimer])
 
-  useEffect(() => clearCloseTimer, [clearCloseTimer])
+  useEffect(
+    () => () => {
+      clearCloseTimer()
+      clearTouchGuardTimer()
+    },
+    [clearCloseTimer, clearTouchGuardTimer],
+  )
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 809.98px)')
@@ -238,7 +283,7 @@ export function PillNav({ logoLabel, logoHref, links, cta, megaMenu }: PillNavPr
     !isMobile && hovered !== null && hasDropdownAt(hovered) ? hovered : null
   const openMegaKind = openPanel !== null ? megaKinds[openPanel] : null
 
-  /* Desktop Escape and outside-click dismissal for open dropdowns / mega menus. */
+  /* Desktop / tablet Escape and outside-click dismissal for open dropdowns & mega menus. */
   useEffect(() => {
     if (openPanel === null) return
 
@@ -265,6 +310,57 @@ export function PillNav({ logoLabel, logoHref, links, cta, megaMenu }: PillNavPr
       document.removeEventListener('pointerdown', onPointerDown)
     }
   }, [openPanel, closeDesktopMenu])
+
+  /* Measure safe viewport bounds for the floating mega menu so tablets, laptops,
+     and short landscape viewports never clip horizontally or vertically. */
+  const measureMegaBounds = useCallback(() => {
+    if (openMegaKind === null || !trackRef.current) return
+
+    const rect = trackRef.current.getBoundingClientRect()
+    const vw = document.documentElement.clientWidth
+    const vh = window.visualViewport?.height ?? window.innerHeight
+    if (vw <= 0 || vh <= 0 || rect.width <= 0) return
+
+    const edgeMargin = vw < 960 ? 12 : 16
+    const maxWidth = Math.max(280, Math.floor(vw - edgeMargin * 2))
+    const targetRem = openMegaKind === 'destinations' ? 48 : 58
+    const rootFontPx =
+      Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16
+    const panelWidth = Math.min(targetRem * rootFontPx, maxWidth)
+    const desiredLeft = Math.max(edgeMargin, Math.min(rect.left, vw - edgeMargin - panelWidth))
+    const offsetX = Math.round(desiredLeft - rect.left)
+    const maxHeight = Math.max(220, Math.floor(vh - rect.bottom - 16))
+
+    setMegaBounds((prev) =>
+      prev &&
+      prev.maxWidth === maxWidth &&
+      prev.maxHeight === maxHeight &&
+      prev.offsetX === offsetX
+        ? prev
+        : { maxWidth, maxHeight, offsetX },
+    )
+  }, [openMegaKind])
+
+  useLayoutEffect(() => {
+    if (openMegaKind === null) return
+    const id = requestAnimationFrame(measureMegaBounds)
+    return () => cancelAnimationFrame(id)
+  }, [openMegaKind, measureMegaBounds])
+
+  useEffect(() => {
+    if (openMegaKind === null) return
+    const onViewportChange = () => measureMegaBounds()
+    window.addEventListener('resize', onViewportChange)
+    window.addEventListener('orientationchange', onViewportChange)
+    window.addEventListener('scroll', onViewportChange, { passive: true })
+    window.visualViewport?.addEventListener('resize', onViewportChange)
+    return () => {
+      window.removeEventListener('resize', onViewportChange)
+      window.removeEventListener('orientationchange', onViewportChange)
+      window.removeEventListener('scroll', onViewportChange)
+      window.visualViewport?.removeEventListener('resize', onViewportChange)
+    }
+  }, [openMegaKind, measureMegaBounds])
 
   const activeIndex = links.findIndex((link) => isActive(pathname, link.href))
 
@@ -318,6 +414,64 @@ export function PillNav({ logoLabel, logoHref, links, cta, megaMenu }: PillNavPr
     }
   }
 
+  const handleTabPointerDown = (event: ReactPointerEvent<HTMLAnchorElement>) => {
+    if (isTouchLikePointer(event.pointerType)) {
+      markTouchInteraction()
+    } else {
+      lastPointerTypeRef.current = event.pointerType || 'mouse'
+    }
+  }
+
+  const handleTabKeyDown = (event: ReactKeyboardEvent<HTMLAnchorElement>) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      lastPointerTypeRef.current = 'keyboard'
+    }
+  }
+
+  const handleTabMouseEnter = (index: number) => {
+    if (isMobile || touchGuardActiveRef.current) return
+    openTab(index)
+  }
+
+  const handleTabFocus = (index: number) => {
+    if (isMobile || touchGuardActiveRef.current) return
+    openTab(index)
+  }
+
+  const handleTabClick = (
+    event: ReactMouseEvent<HTMLAnchorElement>,
+    index: number,
+    hasPanel: boolean,
+  ) => {
+    if (mobileOpen) {
+      closeMobileMenu(true)
+      return
+    }
+
+    const pointerType = lastPointerTypeRef.current
+    lastPointerTypeRef.current = 'mouse'
+
+    // On touch/pen tablets (>=810px) there is no hover gesture: tapping a
+    // dropdown tab opens/closes its mega menu instead of navigating immediately.
+    // The menu itself exposes an "All destinations / All trips" link right at the top.
+    if (!isMobile && hasPanel && isTouchLikePointer(pointerType)) {
+      event.preventDefault()
+      clearCloseTimer()
+      setHovered((current) => (current === index ? null : index))
+      return
+    }
+
+    closeDesktopMenu()
+  }
+
+  const megaStyle = megaBounds
+    ? ({
+        '--pn-mega-max-w': `${megaBounds.maxWidth}px`,
+        '--pn-mega-max-h': `${megaBounds.maxHeight}px`,
+        '--pn-mega-offset-x': `${megaBounds.offsetX}px`,
+      } as CSSProperties)
+    : undefined
+
   return (
     <div
       ref={viewportRef}
@@ -349,9 +503,12 @@ export function PillNav({ logoLabel, logoHref, links, cta, megaMenu }: PillNavPr
         ref={trackRef}
         className="pn-track"
         data-open={mobileOpen}
+        data-panel-open={openPanel !== null ? 'true' : undefined}
         data-lenis-prevent={mobileOpen ? true : undefined}
         aria-label="Main"
-        onMouseLeave={!isMobile ? scheduleDesktopClose : undefined}
+        onMouseLeave={!isMobile ? () => {
+          if (!touchGuardActiveRef.current) scheduleDesktopClose()
+        } : undefined}
         onBlur={handleTrackBlur}
       >
         <button
@@ -399,8 +556,12 @@ export function PillNav({ logoLabel, logoHref, links, cta, megaMenu }: PillNavPr
         <div
           className="pn-links"
           ref={linksRef}
-          onMouseEnter={!isMobile ? clearCloseTimer : undefined}
-          onMouseLeave={!isMobile ? scheduleDesktopClose : undefined}
+          onMouseEnter={!isMobile ? () => {
+            if (!touchGuardActiveRef.current) clearCloseTimer()
+          } : undefined}
+          onMouseLeave={!isMobile ? () => {
+            if (!touchGuardActiveRef.current) scheduleDesktopClose()
+          } : undefined}
         >
           <motion.div
             className="pn-pill"
@@ -435,12 +596,12 @@ export function PillNav({ logoLabel, logoHref, links, cta, megaMenu }: PillNavPr
                   data-active={isActive(pathname, link.href)}
                   aria-expanded={hasPanel && !mobileOpen ? isExpanded : undefined}
                   aria-haspopup={hasPanel && !mobileOpen ? 'true' : undefined}
-                  onMouseEnter={!isMobile ? () => openTab(index) : undefined}
-                  onFocus={!isMobile ? () => openTab(index) : undefined}
-                  onClick={() => {
-                    if (mobileOpen) closeMobileMenu(true)
-                    else closeDesktopMenu()
-                  }}
+                  onPointerDown={!isMobile ? handleTabPointerDown : undefined}
+                  onTouchStart={!isMobile ? markTouchInteraction : undefined}
+                  onKeyDown={!isMobile ? handleTabKeyDown : undefined}
+                  onMouseEnter={!isMobile ? () => handleTabMouseEnter(index) : undefined}
+                  onFocus={!isMobile ? () => handleTabFocus(index) : undefined}
+                  onClick={(event) => handleTabClick(event, index, hasPanel)}
                 >
                   <span className="pn-label">{link.label}</span>
                   {hasPanel ? <NavCaret /> : null}
@@ -449,7 +610,7 @@ export function PillNav({ logoLabel, logoHref, links, cta, megaMenu }: PillNavPr
                 {hasPanel ? (
                   <button
                     type="button"
-                    className="pn-expand"
+                    className={megaKind ? 'pn-expand pn-expand--mega' : 'pn-expand'}
                     aria-label={`${mobileExpanded === index ? 'Collapse' : 'Expand'} ${link.label} submenu`}
                     aria-expanded={mobileExpanded === index}
                     aria-controls={
@@ -472,7 +633,7 @@ export function PillNav({ logoLabel, logoHref, links, cta, megaMenu }: PillNavPr
                     {mobileExpanded === index ? (
                       <motion.div
                         id={`pn-mobile-panel-${index}`}
-                        className="pn-panel"
+                        className={megaKind ? 'pn-panel pn-panel--mega' : 'pn-panel'}
                         initial={reduceMotion ? false : { height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={reduceMotion ? undefined : { height: 0, opacity: 0 }}
@@ -484,6 +645,7 @@ export function PillNav({ logoLabel, logoHref, links, cta, megaMenu }: PillNavPr
                             kind={megaKind}
                             data={megaMenu}
                             customLinks={children}
+                            pathname={pathname}
                             onNavigate={() => closeMobileMenu(true)}
                           />
                         ) : (
@@ -518,7 +680,9 @@ export function PillNav({ logoLabel, logoHref, links, cta, megaMenu }: PillNavPr
                   animate={{ opacity: 1, y: 0, scale: 1, left: panelLeft }}
                   exit={reduceMotion ? undefined : { opacity: 0, y: -6, scale: 0.99 }}
                   transition={spring}
-                  onMouseEnter={() => openTab(openPanel)}
+                  onMouseEnter={() => {
+                    if (!touchGuardActiveRef.current) openTab(openPanel)
+                  }}
                 >
                   {(links[openPanel].children ?? []).map((child) => (
                     <Link
@@ -537,20 +701,25 @@ export function PillNav({ logoLabel, logoHref, links, cta, megaMenu }: PillNavPr
           ) : null}
         </div>
 
-        {/* Desktop mega menu panel — one shared navy shell anchored to `.pn-track` so
-            switching between Destinations and Trips swaps cleanly with zero overlap. */}
+        {/* Desktop & tablet mega menu panel — one shared navy shell anchored to `.pn-track`
+            with live viewport bounds so it never clips horizontally or vertically. */}
         {!isMobile && megaMenu ? (
           <AnimatePresence>
             {openPanel !== null && openMegaKind !== null ? (
               <motion.div
                 key="mega-panel"
                 className={`pn-mega-wrap pn-mega-wrap--${openMegaKind}`}
+                style={megaStyle}
                 initial={reduceMotion ? false : { opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={reduceMotion ? undefined : { opacity: 0, y: -6 }}
                 transition={megaTransition}
-                onMouseEnter={() => openTab(openPanel)}
-                onMouseLeave={scheduleDesktopClose}
+                onMouseEnter={() => {
+                  if (!touchGuardActiveRef.current) openTab(openPanel)
+                }}
+                onMouseLeave={() => {
+                  if (!touchGuardActiveRef.current) scheduleDesktopClose()
+                }}
               >
                 <div className="pn-mega" data-lenis-prevent>
                   <DesktopMegaMenu
@@ -560,6 +729,7 @@ export function PillNav({ logoLabel, logoHref, links, cta, megaMenu }: PillNavPr
                     customLinks={links[openPanel]?.children ?? []}
                     pathname={pathname}
                     onNavigate={closeDesktopMenu}
+                    onClose={closeDesktopMenu}
                   />
                 </div>
               </motion.div>
