@@ -11,10 +11,11 @@ import { resolveSiteUrl } from './site-url'
  *   title        `og:title` → `twitter:title` → JSON-LD `headline`/`name` → `<title>` → `og:site_name`
  *   description  `og:description` → `twitter:description` → `<meta name="description">` → JSON-LD
  *   image        `og:image` (and its `:url` / `:secure_url` forms) → `twitter:image` → `image_src`
- *                link → JSON-LD `image` → `apple-touch-icon` → the first usable `<img>` in the page
+ *                link → JSON-LD `image` → usable `<img>` photographs in the page
  *
  * Rating, review count and prices are typed in, since no page's metadata carries them. Editors can
- * override the title and description from the admin panel; the image is always the linked page's.
+ * override the title and description from the admin panel; page images are preferred, with a
+ * generic local photograph used only if none of them can be displayed.
  *
  * Two things make that work on other people's sites rather than only on our own:
  *
@@ -22,8 +23,8 @@ import { resolveSiteUrl } from './site-url'
  *     consent wall or an empty page, so the request carries a current desktop Chrome UA and the
  *     usual `Accept` / `Accept-Language` headers.
  *   · **The head is not the whole story.** Open Graph tags win when they exist, but plenty of pages
- *     ship only JSON-LD, only a `rel="image_src"` link, or nothing but a first content image. When
- *     the head declares no image, a little of the body is read too, which is where that image is.
+ *     ship only JSON-LD, only a `rel="image_src"` link, or nothing but a first content image. A
+ *     little of the body is also read to provide alternatives when the featured image fails.
  */
 
 /** The fields an editor fills in on a trip or post (see `src/fields/link-preview.ts`). */
@@ -41,6 +42,8 @@ export type LinkPreviewMetadata = {
   title?: string
   description?: string
   image?: string
+  /** Additional photographs from the page, in preference order. */
+  images?: string[]
 }
 
 export type ResolvedLinkPreview = {
@@ -51,6 +54,7 @@ export type ResolvedLinkPreview = {
   title: string
   description: string
   image: string | null
+  imageAlternatives?: string[]
   rating: number | null
   reviewCount: number | null
   price: string | null
@@ -67,6 +71,7 @@ export type InternalLinkPreview = {
   title: string | null
   description: string | null
   image: string | null
+  images?: string[]
 }
 
 /**
@@ -91,16 +96,12 @@ const ACCEPT = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
 const FETCH_TIMEOUT_MS = 8000
 /** Metadata sits in the document head; there is no reason to download a whole page. */
 const MAX_HEAD_BYTES = 256 * 1024
-/** Read past `</head>` for a content image only when the head declared none at all. */
+/** Read a small amount beyond `</head>` to find backup content images. */
 const MAX_BODY_BYTES_FOR_IMAGE = 64 * 1024
-
-/** Anything here means the head already says (or implies) what the card's image is. */
-const IMAGE_HINT =
-  /(?:og:image|twitter:image|image_src|apple-touch-icon|application\/ld\+json|itemprop=["']image)/i
 
 /** Images that are never a card thumbnail: tracking pixels, spacers, sprites, inline data. */
 const UNUSABLE_IMAGE =
-  /(?:^data:|sprite|spacer|pixel|blank\.(?:gif|png)|\.svg(?:[?#]|$)|logo|icon)/i
+  /(?:^data:|sprite|spacer|pixel|placeholder|blank\.(?:gif|png)|\.svg(?:[?#]|$)|logo|icon)/i
 
 /**
  * Accepts an absolute http(s) URL, or a root-relative path such as `/trips/annapurna-base-camp`.
@@ -276,21 +277,28 @@ function resolveImageUrl(raw: string | undefined, pageUrl: string): string | und
   }
 }
 
-/**
- * The first `<img>` that could stand in for a thumbnail. Only reached when the page declares no
- * image of its own, so it is a last resort: tracking pixels, spacers, sprites, icons and inline data
- * are skipped, and relative addresses are resolved against the page.
- */
-function firstContentImage(html: string, pageUrl: string): string | undefined {
+/** A few usable body photographs, including common lazy-loaded and responsive images. */
+function contentImages(html: string, pageUrl: string): string[] {
+  const images: string[] = []
   for (const tag of html.match(/<img\b[^>]*>/gi) ?? []) {
     const attributes = readAttributes(tag)
-    const raw = attributes.src ?? attributes['data-src'] ?? attributes['data-lazy-src']
-    if (!raw || UNUSABLE_IMAGE.test(raw)) continue
     if (attributes.width === '1' || attributes.height === '1') continue
-    const image = resolveImageUrl(raw, pageUrl)
-    if (image) return image
+    const firstSrcset = (value: string | undefined) => value?.split(',')[0]?.trim().split(/\s+/)[0]
+    const choices = [
+      attributes['data-src'],
+      attributes['data-lazy-src'],
+      firstSrcset(attributes['data-srcset']),
+      attributes.src,
+      firstSrcset(attributes.srcset),
+    ]
+    for (const raw of choices) {
+      if (!raw || UNUSABLE_IMAGE.test(raw)) continue
+      const image = resolveImageUrl(raw, pageUrl)
+      if (image && !images.includes(image)) images.push(image)
+    }
+    if (images.length >= 6) break
   }
-  return undefined
+  return images.slice(0, 6)
 }
 
 /**
@@ -319,23 +327,29 @@ export function parseLinkPreviewMetadata(html: string, pageUrl: string): LinkPre
     meta.description,
     structured.description,
   )
-  const rawImage = firstText(
+  // Keep a short list, not just one URL: a featured image can be unavailable to the proxy or
+  // the browser even when the page offers other perfectly usable photographs.
+  const rawImages = [
     meta['og:image'],
-    meta['og:image:url'],
     meta['og:image:secure_url'],
+    meta['og:image:url'],
     meta['twitter:image'],
     meta['twitter:image:src'],
     meta['thumbnail'],
     meta['image'],
     links['image_src'],
     structured.image,
-    links['apple-touch-icon'],
-    links['apple-touch-icon-precomposed'],
-    // Last: an image in the body, which is only in `html` when the head named none.
-    firstContentImage(html, pageUrl),
-  )
+    ...contentImages(html, pageUrl),
+  ]
+  const images = [
+    ...new Set(
+      rawImages
+        .map((raw) => resolveImageUrl(raw, pageUrl))
+        .filter((image): image is string => Boolean(image)),
+    ),
+  ].slice(0, 6)
 
-  return { title, description, image: resolveImageUrl(rawImage, pageUrl) }
+  return { title, description, image: images[0], images: images.slice(1) }
 }
 
 /** Turns an editor's value into an absolute URL for fetching; `null` when it is not usable. */
@@ -391,8 +405,8 @@ export async function fetchLinkPreviewMetadata(
 }
 
 /**
- * Reads just enough of the response to describe it: the head, plus — when the head declares no
- * image — a short stretch of the body, where a content image usually is.
+ * Reads a bounded head and a short stretch of body, for alternative photographs as well as
+ * the featured image. Cancel the stream rather than downloading an entire page.
  */
 async function readHtml(response: Response, charset: string | undefined): Promise<string> {
   if (!response.body) return ''
@@ -405,27 +419,19 @@ async function readHtml(response: Response, charset: string | undefined): Promis
   }
 
   const reader = response.body.getReader()
+  const limit = MAX_HEAD_BYTES + MAX_BODY_BYTES_FOR_IMAGE
   let received = 0
-  let headEnd = -1
   let text = ''
 
   try {
-    while (received < MAX_HEAD_BYTES) {
+    while (received < limit) {
       const { done, value } = await reader.read()
       if (done) break
-      received += value.byteLength
-      text += decoder.decode(value, { stream: true })
-
-      if (headEnd < 0) {
-        const close = text.search(/<\/head>/i)
-        if (close >= 0) {
-          headEnd = received
-          // Nothing after the head can beat what the head already declared.
-          if (IMAGE_HINT.test(text.slice(0, close))) break
-        }
-      } else if (received - headEnd > MAX_BODY_BYTES_FOR_IMAGE) {
-        break
-      }
+      const chunk = value.subarray(0, limit - received)
+      received += chunk.byteLength
+      text += decoder.decode(chunk, { stream: true })
+      const close = text.search(/<\/head>/i)
+      if (close >= 0 && text.length - close >= MAX_BODY_BYTES_FOR_IMAGE) break
     }
     text += decoder.decode()
   } finally {
@@ -501,6 +507,9 @@ export async function resolveLinkPreview(
     description:
       cleanText(source.linkPreviewDescription) ?? own?.description ?? fetched?.description ?? '',
     image: firstPartyPath(own?.image ?? fetched?.image ?? null),
+    imageAlternatives: [...(own?.images ?? []), ...(fetched?.images ?? [])].map(
+      (image) => firstPartyPath(image) ?? image,
+    ),
     rating: cleanNumber(source.linkPreviewRating, 5),
     reviewCount: cleanNumber(source.linkPreviewReviewCount),
     price: cleanText(source.linkPreviewPrice),

@@ -140,3 +140,19 @@ test('another site’s page is never looked up in our CMS', async () => {
   )
   assert.equal(await lookupInternalLinkPreview('not a url'), null)
 })
+
+test('a trip provides its gallery and sharing image as fallbacks after its featured image', () => {
+  const trip = {
+    title: 'Ghorepani Poon Hill Trek',
+    summary: 'Annapurna foothills.',
+    heroImage: media('/api/media/file/poon-hill.jpg'),
+    meta: { image: media('/api/media/file/sharing.jpg') },
+    gallery: [{ image: media('/api/media/file/forest.jpg') }, { image: 123 }],
+  } as unknown as Trip
+  const preview = previewFromTrip(trip)
+  assert.match(preview.image ?? '', /poon-hill\.jpg$/)
+  assert.deepEqual(
+    preview.images?.map((url) => new URL(url).pathname),
+    ['/api/media/file/sharing.jpg', '/api/media/file/forest.jpg'],
+  )
+})

@@ -362,7 +362,7 @@ test('every declared image form is understood, best first', () => {
     `<link rel="apple-touch-icon" sizes="180x180" href="/touch.png">`,
     PAGE,
   )
-  assert.equal(touchIcon.image, 'https://www.example.com/touch.png')
+  assert.equal(touchIcon.image, undefined)
 
   const itemprop = parseLinkPreviewMetadata(
     `<meta itemprop="image" content="https://cdn.example.com/d.png">`,
@@ -509,4 +509,88 @@ test('a page that declares a non-UTF-8 charset is decoded with it', async () => 
       assert.equal(meta?.title, 'Café au lait')
     },
   )
+})
+
+test('collects ordered, distinct alternatives from metadata and the page body', () => {
+  const html = `<html><head>
+    <meta property="og:image" content="/featured.jpg">
+    <meta name="twitter:image" content="/social.jpg">
+    <link rel="apple-touch-icon" href="/icon.png">
+    </head><body>
+    <img src="data:image/gif;base64,AA" data-src="/body.jpg">
+    <img srcset="/responsive.jpg 1x, /responsive-large.jpg 2x">
+    <img src="/body.jpg">
+    </body></html>`
+  const meta = parseLinkPreviewMetadata(html, PAGE)
+  assert.equal(meta.image, 'https://www.example.com/featured.jpg')
+  assert.deepEqual(meta.images, [
+    'https://www.example.com/social.jpg',
+    'https://www.example.com/body.jpg',
+    'https://www.example.com/responsive.jpg',
+  ])
+})
+
+test('an invalid featured image does not hide a usable alternate image', () => {
+  const meta = parseLinkPreviewMetadata(
+    `<meta property="og:image" content="javascript:alert(1)"><meta name="twitter:image" content="/photo.jpg">`,
+    PAGE,
+  )
+  assert.equal(meta.image, 'https://www.example.com/photo.jpg')
+})
+
+test('the fetch reads the body even when the head already names an image', async () => {
+  const encoder = new TextEncoder()
+  const stream = new ReadableStream({
+    start(controller) {
+      controller.enqueue(
+        encoder.encode('<html><head><meta property="og:image" content="/hero.jpg"></head>'),
+      )
+      controller.enqueue(encoder.encode('<body><img src="/another.jpg"></body></html>'))
+      controller.close()
+    },
+  })
+  await withFetch(
+    async () => new Response(stream, { headers: { 'content-type': 'text/html' } }),
+    async () => {
+      const meta = await fetchLinkPreviewMetadata(PAGE)
+      assert.equal(meta?.image, 'https://www.example.com/hero.jpg')
+      assert.deepEqual(meta?.images, ['https://www.example.com/another.jpg'])
+    },
+  )
+})
+
+test('the resolved card preserves alternate page images for the frontend', async () => {
+  const card = await resolve({ linkPreviewUrl: PAGE }, async () => ({
+    image: 'https://example.com/featured.jpg',
+    images: ['https://example.com/another.jpg'],
+  }))
+  assert.deepEqual(card?.imageAlternatives, ['https://example.com/another.jpg'])
+})
+
+test('first-party featured and gallery images are retained for fallback without a self-request', async () => {
+  let fetched = false
+  const card = await resolve(
+    { linkPreviewUrl: '/trips/ghorepani-poon-hill' },
+    async () => {
+      fetched = true
+      return null
+    },
+    async () => ({
+      title: 'Ghorepani Poon Hill Trek',
+      description: null,
+      image: 'https://hikeglobally.com/api/media/file/featured.jpg',
+      images: ['https://hikeglobally.com/api/media/file/gallery.jpg'],
+    }),
+  )
+  assert.equal(fetched, false)
+  assert.equal(card?.image, '/api/media/file/featured.jpg')
+  assert.deepEqual(card?.imageAlternatives, ['/api/media/file/gallery.jpg'])
+})
+
+test('lazy image placeholders do not beat the actual photograph', () => {
+  const meta = parseLinkPreviewMetadata(
+    '<img src="/placeholder.png" data-srcset="/trek.jpg 1x, /trek-large.jpg 2x">',
+    PAGE,
+  )
+  assert.equal(meta.image, 'https://www.example.com/trek.jpg')
 })

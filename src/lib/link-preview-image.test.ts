@@ -2,8 +2,7 @@
  * The link card's image route is public, so it is also the one place on the site that fetches an
  * arbitrary address on a reader's behalf. These tests pin the two things that keep that safe — only
  * a plain public `http(s)` address is ever accepted, and only a raster image is ever served back —
- * and the candidate order that makes the card show a picture for *any* URL, not just ones with
- * Open Graph art.
+ * and the candidate order that prefers page photographs over a bundled fallback.
  */
 
 import assert from 'node:assert/strict'
@@ -120,44 +119,45 @@ test('the proxy address is relative and encodes the target', () => {
   )
 })
 
-test('every link card gets an image: the page art first, then the site icon', () => {
-  assert.deepEqual(linkPreviewImageCandidates('https://cdn.example.com/og.jpg', 'example.com'), [
-    {
-      src: '/api/link-preview-image?url=https%3A%2F%2Fcdn.example.com%2Fog.jpg',
-      icon: false,
-    },
-    {
-      src: '/api/link-preview-image?url=https%3A%2F%2Fexample.com%2Fapple-touch-icon.png',
-      icon: true,
-    },
-    { src: '/api/link-preview-image?url=https%3A%2F%2Fexample.com%2Ffavicon.ico', icon: true },
-  ])
-})
-
-test('an image on this origin is used directly, without a round trip through the proxy', () => {
+test('page images are tried in order via proxy and directly, then the local photograph', () => {
   assert.deepEqual(
-    linkPreviewImageCandidates('/api/media/file/everest-hero.jpg', 'hikeglobally.com')[0],
-    {
-      src: '/api/media/file/everest-hero.jpg',
-      icon: false,
-    },
-  )
-  // A protocol-relative address is still somebody else's, so it is proxied.
-  assert.equal(
-    linkPreviewImageCandidates('//cdn.example.com/a.jpg', 'example.com')[0]?.src.startsWith(
-      '/api/link-preview-image?url=',
-    ),
-    true,
+    linkPreviewImageCandidates('https://cdn.example.com/og.jpg', 'example.com', [
+      'https://cdn.example.com/body.jpg',
+      'https://cdn.example.com/og.jpg',
+    ]),
+    [
+      { src: imageProxyUrl('https://cdn.example.com/og.jpg'), icon: false },
+      { src: 'https://cdn.example.com/og.jpg', icon: false },
+      { src: imageProxyUrl('https://cdn.example.com/body.jpg'), icon: false },
+      { src: 'https://cdn.example.com/body.jpg', icon: false },
+      { src: '/images/trips/hero.jpg', icon: false },
+    ],
   )
 })
 
-test('a page with no Open Graph image still falls back to the site icon', () => {
-  assert.deepEqual(linkPreviewImageCandidates(null, 'www.example.com'), [
-    {
-      src: '/api/link-preview-image?url=https%3A%2F%2Fwww.example.com%2Fapple-touch-icon.png',
-      icon: true,
-    },
-    { src: '/api/link-preview-image?url=https%3A%2F%2Fwww.example.com%2Ffavicon.ico', icon: true },
+test('same-origin images are loaded directly, and unsafe targets never become browser fallbacks', () => {
+  assert.deepEqual(
+    linkPreviewImageCandidates('/api/media/file/everest-hero.jpg', 'hikeglobally.com'),
+    [
+      { src: '/api/media/file/everest-hero.jpg', icon: false },
+      { src: '/images/trips/hero.jpg', icon: false },
+    ],
+  )
+  assert.deepEqual(linkPreviewImageCandidates('http://localhost/private', 'example.com'), [
+    { src: '/images/trips/hero.jpg', icon: false },
+  ])
+  assert.deepEqual(
+    linkPreviewImageCandidates('//cdn.example.com/a.jpg', 'example.com').slice(0, 2),
+    [
+      { src: imageProxyUrl('https://cdn.example.com/a.jpg'), icon: false },
+      { src: 'https://cdn.example.com/a.jpg', icon: false },
+    ],
+  )
+})
+
+test('a page with no image uses a bundled photograph rather than an icon or initial', () => {
+  assert.deepEqual(linkPreviewImageCandidates(null, 'example.com'), [
+    { src: '/images/trips/hero.jpg', icon: false },
   ])
 })
 

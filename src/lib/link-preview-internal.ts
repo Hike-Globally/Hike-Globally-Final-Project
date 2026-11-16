@@ -84,7 +84,11 @@ export function previewFromTrip(trip: Trip): InternalLinkPreview {
   return {
     title: trimText(trip.title),
     description: trimText(trip.summary),
-    image: cardImage(trip.heroImage, trip.meta?.image),
+    ...cardImages(
+      trip.heroImage,
+      trip.meta?.image,
+      ...(trip.gallery ?? []).map((row) => row.image),
+    ),
   }
 }
 
@@ -93,7 +97,7 @@ export function previewFromPost(post: Blog): InternalLinkPreview {
   return {
     title: trimText(post.title),
     description: trimText(post.excerpt),
-    image: cardImage(post.featuredImage, post.meta?.image),
+    ...cardImages(post.featuredImage, post.meta?.image),
   }
 }
 
@@ -102,26 +106,23 @@ export function previewFromDestination(destination: Destination): InternalLinkPr
   return {
     title: trimText(destination.name),
     description: trimText(destination.tagline),
-    image: cardImage(destination.heroImage, destination.meta?.image),
+    ...cardImages(
+      destination.heroImage,
+      destination.meta?.image,
+      ...(destination.gallery ?? []).map((row) => row.image),
+    ),
   }
 }
 
-/**
- * The image a card shows, as an absolute URL: the document's **featured image** first — the picture
- * it is illustrated with — and an editor's sharing image from the SEO group only as a fallback.
- * `null` when neither is usable, so the card can still try the network.
- */
-function cardImage(
-  featured: number | Media | null | undefined,
-  fallback: number | Media | null | undefined,
-): string | null {
-  for (const image of [featured, fallback]) {
-    // A bare ID means the relationship was not populated; there is no URL to use.
-    if (!image || typeof image === 'number') continue
-    const url = imageUrl(image)
-    if (url) return url
-  }
-  return null
+/** Featured image first, then sharing and gallery images if the first one fails to load. */
+function cardImages(...media: (number | Media | null | undefined)[]): {
+  image: string | null
+  images: string[]
+} {
+  const images = [
+    ...new Set(media.map((item) => imageUrl(item)).filter((url): url is string => Boolean(url))),
+  ].slice(0, 6)
+  return { image: images[0] ?? null, images: images.slice(1) }
 }
 
 /**

@@ -2,7 +2,7 @@
  * The link card's markup. These tests render it for real and pin the things a reader complained
  * about, so a future styling change cannot quietly undo them:
  *
- *   - the card always carries an image, and always through this site's own image proxy;
+ *   - the card prefers page imagery and has a local photographic fallback;
  *   - the price block is part of the card's middle row (after the body, before the open arrow),
  *     not a separate strip at the foot of the box;
  *   - the rating, the review count and the "was" price are all present when the row sets them;
@@ -56,9 +56,9 @@ test('the card always shows an image, fetched through this site', () => {
   assert.ok(src, 'no image in the card')
   assert.ok(src.startsWith('/api/link-preview-image?url='), src)
 
-  // No Open Graph art: the site's icon still puts a picture in the card.
+  // A bundled travel photograph replaces the old letter tile when the page has no image.
   const withoutImage = render({ image: null })
-  assert.match(withoutImage, /src="\/api\/link-preview-image\?url=https%3A%2F%2Fbooking\.com%2F/)
+  assert.match(withoutImage, /src="\/images\/trips\/hero\.jpg"/)
 })
 
 test('a featured image from this site is loaded from this origin, not through the proxy', () => {

@@ -48,7 +48,7 @@ export function LinkPreviewCard({ card }: { card: ResolvedLinkPreview }) {
       target={card.external ? '_blank' : undefined}
       rel={card.external ? 'noopener noreferrer' : undefined}
     >
-      <LinkPreviewThumb image={card.image} host={card.host} />
+      <LinkPreviewThumb image={card.image} host={card.host} alternatives={card.imageAlternatives} />
 
       <span className="link-preview-body">
         {showHost ? (

@@ -76,32 +76,8 @@
   transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 
-/* A site icon (candidate after the page's own picture) is padded and contained, never stretched. */
-.link-preview-thumb img[data-icon] {
-  padding: 0.85rem;
-  background: #ffffff;
-  object-fit: contain;
-}
-
 .link-preview-card:hover .link-preview-thumb img {
   transform: scale(1.06);
-}
-
-/* Every candidate failed (the site blocks us entirely): the initial, so the card still looks
-   finished rather than showing an empty square or a broken-image glyph. */
-.link-preview-thumb-initial {
-  display: grid;
-  width: 100%;
-  height: 100%;
-  place-items: center;
-  background: linear-gradient(140deg, var(--color-deep-20) 0%, var(--color-haze) 140%);
-  color: var(--color-deep-80);
-  font-family: var(--font-heading);
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1;
-  text-transform: uppercase;
-  user-select: none;
 }
 
 /* ── Body ──────────────────────────────────────────────────────────────────────────────────── */
@@ -310,10 +286,6 @@
     width: 4.75rem;
     height: 4.75rem;
     border-radius: 0.75rem;
-  }
-
-  .link-preview-thumb-initial {
-    font-size: 1.5rem;
   }
 
   .link-preview-body {
