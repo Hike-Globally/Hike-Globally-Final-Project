@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
 import { Analytics } from '@vercel/analytics/next'
 
+import { AffiliateDisclosure } from '@/components/layout/affiliate-disclosure'
 import { Footer } from '@/components/layout/footer'
 import { Header } from '@/components/layout/header'
 import { LivePreviewRefresh } from '@/components/live-preview-refresh'
@@ -13,6 +14,7 @@ import { faviconIcons } from '@/lib/favicon'
 import { imageUrl } from '@/lib/seo'
 import { resolveSiteUrlObject } from '@/lib/site-url'
 import '@/components/content/custom-html-section.css'
+import '@/components/layout/affiliate-disclosure.css'
 import '@/components/sections/key-takeaways.css'
 import '@/components/sections/link-preview.css'
 import './globals.css'
@@ -218,6 +220,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </main>
 
         <Footer />
+        <AffiliateDisclosure />
 
         {/* Lenis smooth scrolling — ~6KB, disabled for reduced-motion users. */}
         <SmoothScroll />
