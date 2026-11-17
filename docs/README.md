@@ -26,6 +26,7 @@ documents here go deeper on specific areas.
 | [internal-linking.md](content/internal-linking.md) | Automatic internal links from keywords — how editors use it and how the engine works. |
 | [trip-brochure.md](content/trip-brochure.md) | The downloadable trip brochure on the trip page. |
 | [trip-audience.md](content/trip-audience.md) | The *Who Is This Trip For / Not For* cards on the trip page. |
+| [brand-search-result.md](content/brand-search-result.md) | What a brand search result (logo, site name, sitelinks) is built from, what markup can and cannot buy, and how to check a deployment. |
 
 ## Design
 

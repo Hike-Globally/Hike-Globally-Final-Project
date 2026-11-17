@@ -354,6 +354,9 @@ to that decision:
 | Favicon | `/icon-192.png` (declared in `src/lib/favicon.ts`) | Google shows the icon beside every result and asks for a square icon that is a multiple of 48px. The 16/32/48 ICO and the 180px Apple icon serve browsers and iOS; the 192px PNG is generated from `favicon.svg`. |
 | Sitelink candidates | Navigation, footer, internal links | Candidates are chosen from pages with high internal prominence and a distinctive title — `/trips`, `/destinations`, `/blog`, `/about`, `/contact`. Nothing in a page's `<head>` changes this. |
 
+The full anatomy of a brand result (which element Google decides, which markup helps, and how to
+check a deployment) is in [docs/content/brand-search-result.md](docs/content/brand-search-result.md).
+
 Two blocks that used to sit in this table are deliberately gone, and `npm test` fails if they come
 back: `potentialAction` / `SearchAction` (the sitelinks search box, retired 21 November 2024 — its
 target `/trips?q=…` never filtered anything) and `FAQPage` (rich-result eligibility cut to
