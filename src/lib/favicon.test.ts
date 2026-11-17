@@ -61,3 +61,17 @@ test('every declared icon exists and both apps share the same icon metadata', ()
     assert.match(source, /icons:\s*faviconIcons/)
   }
 })
+
+test('the search icon is a 192 pixel PNG rendered from the same mark', () => {
+  // Google shows a favicon beside a result only for a square icon whose size is a multiple of
+  // 48px (or a valid SVG). The ICO tops out at 48 and the Apple icon is 180, so the 192px PNG is
+  // the candidate that rule is about.
+  const png = asset('/icon-192.png')
+  assert.ok(png.subarray(0, 8).equals(pngSignature))
+  assert.equal(png.readUInt32BE(16), 192)
+  assert.equal(png.readUInt32BE(20), 192)
+
+  const icons = [...faviconIcons.icon, ...faviconIcons.apple].map((icon) => String(icon.url))
+  assert.ok(icons.includes('/icon-192.png'), 'the 192px icon must be declared')
+  assert.ok(icons.includes('/favicon.svg'), 'the SVG stays declared for browsers')
+})

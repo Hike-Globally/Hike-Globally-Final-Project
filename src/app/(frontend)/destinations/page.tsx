@@ -41,7 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
 /** DESTINATIONS LISTING — `/destinations` */
 export default async function DestinationsPage() {
   const dict = dictionary
-  const destinations = await getDestinations()
+  const [destinations, settings] = await Promise.all([getDestinations(), getSettings()])
 
   return (
     /* `data-destinations-page` scopes this page's fixed description sizes (see
@@ -176,7 +176,7 @@ export default async function DestinationsPage() {
             name: dict.destinations.listingTitle,
             description: dict.destinations.listingSubtitle,
             url: sitePath('/destinations'),
-            siteName: dict.structuredData.organization,
+            siteName: settings.siteName,
             items: destinations.map((destination) => ({
               name: destination.name,
               url: sitePath(`/destinations/${destination.slug}`),

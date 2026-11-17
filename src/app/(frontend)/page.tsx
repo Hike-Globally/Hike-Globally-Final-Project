@@ -5,7 +5,14 @@ import { JsonLd } from '@/components/seo/json-ld'
 import { HomeFallback } from '@/components/views/home-fallback'
 import { getPage, getSettings } from '@/lib/data'
 import { isLivePreviewRequest } from '@/lib/live-preview-access'
-import { buildMetadata, organizationJsonLd, seoFromDoc, siteUrl, websiteJsonLd } from '@/lib/seo'
+import {
+  buildMetadata,
+  organizationJsonLd,
+  seoFromDoc,
+  siteNameAlternates,
+  siteUrl,
+  websiteJsonLd,
+} from '@/lib/seo'
 
 import './homepage.css'
 
@@ -67,10 +74,16 @@ export default async function HomePage() {
     <div data-homepage="">
       {page ? <BlockRenderer blocks={page.blocks} homepage /> : <HomeFallback />}
 
+      {/* The brand graph, as one block.
+          `name` is the brand (what Google matches against og:site_name, the title and the
+          headings); `legalName` carries the registered company, so the two never compete as
+          two spellings of the same name. `WebSite` states the preferred site name for the
+          domain — the only brand-SERP element Google documents as owner-settable. */}
       <JsonLd
         data={[
           organizationJsonLd({
-            name: settings.legalName || settings.siteName,
+            name: settings.siteName,
+            legalName: settings.legalName,
             url: siteUrl,
             logo: `${siteUrl}/images/logo.svg`,
             description: settings.tagline ?? undefined,
@@ -82,7 +95,13 @@ export default async function HomePage() {
               url: social.url,
             })),
           }),
-          websiteJsonLd({ name: settings.siteName, url: siteUrl }),
+          websiteJsonLd({
+            name: settings.siteName,
+            // The bare domain is Google's documented last-resort option, used when it will not
+            // select the preferred name (a name another site already owns, for instance).
+            alternateName: siteNameAlternates(siteUrl),
+            url: siteUrl,
+          }),
         ]}
       />
     </div>

@@ -52,6 +52,7 @@ test('custom HTML stays in the trip body column and keeps one sticky booking sid
         ],
       },
       related: [],
+      siteName: 'Hike Globally',
     }),
   )
 
@@ -64,7 +65,11 @@ test('custom HTML stays in the trip body column and keeps one sticky booking sid
 test('booking cards show every difficulty level without a text background', () => {
   for (const level of DIFFICULTY_LEVELS) {
     const html = renderToStaticMarkup(
-      createElement(TripDetail, { trip: { ...trip, difficulty: level.value }, related: [] }),
+      createElement(TripDetail, {
+        trip: { ...trip, difficulty: level.value },
+        related: [],
+        siteName: 'Hike Globally',
+      }),
     )
     const labels = [
       ...html.matchAll(

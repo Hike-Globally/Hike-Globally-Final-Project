@@ -27,7 +27,7 @@ import type { PostCard as PostCardData } from '@/lib/data'
 import type { InternalLinker } from '@/lib/internal-links'
 import { getArticleHeadings } from '@/lib/article-headings'
 import { formatDate, readingTimeMinutes } from '@/lib/format'
-import { blogPostingJsonLd, breadcrumbJsonLd, faqJsonLd } from '@/lib/seo'
+import { blogPostingJsonLd, breadcrumbJsonLd } from '@/lib/seo'
 import { getTripFaqGroups } from '@/lib/trip-faqs'
 import { cn } from '@/lib/utils'
 import type { Blog } from '@/payload-types'
@@ -89,7 +89,6 @@ export function PostDetail({
 
   // Blog posts use the trip FAQ categories, so this is the same grouping the trip page renders.
   const faqGroups = getTripFaqGroups(post)
-  const faqs = faqGroups.flatMap(({ faqs: items }) => items)
   const sections = resolvePageSections(post.pageSections, blogSectionOptions)
 
   const category = post.categories?.[0]
@@ -393,9 +392,8 @@ export function PostDetail({
             siteName,
             categories: (post.categories ?? []).map(blogCategoryLabel),
           }),
-          ...(faqs.length && sections.some(({ kind }) => kind === 'faqs')
-            ? [faqJsonLd(faqs.map((faq) => ({ question: faq.question, answer: faq.answer ?? '' })))]
-            : []),
+          // No FAQPage node: Google stopped rendering FAQ rich results (2023 for ordinary
+          // sites, fully in 2026). The questions stay on the page — see `src/lib/seo.ts`.
         ]}
       />
     </>

@@ -22,7 +22,9 @@ export async function generateMetadata(): Promise<Metadata> {
   })
 }
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const settings = await getSettings()
+
   return (
     <div className="info-page">
       <section className="info-hero" data-header-hero>
@@ -180,7 +182,7 @@ export default function AboutPage() {
             name: 'About us',
             description,
             url: '/about',
-            siteName: 'Hike Globally',
+            siteName: settings.siteName,
           }),
         ]}
       />

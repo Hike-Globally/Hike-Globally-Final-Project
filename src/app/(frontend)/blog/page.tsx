@@ -41,7 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
 /** BLOG LISTING — `/blog` */
 export default async function BlogPage() {
   const dict = dictionary
-  const posts = await getPosts()
+  const [posts, settings] = await Promise.all([getPosts(), getSettings()])
 
   return (
     /* `data-blog-page` scopes the journal type scale (see `blog.css`): the hero
@@ -130,7 +130,7 @@ export default async function BlogPage() {
             name: dict.blog.listingTitle,
             description: dict.blog.listingSubtitle,
             url: sitePath('/blog'),
-            siteName: dict.structuredData.organization,
+            siteName: settings.siteName,
             items: posts.map((post) => ({
               name: post.title,
               url: sitePath(`/blog/${post.slug}`),

@@ -319,14 +319,64 @@ export const seoFromDoc = (
 /* ==========================================================================
    Structured data (schema.org)
    ==========================================================================
-   JSON-LD is how Google turns a page into a rich result: trip prices, FAQs,
-   breadcrumbs and review ratings can all appear directly in the SERP.
+   JSON-LD is how Google turns a page into a rich result. What it can and cannot
+   buy has changed a lot, so the rules behind these builders are:
+
+   · `WebSite` (homepage only) — Google's documented way to *state a preference*
+     for the site name shown above every result for the domain, and what it reads
+     for a brand result's identity. It is a signal, not a directive.
+   · `Organization` — the business entity behind the site: name, logo, address,
+     contact point and `sameAs` profiles. This is the Knowledge-Panel input.
+   · `BreadcrumbList` — can replace the raw URL in a result with a readable path.
+   · `TouristTrip` / `TouristDestination` / `BlogPosting` — what the page is.
+
+   Two blocks that look like they help a brand result do not, and are deliberately
+   absent (see `websiteJsonLd`):
+
+   · `potentialAction: SearchAction` — powered the sitelinks search box, which
+     Google retired on 21 November 2024. The markup no longer does anything.
+   · `FAQPage` — rich-result eligibility was cut to government/health sites in
+     2023 and dropped entirely in 2026. The FAQ text stays on the page (that is
+     what people and AI answers read); only the dead markup is gone.
    ========================================================================== */
 
 type JsonLdInput = Record<string, unknown>
 
+/**
+ * The brand node every other graph entry points at, built from one place.
+ *
+ * A page that says `publisher: { '@type': 'Organization', name: … }` without a `url` or `logo`
+ * describes an organization that cannot be matched to the `Organization` node on the homepage —
+ * Google reads them as unrelated names. One builder for the reference means the brand is spelled
+ * and addressed identically everywhere it appears.
+ */
+export const brandNode = ({
+  siteName,
+  url = siteUrl,
+  logo,
+}: {
+  siteName: string
+  url?: string
+  logo?: string
+}): JsonLdInput => ({
+  '@type': 'Organization',
+  name: siteName,
+  url,
+  logo: logo ?? `${url}/images/logo.svg`,
+})
+
+/**
+ * The business behind the site.
+ *
+ * `legalName` is kept as its own property rather than being promoted to `name`:
+ * `name` is the brand a traveller searches for and the one Google matches against
+ * the site name, so it must be the short form ("Hike Globally"), while the legal
+ * entity ("Hike Globally Trekking Pvt. Ltd.") belongs in `legalName` — the pair is
+ * how a brand entity is disambiguated from a same-named one.
+ */
 export const organizationJsonLd = ({
   name,
+  legalName,
   url,
   logo,
   description,
@@ -336,6 +386,7 @@ export const organizationJsonLd = ({
   socials,
 }: {
   name: string
+  legalName?: string | null
   url: string
   logo?: string
   description?: string | null
@@ -347,6 +398,7 @@ export const organizationJsonLd = ({
   '@context': 'https://schema.org',
   '@type': ['Organization', 'TouristInformationCenter'],
   name,
+  legalName: legalName && legalName !== name ? legalName : undefined,
   url,
   logo,
   description: description ?? undefined,
@@ -370,18 +422,59 @@ export const organizationJsonLd = ({
   sameAs: socials?.length ? socials.map((social) => social.url) : undefined,
 })
 
-export const websiteJsonLd = ({ name, url }: { name: string; url: string }): JsonLdInput => ({
+/**
+ * The site-name fallbacks to declare next to the preferred name.
+ *
+ * Google documents two things it will consider when the preferred name is not the one it picks:
+ * an `alternateName`, and — as a last resort — the bare domain. The domain is derived from
+ * `siteUrl` rather than typed in, so it can never drift from the origin the rest of the metadata
+ * uses, and a host Google could not use as a name (a dotless `localhost` or preview container) is
+ * dropped instead of being published as `alternateName: ["localhost"]`.
+ */
+export const siteNameAlternates = (url: string = siteUrl): string[] => {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./i, '')
+    return host.includes('.') ? [host] : []
+  } catch {
+    return []
+  }
+}
+
+/**
+ * The site as an entity — the homepage's declaration of its own name.
+ *
+ * `name` + `url` are the two properties Google's site-name feature documents as
+ * required; `alternateName` is the documented escape hatch for when the preferred
+ * name is not selected (a shorter form, an acronym, or the bare domain). Google
+ * cross-checks this against `og:site_name`, the homepage `<title>` and the
+ * homepage headings, so all of them carry `settings.siteName` unchanged.
+ *
+ * There is deliberately no `potentialAction`/`SearchAction`: it fed the sitelinks
+ * search box, which Google removed on 21 November 2024, and the template it pointed
+ * at (`/trips?q=…`) never filtered anything — the explorer's filters live in the
+ * URL as `?difficulty=`, `?destination=`, `?season=` and `?type=`.
+ */
+export const websiteJsonLd = ({
+  name,
+  alternateName,
+  url,
+}: {
+  name: string
+  alternateName?: string[]
+  url: string
+}): JsonLdInput => ({
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name,
+  alternateName: alternateName?.length ? alternateName : undefined,
   url,
-  potentialAction: {
-    '@type': 'SearchAction',
-    target: `${url}/trips?q={search_term_string}`,
-    'query-input': 'required name=search_term_string',
-  },
 })
 
+/**
+ * The visible trail, as markup. The last entry is the page itself, so its `item`
+ * URL is left out — the one omission Google documents for a `BreadcrumbList`, and
+ * the one that keeps the trail from linking a page to itself.
+ */
 export const breadcrumbJsonLd = (items: { name: string; url: string }[]): JsonLdInput => ({
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
@@ -389,7 +482,7 @@ export const breadcrumbJsonLd = (items: { name: string; url: string }[]): JsonLd
     '@type': 'ListItem',
     position: index + 1,
     name: item.name,
-    item: canonicalUrl(item.url),
+    item: index === items.length - 1 ? undefined : canonicalUrl(item.url),
   })),
 })
 
@@ -429,11 +522,8 @@ export const blogPostingJsonLd = ({
     articleSection: categories?.length ? categories : undefined,
     wordCount: body ? body.split(/\s+/).length : undefined,
     author: authorName ? { '@type': 'Person', name: authorName } : undefined,
-    publisher: {
-      '@type': 'Organization',
-      name: siteName,
-      url: siteUrl,
-    },
+    // The homepage's `Organization` node, by reference: same name, same URL, same logo.
+    publisher: brandNode({ siteName }),
     articleBody: truncate(body, 4000),
   }
 }
@@ -477,7 +567,7 @@ export const touristTripJsonLd = ({
           })),
         }
       : undefined,
-    provider: { '@type': 'Organization', name: siteName, url: siteUrl },
+    provider: brandNode({ siteName }),
     offers: {
       '@type': 'Offer',
       price: trip.priceFrom,
@@ -532,7 +622,7 @@ export const webPageJsonLd = ({
     image: pageImage ? [pageImage] : undefined,
     inLanguage: htmlLang,
     isPartOf: { '@type': 'WebSite', name: siteName, url: siteUrl },
-    publisher: { '@type': 'Organization', name: siteName, url: siteUrl },
+    publisher: brandNode({ siteName }),
     mainEntity: items?.length
       ? {
           '@type': 'ItemList',
@@ -579,12 +669,14 @@ export const touristDestinationJsonLd = ({
       : undefined,
 })
 
-export const faqJsonLd = (faqs: { question: string; answer: string }[]): JsonLdInput => ({
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: faqs.map((faq) => ({
-    '@type': 'Question',
-    name: faq.question,
-    acceptedAnswer: { '@type': 'Answer', text: faq.answer },
-  })),
-})
+/* There is no `faqJsonLd()`.
+ *
+ * It emitted `FAQPage`, which Google stopped rendering for ordinary sites in August 2023
+ * (eligibility was cut to government and health sites) and dropped for everyone in 2026, when
+ * the documentation and the Search Console report were removed too. Keeping the block would be
+ * markup that reads well in a validator and earns nothing in a result — and, on a trip page, a
+ * second `FAQPage` node describing the same questions the page already lists.
+ *
+ * The questions themselves stay visible and in the HTML: that is what readers, AI answers and
+ * every engine other than Google read. Only the dead annotation is gone.
+ */

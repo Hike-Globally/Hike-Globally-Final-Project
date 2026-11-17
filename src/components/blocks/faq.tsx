@@ -4,15 +4,17 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
-import { JsonLd } from '@/components/seo/json-ld'
 import { SectionHeading } from '@/components/sections/section-heading'
-import { faqJsonLd } from '@/lib/seo'
 import type { FaqBlock } from '@/payload-types'
 
 /**
  * FAQ block — the only block that ships real interactivity (Radix accordion, ~4KB).
- * It also emits FAQPage structured data, which is what makes the questions eligible to
- * appear directly under your result in Google.
+ *
+ * It emits no JSON-LD. `FAQPage` used to be what made these questions eligible for an
+ * expandable result; Google restricted that to government/health sites in August 2023 and
+ * removed the display entirely in 2026, so the markup earned nothing and cost a second copy of
+ * every answer in the HTML. The accordion itself stays — that is what readers and AI answers
+ * read (see `src/lib/seo.ts`).
  */
 export function Faq({ block }: { block: FaqBlock }) {
   const items = (block.items ?? []).filter((item) => Boolean(item?.question))
@@ -45,12 +47,6 @@ export function Faq({ block }: { block: FaqBlock }) {
           </Accordion>
         </div>
       </div>
-
-      <JsonLd
-        data={faqJsonLd(
-          items.map((item) => ({ question: item.question ?? '', answer: item.answer ?? '' })),
-        )}
-      />
     </section>
   )
 }

@@ -9,6 +9,8 @@
  * Run with: npm test
  */
 import assert from 'node:assert/strict'
+import { readdirSync, readFileSync } from 'node:fs'
+import path from 'node:path'
 import test from 'node:test'
 
 import type { Blog, Media, Trip } from '@/payload-types'
@@ -21,14 +23,19 @@ const { MAX_KEYWORDS } = await import('../fields/keywords')
 
 const {
   blogPostingJsonLd,
+  brandNode,
+  breadcrumbJsonLd,
   buildMetadata,
   canonicalPath,
   canonicalUrl,
   normalizeKeywords,
   schemaImageUrl,
   seoFromDoc,
+  organizationJsonLd,
+  siteNameAlternates,
   touristTripJsonLd,
   webPageJsonLd,
+  websiteJsonLd,
 } = await import('./seo')
 
 const pathCases: Array<[string | null | undefined, string]> = [
@@ -362,4 +369,123 @@ test('webPageJsonLd omits the ItemList when a page has nothing to list', () => {
   assert.equal(jsonLd['@type'], 'WebPage')
   assert.equal(jsonLd.mainEntity, undefined)
   assert.equal(jsonLd.image, undefined)
+})
+
+/* ==========================================================================
+   Brand markup — what a brand query can and cannot be given
+   ==========================================================================
+   The sites that show sitelinks under a brand result earn them through site structure, not
+   markup: Google has no sitelink schema and no request form. What markup *can* do is state the
+   site name, describe the business, and give every page a readable breadcrumb — which is what
+   these tests pin down, along with the two blocks that no longer do anything.
+   ========================================================================== */
+
+test('websiteJsonLd states the site name and carries no SearchAction', () => {
+  const jsonLd = websiteJsonLd({ name: 'Hike Globally', url: 'https://hikeglobally.com' })
+
+  assert.deepEqual(jsonLd, {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Hike Globally',
+    alternateName: undefined,
+    url: 'https://hikeglobally.com',
+  })
+
+  // The sitelinks search box was removed on 21 November 2024. Its markup is inert, and the
+  // template it used to carry pointed at a query string the trip explorer never reads.
+  assert.equal('potentialAction' in jsonLd, false)
+})
+
+test('websiteJsonLd passes alternate names through, and drops an empty list', () => {
+  const jsonLd = websiteJsonLd({
+    name: 'Hike Globally',
+    alternateName: ['hikeglobally.com'],
+    url: 'https://hikeglobally.com',
+  })
+  assert.deepEqual(jsonLd.alternateName, ['hikeglobally.com'])
+
+  assert.equal(
+    websiteJsonLd({ name: 'Hike Globally', alternateName: [], url: 'https://hikeglobally.com' })
+      .alternateName,
+    undefined,
+  )
+})
+
+test('organizationJsonLd keeps the brand in name and the company in legalName', () => {
+  const jsonLd = organizationJsonLd({
+    name: 'Hike Globally',
+    legalName: 'Hike Globally Trekking Pvt. Ltd.',
+    url: 'https://hikeglobally.com',
+    logo: 'https://hikeglobally.com/images/logo.svg',
+    email: 'hello@hikeglobally.com',
+  })
+
+  assert.equal(jsonLd.name, 'Hike Globally')
+  assert.equal(jsonLd.legalName, 'Hike Globally Trekking Pvt. Ltd.')
+
+  // A legal name identical to the brand is not a second name — emitting it twice only dilutes
+  // the site-name signal Google cross-checks against og:site_name and the title.
+  const sameName = organizationJsonLd({ name: 'Hike Globally', legalName: 'Hike Globally', url: 'u' })
+  assert.equal(sameName.legalName, undefined)
+})
+
+test('brandNode is the one brand reference every page points at', () => {
+  assert.deepEqual(brandNode({ siteName: 'Hike Globally' }), {
+    '@type': 'Organization',
+    name: 'Hike Globally',
+    url: 'https://hikeglobally.com',
+    logo: 'https://hikeglobally.com/images/logo.svg',
+  })
+})
+
+test('a breadcrumb trail leaves the current page unlinked', () => {
+  const jsonLd = breadcrumbJsonLd([
+    { name: 'Home', url: '/' },
+    { name: 'Trips', url: '/trips' },
+    { name: 'Everest Base Camp Trek', url: '/trips/everest-base-camp' },
+  ])
+
+  assert.deepEqual(jsonLd.itemListElement, [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Home',
+      item: 'https://hikeglobally.com',
+    },
+    { '@type': 'ListItem', position: 2, name: 'Trips', item: 'https://hikeglobally.com/trips' },
+    // The page itself: Google allows the last `item` to be omitted, and a trail that points a
+    // page at its own URL is noise in a result that already links it.
+    { '@type': 'ListItem', position: 3, name: 'Everest Base Camp Trek', item: undefined },
+  ])
+})
+
+test('no page ships FAQPage or SearchAction markup any more', () => {
+  // Google stopped rendering FAQ rich results (narrowed to government/health sites in August
+  // 2023, removed entirely in 2026) and retired the sitelinks search box in November 2024.
+  // Both blocks would still validate, and neither earns anything — so `src` must not emit them.
+  const root = path.resolve(import.meta.dirname, '..')
+  const offenders: string[] = []
+
+  const walk = (directory: string): string[] =>
+    readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+      const full = path.join(directory, entry.name)
+      return entry.isDirectory() ? walk(full) : [full]
+    })
+
+  for (const file of walk(root).filter((file) => /\.(ts|tsx)$/.test(file))) {
+    if (file.endsWith('.test.ts')) continue
+    const source = readFileSync(file, 'utf8')
+    // Comments explain both removals by name, so only markup-shaped uses count.
+    if (source.includes("'@type': 'FAQPage'")) offenders.push(path.relative(root, file))
+  }
+
+  assert.deepEqual(offenders, [], 'FAQPage markup no longer produces a Google rich result')
+})
+
+test('siteNameAlternates publishes the bare domain, and nothing Google could not use', () => {
+  assert.deepEqual(siteNameAlternates('https://hikeglobally.com'), ['hikeglobally.com'])
+  assert.deepEqual(siteNameAlternates('https://www.hikeglobally.com'), ['hikeglobally.com'])
+  // A dotless host is not a domain Google can show as a site name, so it is not offered.
+  assert.deepEqual(siteNameAlternates('http://localhost:3000'), [])
+  assert.deepEqual(siteNameAlternates('not a url'), [])
 })

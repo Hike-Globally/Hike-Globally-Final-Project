@@ -184,3 +184,30 @@ test('the detail routes publish the Keywords section', () => {
     )
   }
 })
+
+test('the brand name in JSON-LD comes from the CMS settings, never a literal', () => {
+  // Google's site-name system reads the WebSite/Organization name and cross-checks it against
+  // og:site_name, the <title> and the homepage headings. A `siteName: 'Hike Globally'` typed into
+  // one page's JSON-LD is a second, independent spelling: rename the site in the admin and that
+  // page keeps describing the old brand. Every node must take the name from `getSettings()`.
+  const files = [
+    ...walk(frontendRoot),
+    ...walk(path.join(repoRoot, 'src', 'components', 'views')),
+  ].filter((file) => file.endsWith('.tsx'))
+
+  const problems = files
+    .filter((file) => /siteName:\s*'[^']+'/.test(readFileSync(file, 'utf8')))
+    .map(relative)
+
+  assert.deepEqual(
+    problems,
+    [],
+    'Pass `settings.siteName` to the JSON-LD builders instead of a literal:\\n' +
+      `${problems.map((problem) => `  - ${problem}`).join('\n')}`,
+  )
+
+  // And the homepage — the one page Google reads for the site name — must declare it.
+  const homepage = readFileSync(path.join(frontendRoot, 'page.tsx'), 'utf8')
+  assert.match(homepage, /websiteJsonLd\(\{[\s\S]*?name:\s*settings\.siteName/)
+  assert.match(homepage, /organizationJsonLd\(\{[\s\S]*?name:\s*settings\.siteName/)
+})

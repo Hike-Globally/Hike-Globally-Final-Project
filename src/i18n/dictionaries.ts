@@ -287,9 +287,6 @@ const en = {
     home: 'Back to the homepage',
     trips: 'Browse trips',
   },
-  structuredData: {
-    organization: 'Hike Globally',
-  },
 } as const
 
 /** Widens the literal types of the dictionary (literal string types -> string). */

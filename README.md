@@ -331,14 +331,34 @@ ones.
 
 | Page | Open Graph | JSON-LD |
 | ---- | ---------- | ------- |
-| `/` | `website` + default share image | `Organization`, `WebSite` (with `SearchAction`), `FAQPage` when the block is used |
+| `/` | `website` + default share image | `Organization` (name, `legalName`, logo, address, contact point, `sameAs`), `WebSite` (site-name preference) |
 | `/trips`, `/blog`, `/destinations` | `website` | `BreadcrumbList` + `CollectionPage` whose `ItemList` is the cards the page renders |
-| `/trips/[slug]` | `website` + trip hero | `BreadcrumbList`, `TouristTrip` (offer, itinerary, duration, keywords), `FAQPage` |
-| `/blog/[slug]` | `article` + `article:published_time` / `modified_time` / `tag` | `BreadcrumbList`, `BlogPosting` (author, `articleSection`, `wordCount`, keywords), `FAQPage` when the post has FAQs |
+| `/trips/[slug]` | `website` + trip hero | `BreadcrumbList`, `TouristTrip` (offer, itinerary, duration, keywords) |
+| `/blog/[slug]` | `article` + `article:published_time` / `modified_time` / `tag` | `BreadcrumbList`, `BlogPosting` (author, `articleSection`, `wordCount`, keywords) |
 | `/destinations/[slug]` | `website` + region hero | `BreadcrumbList`, `TouristDestination` (geo, country) |
 | `/inquiry` | `website` | `BreadcrumbList`, `ContactPage` |
 | any CMS page (`/[slug]`) | `website` + page image | `BreadcrumbList`, `WebPage` |
 | `/inquiry/thank-you`, 404 | — | — (both `noindex`, so nothing is offered to the index) |
+
+### What a brand search result is built from
+
+A result for the brand name — logo, site name, and the indented sitelinks under it — is
+assembled automatically; there is no markup, Search Console setting or request form for
+sitelinks, and nothing below can force them to appear. What the site controls is the **input**
+to that decision:
+
+| Lever | Where | Why it matters |
+| ----- | ----- | -------------- |
+| Site name | `WebSite` on `/` (`name` + `url` + `alternateName`) | The one documented preference. Google reads it, then cross-checks `og:site_name`, the homepage `<title>` and the homepage headings — so all of them come from `settings.siteName`, unchanged. |
+| Brand entity | `Organization` on `/` | `name` is the short brand, `legalName` the registered company, plus logo (≥112×112 for the Knowledge Panel), address, contact point and `sameAs` profiles. Every other page references it through `brandNode()`, so the brand is spelled and addressed identically. |
+| Favicon | `/icon-192.png` (declared in `src/lib/favicon.ts`) | Google shows the icon beside every result and asks for a square icon that is a multiple of 48px. The 16/32/48 ICO and the 180px Apple icon serve browsers and iOS; the 192px PNG is generated from `favicon.svg`. |
+| Sitelink candidates | Navigation, footer, internal links | Candidates are chosen from pages with high internal prominence and a distinctive title — `/trips`, `/destinations`, `/blog`, `/about`, `/contact`. Nothing in a page's `<head>` changes this. |
+
+Two blocks that used to sit in this table are deliberately gone, and `npm test` fails if they come
+back: `potentialAction` / `SearchAction` (the sitelinks search box, retired 21 November 2024 — its
+target `/trips?q=…` never filtered anything) and `FAQPage` (rich-result eligibility cut to
+government/health sites in August 2023, display removed entirely in 2026). The FAQ copy itself
+stays on the page; only the dead annotation went.
 
 The root layout adds site-wide `og:site_name`, `og:locale` and a default share image for routes that
 return no metadata of their own. Note that a route returning its own `openGraph` block replaces that

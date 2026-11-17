@@ -50,7 +50,7 @@ import { resolveTripBrochure, type TripBrochure } from '@/lib/trip-brochure'
 import { resolveLink } from '@/lib/links'
 import { cn } from '@/lib/utils'
 import { hasRichTextContent } from '@/lib/rich-text-content'
-import { breadcrumbJsonLd, faqJsonLd, touristTripJsonLd } from '@/lib/seo'
+import { breadcrumbJsonLd, touristTripJsonLd } from '@/lib/seo'
 import type { Media, Trip } from '@/payload-types'
 
 /* ----------------------------------------------------------------------------
@@ -215,10 +215,13 @@ function RouteMapSection({ trip, linker }: { trip: Trip; linker?: InternalLinker
 export function TripDetail({
   trip,
   related,
+  siteName,
   linker,
 }: {
   trip: Trip
   related: TripCardData[]
+  /** The brand, from the settings global — the same string the homepage's `Organization` uses. */
+  siteName: string
   /**
    * The page's automated internal keyword linking, created by the route (see
    * `src/lib/internal-links.ts`). Omitted, every section renders exactly as it did before.
@@ -252,7 +255,6 @@ export function TripDetail({
   const bookingLink = resolveLink(trip.bookingLink?.link)
   const bookingHref = bookingLink?.href ?? inquiryHref
   const faqGroups = getTripFaqGroups(trip)
-  const faqs = faqGroups.flatMap(({ faqs: items }) => items)
   const highlights = trip.highlights?.filter(({ text }) => text.trim())
   const brochure = resolveTripBrochure(trip, trip.slug, dict.trip.downloadBrochure)
 
@@ -537,11 +539,10 @@ export function TripDetail({
             // structured data requires (a relative one is dropped from the rich result).
             image: trip.heroImage,
             destinationName: destination?.name,
-            siteName: dict.structuredData.organization,
+            siteName,
           }),
-          ...(faqs.length && sections.some(({ kind }) => kind === 'faqs')
-            ? [faqJsonLd(faqs.map((faq) => ({ question: faq.question, answer: faq.answer ?? '' })))]
-            : []),
+          // No FAQPage node: Google stopped rendering FAQ rich results (2023 for ordinary sites,
+          // fully in 2026). The questions are still on the page — see `src/lib/seo.ts`.
         ]}
       />
     </>

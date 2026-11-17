@@ -3,7 +3,13 @@ import { notFound } from 'next/navigation'
 
 import { TripDetail } from '@/components/views/trip-detail'
 import { sitePath } from '@/i18n/config'
-import { createInternalLinker, getAllTripSlugs, getRelatedTrips, getTrip } from '@/lib/data'
+import {
+  createInternalLinker,
+  getAllTripSlugs,
+  getRelatedTrips,
+  getSettings,
+  getTrip,
+} from '@/lib/data'
 import { isLivePreviewRequest } from '@/lib/live-preview-access'
 import { buildMetadata, seoFromDoc } from '@/lib/seo'
 
@@ -55,7 +61,7 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
 
   if (!trip) notFound()
 
-  const [related, linker] = await Promise.all([
+  const [related, linker, settings] = await Promise.all([
     getRelatedTrips(trip, 3),
     /**
      * Automated internal keyword linking (see `src/lib/internal-links.ts`): the overview, "why
@@ -64,7 +70,10 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
      * posts they mention. Passing the trip as `self` is what stops it linking to itself.
      */
     createInternalLinker({ collection: 'trips', id: trip.id }),
+    getSettings(),
   ])
 
-  return <TripDetail trip={trip} related={related} linker={linker} />
+  return (
+    <TripDetail trip={trip} related={related} siteName={settings.siteName} linker={linker} />
+  )
 }

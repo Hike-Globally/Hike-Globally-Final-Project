@@ -38,7 +38,11 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function TripsPage() {
   const dict = dictionary
 
-  const [trips, destinations] = await Promise.all([getTrips(), getDestinations()])
+  const [trips, destinations, settings] = await Promise.all([
+    getTrips(),
+    getDestinations(),
+    getSettings(),
+  ])
 
   return (
     <>
@@ -119,7 +123,7 @@ export default async function TripsPage() {
             name: dict.trips.listingTitle,
             description: dict.trips.listingSubtitle,
             url: sitePath('/trips'),
-            siteName: dict.structuredData.organization,
+            siteName: settings.siteName,
             items: trips.map((trip) => ({
               name: trip.title,
               url: sitePath(`/trips/${trip.slug}`),
