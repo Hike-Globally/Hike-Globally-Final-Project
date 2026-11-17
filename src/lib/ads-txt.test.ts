@@ -6,8 +6,9 @@
  * `public/ads.txt`, and Next.js copies `public/` to the deployment root, so it is served at
  * `https://<host>/ads.txt`. A file at the repo root is never served to anyone — and the one that
  * used to sit there was not a manifest at all, but the `<script>` loader snippet (a page's
- * `<head>` content, in HTML, with Windows line endings). Anything reading "the ads.txt in the
- * repo" could pick up that snippet and paste it into the wrong file on a host.
+ * `<head>` content, in HTML, with Windows line endings). That snippet has since been deleted, so
+ * the loader now lives only inline in the root layout and `public/ads.txt` is the only `ads.txt`
+ * in the repo; this test keeps the second one from ever coming back.
  *
  * So this file pins down all three things AdSense actually checks, plus the trap that caused the
  * confusion:

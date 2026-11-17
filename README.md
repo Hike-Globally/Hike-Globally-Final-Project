@@ -406,9 +406,10 @@ What went wrong before, and what not to do again:
 
 - **A repo-root `ads.txt` is never served.** Only `public/` is deployed. The root file that used to
   exist was not a manifest at all — it was the AdSense **`<script>` loader** (HTML, with Windows line
-  endings), now correctly named [`adsense-snippet.txt`](adsense-snippet.txt). Anyone "fixing ads.txt"
-  from the repo root would have pasted HTML into a text manifest. `src/lib/ads-txt.test.ts` fails if
-  a root `ads.txt` reappears.
+  endings). It has been deleted: the loader now lives only inline in the root layout, and
+  `public/ads.txt` is the only `ads.txt` in the repository. Anyone "fixing ads.txt" from the repo
+  root would otherwise have pasted HTML into a text manifest. `src/lib/ads-txt.test.ts` fails if a
+  root `ads.txt` reappears.
 - **The manifest and the loader must name the same publisher.** `public/ads.txt` says
   `pub-2988608851561676`; the loader in the root layout says `ca-pub-2988608851561676`. A mismatch is
   reported as *ads.txt unauthorized*, not *not found*.
