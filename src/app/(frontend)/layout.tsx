@@ -154,9 +154,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang={htmlLang}
       className={`${displayFont.variable} ${bodyFont.variable} ${calSansFont.variable} overflow-x-clip`}
     >
-      {/* Google tag (gtag.js) & Google AdSense — verbatim from gtag.txt and ads.txt at the repo
-          root. This root layout wraps every public page, so placing the snippets inside <head> is
-          the Next.js equivalent of pasting them between <head></head> of each page. */}
+      {/* Google tag (gtag.js) & Google AdSense — verbatim from gtag.txt and adsense-snippet.txt at
+          the repo root. This root layout wraps every public page, so placing the snippets inside
+          <head> is the Next.js equivalent of pasting them between <head></head> of each page.
+
+          The AdSense loader snippet is deliberately NOT called `ads.txt`: that name is reserved for
+          the machine-read publisher manifest, which is the different file `public/ads.txt` that
+          Next serves at `/ads.txt`. Two files sharing the name is what made AdSense report
+          "ads.txt status: not found" while looking correct in the repo — see README, "ads.txt". */}
       <head>
         {/* Google tag (gtag.js) */}
         {/* eslint-disable-next-line @next/next/next-script-for-ga -- gtag.txt is pasted verbatim as requested, rather than the @next/third-parties wrapper */}
@@ -172,7 +177,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 `,
           }}
         ></script>
-        {/* Google AdSense (from ads.txt) */}
+        {/* Google AdSense (from adsense-snippet.txt) */}
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2988608851561676"
