@@ -73,7 +73,7 @@ workers at once; `src/lib/migration-guard.ts` serialises them. The version of th
 shipped first created only the two `_id` columns, so a database that ran it can be missing
 `brochure_title` / `brochure_note` while `payload_migrations` already lists it as done. Both the
 migration and the boot-time `src/lib/schema-repair.ts` close that gap idempotently — see
-[Deployment in the README](../README.md#deployment) for the full story.
+[Deployment in the README](../../README.md#deployment) for the full story.
 
 ## Verification
 

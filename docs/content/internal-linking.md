@@ -17,7 +17,7 @@ Two things are worth knowing:
 
 | Thing                                        | Detail                                                                                                                                                                                                                  |
 | -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| The phrases come from the **Keywords** panel | A document is linked by the keywords its editor typed, plus its title and its slug. Adding a keyword to a trip makes the whole site start linking to it by that phrase. See [README → Keywords](../README.md#keywords). |
+| The phrases come from the **Keywords** panel | A document is linked by the keywords its editor typed, plus its title and its slug. Adding a keyword to a trip makes the whole site start linking to it by that phrase. See [README → Keywords](../../README.md#keywords). |
 | A link you add by hand always wins           | If you have already linked a mention, the automation will not add a second link to the same page anywhere else in that document. Where you and the automation disagree, you win.                                        |
 
 The automation never touches a heading, a bullet list, a quote, a table, an image caption or a link

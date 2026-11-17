@@ -1,7 +1,7 @@
 /**
  * Custom HTML sections publish an editor's markup **verbatim** — `<script>` tags, `<style>` blocks,
  * iframes, forms, event handlers and any URL scheme included. The snippets editors paste are whole
- * third-party products (the Travelpayouts affiliate loader at the repo root, booking widgets, map
+ * third-party products (the Travelpayouts affiliate loader in docs/reference/third-party/, booking widgets, map
  * embeds, an AdSense unit), and those only work if nothing is stripped from them.
  *
  * Two browser rules decide what has to happen next, and they are the reason this module exists:

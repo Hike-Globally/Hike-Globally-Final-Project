@@ -9,7 +9,7 @@ import { TripCard as TripCardView } from './trip-card'
 
 /**
  * Homepage trips gallery rendered as the "Rope Curve Carousel" — the hanging
- * cards animation from `animation.html` (ropecurvecarousel.framer.website),
+ * cards animation from `docs/assets/rope-carousel-reference.html` (ropecurvecarousel.framer.website),
  * recreated 1:1 in `rope-carousel.tsx`.
  *
  * The rope needs at least three cards to read as a clothesline; with fewer

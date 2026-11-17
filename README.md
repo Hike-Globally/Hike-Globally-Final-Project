@@ -9,7 +9,8 @@ Payload CMS 3 + PostgreSQL**, in a single deployable application.
 - CMS: Payload admin at `/admin`, drafts + versions + role-based access control.
 - Content saved in the CMS appears on the site immediately (tag-based on-demand revalidation).
 
-Full architecture, data model, caching strategy and trade-offs: **[docs/IMPLEMENTATION-PLAN.md](docs/IMPLEMENTATION-PLAN.md)**.
+Full architecture, data model, caching strategy and trade-offs: **[docs/architecture/implementation-plan.md](docs/architecture/implementation-plan.md)**.
+Editor-facing feature guides, design standards and runbooks: **[docs/](docs/README.md)**.
 
 ## Quick start
 
@@ -273,7 +274,7 @@ It is wired on the four detail routes: each awaits one `createInternalLinker({ c
 threads it down to every rich text block on the page, so they share one budget and the page cannot
 link to itself. With no database configured it yields an empty linker and every page renders
 byte-for-byte as it did before. Full design, rules, limitations and the verify-after-deploy `curl`:
-**[docs/internal-linking.md](docs/internal-linking.md)**. `npm test` covers the engine and the
+**[docs/content/internal-linking.md](docs/content/internal-linking.md)**. `npm test` covers the engine and the
 rendered markup in `src/lib/internal-links.test.ts`.
 
 ### Redirections
@@ -357,7 +358,8 @@ Next.js equivalent of pasting the snippet immediately after the opening `<head>`
 layout wraps every public page, so the tag is emitted on `/`, `/trips`, `/trips/[slug]`, `/blog`,
 `/destinations`, `/inquiry` and every CMS page.
 
-The snippet is the verbatim contents of [`gtag.txt`](gtag.txt) at the repo root (measurement ID
+The snippet is the verbatim contents of
+[`docs/reference/third-party/gtag.txt`](docs/reference/third-party/gtag.txt) (measurement ID
 `G-WWQBTLKKBW`). Keep the two in sync, or change both together.
 
 **Verify the tag is actually being served** — this is the only check that matters, because it is
@@ -426,8 +428,9 @@ exactly as they block the tag checker and Googlebot.
 ## Affiliate tag (Travelpayouts)
 
 The Travelpayouts tag sits in the same `<head>` block, immediately after the Google AdSense
-snippet. It is the verbatim contents of [`Travelpayouts.txt`](Travelpayouts.txt) at the repo root:
-an inline loader that appends `https://tpembars.com/NDgxMjc5.js?t=481279` to `document.head` at
+snippet. It is the verbatim contents of
+[`docs/reference/third-party/travelpayouts.txt`](docs/reference/third-party/travelpayouts.txt): an
+inline loader that appends `https://tpembars.com/NDgxMjc5.js?t=481279` to `document.head` at
 runtime. Keep the two in sync, or change both together.
 
 `nowprocket` and the other `data-cfasync` / `data-wpfc-render` / `seraph-accel-crit` attributes are
@@ -444,7 +447,7 @@ and build on the newest major (26.x at the time of writing), which is a build no
 tested against. A Blob store named after the project arrives as `HikeGlobally_READ_WRITE_TOKEN`;
 that is reported at startup rather than silently used, because switching storage would strand the
 files already in Postgres (see [Media storage](#media-storage) for the two-line fix). See
-[§9 of the implementation plan](docs/IMPLEMENTATION-PLAN.md#9-deployment); the short version is
+[§9 of the implementation plan](docs/architecture/implementation-plan.md#9-deployment); the short version is
 `npm ci && npm run build`, with the four environment variables above set. `npm run build` applies
 pending migrations **before** it builds (`payload generate:importmap && node
 scripts/migrate-for-build.mjs && next build`), so a deploy can never ship against an outdated

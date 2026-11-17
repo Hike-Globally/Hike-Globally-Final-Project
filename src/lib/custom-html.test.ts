@@ -44,7 +44,7 @@ test('publishes scripts, styles, embeds, forms and event handlers exactly as pas
 })
 
 test('keeps a pasted affiliate loader byte-for-byte and in source order', () => {
-  // The Travelpayouts tag from the repo root is the shape editors actually paste.
+  // The Travelpayouts tag from docs/reference/third-party/travelpayouts.txt is the shape editors actually paste.
   const snippet =
     '<script nowprocket data-noptimize="1" data-cfasync="false" data-cmp-ab="2">' +
     'var s=document.createElement("script");s.src="https://tpembars.com/NDgxMjc5.js?t=481279";' +
