@@ -3,7 +3,7 @@
    ==========================================================================
 
    Consumes ONLY the tokens declared in `admin-theme.css` (and documented in
-   DESIGN_SYSTEM.md). There are no literal colours, font sizes, spacings,
+   docs/design/design-system.md). There are no literal colours, font sizes, spacings,
    radii, gradients or shadows in this file: every value below is a `var(--hg-*)`
    token or a structural layout ratio (percent, fr, 1px hairline).
 

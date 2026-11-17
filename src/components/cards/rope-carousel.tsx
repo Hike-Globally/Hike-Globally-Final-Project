@@ -3,7 +3,7 @@
 /**
  * ============================================================================
  * ROPE CURVE CAROUSEL — a 1:1 recreation of the reference build saved in
- * `animation.html` (ropecurvecarousel.framer.website, "Rope Curve Carousel").
+ * `docs/assets/rope-carousel-reference.html` (ropecurvecarousel.framer.website, "Rope Curve Carousel").
  * ============================================================================
  * Every static value (curve shape, rope strokes, card geometry, peg clip,
  * hang shadow, edge fade mask, hover choreography) is measured straight from

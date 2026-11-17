@@ -7,7 +7,7 @@
    these variables — it contains no literal colours, sizes or shadows of its
    own, so a change made in this file lands on every screen at once.
 
-   Documented in DESIGN_SYSTEM.md. Change a value here, not in a component.
+   Documented in docs/design/design-system.md. Change a value here, not in a component.
 
    Palette rules
    -------------

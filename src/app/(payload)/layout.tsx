@@ -8,7 +8,7 @@ import type React from 'react'
 import { importMap } from './admin/importMap'
 // Payload's own admin stylesheet — theme variables, layout grid, nav rail, form controls.
 import '@payloadcms/next/css'
-// Design tokens (the single source of truth, see DESIGN_SYSTEM.md) come first…
+// Design tokens (the single source of truth, see docs/design/design-system.md) come first…
 import './admin-theme.css'
 // …then the component styles, which consume only those tokens and must win.
 import './custom.scss'

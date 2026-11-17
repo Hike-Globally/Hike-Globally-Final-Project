@@ -5,7 +5,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { AffiliateDisclosure } from '@/components/layout/affiliate-disclosure'
 import { Footer } from '@/components/layout/footer'
 import { Header } from '@/components/layout/header'
-import { LivePreviewRefresh } from '@/components/live-preview-refresh'
+import { LivePreviewRefresh } from '@/components/providers/live-preview-refresh'
 import { SmoothScroll } from '@/components/providers/smooth-scroll'
 import { dictionary } from '@/i18n/dictionaries'
 import { htmlLang, ogLocale } from '@/i18n/config'
@@ -155,10 +155,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${displayFont.variable} ${bodyFont.variable} ${calSansFont.variable} overflow-x-clip`}
     >
       {/* Google tag (gtag.js) & Google AdSense. The gtag snippet is the verbatim contents of
-          gtag.txt at the repo root; the AdSense loader below is inline, because the file it used to
-          be pasted from was removed — this block is now its only copy. This root layout wraps every
-          public page, so placing the snippets inside <head> is the Next.js equivalent of pasting
-          them between <head></head> of each page.
+          docs/reference/third-party/gtag.txt; the AdSense loader below is inline, because the
+          file it used to be pasted from was removed — this block is now its only copy. This root
+          layout wraps every public page, so placing the snippets inside <head> is the Next.js
+          equivalent of pasting them between <head></head> of each page.
 
           Note the AdSense loader is NOT `ads.txt`: that name belongs to the machine-read publisher
           manifest, the single file `public/ads.txt` that Next serves at `/ads.txt`. Two files
@@ -185,8 +185,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2988608851561676"
           crossOrigin="anonymous"
         ></script>
-        {/* Travelpayouts affiliate tag (from Travelpayouts.txt) — the inline loader appends the
-            https://tpembars.com/NDgxMjc5.js?t=481279 <script> to document.head at runtime.
+        {/* Travelpayouts affiliate tag (from docs/reference/third-party/travelpayouts.txt) — the
+            inline loader appends the https://tpembars.com/NDgxMjc5.js?t=481279 <script> to
+            document.head at runtime.
             `nowprocket` is a WP Rocket delay-exclusion flag with no equivalent here, so it is
             spread in rather than written as a literal prop (React has no type for it and would
             otherwise reject the attribute); the remaining cache/defer flags are emitted verbatim. */}

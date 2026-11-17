@@ -10,7 +10,7 @@ import type { Setting } from '@/payload-types'
 import './footer.css'
 
 /**
- * Site footer — the full-width dark footer ported from `footer-sample.png`,
+ * Site footer — the full-width dark footer ported from `docs/assets/footer-sample.png`,
  * rendered once from the root layout so it is the global, sitewide footer.
  *
  * Content still comes from the `footer` + `settings` Payload globals:
