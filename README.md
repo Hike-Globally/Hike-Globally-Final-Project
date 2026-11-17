@@ -391,6 +391,38 @@ layer:
 Note that a challenge here is not only an analytics problem: it blocks Googlebot the same way, so it
 also stalls indexing of the sitemap.
 
+### "AdSense says ads.txt status is not found"
+
+The file AdSense crawls is **`public/ads.txt`**. Next.js copies `public/` to the deployment root, so
+that file is served at `https://<host>/ads.txt` — and at the time of writing it is served with
+`200`, `Content-Type: text/plain` and the correct publisher line, on both `hikeglobally.com` and
+`www.hikeglobally.com`. Nothing needs to be done at the CDN; verify it directly:
+
+```bash
+curl -sSL https://hikeglobally.com/ads.txt      # google.com, pub-2988608851561676, DIRECT, f08c47fec0942fa0
+```
+
+What went wrong before, and what not to do again:
+
+- **A repo-root `ads.txt` is never served.** Only `public/` is deployed. The root file that used to
+  exist was not a manifest at all — it was the AdSense **`<script>` loader** (HTML, with Windows line
+  endings). It has been deleted: the loader now lives only inline in the root layout, and
+  `public/ads.txt` is the only `ads.txt` in the repository. Anyone "fixing ads.txt" from the repo
+  root would otherwise have pasted HTML into a text manifest. `src/lib/ads-txt.test.ts` fails if a
+  root `ads.txt` reappears.
+- **The manifest and the loader must name the same publisher.** `public/ads.txt` says
+  `pub-2988608851561676`; the loader in the root layout says `ca-pub-2988608851561676`. A mismatch is
+  reported as *ads.txt unauthorized*, not *not found*.
+- **Keep the file parser-clean.** UTF-8 without a BOM, LF line endings, one record per line, a
+  trailing newline, no HTML. The test above enforces each of these.
+- **Give the crawler time.** AdSense re-crawls on its own schedule; the dashboard can take a day or
+  two to change after a deploy. Re-checking the URL in a browser does not trigger a recrawl, and the
+  status only refreshes once the site is approved and serving ads.
+
+If `curl` returns a challenge page or something other than `200`, the cause is in front of the app —
+the Cloudflare and Vercel Deployment Protection items in the section above block the ads.txt crawler
+exactly as they block the tag checker and Googlebot.
+
 ## Affiliate tag (Travelpayouts)
 
 The Travelpayouts tag sits in the same `<head>` block, immediately after the Google AdSense
