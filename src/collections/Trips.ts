@@ -86,8 +86,6 @@ export const Trips: CollectionConfig = {
       index: true,
       admin: {
         position: 'sidebar',
-        description:
-          'The person who wrote or maintains this itinerary. Their public bio and qualifications are shown on the trip page. This is not a guarantee that they will lead every departure. Leave blank until assigned.',
       },
     },
     pageSectionsField(tripSectionOptions),
@@ -97,10 +95,6 @@ export const Trips: CollectionConfig = {
       localized: true,
       required: true,
       maxLength: 220,
-      admin: {
-        description:
-          '2–3 sentences. Used on cards, in search results and as the meta description fallback.',
-      },
     },
     {
       name: 'heroImage',
@@ -118,8 +112,6 @@ export const Trips: CollectionConfig = {
           localized: true,
           labels: { singular: 'Takeaway', plural: 'Takeaways' },
           admin: {
-            description:
-              'Add one point per row before Overview. Wrap a phrase in **double asterisks** to make it bold. Drag to reorder; leave empty to hide the section.',
             components: { Field: '@/components/admin/instant-trip-array' },
           },
           fields: [{ name: 'text', type: 'textarea', required: true }],
@@ -132,10 +124,6 @@ export const Trips: CollectionConfig = {
       editor: contentEditor(),
       localized: true,
       label: 'Overview',
-      admin: {
-        description:
-          'The main body of the trip page. Insert Link preview or Multi-URL Preview between paragraphs from the toolbar’s block menu (or type /multiUrlPreview). Headings, links, lists, images and tables remain available.',
-      },
     },
 
     /* --------------------------------------------------------------------------
@@ -182,7 +170,7 @@ export const Trips: CollectionConfig = {
               label: 'Days',
               required: true,
               min: 1,
-              admin: { width: '25%', description: 'Total days on the trip.' },
+              admin: { width: '25%' },
             },
             {
               name: 'durationNights',
@@ -203,7 +191,7 @@ export const Trips: CollectionConfig = {
               type: 'number',
               label: 'Max altitude',
               min: 0,
-              admin: { width: '25%', description: 'Highest point, in metres.' },
+              admin: { width: '25%' },
             },
           ],
         },
@@ -218,8 +206,6 @@ export const Trips: CollectionConfig = {
               options: difficultySelectOptions,
               admin: {
                 width: '50%',
-                description:
-                  'Nine rungs, from Easy to Extreme. The homepage slider after the hero groups published trips by this value.',
               },
             },
             {
@@ -256,7 +242,6 @@ export const Trips: CollectionConfig = {
               min: 0,
               admin: {
                 width: '33%',
-                description: 'Lowest per-person price, no thousands separators.',
               },
             },
             {
@@ -287,7 +272,6 @@ export const Trips: CollectionConfig = {
           name: 'priceNote',
           type: 'text',
           localized: true,
-          admin: { description: 'Optional: "based on a group of 4", "single supplement +$320".' },
         },
       ],
     },
@@ -314,10 +298,6 @@ export const Trips: CollectionConfig = {
           // as a page. Video is excluded so the picker only offers something a visitor can read;
           // Media's own `mimeTypes` allow-list has the final say on what can be stored.
           filterOptions: { mimeType: { not_like: 'video/%' } },
-          admin: {
-            description:
-              'Upload the downloadable version of this itinerary. A “Download Trip Brochure” button then appears under “Book This Trek” on the trip page. Leave empty to hide the button.',
-          },
         },
         {
           type: 'row',
@@ -330,7 +310,6 @@ export const Trips: CollectionConfig = {
               admin: {
                 width: '50%',
                 placeholder: 'Download Trip Brochure',
-                description: 'Optional. Replaces the default button text.',
               },
             },
             {
@@ -341,8 +320,6 @@ export const Trips: CollectionConfig = {
               admin: {
                 width: '50%',
                 placeholder: 'PDF · day-by-day itinerary, map and packing list',
-                description:
-                  'Optional single line under the button. Defaults to the file type and size (e.g. “PDF · 2.3 MB”).',
               },
             },
           ],
@@ -363,8 +340,6 @@ export const Trips: CollectionConfig = {
           localized: true,
           labels: { singular: 'Highlight', plural: 'Highlights' },
           admin: {
-            description:
-              'One bullet per row. Wrap a phrase in **double asterisks** to make it bold.',
             components: { Field: '@/components/admin/instant-trip-array' },
           },
           fields: [{ name: 'text', type: 'text', required: true }],
@@ -397,7 +372,6 @@ export const Trips: CollectionConfig = {
           localized: true,
           admin: {
             placeholder: tripAudienceDefaults.forHeading,
-            description: `Optional. Leave empty to use “${tripAudienceDefaults.forHeading}”.`,
           },
         },
         {
@@ -407,8 +381,6 @@ export const Trips: CollectionConfig = {
           localized: true,
           admin: {
             className: 'hg-trip-compact-editor',
-            description:
-              'Describe the travellers this trip suits best — fitness, experience, travel style. Bullet lists display with a check mark on each point. Leave empty to hide this card.',
           },
         },
       ],
@@ -425,7 +397,6 @@ export const Trips: CollectionConfig = {
           localized: true,
           admin: {
             placeholder: tripAudienceDefaults.notForHeading,
-            description: `Optional. Leave empty to use “${tripAudienceDefaults.notForHeading}”.`,
           },
         },
         {
@@ -435,8 +406,6 @@ export const Trips: CollectionConfig = {
           localized: true,
           admin: {
             className: 'hg-trip-compact-editor',
-            description:
-              'Be candid about who should choose a different trip — and why. Bullet lists display with a cross on each point. Leave empty to hide this card.',
           },
         },
       ],
@@ -452,7 +421,6 @@ export const Trips: CollectionConfig = {
           localized: true,
           labels: { singular: 'Day', plural: 'Itinerary' },
           admin: {
-            description: 'One entry per day. Day-level content is translated per language.',
             components: { Field: '@/components/admin/instant-trip-array' },
             initCollapsed: true,
           },
@@ -477,14 +445,13 @@ export const Trips: CollectionConfig = {
                   type: 'text',
                   admin: {
                     width: '50%',
-                    description: 'e.g. Teahouse in Namche Bazaar',
                   },
                 },
                 {
                   name: 'altitude',
                   type: 'number',
                   min: 0,
-                  admin: { width: '25%', description: 'Metres' },
+                  admin: { width: '25%' },
                 },
                 {
                   name: 'food',
@@ -495,7 +462,6 @@ export const Trips: CollectionConfig = {
                   ],
                   admin: {
                     width: '25%',
-                    description: 'Are this day’s meals covered by the price?',
                   },
                 },
               ],
@@ -517,8 +483,6 @@ export const Trips: CollectionConfig = {
             plural: 'Essential Information sections',
           },
           admin: {
-            description:
-              'Add extra headed sections to the trip page. Their position is controlled by the Essential information row in Page sections; drag the entries here to reorder them within Essential Information.',
             components: { Field: '@/components/admin/instant-trip-array' },
             initCollapsed: true,
           },
@@ -527,7 +491,6 @@ export const Trips: CollectionConfig = {
               name: 'heading',
               type: 'text',
               required: true,
-              admin: { description: 'Displayed above this section’s content.' },
             },
             {
               name: 'content',
@@ -593,7 +556,6 @@ export const Trips: CollectionConfig = {
           localized: true,
           admin: {
             className: 'hg-trip-compact-editor',
-            description: 'Reasons to choose this trek. Displayed before Highlights.',
           },
         },
       ],
@@ -611,7 +573,6 @@ export const Trips: CollectionConfig = {
           localized: true,
           admin: {
             className: 'hg-trip-compact-editor',
-            description: 'Optional introduction or route notes. Displayed after Highlights.',
           },
         },
         {
@@ -620,18 +581,12 @@ export const Trips: CollectionConfig = {
           type: 'upload',
           relationTo: 'media',
           filterOptions: { mimeType: { contains: 'image/' } },
-          admin: {
-            description: 'Upload the original route map image. Add descriptive alt text in Media.',
-          },
         },
         {
           name: 'altitudeChart',
           type: 'upload',
           relationTo: 'media',
           filterOptions: { mimeType: { contains: 'image/' } },
-          admin: {
-            description: 'Upload the altitude chart image. Add descriptive alt text in Media.',
-          },
         },
       ],
     },
@@ -646,8 +601,6 @@ export const Trips: CollectionConfig = {
           type: 'array',
           labels: { singular: 'Departure date', plural: 'Departure dates' },
           admin: {
-            description:
-              'Pick departure dates directly on the calendar or add rows individually. Displayed as an interactive calendar and departure schedule after Detailed Itinerary.',
             components: {
               Field: '@/components/admin/departure-dates-field',
               RowLabel: '@/components/admin/departure-row-label',
@@ -689,7 +642,6 @@ export const Trips: CollectionConfig = {
                   admin: {
                     width: '50%',
                     placeholder: 'Auto-calculated from trip days',
-                    description: 'Optional — defaults to Start date + trip duration.',
                     date: {
                       pickerAppearance: 'dayOnly',
                       displayFormat: 'd MMM yyyy',
@@ -717,7 +669,6 @@ export const Trips: CollectionConfig = {
                   min: 0,
                   admin: {
                     width: '33%',
-                    description: 'Optional — uses Pricing → Price From when blank.',
                   },
                 },
                 {
@@ -727,7 +678,6 @@ export const Trips: CollectionConfig = {
                   admin: {
                     width: '33%',
                     placeholder: 'e.g. 4 spots left',
-                    description: 'Optional short badge or note.',
                   },
                 },
               ],
@@ -740,10 +690,6 @@ export const Trips: CollectionConfig = {
           type: 'richText',
           editor: contentEditor(),
           localized: true,
-          admin: {
-            description:
-              'Optional notes displayed below the calendar and departure dates (e.g. private group departures, custom dates or seasonal notes).',
-          },
         },
       ],
     },
@@ -796,10 +742,6 @@ export const Trips: CollectionConfig = {
           type: 'array',
           localized: true,
           labels: { singular: 'Packing item', plural: 'Packing list items' },
-          admin: {
-            description:
-              'Personal gear and essentials travellers should bring. Each item is filed under one of the three accordions on the trip page — Clothing and Footwear, Trekking Equipment, Personal Items.',
-          },
           fields: [
             {
               type: 'row',
@@ -849,10 +791,6 @@ export const Trips: CollectionConfig = {
           relationTo: 'trips',
           hasMany: true,
           filterOptions: ({ id }) => (id ? { id: { not_equals: id } } : true),
-          admin: {
-            description:
-              'Shown in the "You may also like" rail. Leave empty to auto-fill from the same destination.',
-          },
         },
       ],
     },
@@ -865,20 +803,12 @@ export const Trips: CollectionConfig = {
           name: 'bookingLink',
           type: 'group',
           label: 'Booking CTA',
-          admin: {
-            description:
-              'Optional external booking button (e.g. your booking engine). Leave empty to use the built-in inquiry form.',
-          },
           fields: [linkField({ name: 'link', label: 'Booking link', newTab: false })],
         },
         {
           name: 'featured',
           type: 'checkbox',
           defaultValue: false,
-          admin: {
-            description:
-              'Pinned first on /trips and picked by the homepage "Featured trips" section. With none ticked, the homepage falls back to the newest published trips rather than hiding the section.',
-          },
         },
       ],
     },
