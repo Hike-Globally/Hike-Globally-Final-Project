@@ -22,7 +22,7 @@ async function render(content: unknown) {
   return new Response(stream).text()
 }
 
-test('Blog body and trip Essential Information panel use the content editor', () => {
+test('Blog body and Trip information panels use the shared content editor', () => {
   const blogContent = Blog.fields.find((field) => 'name' in field && field.name === 'content')
   assert.ok(blogContent && blogContent.type === 'richText' && blogContent.editor)
   const panel = Trips.fields.find(
@@ -37,6 +37,19 @@ test('Blog body and trip Essential Information panel use the content editor', ()
   })
   const content = sections.fields.find((field) => 'name' in field && field.name === 'content')
   assert.ok(content && content.type === 'richText' && content.editor)
+
+  const hotelsPanel = Trips.fields.find(
+    (field) => field.type === 'collapsible' && field.label === 'Hotels Near Destination',
+  )
+  assert.ok(hotelsPanel && hotelsPanel.type === 'collapsible')
+  const hotels = hotelsPanel.fields.find(
+    (field) => 'name' in field && field.name === 'hotelsNearDestination',
+  )
+  assert.ok(hotels && hotels.type === 'array')
+  assert.deepEqual(hotels.labels, { singular: 'Hotel', plural: 'Hotels' })
+  const hotelContent = hotels.fields.find((field) => 'name' in field && field.name === 'content')
+  assert.ok(hotelContent && hotelContent.type === 'richText' && hotelContent.editor)
+
   assert.equal(inlineLinkPreviewBlock.slug, 'linkPreview')
   const url = inlineLinkPreviewBlock.fields[0]
   assert.ok(url.type === 'text' && !url.admin?.condition && url.validate)

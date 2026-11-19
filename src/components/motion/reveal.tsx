@@ -45,8 +45,8 @@ export function shouldAnimateOnMount(top: number, viewportHeight: number): boole
  *
  * The observation uses `threshold: 0`: any part of the element reaching the viewport reveals it.
  * A ratio threshold (the old `0.12`) is unreachable for a section taller than ~8 viewports, which
- * is exactly what the open Essential Information accordions on a trip page become on a laptop or
- * a phone — the section then stayed at `opacity: 0` until the page was reloaded.
+ * is exactly what the open Essential Information and Hotels Near Destination accordions on a trip
+ * page become on a laptop or a phone — the section then stayed at `opacity: 0` until reloaded.
  *
  * It also fully respects `prefers-reduced-motion`: the element simply renders visible.
  */

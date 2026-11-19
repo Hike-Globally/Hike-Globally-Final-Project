@@ -807,12 +807,13 @@
     letter-spacing: -0.01em;
     @apply mt-10 text-ink;
   }
-  /* Essential Information descriptions are the one rich-text context whose headings are
-     subheadings of an H2 accordion title. They read the global H3 role (`heading-md`, the
-     card token) instead of the smaller H4 role above, so H2 → H3 follows the site scale
-     rather than rendering both at the same 17px. Scoped to this section only — every other
-     rich-text block keeps its existing heading sizes. */
-  .essential-information-copy h3 {
+  /* Essential Information and hotel descriptions are rich-text contexts whose headings are
+     subheadings of an H2 accordion title. They read the global H3 role (`heading-md`, the card
+     token) instead of the smaller H4 role above, so H2 → H3 follows the site scale rather than
+     rendering both at the same 17px. Scoped to these sections — other rich-text blocks keep
+     their existing heading sizes. */
+  .essential-information-copy h3,
+  .hotels-near-destination-copy h3 {
     @apply heading-md;
   }
   .prose-hg h4 {
