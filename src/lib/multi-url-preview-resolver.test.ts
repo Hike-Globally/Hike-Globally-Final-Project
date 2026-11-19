@@ -54,6 +54,39 @@ test('a collection reuses single-link metadata, images, overrides, rating limits
   assert.ok(preview.cards.every(({ external }) => external))
 })
 
+test('each URL can override its thumbnail with uploaded media or a public image URL', async () => {
+  const result = await resolveMultiUrlPreview(
+    source(
+      {
+        linkPreviewUrl: 'https://example.com/uploaded',
+        linkPreviewImage: {
+          id: 7,
+          alt: 'Uploaded thumbnail',
+          url: '/api/media/file/featured.webp',
+          mimeType: 'image/webp',
+          updatedAt: '2026-11-19T00:00:00.000Z',
+          createdAt: '2026-11-19T00:00:00.000Z',
+        },
+        linkPreviewImageUrl: 'https://images.example.com/ignored.webp',
+      },
+      {
+        linkPreviewUrl: 'https://example.com/remote',
+        linkPreviewImageUrl: 'https://images.example.com/remote.webp',
+      },
+    ),
+    {
+      metadata: async () => ({
+        title: 'Linked page',
+        image: 'https://example.com/page-image.jpg',
+      }),
+    },
+  )
+  assert.equal(result?.cards[0]?.image, '/api/media/file/featured.webp')
+  assert.ok(result?.cards[0]?.imageAlternatives?.includes('https://example.com/page-image.jpg'))
+  assert.equal(result?.cards[1]?.image, 'https://images.example.com/remote.webp')
+  assert.ok(result?.cards[1]?.imageAlternatives?.includes('https://example.com/page-image.jpg'))
+})
+
 test('internal links keep real CMS metadata and never make an HTTP self-request, even without images', async () => {
   const url = new URL(resolveSiteUrl())
   const alias = new URL(url)

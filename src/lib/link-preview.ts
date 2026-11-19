@@ -1,3 +1,6 @@
+import type { Media } from '@/payload-types'
+
+import { isAllowedImageType, parseImageProxyUrl } from './link-preview-image'
 import { resolveSiteUrl } from './site-url'
 
 /**
@@ -14,8 +17,9 @@ import { resolveSiteUrl } from './site-url'
  *                link → JSON-LD `image` → usable `<img>` photographs in the page
  *
  * Rating, review count and prices are typed in, since no page's metadata carries them. Editors can
- * override the title and description from the admin panel; page images are preferred, with a
- * generic local photograph used only if none of them can be displayed.
+ * override the title and description; Multi-URL rows can also choose a thumbnail by uploading media
+ * or entering a public image URL. Otherwise page images are preferred, with a generic local
+ * photograph used only if none of them can be displayed.
  *
  * Two things make that work on other people's sites rather than only on our own:
  *
@@ -36,6 +40,10 @@ export type LinkPreviewSource = {
   linkPreviewReviewCount?: number | null
   linkPreviewPrice?: string | null
   linkPreviewOriginalPrice?: string | null
+  /** Populated upload relation; only its public URL is needed by the card. */
+  linkPreviewImage?: number | Media | null
+  /** Public image URL override, used when the editor does not upload a file. */
+  linkPreviewImageUrl?: string | null
 }
 
 export type LinkPreviewMetadata = {
@@ -444,10 +452,21 @@ export async function fetchLinkPreviewMetadata(
     })
     if (!response.ok) return null
 
-    // A server that sends no `Content-Type` at all is rare but real; only reject what is clearly
-    // not a page (an image, a PDF, JSON from an API endpoint).
+    // A pasted URL may itself be a public image rather than an HTML page. Preserve it as the
+    // card image instead of treating every non-HTML response as a failed preview. Keep the same
+    // raster-only allowlist as the image proxy (SVG can execute script when served from our origin).
     const contentType = response.headers.get('content-type') ?? ''
-    if (contentType && !/html|xml/i.test(contentType)) return null
+    if (isAllowedImageType(contentType)) {
+      await response.body?.cancel().catch(() => undefined)
+      return { image: absoluteUrl }
+    }
+
+    // A server that sends no `Content-Type` at all is rare but real; only reject what is clearly
+    // not a page (a PDF, JSON from an API endpoint, or an unsupported image such as SVG).
+    if (contentType && !/html|xml/i.test(contentType)) {
+      await response.body?.cancel().catch(() => undefined)
+      return null
+    }
 
     const html = await readHtml(response, charsetOf(contentType))
     return parseLinkPreviewMetadata(html, response.url || absoluteUrl)
@@ -521,6 +540,21 @@ function firstPartyPath(image: string | null): string | null {
   return image.startsWith(`${origin}/`) ? image.slice(origin.length) : image
 }
 
+/** Uploaded media may be a relative site path; remote overrides must pass the public URL guard. */
+function previewImageOverride(source: LinkPreviewSource): string | null {
+  const upload = source.linkPreviewImage
+  const uploadUrl =
+    upload &&
+    typeof upload === 'object' &&
+    (!upload.mimeType || upload.mimeType.startsWith('image/'))
+      ? upload.url
+      : undefined
+  const value = cleanText(uploadUrl) ?? cleanText(source.linkPreviewImageUrl)
+  if (!value) return null
+  if (value.startsWith('/') && !value.startsWith('//')) return value
+  return parseImageProxyUrl(value)?.href ?? null
+}
+
 /**
  * Builds the card for a page. Returns `null` when no URL is set, which hides the section.
  *
@@ -544,10 +578,21 @@ export async function resolveLinkPreview(
   const siteHost = hostOf(resolveSiteUrl())
 
   const own = host === siteHost && resolvers.internal ? await resolvers.internal(absolute) : null
-  // Nothing left to learn from the network when the CMS already knows the page's picture.
+  const imageOverride = previewImageOverride(source)
+  // Nothing left to learn from the network when the CMS already knows the page's picture. An
+  // image override changes only the thumbnail; CMS/page metadata still supplies title and text.
   const fetched = own?.image
     ? null
     : await (resolvers.metadata ?? fetchLinkPreviewMetadata)(absolute)
+  const selectedImage = imageOverride ?? own?.image ?? fetched?.image ?? null
+  const imageAlternatives = [
+    ...(imageOverride ? [own?.image, fetched?.image] : []),
+    ...(own?.images ?? []),
+    ...(fetched?.images ?? []),
+  ]
+    .filter((image): image is string => Boolean(image))
+    .map((image) => firstPartyPath(image) ?? image)
+    .filter((image) => image !== firstPartyPath(selectedImage))
 
   return {
     href: rawUrl.startsWith('/') ? rawUrl : absolute,
@@ -556,10 +601,8 @@ export async function resolveLinkPreview(
     title: cleanText(source.linkPreviewTitle) ?? own?.title ?? fetched?.title ?? host,
     description:
       cleanText(source.linkPreviewDescription) ?? own?.description ?? fetched?.description ?? '',
-    image: firstPartyPath(own?.image ?? fetched?.image ?? null),
-    imageAlternatives: [...(own?.images ?? []), ...(fetched?.images ?? [])].map(
-      (image) => firstPartyPath(image) ?? image,
-    ),
+    image: firstPartyPath(selectedImage),
+    imageAlternatives: [...new Set(imageAlternatives)],
     rating: cleanNumber(source.linkPreviewRating, 5),
     reviewCount: cleanNumber(source.linkPreviewReviewCount),
     price: cleanText(source.linkPreviewPrice),
