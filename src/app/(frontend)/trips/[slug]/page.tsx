@@ -3,7 +3,13 @@ import { notFound } from 'next/navigation'
 
 import { TripDetail } from '@/components/views/trip-detail'
 import { sitePath } from '@/i18n/config'
-import { createInternalLinker, getAllTripSlugs, getRelatedTrips, getTrip } from '@/lib/data'
+import {
+  createInternalLinker,
+  getAllTripSlugs,
+  getRelatedTrips,
+  getSettings,
+  getTrip,
+} from '@/lib/data'
 import { isLivePreviewRequest } from '@/lib/live-preview-access'
 import { buildMetadata, seoFromDoc } from '@/lib/seo'
 
@@ -55,8 +61,9 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
 
   if (!trip) notFound()
 
-  const [related, linker] = await Promise.all([
+  const [related, settings, linker] = await Promise.all([
     getRelatedTrips(trip, 3),
+    getSettings(),
     /**
      * Automated internal keyword linking (see `src/lib/internal-links.ts`): the overview, "why
      * choose this trek", the route map intro, departure notes, the audience cards and the
@@ -66,5 +73,5 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
     createInternalLinker({ collection: 'trips', id: trip.id }),
   ])
 
-  return <TripDetail trip={trip} related={related} linker={linker} />
+  return <TripDetail trip={trip} related={related} settings={settings} linker={linker} />
 }

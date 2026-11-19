@@ -7,7 +7,9 @@ import type {
   PayloadRequest,
 } from 'payload'
 
+import { authorProfile } from '../lib/author-profile'
 import { CACHE_TAG, revalidationDisabled } from '../lib/cache-tags'
+import type { User } from '../payload-types'
 import { LLMS_TXT_PATH } from '../lib/llms-txt'
 import {
   shouldRevalidateAfterChange,
@@ -173,6 +175,32 @@ export const revalidatePostDelete = postHooks.afterDelete
 
 export const revalidatePage = pageHooks.afterChange
 export const revalidatePageDelete = pageHooks.afterDelete
+
+/** Profiles are populated inside cached posts/trips; a User save must refresh those reads too. */
+const revalidateAuthorPages = () => {
+  if (revalidationDisabled()) return
+  try {
+    for (const tag of [CACHE_TAG.posts, CACHE_TAG.trips, CACHE_TAG.pages]) {
+      revalidateTag(tag, { expire: 0 })
+    }
+    revalidatePath('/', 'layout')
+  } catch (error) {
+    console.warn(`[revalidate] skipped — ${(error as Error).message}`)
+  }
+}
+
+export const revalidateAuthor: CollectionAfterChangeHook<User> = ({ doc, previousDoc }) => {
+  // Login/session/password changes must not invalidate the public site.
+  if (JSON.stringify(authorProfile(doc)) !== JSON.stringify(authorProfile(previousDoc))) {
+    revalidateAuthorPages()
+  }
+  return doc
+}
+
+export const revalidateAuthorDelete: CollectionAfterDeleteHook<User> = ({ doc }) => {
+  revalidateAuthorPages()
+  return doc
+}
 
 /**
  * Header / footer / settings appear on every page, so a change invalidates the whole root

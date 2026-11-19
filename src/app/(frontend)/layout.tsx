@@ -7,11 +7,12 @@ import { Footer } from '@/components/layout/footer'
 import { Header } from '@/components/layout/header'
 import { LivePreviewRefresh } from '@/components/providers/live-preview-refresh'
 import { SmoothScroll } from '@/components/providers/smooth-scroll'
+import { JsonLd } from '@/components/seo/json-ld'
 import { dictionary } from '@/i18n/dictionaries'
 import { htmlLang, ogLocale } from '@/i18n/config'
 import { getSettings } from '@/lib/data'
 import { faviconIcons } from '@/lib/favicon'
-import { imageUrl } from '@/lib/seo'
+import { imageUrl, organizationJsonLd, siteUrl } from '@/lib/seo'
 import { resolveSiteUrlObject } from '@/lib/site-url'
 import '@/components/content/custom-html-section.css'
 import '@/components/layout/affiliate-disclosure.css'
@@ -146,8 +147,9 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const dict = dictionary
+  const settings = await getSettings()
 
   return (
     <html
@@ -213,6 +215,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         ></script>
       </head>
       <body className="flex min-h-dvh min-w-0 flex-col overflow-x-clip bg-background text-foreground">
+        {/* Shared publisher identity, including on blog and trip detail pages. */}
+        <JsonLd
+          data={organizationJsonLd({
+            name: settings.siteName,
+            legalName: settings.legalName,
+            url: siteUrl,
+            logo: settings.logo,
+            description: settings.tagline,
+            email: settings.email,
+            phone: settings.phone,
+            address: settings.address,
+            socials: settings.socials,
+          })}
+        />
         <LivePreviewRefresh />
         <a
           href="#main"

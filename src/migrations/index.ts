@@ -22,6 +22,7 @@ import * as migration_20261108_150000_redirections from './20261108_150000_redir
 import * as migration_20261115_120000_home_hero_split_heading from './20261115_120000_home_hero_split_heading'
 import * as migration_20261115_180000_link_preview from './20261115_180000_link_preview'
 import * as migration_20261115_200000_link_preview_in_page_section from './20261115_200000_link_preview_in_page_section'
+import * as migration_20261119_120000_author_expertise from './20261119_120000_author_expertise'
 
 export const migrations = [
   {
@@ -143,5 +144,10 @@ export const migrations = [
     up: migration_20261115_200000_link_preview_in_page_section.up,
     down: migration_20261115_200000_link_preview_in_page_section.down,
     name: '20261115_200000_link_preview_in_page_section',
+  },
+  {
+    up: migration_20261119_120000_author_expertise.up,
+    down: migration_20261119_120000_author_expertise.down,
+    name: '20261119_120000_author_expertise',
   },
 ]

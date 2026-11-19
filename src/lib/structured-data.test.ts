@@ -67,7 +67,8 @@ const sourceWithImports = (file: string): string => {
 
 /** Route → the JSON-LD builders that must be reachable from it. */
 const expectedStructuredData: Record<string, string[]> = {
-  'src/app/(frontend)/page.tsx': ['organizationJsonLd', 'websiteJsonLd'],
+  'src/app/(frontend)/layout.tsx': ['organizationJsonLd'],
+  'src/app/(frontend)/page.tsx': ['websiteJsonLd'],
   'src/app/(frontend)/[slug]/page.tsx': ['breadcrumbJsonLd', 'webPageJsonLd'],
   'src/app/(frontend)/trips/page.tsx': ['breadcrumbJsonLd', 'webPageJsonLd'],
   'src/app/(frontend)/trips/[slug]/page.tsx': ['breadcrumbJsonLd', 'touristTripJsonLd'],
@@ -132,6 +133,16 @@ test('every page renders the structured data its route calls for', () => {
       '  Fix: render <JsonLd data={[…]} /> from "@/components/seo/json-ld" with the builders in ' +
       '"@/lib/seo".',
   )
+})
+
+test('the shared layout publishes organization identity without a duplicate homepage entity', () => {
+  const layout = readFileSync(path.join(frontendRoot, 'layout.tsx'), 'utf8')
+  const home = readFileSync(path.join(frontendRoot, 'page.tsx'), 'utf8')
+  assert.match(layout, /<JsonLd[\s\S]*?organizationJsonLd\(/)
+  for (const field of ['siteName', 'legalName', 'logo', 'email', 'phone', 'address', 'socials']) {
+    assert.ok(layout.includes(`settings.${field}`), `Organization must read settings.${field}`)
+  }
+  assert.doesNotMatch(home, /organizationJsonLd\(/)
 })
 
 test('structured data never receives a relative image URL', () => {

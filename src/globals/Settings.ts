@@ -1,6 +1,7 @@
 import type { GlobalConfig } from 'payload'
 
 import { adminOrEditor, anyone } from '../access'
+import { socialsField } from '../fields/socials'
 import { revalidateGlobal } from '../hooks/revalidate'
 import { siteLivePreviewURL } from '../lib/live-preview-url'
 
@@ -29,7 +30,13 @@ export const Settings: GlobalConfig = {
     {
       type: 'row',
       fields: [
-        { name: 'siteName', type: 'text', required: true, defaultValue: 'Hike Globally', admin: { width: '50%' } },
+        {
+          name: 'siteName',
+          type: 'text',
+          required: true,
+          defaultValue: 'Hike Globally',
+          admin: { width: '50%' },
+        },
         { name: 'tagline', type: 'text', localized: true, admin: { width: '50%' } },
       ],
     },
@@ -42,7 +49,10 @@ export const Settings: GlobalConfig = {
           type: 'upload',
           relationTo: 'media',
           label: 'Default social share image',
-          admin: { width: '50%', description: 'Used when a page has no image of its own. 1200×630px.' },
+          admin: {
+            width: '50%',
+            description: 'Used when a page has no image of its own. 1200×630px.',
+          },
         },
       ],
     },
@@ -51,7 +61,11 @@ export const Settings: GlobalConfig = {
       fields: [
         { name: 'email', type: 'email', required: true, admin: { width: '33%' } },
         { name: 'phone', type: 'text', admin: { width: '33%' } },
-        { name: 'whatsapp', type: 'text', admin: { width: '33%', description: 'Digits only, e.g. 9779851000000' } },
+        {
+          name: 'whatsapp',
+          type: 'text',
+          admin: { width: '33%', description: 'Digits only, e.g. 9779851000000' },
+        },
       ],
     },
     {
@@ -60,33 +74,8 @@ export const Settings: GlobalConfig = {
       localized: true,
       admin: { description: 'Shown in the footer and used for LocalBusiness structured data.' },
     },
-    {
-      name: 'socials',
-      type: 'array',
-      labels: { singular: 'Social profile', plural: 'Social profiles' },
-      fields: [
-        {
-          type: 'row',
-          fields: [
-            {
-              name: 'platform',
-              type: 'select',
-              required: true,
-              options: [
-                { label: 'Instagram', value: 'instagram' },
-                { label: 'Facebook', value: 'facebook' },
-                { label: 'YouTube', value: 'youtube' },
-                { label: 'TikTok', value: 'tiktok' },
-                { label: 'LinkedIn', value: 'linkedin' },
-                { label: 'X', value: 'x' },
-              ],
-              admin: { width: '50%' },
-            },
-            { name: 'url', type: 'text', required: true, admin: { width: '50%' } },
-          ],
-        },
-      ],
-    },
+    // The Organization's `sameAs` — shared with Users (see src/fields/socials.ts).
+    socialsField(),
     {
       type: 'row',
       fields: [
