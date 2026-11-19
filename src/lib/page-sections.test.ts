@@ -6,6 +6,7 @@ import {
   defaultPageSections,
   groupPageSections,
   linkPreviewAddress,
+  orderTripPageSections,
   resolvePageSections,
   resolveSectionContent,
   tripSectionOptions,
@@ -143,38 +144,66 @@ test('full-width sections can be interleaved with body sections without changing
   assert.deepEqual(groups[2].sections, [{ kind: 'itinerary' }, { kind: 'html' }])
 })
 
-test('trip: new content sections have the requested default positions', () => {
+test('trip: default primary sections follow the sticky navigation sequence', () => {
   const kinds = defaultPageSections(tripSectionOptions).map(({ kind }) => kind)
-  assert.equal(kinds[kinds.indexOf('highlights') - 1], 'whyChoose')
-  assert.equal(kinds[kinds.indexOf('highlights') + 1], 'audience')
-  assert.equal(kinds[kinds.indexOf('audience') + 1], 'linkPreview')
-  assert.equal(kinds[kinds.indexOf('linkPreview') + 1], 'routeMap')
-  assert.equal(kinds[kinds.indexOf('itinerary') + 1], 'departures')
-  for (const kind of ['whyChoose', 'routeMap', 'departures']) {
-    const hidden = defaultPageSections(tripSectionOptions).filter((row) => row.kind !== kind)
-    assert.deepEqual(resolvePageSections(hidden, tripSectionOptions), hidden)
-  }
+  assert.deepEqual(kinds.slice(0, 7), [
+    'hero',
+    'overview',
+    'highlights',
+    'itinerary',
+    'information',
+    'departures',
+    'faqs',
+  ])
 })
 
-test('trip: Key Takeaways sits immediately before Overview and can be hidden', () => {
-  const layout = defaultPageSections(tripSectionOptions)
-  const overview = layout.findIndex(({ kind }) => kind === 'overview')
-  assert.equal(layout[overview - 1].kind, 'keyTakeaways')
-  const hidden = layout.filter(({ kind }) => kind !== 'keyTakeaways')
-  assert.deepEqual(resolvePageSections(hidden, tripSectionOptions), hidden)
+test('trip: existing CMS layouts render primary sections in canonical order and retain extras', () => {
+  const saved = [
+    { kind: 'related' },
+    { id: 'custom-first', kind: 'html', html: '<p>First custom block</p>' },
+    { kind: 'faqs' },
+    { kind: 'itinerary' },
+    { kind: 'overview' },
+    { kind: 'keyTakeaways' },
+    { kind: 'highlights' },
+    { kind: 'departures' },
+    { kind: 'information' },
+    { id: 'custom-second', kind: 'html', html: '<p>Second custom block</p>' },
+    { kind: 'hero' },
+    { kind: 'inquiry' },
+  ] satisfies PageSection[]
+
+  const ordered = orderTripPageSections(saved)
+  assert.deepEqual(
+    ordered.map(({ kind }) => kind),
+    [
+      'hero',
+      'overview',
+      'highlights',
+      'itinerary',
+      'information',
+      'departures',
+      'faqs',
+      'html',
+      'keyTakeaways',
+      'html',
+      'related',
+      'inquiry',
+    ],
+  )
+  assert.deepEqual(
+    ordered.filter(({ kind }) => kind === 'html').map(({ id }) => id),
+    ['custom-first', 'custom-second'],
+  )
 })
 
-test('trip: Who is this trip for / not for sits immediately after Highlights and can be hidden', () => {
-  const layout = defaultPageSections(tripSectionOptions)
-  const highlights = layout.findIndex(({ kind }) => kind === 'highlights')
-  assert.equal(layout[highlights + 1].kind, 'audience')
-  const hidden = layout.filter(({ kind }) => kind !== 'audience')
-  assert.deepEqual(resolvePageSections(hidden, tripSectionOptions), hidden)
-  assert.equal(
-    groupPageSections(layout, ['hero', 'inquiry', 'related'])[1].sections.some(
-      ({ kind }) => kind === 'audience',
-    ),
-    true,
+test('trip: optional core sections can still be omitted from a saved layout', () => {
+  const layout = defaultPageSections(tripSectionOptions).filter(
+    ({ kind }) => !['highlights', 'departures'].includes(kind),
+  )
+  assert.deepEqual(
+    orderTripPageSections(layout).slice(0, 5).map(({ kind }) => kind),
+    ['hero', 'overview', 'itinerary', 'information', 'faqs'],
   )
 })
 

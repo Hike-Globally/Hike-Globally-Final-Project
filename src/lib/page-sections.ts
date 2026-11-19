@@ -3,23 +3,22 @@ import type { ReactNode } from 'react'
 /** Shared by the CMS and public/preview renderers. Order is document-specific. */
 export const tripSectionOptions = [
   { label: 'Hero & trip facts', value: 'hero' },
-  { label: 'Key Takeaways', value: 'keyTakeaways' },
+  // The primary trip-story sequence, also used by the sticky section navigation.
   { label: 'Overview', value: 'overview' },
-  { label: 'Why Choose This Trek', value: 'whyChoose' },
   { label: 'Highlights', value: 'highlights' },
-  // Added after page layouts shipped: migration 20261107_120000_trip_audience inserts this row
-  // right after Highlights in every layout saved before it existed.
+  { label: 'Itinerary', value: 'itinerary' },
+  { label: 'Essential information', value: 'information' },
+  { label: 'Departures', value: 'departures' },
+  { label: 'FAQs', value: 'faqs' },
+  // Optional supporting sections follow the primary sequence. Existing saved layouts are
+  // normalized to this primary order at render time while these supporting rows keep their order.
+  { label: 'Key Takeaways', value: 'keyTakeaways' },
+  { label: 'Why Choose This Trek', value: 'whyChoose' },
   { label: 'Who is this trip for / not for', value: 'audience' },
-  // Added with the link preview card: migration 20261115_180000_link_preview inserts this row
-  // after the audience pair (or after Highlights / Overview) in every layout saved before it.
   { label: 'Link preview', value: 'linkPreview' },
   { label: 'Original route map and altitude chart', value: 'routeMap' },
-  { label: 'Itinerary', value: 'itinerary' },
-  { label: 'Departures', value: 'departures' },
-  { label: 'Essential information', value: 'information' },
   { label: 'Included / not included', value: 'inclusions' },
   { label: 'Packing list', value: 'packing' },
-  { label: 'FAQs', value: 'faqs' },
   { label: 'Gallery', value: 'gallery' },
   { label: 'Inquiry form', value: 'inquiry' },
   { label: 'Related trips', value: 'related' },
@@ -89,6 +88,33 @@ export function resolvePageSections(
     seen.add(kind)
     return true
   })
+}
+
+/**
+ * Keep the trip's six main content sections in the same predictable sequence on every trip page.
+ * The CMS can still hide sections; optional/supporting rows retain their saved order and are
+ * rendered after this primary sequence. The hero remains first, with inquiry/related bands last.
+ */
+export function orderTripPageSections(sections: PageSection[]): PageSection[] {
+  const primaryOrder = [
+    'overview',
+    'highlights',
+    'itinerary',
+    'information',
+    'departures',
+    'faqs',
+  ]
+  const primary = new Set(primaryOrder)
+  const edgeSections = new Set(['hero', 'inquiry', 'related'])
+  const take = (kind: string) => sections.filter((section) => section.kind === kind)
+  const hero = take('hero')
+  const body = primaryOrder.flatMap(take)
+  const supporting = sections.filter(
+    ({ kind }) => !primary.has(kind) && !edgeSections.has(kind),
+  )
+  const closing = sections.filter(({ kind }) => kind === 'inquiry' || kind === 'related')
+
+  return [...hero, ...body, ...supporting, ...closing]
 }
 
 /**
