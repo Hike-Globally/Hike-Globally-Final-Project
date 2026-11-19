@@ -419,6 +419,7 @@ export interface Trip {
           | 'highlights'
           | 'itinerary'
           | 'information'
+          | 'hotelsNearDestination'
           | 'departures'
           | 'faqs'
           | 'keyTakeaways'
@@ -679,6 +680,36 @@ export interface Trip {
         heading: string;
         /**
          * Insert Link preview or Multi-URL Preview from the toolbar’s block menu (or type /multiUrlPreview) to place one card or a collection of URLs among your text, with a layout and animation of your choice. Write the section content using the same rich-text editor and formatting options as the Overview — including tables. Use the toolbar’s “+” menu (or type /table) to insert one: rows and columns first, then the hover handles to add, remove, merge or resize. Handy for cost breakdowns, gear lists and season comparisons.
+         */
+        content: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Add one entry per nearby hotel. Each entry appears as an open accordion; include the location, facilities, and useful booking details in its content.
+   */
+  hotelsNearDestination?:
+    | {
+        /**
+         * Displayed as this hotel’s accordion heading.
+         */
+        heading: string;
+        /**
+         * Describe the hotel and its distance from the destination. Add Link preview or Multi-URL Preview blocks for booking links when useful.
          */
         content: {
           root: {
@@ -1963,6 +1994,13 @@ export interface TripsSelect<T extends boolean = true> {
         id?: T;
       };
   contentSections?:
+    | T
+    | {
+        heading?: T;
+        content?: T;
+        id?: T;
+      };
+  hotelsNearDestination?:
     | T
     | {
         heading?: T;

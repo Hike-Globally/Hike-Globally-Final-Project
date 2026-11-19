@@ -111,6 +111,7 @@ const en = {
     /** Label on the switch beside the itinerary heading — opens/closes every day at once. */
     expandAll: 'Expand all',
     essentialInformation: 'Essential Information You Must Know',
+    hotelsNearDestination: 'Hotels Near Destination',
     included: "What's included",
     notIncluded: "What's not included",
     packingList: 'Packing list',

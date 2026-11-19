@@ -78,6 +78,13 @@ test('blog: Link preview sits straight after the article body and can be hidden'
 
 test('rejects duplicate built-ins, allows any number of distinct HTML sections', () => {
   assert.equal(typeof validatePageSections([{ kind: 'hero' }, { kind: 'hero' }]), 'string')
+  assert.equal(
+    typeof validatePageSections([
+      { kind: 'hotelsNearDestination' },
+      { kind: 'hotelsNearDestination' },
+    ]),
+    'string',
+  )
   assert.equal(validatePageSections([{ kind: 'html' }, { kind: 'html' }]), true)
   assert.deepEqual(
     resolvePageSections(
@@ -146,12 +153,13 @@ test('full-width sections can be interleaved with body sections without changing
 
 test('trip: default primary sections follow the sticky navigation sequence', () => {
   const kinds = defaultPageSections(tripSectionOptions).map(({ kind }) => kind)
-  assert.deepEqual(kinds.slice(0, 7), [
+  assert.deepEqual(kinds.slice(0, 8), [
     'hero',
     'overview',
     'highlights',
     'itinerary',
     'information',
+    'hotelsNearDestination',
     'departures',
     'faqs',
   ])
@@ -168,6 +176,7 @@ test('trip: existing CMS layouts render primary sections in canonical order and 
     { kind: 'highlights' },
     { kind: 'departures' },
     { kind: 'information' },
+    { kind: 'hotelsNearDestination' },
     { id: 'custom-second', kind: 'html', html: '<p>Second custom block</p>' },
     { kind: 'hero' },
     { kind: 'inquiry' },
@@ -182,6 +191,7 @@ test('trip: existing CMS layouts render primary sections in canonical order and 
       'highlights',
       'itinerary',
       'information',
+      'hotelsNearDestination',
       'departures',
       'faqs',
       'html',
@@ -199,10 +209,12 @@ test('trip: existing CMS layouts render primary sections in canonical order and 
 
 test('trip: optional core sections can still be omitted from a saved layout', () => {
   const layout = defaultPageSections(tripSectionOptions).filter(
-    ({ kind }) => !['highlights', 'departures'].includes(kind),
+    ({ kind }) => !['highlights', 'hotelsNearDestination', 'departures'].includes(kind),
   )
   assert.deepEqual(
-    orderTripPageSections(layout).slice(0, 5).map(({ kind }) => kind),
+    orderTripPageSections(layout)
+      .slice(0, 5)
+      .map(({ kind }) => kind),
     ['hero', 'overview', 'itinerary', 'information', 'faqs'],
   )
 })

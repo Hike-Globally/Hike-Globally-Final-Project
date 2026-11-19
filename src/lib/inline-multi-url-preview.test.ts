@@ -281,3 +281,35 @@ test('Single Trip renders Multi-URL Preview in the Essential Information accordi
     /Pack carefully.*First resource.*Ask us for advice/s,
   )
 })
+
+test('Single Trip renders Hotels Near Destination as a separate accordion section', async () => {
+  const document = await documentOf(
+    createElement(TripDetail, {
+      settings,
+      related: [],
+      trip: {
+        ...trip,
+        pageSections: [{ kind: 'hotelsNearDestination' }],
+        hotelsNearDestination: [
+          {
+            heading: 'Highland Lodge',
+            content: doc(paragraph('Three kilometers from the trailhead.')),
+          },
+        ],
+      },
+    }),
+  )
+
+  const section = document.querySelector('#hotels-near-destination')
+  assert.ok(section)
+  assert.equal(section.querySelector('h2')?.textContent, 'Hotels Near Destination')
+  assert.match(
+    section.querySelector('.hotels-near-destination-copy')?.textContent ?? '',
+    /Three kilometers/,
+  )
+  assert.equal(
+    section.querySelector('[data-slot="accordion-trigger"]')?.textContent?.trim(),
+    'Highland Lodge',
+  )
+  assert.ok(document.querySelector('.trip-section-nav__link[href="#hotels-near-destination"]'))
+})
