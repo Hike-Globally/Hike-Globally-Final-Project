@@ -88,6 +88,9 @@ export function previewFromTrip(trip: Trip): InternalLinkPreview {
       trip.heroImage,
       trip.meta?.image,
       ...(trip.gallery ?? []).map((row) => row.image),
+      ...contentMedia(trip.description),
+      ...(trip.contentSections ?? []).flatMap((row) => contentMedia(row.content)),
+      ...(trip.hotelsNearDestination ?? []).flatMap((row) => contentMedia(row.content)),
     ),
   }
 }
@@ -97,7 +100,7 @@ export function previewFromPost(post: Blog): InternalLinkPreview {
   return {
     title: trimText(post.title),
     description: trimText(post.excerpt),
-    ...cardImages(post.featuredImage, post.meta?.image),
+    ...cardImages(post.featuredImage, post.meta?.image, ...contentMedia(post.content)),
   }
 }
 
@@ -114,6 +117,28 @@ export function previewFromDestination(destination: Destination): InternalLinkPr
   }
 }
 
+/** Read uploaded body images without scraping our own page or following linked-card URLs. */
+function contentMedia(content: unknown): Media[] {
+  const images: Media[] = []
+  function walk(value: unknown) {
+    if (!value || typeof value !== 'object' || images.length >= 12) return
+    const node = value as Record<string, unknown>
+    if (
+      node.type === 'upload' &&
+      node.relationTo === 'media' &&
+      node.value &&
+      typeof node.value === 'object'
+    ) {
+      const media = node.value as Media
+      if (!media.mimeType || media.mimeType.startsWith('image/')) images.push(media)
+    }
+    if (node.root) walk(node.root)
+    if (Array.isArray(node.children)) node.children.forEach(walk)
+  }
+  walk(content)
+  return images
+}
+
 /** Featured image first, then sharing and gallery images if the first one fails to load. */
 function cardImages(...media: (number | Media | null | undefined)[]): {
   image: string | null
@@ -121,7 +146,7 @@ function cardImages(...media: (number | Media | null | undefined)[]): {
 } {
   const images = [
     ...new Set(media.map((item) => imageUrl(item)).filter((url): url is string => Boolean(url))),
-  ].slice(0, 6)
+  ].slice(0, 12)
   return { image: images[0] ?? null, images: images.slice(1) }
 }
 

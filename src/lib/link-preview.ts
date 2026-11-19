@@ -94,14 +94,14 @@ export const LINK_PREVIEW_USER_AGENT =
 const ACCEPT = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
 /** Long enough for a slow host to answer, short enough not to hold a page render hostage. */
 const FETCH_TIMEOUT_MS = 8000
-/** Metadata sits in the document head; there is no reason to download a whole page. */
+/** Bound metadata parsing and the page download, including content beyond large menus/scripts. */
 const MAX_HEAD_BYTES = 256 * 1024
-/** Read a small amount beyond `</head>` to find backup content images. */
-const MAX_BODY_BYTES_FOR_IMAGE = 64 * 1024
+const MAX_HTML_BYTES = 2 * 1024 * 1024
+const MAX_PREVIEW_IMAGES = 12
 
 /** Images that are never a card thumbnail: tracking pixels, spacers, sprites, inline data. */
-const UNUSABLE_IMAGE =
-  /(?:^data:|sprite|spacer|pixel|placeholder|blank\.(?:gif|png)|\.svg(?:[?#]|$)|logo|icon)/i
+const UNUSABLE_IMAGE = /(?:^data:|sprite|spacer|pixel|placeholder|blank\.(?:gif|png))/i
+const DECORATIVE_IMAGE = /(?:\.svg(?:[?#]|$)|logo|icon)/i
 
 /**
  * Accepts an absolute http(s) URL, or a root-relative path such as `/trips/annapurna-base-camp`.
@@ -202,31 +202,27 @@ function firstText(...values: (string | undefined)[]): string | undefined {
   return undefined
 }
 
-/** A JSON-LD `image` may be a string, an array, or an object with `url` / `contentUrl`. */
-function jsonLdImage(value: unknown): string | undefined {
-  if (typeof value === 'string') return textOf(value)
-  if (Array.isArray(value)) {
-    for (const item of value) {
-      const found = jsonLdImage(item)
-      if (found) return found
-    }
-    return undefined
-  }
+/** Retain every structured-data alternative, not only the first (possibly broken) URL. */
+function jsonLdImages(value: unknown): string[] {
+  if (typeof value === 'string') return textOf(value) ? [textOf(value)!] : []
+  if (Array.isArray(value)) return value.flatMap(jsonLdImages)
   if (value && typeof value === 'object') {
     const record = value as Record<string, unknown>
-    return jsonLdImage(record.url ?? record.contentUrl ?? record['@id'])
+    // @id often references a WebPage/ImageObject graph node, not an image resource.
+    const id =
+      typeof record['@id'] === 'string' &&
+      /\.(?:jpe?g|png|webp|avif|gif)(?:[?#]|$)/i.test(record['@id'])
+        ? record['@id']
+        : undefined
+    return jsonLdImages(record.url ?? record.contentUrl ?? id)
   }
-  return undefined
+  return []
 }
 
-/**
- * Structured data, which is the only metadata some pages carry: `schema.org` blocks are walked
- * breadth-first for the first node that names an image, falling back to the first that carries a
- * name or description.
- */
 function readJsonLd(html: string): LinkPreviewMetadata {
-  let fallback: LinkPreviewMetadata | null = null
-
+  let fallback: LinkPreviewMetadata | undefined
+  let primary: LinkPreviewMetadata | undefined
+  const images: string[] = []
   for (const block of html.matchAll(
     /<script\b[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi,
   )) {
@@ -236,38 +232,41 @@ function readJsonLd(html: string): LinkPreviewMetadata {
     } catch {
       continue
     }
-
-    const queue: unknown[] = Array.isArray(parsed) ? [...parsed] : [parsed]
-    while (queue.length) {
-      const node = queue.shift()
+    const queue: unknown[] = [parsed]
+    for (let cursor = 0; cursor < queue.length; cursor++) {
+      const node = queue[cursor]
       if (Array.isArray(node)) {
         queue.push(...node)
         continue
       }
       if (!node || typeof node !== 'object') continue
-
       const record = node as Record<string, unknown>
-      if (Array.isArray(record['@graph'])) queue.push(...record['@graph'])
-
-      const image = jsonLdImage(record.image ?? record.thumbnailUrl)
-      const title = textOf(record.headline ?? record.name)
-      const description = textOf(record.description)
-      if (image) return { title, description, image }
-      if (!fallback && (title || description)) fallback = { title, description }
-
+      const types = Array.isArray(record['@type']) ? record['@type'] : [record['@type']]
+      const found = jsonLdImages(
+        record.primaryImageOfPage ??
+          record.image ??
+          record.thumbnailUrl ??
+          (types.includes('ImageObject') ? (record.contentUrl ?? record.url) : undefined),
+      )
+      const details = {
+        title: textOf(record.headline ?? record.name),
+        description: textOf(record.description),
+      }
+      if (found.length && !primary) primary = details
+      if (!fallback && (details.title || details.description)) fallback = details
+      images.push(...found)
       for (const value of Object.values(record)) {
         if (value && typeof value === 'object') queue.push(value)
       }
     }
   }
-
-  return fallback ?? {}
+  return { ...(primary ?? fallback), image: images[0], images: images.slice(1) }
 }
 
 /** Resolves an image address against the page it was found on; `undefined` if it is unusable. */
 function resolveImageUrl(raw: string | undefined, pageUrl: string): string | undefined {
   const value = raw?.trim()
-  if (!value || /^data:/i.test(value)) return undefined
+  if (!value || /^(?:data:|#)/i.test(value)) return undefined
   try {
     const url = new URL(value, pageUrl)
     if (url.protocol !== 'http:' && url.protocol !== 'https:') return undefined
@@ -277,28 +276,63 @@ function resolveImageUrl(raw: string | undefined, pageUrl: string): string | und
   }
 }
 
-/** A few usable body photographs, including common lazy-loaded and responsive images. */
+/** Prefer a useful resolution rather than a tiny first srcset entry. Keep smaller backups. */
+function srcsetImages(value: string | undefined): string[] {
+  if (/^data:/i.test(value?.trim() ?? '')) return []
+  return (value ?? '')
+    .split(',')
+    .map((part) => {
+      const [url, descriptor] = part.trim().split(/\s+/)
+      return { url, size: Number.parseFloat(descriptor ?? '1') || 1 }
+    })
+    .sort((a, b) => b.size - a.size)
+    .map(({ url }) => url)
+    .filter(Boolean)
+}
+
+/** Featured markup, then content photographs, CSS backgrounds, and finally decorative images. */
 function contentImages(html: string, pageUrl: string): string[] {
-  const images: string[] = []
-  for (const tag of html.match(/<img\b[^>]*>/gi) ?? []) {
-    const attributes = readAttributes(tag)
-    if (attributes.width === '1' || attributes.height === '1') continue
-    const firstSrcset = (value: string | undefined) => value?.split(',')[0]?.trim().split(/\s+/)[0]
-    const choices = [
+  const featured: string[] = []
+  const content: string[] = []
+  const decorative: string[] = []
+  const add = (raw: string | undefined, preferred = false) => {
+    if (!raw || UNUSABLE_IMAGE.test(raw)) return
+    const image = resolveImageUrl(raw, pageUrl)
+    if (image)
+      (preferred ? featured : DECORATIVE_IMAGE.test(raw) ? decorative : content).push(image)
+  }
+  for (const match of html.matchAll(/<(img|source|video)\b[^>]*>/gi)) {
+    const attributes = readAttributes(match[0])
+    if (Number(attributes.width) <= 1 && attributes.width !== undefined) continue
+    if (Number(attributes.height) <= 1 && attributes.height !== undefined) continue
+    const preferred = /(?:wp-post-image|featured|hero|attachment-post-thumbnail)/i.test(
+      `${attributes.class ?? ''} ${attributes.id ?? ''} ${attributes.itemprop ?? ''}`,
+    )
+    for (const raw of [
       attributes['data-src'],
       attributes['data-lazy-src'],
-      firstSrcset(attributes['data-srcset']),
-      attributes.src,
-      firstSrcset(attributes.srcset),
-    ]
-    for (const raw of choices) {
-      if (!raw || UNUSABLE_IMAGE.test(raw)) continue
-      const image = resolveImageUrl(raw, pageUrl)
-      if (image && !images.includes(image)) images.push(image)
-    }
-    if (images.length >= 6) break
+      attributes['data-original'],
+      attributes['data-lazy'],
+      ...srcsetImages(attributes['data-srcset']),
+      ...srcsetImages(attributes['data-lazy-srcset']),
+      ...srcsetImages(attributes.srcset),
+      // A <source> may be audio/video; only its image srcset is meaningful here.
+      ...(match[1].toLowerCase() === 'img' ? [attributes.src] : []),
+      attributes.poster,
+    ])
+      add(raw, preferred)
   }
-  return images.slice(0, 6)
+  for (const tag of html.match(/<[^>]+(?:style|data-bg|data-background)[^>]*>/gi) ?? []) {
+    const attributes = readAttributes(tag)
+    add(attributes['data-bg'])
+    add(attributes['data-background'])
+    for (const match of (attributes.style ?? '').matchAll(
+      /(?:background(?:-image)?\s*:[^;]*?)url\(\s*["']?([^"')]+)["']?\s*\)/gi,
+    )) {
+      add(match[1])
+    }
+  }
+  return [...new Set([...featured, ...content, ...decorative])].slice(0, MAX_PREVIEW_IMAGES)
 }
 
 /**
@@ -307,10 +341,17 @@ function contentImages(html: string, pageUrl: string): string[] {
  * address, and empty or broken values are dropped rather than shown.
  */
 export function parseLinkPreviewMetadata(html: string, pageUrl: string): LinkPreviewMetadata {
-  const head = html.slice(0, MAX_HEAD_BYTES)
+  // Ignore commented-out tags and script/template strings that are not page images. JSON-LD
+  // is parsed separately, including blocks placed at the bottom of the document.
+  html = html.slice(0, MAX_HTML_BYTES).replace(/<!--[\s\S]*?-->/g, '')
+  const structured = readJsonLd(html)
+  const markup = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '')
+  const head = markup.slice(0, MAX_HEAD_BYTES)
+  const base = head.match(/<base\b[^>]*>/i)?.[0]
+  const imageBase =
+    resolveImageUrl(base ? readAttributes(base).href : undefined, pageUrl) ?? pageUrl
   const meta = readMetaTags(head)
   const links = readLinkHrefs(head)
-  const structured = readJsonLd(head)
 
   const titleTag = head.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]
   const title = firstText(
@@ -329,25 +370,34 @@ export function parseLinkPreviewMetadata(html: string, pageUrl: string): LinkPre
   )
   // Keep a short list, not just one URL: a featured image can be unavailable to the proxy or
   // the browser even when the page offers other perfectly usable photographs.
+  const declaredImages: Record<string, string[]> = Object.create(null)
+  for (const tag of head.match(/<meta\b[^>]*>/gi) ?? []) {
+    const attributes = readAttributes(tag)
+    const key = (attributes.property ?? attributes.name ?? attributes.itemprop ?? '')
+      .trim()
+      .toLowerCase()
+    if (attributes.content) (declaredImages[key] ??= []).push(attributes.content)
+  }
   const rawImages = [
-    meta['og:image'],
-    meta['og:image:secure_url'],
-    meta['og:image:url'],
-    meta['twitter:image'],
-    meta['twitter:image:src'],
-    meta['thumbnail'],
-    meta['image'],
+    ...(declaredImages['og:image'] ?? []),
+    ...(declaredImages['og:image:secure_url'] ?? []),
+    ...(declaredImages['og:image:url'] ?? []),
+    ...(declaredImages['twitter:image'] ?? []),
+    ...(declaredImages['twitter:image:src'] ?? []),
+    ...(declaredImages['thumbnail'] ?? []),
+    ...(declaredImages['image'] ?? []),
     links['image_src'],
     structured.image,
-    ...contentImages(html, pageUrl),
+    ...(structured.images ?? []),
+    ...contentImages(markup, imageBase),
   ]
   const images = [
     ...new Set(
       rawImages
-        .map((raw) => resolveImageUrl(raw, pageUrl))
+        .map((raw) => resolveImageUrl(raw, imageBase))
         .filter((image): image is string => Boolean(image)),
     ),
-  ].slice(0, 6)
+  ].slice(0, MAX_PREVIEW_IMAGES)
 
   return { title, description, image: images[0], images: images.slice(1) }
 }
@@ -386,6 +436,7 @@ export async function fetchLinkPreviewMetadata(
         'user-agent': LINK_PREVIEW_USER_AGENT,
         accept: ACCEPT,
         'accept-language': 'en-US,en;q=0.9',
+        'x-link-preview-version': '2',
       },
       redirect: 'follow',
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
@@ -406,7 +457,7 @@ export async function fetchLinkPreviewMetadata(
 }
 
 /**
- * Reads a bounded head and a short stretch of body, for alternative photographs as well as
+ * Reads a bounded document, for alternative photographs as well as
  * the featured image. Cancel the stream rather than downloading an entire page.
  */
 async function readHtml(response: Response, charset: string | undefined): Promise<string> {
@@ -420,7 +471,7 @@ async function readHtml(response: Response, charset: string | undefined): Promis
   }
 
   const reader = response.body.getReader()
-  const limit = MAX_HEAD_BYTES + MAX_BODY_BYTES_FOR_IMAGE
+  const limit = MAX_HTML_BYTES
   let received = 0
   let text = ''
 
@@ -431,8 +482,6 @@ async function readHtml(response: Response, charset: string | undefined): Promis
       const chunk = value.subarray(0, limit - received)
       received += chunk.byteLength
       text += decoder.decode(chunk, { stream: true })
-      const close = text.search(/<\/head>/i)
-      if (close >= 0 && text.length - close >= MAX_BODY_BYTES_FOR_IMAGE) break
     }
     text += decoder.decode()
   } finally {

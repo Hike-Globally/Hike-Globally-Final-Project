@@ -47,3 +47,32 @@ test('the route answers with no private cache headers of its own on a refusal', 
   const response = await request('http://localhost/a.png')
   assert.equal(response.headers.get('cache-control'), null)
 })
+
+test('serves CDN image bytes with the linked page as referrer and follows public redirects', async () => {
+  const original = globalThis.fetch
+  const calls: { url: string; referer: string | null }[] = []
+  globalThis.fetch = async (input, init) => {
+    calls.push({ url: String(input), referer: new Headers(init?.headers).get('referer') })
+    if (calls.length === 1)
+      return new Response(null, { status: 302, headers: { location: '/final.png' } })
+    return new Response(new Uint8Array([137, 80, 78, 71]), {
+      headers: { 'content-type': 'image/png' },
+    })
+  }
+  try {
+    const url = new URL('https://hike.test/api/link-preview-image')
+    url.searchParams.set('url', 'https://93.184.216.34/photo.png')
+    url.searchParams.set('page', 'https://publisher.example.com/trek')
+    const response = await GET(new NextRequest(url))
+    assert.equal(response.status, 200)
+    assert.equal(response.headers.get('content-type'), 'image/png')
+    assert.equal(response.headers.get('x-content-type-options'), 'nosniff')
+    assert.equal((await response.arrayBuffer()).byteLength, 4)
+    assert.deepEqual(calls, [
+      { url: 'https://93.184.216.34/photo.png', referer: 'https://publisher.example.com/trek' },
+      { url: 'https://93.184.216.34/final.png', referer: 'https://publisher.example.com/trek' },
+    ])
+  } finally {
+    globalThis.fetch = original
+  }
+})

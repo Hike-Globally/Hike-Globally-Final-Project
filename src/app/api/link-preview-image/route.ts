@@ -31,15 +31,14 @@ const MAX_REDIRECTS = 3
 const TOTAL_TIMEOUT_MS = 8_000
 
 /**
- * The request pretends to be the host's own page asking for its own picture: a `Referer` on the
- * image's own origin is what the hotlink protection on most CDNs checks, so this is the difference
- * between a card that shows a photograph and one that shows the site's icon.
+ * Use the linked page as Referer: a separate image CDN often expects the publisher's origin,
+ * not the CDN's own origin. Old proxy URLs without a page retain the image-origin fallback.
  */
-const headersFor = (target: URL) => ({
+const headersFor = (target: URL, page: URL | null) => ({
   'user-agent': LINK_PREVIEW_USER_AGENT,
   accept: 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
   'accept-language': 'en-US,en;q=0.9',
-  referer: `${target.origin}/`,
+  referer: page?.href ?? `${target.origin}/`,
 })
 
 const notFound = () => new Response('Not found', { status: 404 })
@@ -47,8 +46,8 @@ const notFound = () => new Response('Not found', { status: 404 })
 /** A private or loopback address is refused even when a public name resolved to one. */
 const resolvesToPrivateAddress = async (url: URL): Promise<boolean> => {
   try {
-    const { address } = await lookup(url.hostname)
-    return isPrivateHost(address)
+    const addresses = await lookup(url.hostname.replace(/^\[|\]$/g, ''), { all: true })
+    return !addresses.length || addresses.some(({ address }) => isPrivateHost(address))
   } catch {
     return true
   }
@@ -58,7 +57,7 @@ const resolvesToPrivateAddress = async (url: URL): Promise<boolean> => {
  * Fetches the image, following redirects by hand: every hop has to survive the same
  * public-address check as the first request, so a redirect cannot walk into a private network.
  */
-const fetchImage = async (start: URL): Promise<Response | null> => {
+const fetchImage = async (start: URL, page: URL | null): Promise<Response | null> => {
   const deadline = Date.now() + TOTAL_TIMEOUT_MS
   let target = start
 
@@ -69,7 +68,7 @@ const fetchImage = async (start: URL): Promise<Response | null> => {
 
     const response = await fetch(target, {
       method: 'GET',
-      headers: headersFor(target),
+      headers: headersFor(target, page),
       redirect: 'manual',
       signal: AbortSignal.timeout(remaining),
       cache: 'no-store',
@@ -124,7 +123,8 @@ export async function GET(request: NextRequest) {
   if (!target) return notFound()
 
   try {
-    const response = await fetchImage(target)
+    const page = parseImageProxyUrl(request.nextUrl.searchParams.get('page'))
+    const response = await fetchImage(target, page)
     if (!response) return notFound()
 
     const contentType = response.headers.get('content-type')

@@ -164,3 +164,13 @@ test('a page with no image uses a bundled photograph rather than an icon or init
 test('the size cap is a sane thumbnail budget', () => {
   assert.equal(MAX_IMAGE_BYTES, 4 * 1024 * 1024)
 })
+
+test('image requests carry the publisher page for CDNs, but never an unsafe referrer', () => {
+  const page = 'https://publisher.example.com/articles/trek'
+  const image = 'https://cdn.example.com/photo.jpg'
+  const candidates = linkPreviewImageCandidates(image, 'publisher.example.com', [], page)
+  assert.equal(candidates[0].src, imageProxyUrl(image, page))
+  assert.equal(new URL(candidates[0].src, page).searchParams.get('page'), page)
+  assert.equal(candidates[1].src, image)
+  assert.equal(imageProxyUrl(image, 'http://localhost/secret'), imageProxyUrl(image))
+})
