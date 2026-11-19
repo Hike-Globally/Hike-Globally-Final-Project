@@ -4,7 +4,9 @@ import { JSDOM } from 'jsdom'
 import { act, createElement, StrictMode } from 'react'
 import { renderToString } from 'react-dom/server'
 
-import type { ResolvedLinkPreview } from '../../lib/link-preview'
+import { parseLinkPreviewMetadata, type ResolvedLinkPreview } from '../../lib/link-preview'
+import { imageProxyUrl, LINK_PREVIEW_FALLBACK_IMAGE } from '../../lib/link-preview-image'
+import { resolveMultiUrlPreview } from '../../lib/multi-url-preview-resolver'
 import {
   multiPreviewKeyframes,
   type MultiPreviewAnimation,
@@ -356,4 +358,59 @@ test('server HTML hydrates under StrictMode without losing content or changing t
   assert.equal(heading?.textContent, 'Worth exploring')
   assert.equal(container.querySelectorAll('.link-preview-card').length, 4)
   assert.deepEqual(warnings, [])
+})
+
+test('Multi-URL cards hydrate with page images and retry featured, direct, body, then local fallback', async (t) => {
+  const page = 'https://publisher.example.com/article'
+  const featured = 'https://publisher.example.com/featured.jpg'
+  const body = 'https://publisher.example.com/body.jpg'
+  const resolved = await resolveMultiUrlPreview(
+    {
+      multiPreviewLinks: [
+        { linkPreviewUrl: page },
+        { linkPreviewUrl: 'https://publisher.example.com/no-featured' },
+      ],
+    },
+    {
+      metadata: async (url) =>
+        parseLinkPreviewMetadata(
+          url === page
+            ? '<meta property="og:image" content="/featured.jpg"><img data-original="/body.jpg">'
+            : '<img src="/only-body.jpg">',
+          url,
+        ),
+    },
+  )
+  assert.ok(resolved)
+  const container = document.createElement('div')
+  const node = createElement(MultiUrlPreviewRail, {
+    ...resolved,
+    layout: 'list',
+    animation: 'none',
+  })
+  container.innerHTML = renderToString(node)
+  document.body.append(container)
+  let root: ReturnType<typeof hydrateRoot>
+  await act(async () => {
+    root = hydrateRoot(container, node)
+  })
+  t.after(async () => {
+    await act(async () => root.unmount())
+    container.remove()
+  })
+  const image = () => container.querySelector('.link-preview-card img')!
+  for (const src of [imageProxyUrl(featured, page), featured, imageProxyUrl(body, page), body]) {
+    assert.equal(image().getAttribute('src'), src)
+    await act(async () => {
+      image().dispatchEvent(new Event('error'))
+    })
+  }
+  assert.equal(image().getAttribute('src'), LINK_PREVIEW_FALLBACK_IMAGE)
+  assert.equal(
+    container.querySelectorAll('.link-preview-card img')[1].getAttribute('src'),
+    imageProxyUrl(
+      'https://publisher.example.com/only-body.jpg',
+      'https://publisher.example.com/no-featured',
+    ),
+  )
 })

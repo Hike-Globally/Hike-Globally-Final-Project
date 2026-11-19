@@ -526,6 +526,7 @@ test('collects ordered, distinct alternatives from metadata and the page body', 
   assert.deepEqual(meta.images, [
     'https://www.example.com/social.jpg',
     'https://www.example.com/body.jpg',
+    'https://www.example.com/responsive-large.jpg',
     'https://www.example.com/responsive.jpg',
   ])
 })
@@ -592,5 +593,107 @@ test('lazy image placeholders do not beat the actual photograph', () => {
     '<img src="/placeholder.png" data-srcset="/trek.jpg 1x, /trek-large.jpg 2x">',
     PAGE,
   )
-  assert.equal(meta.image, 'https://www.example.com/trek.jpg')
+  assert.equal(meta.image, 'https://www.example.com/trek-large.jpg')
+})
+
+test('keeps repeated Open Graph and all JSON-LD image alternatives including footer data', () => {
+  const meta = parseLinkPreviewMetadata(
+    `<head>
+    <meta property="og:image" content="/broken.jpg">
+    <meta property="og:image" content="/featured.jpg">
+    </head><body><script type="application/ld+json">
+    {"@type":"Article","image":["/schema-first.jpg",{"contentUrl":"/schema-second.jpg"}]}
+    </script><img src="/body.jpg"></body>`,
+    PAGE,
+  )
+  assert.equal(meta.image, 'https://www.example.com/broken.jpg')
+  assert.deepEqual(meta.images, [
+    'https://www.example.com/featured.jpg',
+    'https://www.example.com/schema-first.jpg',
+    'https://www.example.com/schema-second.jpg',
+    'https://www.example.com/body.jpg',
+  ])
+})
+
+test('prefers featured body markup and supports original lazy images, picture sources and base URLs', () => {
+  const meta = parseLinkPreviewMetadata(
+    `<head><base href="https://cdn.example.com/assets/"></head>
+    <img src="ordinary.jpg"><img class="wp-post-image" data-original="featured.jpg" src="placeholder.png">
+    <picture><source srcset="small.webp 320w, large.webp 1280w"><img data-lazy-srcset="lazy.jpg 2x"></picture>`,
+    PAGE,
+  )
+  assert.equal(meta.image, 'https://cdn.example.com/assets/featured.jpg')
+  assert.deepEqual(meta.images, [
+    'https://cdn.example.com/assets/ordinary.jpg',
+    'https://cdn.example.com/assets/large.webp',
+    'https://cdn.example.com/assets/small.webp',
+    'https://cdn.example.com/assets/lazy.jpg',
+  ])
+})
+
+test('uses background images or a page logo if there is no content photograph', () => {
+  const meta = parseLinkPreviewMetadata(
+    `<img src="/logo.png">
+    <div style="background-image: url('/mountain.jpg')"></div>
+    <div data-bg="/forest.jpg"></div>`,
+    PAGE,
+  )
+  assert.equal(meta.image, 'https://www.example.com/mountain.jpg')
+  assert.deepEqual(meta.images, [
+    'https://www.example.com/forest.jpg',
+    'https://www.example.com/logo.png',
+  ])
+  assert.equal(
+    parseLinkPreviewMetadata('<img src="/logo.png">', PAGE).image,
+    'https://www.example.com/logo.png',
+  )
+})
+
+test('does not extract phantom images from comments or script strings, and ignores arbitrary meta names', () => {
+  const meta = parseLinkPreviewMetadata(
+    `<!-- <meta property="og:image" content="/old.jpg"> -->
+    <script>const html = '<img src="/fake.jpg">';</script>
+    <meta name="__proto__" content="malicious"><img src="/real.jpg">`,
+    PAGE,
+  )
+  assert.equal(meta.image, 'https://www.example.com/real.jpg')
+})
+
+test('reads images beyond the old 64 KiB body window, while capping the downloaded document', async () => {
+  const encoder = new TextEncoder()
+  let cancelled = false
+  let reads = 0
+  const stream = new ReadableStream({
+    pull(controller) {
+      reads++
+      if (reads === 1)
+        controller.enqueue(encoder.encode('<head><title>Long page</title></head><body>'))
+      else if (reads === 2)
+        controller.enqueue(encoder.encode(' '.repeat(400_000) + '<img src="/deep.jpg">'))
+      else controller.enqueue(encoder.encode(' '.repeat(128 * 1024)))
+    },
+    cancel() {
+      cancelled = true
+    },
+  })
+  const meta = await fetchLinkPreviewMetadata(
+    PAGE,
+    async () => new Response(stream, { headers: { 'content-type': 'text/html' } }),
+  )
+  assert.equal(meta?.image, 'https://www.example.com/deep.jpg')
+  assert.equal(cancelled, true)
+  assert.ok(reads < 20, 'stops reading an unbounded response at 2 MiB')
+})
+
+test('JSON-LD ImageObject graph references do not mask the actual image URL', () => {
+  const meta = parseLinkPreviewMetadata(
+    `<script type="application/ld+json">{
+    "@graph":[
+      {"@type":"WebPage","primaryImageOfPage":{"@id":"https://publisher.example.com/article#primaryimage"}},
+      {"@type":"ImageObject","@id":"https://publisher.example.com/article#primaryimage","contentUrl":"/real-photo.jpg"}
+    ]
+  }</script>`,
+    PAGE,
+  )
+  assert.equal(meta.image, 'https://www.example.com/real-photo.jpg')
 })

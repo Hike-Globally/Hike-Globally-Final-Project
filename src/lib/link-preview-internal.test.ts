@@ -156,3 +156,44 @@ test('a trip provides its gallery and sharing image as fallbacks after its featu
     ['/api/media/file/sharing.jpg', '/api/media/file/forest.jpg'],
   )
 })
+
+test('a post without a featured image falls back to a body upload and ignores non-image media', () => {
+  const post = {
+    title: 'No featured image',
+    content: {
+      root: {
+        children: [
+          {
+            type: 'upload',
+            relationTo: 'media',
+            value: { url: '/document.pdf', mimeType: 'application/pdf' },
+          },
+          {
+            type: 'paragraph',
+            children: [
+              { type: 'upload', relationTo: 'media', value: media('/api/media/file/body.jpg') },
+            ],
+          },
+        ],
+      },
+    },
+  } as unknown as Blog
+  assert.match(previewFromPost(post).image ?? '', /body\.jpg$/)
+  const withFeatured = { ...post, featuredImage: media('/api/media/file/featured.jpg') }
+  assert.match(previewFromPost(withFeatured).image ?? '', /featured\.jpg$/)
+  assert.ok(previewFromPost(withFeatured).images?.some((url) => url.endsWith('/body.jpg')))
+})
+
+test('trip body uploads are used when hero, sharing and gallery images are absent', () => {
+  const trip = {
+    title: 'Body image',
+    description: {
+      root: {
+        children: [
+          { type: 'upload', relationTo: 'media', value: media('/api/media/file/trip-body.jpg') },
+        ],
+      },
+    },
+  } as unknown as Trip
+  assert.match(previewFromTrip(trip).image ?? '', /trip-body\.jpg$/)
+})

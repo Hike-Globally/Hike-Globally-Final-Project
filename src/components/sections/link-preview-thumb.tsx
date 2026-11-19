@@ -9,12 +9,14 @@ export function LinkPreviewThumb({
   image,
   host,
   alternatives = [],
+  pageUrl,
 }: {
   image: string | null
   host: string
   alternatives?: readonly string[]
+  pageUrl?: string
 }) {
-  const candidates = linkPreviewImageCandidates(image, host, alternatives)
+  const candidates = linkPreviewImageCandidates(image, host, alternatives, pageUrl)
   const [failed, setFailed] = useState<string[]>([])
 
   const candidate = candidates.find((entry) => !failed.includes(entry.src))
@@ -24,6 +26,7 @@ export function LinkPreviewThumb({
       {candidate ? (
         // eslint-disable-next-line @next/next/no-img-element -- external images may need a direct fallback.
         <img
+          key={candidate.src}
           src={candidate.src}
           alt=""
           loading="lazy"

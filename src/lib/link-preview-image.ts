@@ -96,8 +96,9 @@ export function parseImageProxyUrl(raw: string | null | undefined): URL | null {
 }
 
 /** The proxy address for an image. Relative, so it works on any host the site is served from. */
-export function imageProxyUrl(url: string): string {
-  return `/api/link-preview-image?url=${encodeURIComponent(url)}`
+export function imageProxyUrl(url: string, pageUrl?: string): string {
+  const page = parseImageProxyUrl(pageUrl)
+  return `/api/link-preview-image?url=${encodeURIComponent(url)}${page ? `&page=${encodeURIComponent(page.href)}` : ''}`
 }
 
 /** A reliable generic travel photograph, used only when the linked page has no usable image. */
@@ -114,6 +115,7 @@ export function linkPreviewImageCandidates(
   image: string | null,
   _host: string,
   alternatives: readonly string[] = [],
+  pageUrl?: string,
 ): LinkPreviewImageCandidate[] {
   const candidates: LinkPreviewImageCandidate[] = []
   const seen = new Set<string>()
@@ -134,7 +136,7 @@ export function linkPreviewImageCandidates(
     // Apply the same public URL restrictions to both the proxy and direct browser fallback.
     const parsed = parseImageProxyUrl(normalized)
     if (!parsed) continue
-    add(imageProxyUrl(parsed.href))
+    add(imageProxyUrl(parsed.href, pageUrl))
     add(parsed.href)
   }
   add(LINK_PREVIEW_FALLBACK_IMAGE)
