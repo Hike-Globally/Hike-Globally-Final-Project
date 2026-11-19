@@ -1,0 +1,74 @@
+.trip-section-nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+  background: color-mix(in srgb, white 96%, var(--color-mist));
+  box-shadow: 0 5px 18px rgb(13 32 40 / 5%);
+}
+
+.trip-section-nav__scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.trip-section-nav__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.trip-section-nav__track {
+  position: relative;
+  display: flex;
+  width: max-content;
+  min-width: 100%;
+  align-items: stretch;
+  gap: clamp(1.25rem, 3vw, 2.75rem);
+}
+
+.trip-section-nav__link {
+  position: relative;
+  display: inline-flex;
+  min-height: 3.5rem;
+  flex: 0 0 auto;
+  align-items: center;
+  color: var(--color-ink-60);
+  font-family: var(--font-sans);
+  font-size: var(--text-small);
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: color 180ms ease;
+}
+
+.trip-section-nav__link:hover,
+.trip-section-nav__link[aria-current='location'] {
+  color: var(--color-ink);
+}
+
+.trip-section-nav__link:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid var(--color-sage-90);
+  outline-offset: -5px;
+}
+
+.trip-section-nav__indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: block;
+  height: 3px;
+  background: var(--color-sage-90);
+  pointer-events: none;
+  transition:
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trip-section-nav__link,
+  .trip-section-nav__indicator {
+    transition: none;
+  }
+}

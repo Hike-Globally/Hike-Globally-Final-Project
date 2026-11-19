@@ -5,6 +5,7 @@ import {
   groupPageSections,
   resolvePageSections,
   resolveSectionContent,
+  orderTripPageSections,
   tripSectionOptions,
   type PageSectionContent,
 } from '@/lib/page-sections'
@@ -31,6 +32,7 @@ import { Reveal } from '@/components/motion/reveal'
 import { Button } from '@/components/ui/button'
 import { EssentialInformationSection } from '@/components/sections/essential-information-section'
 import { TripBrochureButton } from '@/components/trips/trip-brochure-button'
+import { TripSectionNav } from '@/components/trips/trip-section-nav'
 import { FaqSection } from '@/components/sections/faq-section'
 import { DeparturesSection } from '@/components/sections/departures-section'
 import { KeyTakeawaysSection } from '@/components/sections/key-takeaways-section'
@@ -47,6 +49,7 @@ import type { TripCard as TripCardData } from '@/lib/data'
 import { difficultyLabel } from '@/lib/difficulty'
 import { formatNumber, formatPrice } from '@/lib/format'
 import { getTripFaqGroups } from '@/lib/trip-faqs'
+import { normalizeDepartures } from '@/lib/departures'
 import { resolveTripBrochure, type TripBrochure } from '@/lib/trip-brochure'
 import { resolveLink } from '@/lib/links'
 import { cn } from '@/lib/utils'
@@ -249,7 +252,9 @@ export function TripDetail({
     { icon: MapPin, label: dict.trip.destination, value: destination?.name ?? '—' },
   ].filter((fact): fact is NonNullable<typeof fact> => fact !== null)
 
-  const sections = resolvePageSections(trip.pageSections, tripSectionOptions)
+  const sections = orderTripPageSections(
+    resolvePageSections(trip.pageSections, tripSectionOptions),
+  )
   const hasInquiry = sections.some(({ kind }) => kind === 'inquiry')
   const inquiryHref = hasInquiry ? '#inquiry' : sitePath('/contact')
   const bookingLink = resolveLink(trip.bookingLink?.link)
@@ -258,6 +263,44 @@ export function TripDetail({
   const faqs = faqGroups.flatMap(({ faqs: items }) => items)
   const highlights = trip.highlights?.filter(({ text }) => text.trim())
   const brochure = resolveTripBrochure(trip, trip.slug, dict.trip.downloadBrochure)
+  const hasSection = (kind: string) => sections.some((section) => section.kind === kind)
+  const tripNavItems = [
+    {
+      id: 'overview',
+      label: 'Overview',
+      kind: 'overview',
+      hasContent: hasRichTextContent(trip.description),
+    },
+    {
+      id: 'key-highlights',
+      label: 'Highlights',
+      kind: 'highlights',
+      hasContent: Boolean(highlights?.length),
+    },
+    {
+      id: 'itinerary',
+      label: 'Itinerary',
+      kind: 'itinerary',
+      hasContent: Boolean(trip.itinerary?.length),
+    },
+    {
+      id: 'essential-information',
+      label: 'Essential Info',
+      kind: 'information',
+      hasContent: Boolean(trip.contentSections?.length),
+    },
+    {
+      id: 'departures',
+      label: 'Departures',
+      kind: 'departures',
+      hasContent:
+        normalizeDepartures(trip.departureDates, {
+          durationDays: trip.durationDays,
+          priceFrom: trip.priceFrom,
+        }).length > 0 || hasRichTextContent(trip.departures),
+    },
+    { id: 'faqs', label: 'FAQs', kind: 'faqs', hasContent: Boolean(faqGroups.length) },
+  ].filter(({ kind, hasContent }) => hasSection(kind) && hasContent)
 
   const sectionContent: Record<string, PageSectionContent> = {
     hero: (
@@ -329,16 +372,16 @@ export function TripDetail({
       </>
     ),
     keyTakeaways: <KeyTakeawaysSection items={trip.keyTakeaways} />,
-    overview: (
-      <>
-        <Reveal as="section" className="py-16 md:py-24">
+    overview: hasRichTextContent(trip.description) ? (
+      <section id="overview" className="scroll-mt-24">
+        <Reveal className="py-16 md:py-24">
           <SectionTitle title={dict.trip.overview} />
           <div className="prose-hg max-w-none leading-[1.8]">
             <RichText content={trip.description} linker={linker} />
           </div>
         </Reveal>
-      </>
-    ),
+      </section>
+    ) : null,
     whyChoose: hasRichTextContent(trip.whyChooseThisTrek) ? (
       <section id="why-choose-this-trek" className="scroll-mt-24 pb-16 md:pb-24">
         <SectionTitle title="Why Choose This Trek" />
@@ -480,6 +523,8 @@ export function TripDetail({
   // booking sidebar instead of splitting the page into another full-width group.
   const groups = groupPageSections(sections, ['hero', 'inquiry', 'related'])
   const lastBodyGroup = groups.findLast((group) => !group.fullWidth)
+  const firstBodyGroupIndex = groups.findIndex((group) => !group.fullWidth)
+  const hasHeroSection = sections.some(({ kind }) => kind === 'hero')
   const guideProfile = (
     <AuthorProfile author={trip.guide} label={dict.trip.aboutGuide} className="mt-0 mb-16" />
   )
@@ -511,25 +556,36 @@ export function TripDetail({
             ) : null}
           </Fragment>
         ))
-        if (group.fullWidth) return <Fragment key={groupIndex}>{content}</Fragment>
-        return (
-          <div
-            key={groupIndex}
-            className="container-content grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14 3xl:grid-cols-[minmax(0,1fr)_26rem]"
-          >
-            <div className="single-page-body min-w-0">
+        if (group.fullWidth) {
+          return (
+            <Fragment key={groupIndex}>
               {content}
-              {group === lastBodyGroup ? guideProfile : null}
+              {group.sections.some(({ kind }) => kind === 'hero') ? (
+                <TripSectionNav items={tripNavItems} />
+              ) : null}
+            </Fragment>
+          )
+        }
+        return (
+          <Fragment key={groupIndex}>
+            {!hasHeroSection && groupIndex === firstBodyGroupIndex ? (
+              <TripSectionNav items={tripNavItems} />
+            ) : null}
+            <div className="container-content grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14 3xl:grid-cols-[minmax(0,1fr)_26rem]">
+              <div className="single-page-body min-w-0">
+                {content}
+                {group === lastBodyGroup ? guideProfile : null}
+              </div>
+              <aside className="hidden lg:sticky lg:top-28 lg:mt-16 lg:block lg:self-start">
+                <TripBookingCard
+                  trip={trip}
+                  dict={dict}
+                  bookingHref={bookingHref}
+                  brochure={brochure}
+                />
+              </aside>
             </div>
-            <aside className="hidden lg:sticky lg:top-28 lg:mt-16 lg:block lg:self-start">
-              <TripBookingCard
-                trip={trip}
-                dict={dict}
-                bookingHref={bookingHref}
-                brochure={brochure}
-              />
-            </aside>
-          </div>
+          </Fragment>
         )
       })}
       {/* A layout with no body column still needs visible attribution for its schema. */}
