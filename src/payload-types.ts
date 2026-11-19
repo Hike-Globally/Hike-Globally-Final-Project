@@ -404,9 +404,6 @@ export interface Trip {
    * Auto-generated from the title. Edit carefully — changing it changes the live URL.
    */
   slug?: string | null;
-  /**
-   * The person who wrote or maintains this itinerary. Their public bio and qualifications are shown on the trip page. This is not a guarantee that they will lead every departure. Leave blank until assigned.
-   */
   guide?: (number | null) | User;
   /**
    * Drag the row handles to set the order on this page, or use each row’s Move Up / Move Down controls. Add as many Custom HTML, Link preview or Multi-URL Preview rows as the page needs — each one carries its own content. Multi-URL Preview can also be inserted between paragraphs from the content editor’s block menu. Every other section reads the fields below and can be placed once; empty sections do not display. Removing a row hides that section without deleting its content. The booking card and article outline stay beside their content.
@@ -512,23 +509,14 @@ export interface Trip {
         id?: string | null;
       }[]
     | null;
-  /**
-   * 2–3 sentences. Used on cards, in search results and as the meta description fallback.
-   */
   summary: string;
   heroImage: number | Media;
-  /**
-   * Add one point per row before Overview. Wrap a phrase in **double asterisks** to make it bold. Drag to reorder; leave empty to hide the section.
-   */
   keyTakeaways?:
     | {
         text: string;
         id?: string | null;
       }[]
     | null;
-  /**
-   * The main body of the trip page. Insert Link preview or Multi-URL Preview between paragraphs from the toolbar’s block menu (or type /multiUrlPreview). Headings, links, lists, images and tables remain available.
-   */
   description?: {
     root: {
       type: string;
@@ -546,19 +534,10 @@ export interface Trip {
   } | null;
   destination: number | Destination;
   tripType: 'trekking' | 'expedition' | 'peak-climbing' | 'cultural' | 'heli' | 'multi-sport';
-  /**
-   * Total days on the trip.
-   */
   durationDays: number;
   durationNights?: number | null;
   groupSizeMax?: number | null;
-  /**
-   * Highest point, in metres.
-   */
   maxAltitude?: number | null;
-  /**
-   * Nine rungs, from Easy to Extreme. The homepage slider after the hero groups published trips by this value.
-   */
   difficulty:
     | 'easy'
     | 'easy-moderate'
@@ -570,44 +549,20 @@ export interface Trip {
     | 'strenuous-extreme'
     | 'extreme';
   bestSeasons?: ('spring' | 'summer' | 'autumn' | 'winter')[] | null;
-  /**
-   * Lowest per-person price, no thousands separators.
-   */
   priceFrom: number;
   priceCurrency: 'USD' | 'EUR' | 'NPR';
   priceUnit?: ('per-person' | 'per-group') | null;
-  /**
-   * Optional: "based on a group of 4", "single supplement +$320".
-   */
   priceNote?: string | null;
-  /**
-   * Upload the downloadable version of this itinerary. A “Download Trip Brochure” button then appears under “Book This Trek” on the trip page. Leave empty to hide the button.
-   */
   brochureFile?: (number | null) | Media;
-  /**
-   * Optional. Replaces the default button text.
-   */
   brochureTitle?: string | null;
-  /**
-   * Optional single line under the button. Defaults to the file type and size (e.g. “PDF · 2.3 MB”).
-   */
   brochureNote?: string | null;
-  /**
-   * One bullet per row. Wrap a phrase in **double asterisks** to make it bold.
-   */
   highlights?:
     | {
         text: string;
         id?: string | null;
       }[]
     | null;
-  /**
-   * Optional. Leave empty to use “Who Is This Trip For”.
-   */
   tripForHeading?: string | null;
-  /**
-   * Describe the travellers this trip suits best — fitness, experience, travel style. Bullet lists display with a check mark on each point. Leave empty to hide this card.
-   */
   tripForDescription?: {
     root: {
       type: string;
@@ -623,13 +578,7 @@ export interface Trip {
     };
     [k: string]: unknown;
   } | null;
-  /**
-   * Optional. Leave empty to use “Who Is This Trip Not For”.
-   */
   tripNotForHeading?: string | null;
-  /**
-   * Be candid about who should choose a different trip — and why. Bullet lists display with a cross on each point. Leave empty to hide this card.
-   */
   tripNotForDescription?: {
     root: {
       type: string;
@@ -645,37 +594,19 @@ export interface Trip {
     };
     [k: string]: unknown;
   } | null;
-  /**
-   * One entry per day. Day-level content is translated per language.
-   */
   itinerary?:
     | {
         day: number;
         title: string;
         description: string;
-        /**
-         * e.g. Teahouse in Namche Bazaar
-         */
         accommodation?: string | null;
-        /**
-         * Metres
-         */
         altitude?: number | null;
-        /**
-         * Are this day’s meals covered by the price?
-         */
         food?: ('included' | 'not-included') | null;
         id?: string | null;
       }[]
     | null;
-  /**
-   * Add extra headed sections to the trip page. Their position is controlled by the Essential information row in Page sections; drag the entries here to reorder them within Essential Information.
-   */
   contentSections?:
     | {
-        /**
-         * Displayed above this section’s content.
-         */
         heading: string;
         content: {
           root: {
@@ -695,9 +626,6 @@ export interface Trip {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Reasons to choose this trek. Displayed before Highlights.
-   */
   whyChooseThisTrek?: {
     root: {
       type: string;
@@ -713,9 +641,6 @@ export interface Trip {
     };
     [k: string]: unknown;
   } | null;
-  /**
-   * Optional introduction or route notes. Displayed after Highlights.
-   */
   routeMapContent?: {
     root: {
       type: string;
@@ -731,39 +656,18 @@ export interface Trip {
     };
     [k: string]: unknown;
   } | null;
-  /**
-   * Upload the original route map image. Add descriptive alt text in Media.
-   */
   routeMap?: (number | null) | Media;
-  /**
-   * Upload the altitude chart image. Add descriptive alt text in Media.
-   */
   altitudeChart?: (number | null) | Media;
-  /**
-   * Pick departure dates directly on the calendar or add rows individually. Displayed as an interactive calendar and departure schedule after Detailed Itinerary.
-   */
   departureDates?:
     | {
         startDate: string;
-        /**
-         * Optional — defaults to Start date + trip duration.
-         */
         endDate?: string | null;
         status: 'available' | 'guaranteed' | 'limited' | 'sold-out';
-        /**
-         * Optional — uses Pricing → Price From when blank.
-         */
         price?: number | null;
-        /**
-         * Optional short badge or note.
-         */
         note?: string | null;
         id?: string | null;
       }[]
     | null;
-  /**
-   * Optional notes displayed below the calendar and departure dates (e.g. private group departures, custom dates or seasonal notes).
-   */
   departures?: {
     root: {
       type: string;
@@ -840,9 +744,6 @@ export interface Trip {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Personal gear and essentials travellers should bring. Each item is filed under one of the three accordions on the trip page — Clothing and Footwear, Trekking Equipment, Personal Items.
-   */
   packingList?:
     | {
         item: string;
@@ -856,13 +757,7 @@ export interface Trip {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Shown in the "You may also like" rail. Leave empty to auto-fill from the same destination.
-   */
   relatedTrips?: (number | Trip)[] | null;
-  /**
-   * Optional external booking button (e.g. your booking engine). Leave empty to use the built-in inquiry form.
-   */
   bookingLink?: {
     link?: {
       /**
@@ -890,9 +785,6 @@ export interface Trip {
       url?: string | null;
     };
   };
-  /**
-   * Pinned first on /trips and picked by the homepage "Featured trips" section. With none ticked, the homepage falls back to the newest published trips rather than hiding the section.
-   */
   featured?: boolean | null;
   /**
    * The phrases you want this page to rank for. Type one, press Enter, repeat — up to 20. Write them the way a traveller would search ("everest base camp trek cost"), lead with the most important, and use the same wording in the title and copy. They are published as meta keywords, as Open Graph article tags and in the structured data.
