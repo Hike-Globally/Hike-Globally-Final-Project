@@ -4,7 +4,7 @@ Open a trip or blog post in the Payload admin and use **Page sections** near the
 
 - Drag a row by its handle to change the order on that individual page. The row menu also provides Move Up / Move Down controls.
 - Choose **Add Page section**, leave **Section** set to **Custom HTML**, and paste your code — HTML, CSS and JavaScript all work (see [Custom HTML, CSS and JavaScript](#custom-html-css-and-javascript)). A visible section heading is optional. Drag this row anywhere in the list; multiple HTML rows are supported.
-- Existing rows refer to the existing content editors below the panel. For example, edit the Overview field to change the Overview row's content. Essential information entries can also be dragged within their existing content-sections array.
+- Existing rows refer to the existing content editors below the panel. For example, edit the Overview field to change the Overview row's content. Essential Information entries can also be dragged within their array in the Essential Information panel.
 - Removing an existing section row hides it without deleting its source content. Add that section again to restore it. A built-in section other than **Custom HTML**, **Link preview** and **Multi-URL Preview** may only appear once, because it renders the document itself — a second copy would repeat the same content. Those three carry their own content per row, so a page can hold several independent instances, and at least one row must remain.
 - Save a draft or use live preview to review the order, then publish to update the public page. The order and custom HTML are included in version history.
 
@@ -58,7 +58,7 @@ Implementation: `src/lib/link-preview.ts` (URL validation, metadata parsing, mer
 
 Choose **Section → Multi-URL Preview** to add up to **12 independently configured URLs** in one collection. It offers **original stacked link cards**, a **card slider**, or a **one-card carousel**, plus **Fade, Rise, Slide, Soft zoom, Reveal** and **None**. Optional metadata overrides, ratings and prices work per URL, using the existing Link preview card behavior. Empty collections render nothing; existing single Link preview cards remain unchanged.
 
-It is also available **inside content**, not only as a Page sections row: in a Blog body or Trip **Content sections → Content** editor, choose **Multi-URL Preview** from the block menu (or type `/multiUrlPreview`) between paragraphs. The collection stays in that body/accordion. See the [Multi-URL Preview editor and deployment guide](multi-url-preview.md) for all placements, responsive layouts, keyboard/touch controls, reduced motion and migration `20261119_170704_multi_url_preview`.
+It is also available **inside content**, not only as a Page sections row: in a Blog body or the Trip **Essential Information → Content** editor, choose **Multi-URL Preview** from the block menu (or type `/multiUrlPreview`) between paragraphs. The collection stays in that body/accordion. See the [Multi-URL Preview editor and deployment guide](multi-url-preview.md) for all placements, responsive layouts, keyboard/touch controls, reduced motion and migration `20261119_170704_multi_url_preview`.
 
 ## Custom HTML, CSS and JavaScript
 

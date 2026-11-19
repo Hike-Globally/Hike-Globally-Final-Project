@@ -506,16 +506,19 @@ export const Trips: CollectionConfig = {
     },
     {
       type: 'collapsible',
-      label: 'Content sections',
+      label: 'Essential Information',
       fields: [
         {
           name: 'contentSections',
           type: 'array',
           localized: true,
-          labels: { singular: 'Content section', plural: 'Content sections' },
+          labels: {
+            singular: 'Essential Information section',
+            plural: 'Essential Information sections',
+          },
           admin: {
             description:
-              'Add extra headed sections to the trip page. Their position is controlled by the Essential information row in Page sections; drag the entries here to reorder them within that section.',
+              'Add extra headed sections to the trip page. Their position is controlled by the Essential information row in Page sections; drag the entries here to reorder them within Essential Information.',
             components: { Field: '@/components/admin/instant-trip-array' },
             initCollapsed: true,
           },

@@ -14,7 +14,7 @@ import type { Trip } from '@/payload-types'
 type ContentSections = NonNullable<Trip['contentSections']>
 
 /**
- * Essential Information — the trip's CMS "Content sections" array.
+ * Essential Information — the trip's CMS "Essential Information" panel.
  *
  * Outline: the section title is an H2, every CMS Heading field is an H2, and every subheading
  * written in the Description editor is a real H3. Sizes come from the global H2/H3 roles;
