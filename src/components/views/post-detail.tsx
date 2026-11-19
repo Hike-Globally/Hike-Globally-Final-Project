@@ -21,6 +21,7 @@ import { JsonLd } from '@/components/seo/json-ld'
 import { Breadcrumbs } from '@/components/sections/breadcrumbs'
 import { FaqSection } from '@/components/sections/faq-section'
 import { LinkPreviewSection } from '@/components/sections/link-preview-section'
+import { MultiUrlPreviewSection } from '@/components/sections/multi-url-preview-section'
 import { PayloadImage, PayloadImageFill } from '@/components/ui/payload-image'
 import { blogCategoryLabel, dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
@@ -226,6 +227,7 @@ export function PostDetail({
     ),
     // The card's URL lives in its own row, so the row is what the section reads.
     linkPreview: (section) => <LinkPreviewSection source={section} />,
+    multiUrlPreview: (section) => <MultiUrlPreviewSection source={section} />,
     // Same section as the trip page. Margins rather than the trip's padding, so the gap to the
     // article body and author box collapses into one, whichever order the editor chooses.
     faqs: (

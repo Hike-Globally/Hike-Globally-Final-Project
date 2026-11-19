@@ -378,9 +378,10 @@ function charsetOf(contentType: string): string | undefined {
  */
 export async function fetchLinkPreviewMetadata(
   absoluteUrl: string,
+  fetchPage: typeof fetch = fetch,
 ): Promise<LinkPreviewMetadata | null> {
   try {
-    const response = await fetch(absoluteUrl, {
+    const response = await fetchPage(absoluteUrl, {
       headers: {
         'user-agent': LINK_PREVIEW_USER_AGENT,
         accept: ACCEPT,

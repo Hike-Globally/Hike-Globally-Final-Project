@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 
+import { MULTI_URL_PREVIEW_NAME, type MultiUrlPreviewSource } from './multi-url-preview'
+
 /** Shared by the CMS and public/preview renderers. Order is document-specific. */
 export const tripSectionOptions = [
   { label: 'Hero & trip facts', value: 'hero' },
@@ -16,6 +18,7 @@ export const tripSectionOptions = [
   { label: 'Why Choose This Trek', value: 'whyChoose' },
   { label: 'Who is this trip for / not for', value: 'audience' },
   { label: 'Link preview', value: 'linkPreview' },
+  { label: MULTI_URL_PREVIEW_NAME, value: 'multiUrlPreview' },
   { label: 'Original route map and altitude chart', value: 'routeMap' },
   { label: 'Included / not included', value: 'inclusions' },
   { label: 'Packing list', value: 'packing' },
@@ -30,6 +33,7 @@ export const blogSectionOptions = [
   // Added with the link preview card: migration 20261115_180000_link_preview inserts this row
   // straight after the article body in every layout saved before it.
   { label: 'Link preview', value: 'linkPreview' },
+  { label: MULTI_URL_PREVIEW_NAME, value: 'multiUrlPreview' },
   // Added after page layouts shipped: migration 20261019_045205_blog_faqs inserts this row
   // after the article body in every layout saved before it existed, so older posts get it too.
   { label: 'FAQs', value: 'faqs' },
@@ -39,7 +43,7 @@ export const blogSectionOptions = [
   { label: 'Related posts', value: 'related' },
 ]
 
-export type PageSection = {
+export type PageSection = MultiUrlPreviewSource & {
   id?: string | null
   kind: string
   heading?: string | null
@@ -61,15 +65,23 @@ export type PageSection = {
  * Custom HTML rows were always repeatable — a page can carry several snippets. **Link preview**
  * rows are repeatable too: a trip or post often points at more than one place (the operator, a
  * partner's booking page, a related guide), and each row keeps its own URL and card details, so
- * the cards can sit at different points in the layout.
+ * the cards can sit at different points in the layout. Multi-URL Preview rows similarly keep
+ * their own ordered links and presentation settings, so several collections can be placed.
  *
  * Every other built-in section reads the document itself (`itinerary`, `faqs`, `hero`, …) and can
  * only be placed once; adding it a second time would show the same content twice.
  */
-export const REPEATABLE_SECTION_KINDS: ReadonlySet<string> = new Set(['html', 'linkPreview'])
+export const REPEATABLE_SECTION_KINDS: ReadonlySet<string> = new Set([
+  'html',
+  'linkPreview',
+  'multiUrlPreview',
+])
 
 export function defaultPageSections(options: { value: string }[]): PageSection[] {
-  return options.map(({ value }) => ({ kind: value }))
+  // A new collection is opt-in. Do not insert even an empty row into existing/default layouts.
+  return options
+    .filter(({ value }) => value !== 'multiUrlPreview')
+    .map(({ value }) => ({ kind: value }))
 }
 
 /** Older documents have no layout: keep their original sections and order. */
@@ -151,7 +163,7 @@ export function linkPreviewAddress(url: string | null | undefined): string | nul
 
 /**
  * The admin-side rule: a built-in section may only be placed once, because it renders the document
- * itself and a second copy would repeat that content. Custom HTML and Link preview rows are
+ * itself and a second copy would repeat that content. Custom HTML, Link preview and Multi-URL Preview rows are
  * repeatable (see `REPEATABLE_SECTION_KINDS`) — each one carries its own content, so several of
  * them are several different sections.
  */
@@ -161,7 +173,7 @@ export function validatePageSections(value: unknown): true | string {
   for (const section of value as PageSection[]) {
     if (!section.kind || REPEATABLE_SECTION_KINDS.has(section.kind)) continue
     if (seen.has(section.kind)) {
-      return 'This section can only be added once. Custom HTML and Link preview rows can be repeated.'
+      return 'This section can only be added once. Custom HTML, Link preview and Multi-URL Preview rows can be repeated.'
     }
     seen.add(section.kind)
   }

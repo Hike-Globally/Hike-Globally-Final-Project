@@ -1,4 +1,5 @@
 import { InlineLinkPreview } from '@/components/sections/inline-link-preview'
+import { MultiUrlPreviewSection } from '@/components/sections/multi-url-preview-section'
 import Link from 'next/link'
 import type { CSSProperties, ReactNode } from 'react'
 
@@ -406,8 +407,13 @@ const renderNode = (node: RichTextNode, index: number, context: RenderContext): 
     }
 
     case 'block': {
-      if (node.fields?.blockType !== 'linkPreview') return null
-      return <InlineLinkPreview key={key} source={node.fields} />
+      if (node.fields?.blockType === 'linkPreview') {
+        return <InlineLinkPreview key={key} source={node.fields} />
+      }
+      if (node.fields?.blockType === 'multiUrlPreview') {
+        return <MultiUrlPreviewSection key={key} source={node.fields} placement="inline" />
+      }
+      return null
     }
 
     case 'upload': {

@@ -30,6 +30,12 @@ export default function PageSectionLabel() {
       const address = linkPreviewAddress(data.linkPreviewUrl)
       if (address) label = `${label ?? 'Link preview'} — ${address}`
     }
+    if (data.kind === 'multiUrlPreview') {
+      const count =
+        data.multiPreviewLinks?.filter((link) => link.linkPreviewUrl?.trim()).length ?? 0
+      const heading = data.multiPreviewHeading?.trim()
+      label = `${label}${heading ? ` — ${heading}` : ''} · ${count} ${count === 1 ? 'URL' : 'URLs'}`
+    }
   }
 
   return (

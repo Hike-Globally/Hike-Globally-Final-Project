@@ -20,10 +20,14 @@ async function sqlFor(migrate: typeof up | typeof down) {
   return statements.join('\n')
 }
 
-test('author expertise migration is registered after all existing migrations', () => {
-  assert.equal(migrations.at(-1)?.name, '20261119_120000_author_expertise')
-  assert.equal(migrations.at(-1)?.up, up)
-  assert.equal(migrations.at(-1)?.down, down)
+test('author expertise migration remains registered after the single-link migration', () => {
+  const index = migrations.findIndex(({ name }) => name === '20261119_120000_author_expertise')
+  assert.ok(
+    index >
+      migrations.findIndex(({ name }) => name === '20261115_200000_link_preview_in_page_section'),
+  )
+  assert.equal(migrations[index]?.up, up)
+  assert.equal(migrations[index]?.down, down)
 })
 
 test('author expertise migration adds nullable facts and live/versioned guide relationships', async () => {
