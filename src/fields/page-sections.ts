@@ -3,6 +3,7 @@ import { array } from 'payload/shared'
 
 import { defaultPageSections, validatePageSections } from '../lib/page-sections'
 import { linkPreviewSectionFields } from './link-preview'
+import { multiUrlPreviewFields } from './multi-url-preview'
 
 /** Payload arrays provide persisted drag handles, move controls, and draft/live-preview support. */
 export function pageSectionsField(options: { label: string; value: string }[]): ArrayField {
@@ -27,7 +28,7 @@ export function pageSectionsField(options: { label: string; value: string }[]): 
     admin: {
       initCollapsed: true,
       description:
-        'Drag the row handles to set the order on this page, or use each row’s Move Up / Move Down controls. Add as many Custom HTML or Link preview rows as the page needs — each one carries its own content, so a page can point at several places. Every other section reads the fields below and can be placed once; empty sections do not display. Removing a row hides that section without deleting its content. The booking card and article outline stay beside their content.',
+        'Drag the row handles to set the order on this page, or use each row’s Move Up / Move Down controls. Add as many Custom HTML, Link preview or Multi-URL Preview rows as the page needs — each one carries its own content. Multi-URL Preview can also be inserted between paragraphs from the content editor’s block menu. Every other section reads the fields below and can be placed once; empty sections do not display. Removing a row hides that section without deleting its content. The booking card and article outline stay beside their content.',
       components: { RowLabel: '@/components/admin/page-section-label' },
     },
     fields: [
@@ -60,6 +61,7 @@ export function pageSectionsField(options: { label: string; value: string }[]): 
       /* A Link preview row holds its own URL and card details, right here in the row. See
          src/fields/link-preview.ts. */
       ...linkPreviewSectionFields(),
+      ...multiUrlPreviewFields(),
     ],
   }
 }

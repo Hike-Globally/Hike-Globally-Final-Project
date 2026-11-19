@@ -128,11 +128,12 @@ export const Trips: CollectionConfig = {
     {
       name: 'description',
       type: 'richText',
+      editor: contentEditor(),
       localized: true,
       label: 'Overview',
       admin: {
         description:
-          'The main body of the trip page. The toolbar across the top of the box has headings, bold, links, lists and images.',
+          'The main body of the trip page. Insert Link preview or Multi-URL Preview between paragraphs from the toolbar’s block menu (or type /multiUrlPreview). Headings, links, lists, images and tables remain available.',
       },
     },
 
@@ -532,7 +533,7 @@ export const Trips: CollectionConfig = {
               admin: {
                 className: 'hg-trip-compact-editor',
                 description:
-                  'Insert a Link preview from the toolbar’s block menu (or type /linkPreview) and paste a URL to place a card among your text. Write the section content using the same rich-text editor and formatting options as the Overview — including tables. Use the toolbar’s “+” menu (or type /table) to insert one: rows and columns first, then the hover handles to add, remove, merge or resize. Handy for cost breakdowns, gear lists and season comparisons.',
+                  'Insert Link preview or Multi-URL Preview from the toolbar’s block menu (or type /multiUrlPreview) to place one card or a collection of URLs among your text, with a layout and animation of your choice. Write the section content using the same rich-text editor and formatting options as the Overview — including tables. Use the toolbar’s “+” menu (or type /table) to insert one: rows and columns first, then the hover handles to add, remove, merge or resize. Handy for cost breakdowns, gear lists and season comparisons.',
               },
             },
           ],
@@ -548,6 +549,7 @@ export const Trips: CollectionConfig = {
         {
           name: 'whyChooseThisTrek',
           type: 'richText',
+          editor: contentEditor(),
           localized: true,
           admin: {
             className: 'hg-trip-compact-editor',
@@ -565,6 +567,7 @@ export const Trips: CollectionConfig = {
           name: 'routeMapContent',
           label: 'Route map and altitude chart content',
           type: 'richText',
+          editor: contentEditor(),
           localized: true,
           admin: {
             className: 'hg-trip-compact-editor',
@@ -695,6 +698,7 @@ export const Trips: CollectionConfig = {
           name: 'departures',
           label: 'Additional departure notes',
           type: 'richText',
+          editor: contentEditor(),
           localized: true,
           admin: {
             description:

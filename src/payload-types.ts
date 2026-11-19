@@ -405,7 +405,7 @@ export interface Trip {
    */
   guide?: (number | null) | User;
   /**
-   * Drag the row handles to set the order on this page, or use each row’s Move Up / Move Down controls. Add as many Custom HTML or Link preview rows as the page needs — each one carries its own content, so a page can point at several places. Every other section reads the fields below and can be placed once; empty sections do not display. Removing a row hides that section without deleting its content. The booking card and article outline stay beside their content.
+   * Drag the row handles to set the order on this page, or use each row’s Move Up / Move Down controls. Add as many Custom HTML, Link preview or Multi-URL Preview rows as the page needs — each one carries its own content. Multi-URL Preview can also be inserted between paragraphs from the content editor’s block menu. Every other section reads the fields below and can be placed once; empty sections do not display. Removing a row hides that section without deleting its content. The booking card and article outline stay beside their content.
    */
   pageSections?:
     | {
@@ -417,6 +417,7 @@ export interface Trip {
           | 'highlights'
           | 'audience'
           | 'linkPreview'
+          | 'multiUrlPreview'
           | 'routeMap'
           | 'itinerary'
           | 'departures'
@@ -458,6 +459,52 @@ export interface Trip {
          * Optional. Shown struck through before the price.
          */
         linkPreviewOriginalPrice?: string | null;
+        multiPreviewHeading?: string | null;
+        /**
+         * A short introduction to this collection of links.
+         */
+        multiPreviewDescription?: string | null;
+        /**
+         * Stack the original cards, show a swipeable card slider, or a one-card carousel.
+         */
+        multiPreviewLayout?: ('list' | 'slider' | 'carousel') | null;
+        /**
+         * Five restrained motion styles, or None. Always respects the visitor’s reduced-motion preference.
+         */
+        multiPreviewAnimation?: ('fade' | 'rise' | 'slide' | 'zoom' | 'reveal' | 'none') | null;
+        /**
+         * Add up to 12 URLs and drag to reorder. Each card uses the linked page’s image, title and description, with the same optional overrides as Link preview. No URLs means no section or empty space on the public page.
+         */
+        multiPreviewLinks?:
+          | {
+              /**
+               * Paste a public https:// address, or a site path such as /trips/annapurna-base-camp. Blank rows are hidden. External links open in a new tab.
+               */
+              linkPreviewUrl?: string | null;
+              /**
+               * Leave empty to use the page’s own title.
+               */
+              linkPreviewTitle?: string | null;
+              /**
+               * Leave empty to use the page’s own description. Shown on one line.
+               */
+              linkPreviewDescription?: string | null;
+              /**
+               * Out of 5, e.g. 4.8. Leave empty to hide the stars.
+               */
+              linkPreviewRating?: number | null;
+              linkPreviewReviewCount?: number | null;
+              /**
+               * Shown in bold. Written exactly as it should appear.
+               */
+              linkPreviewPrice?: string | null;
+              /**
+               * Optional. Shown struck through before the price.
+               */
+              linkPreviewOriginalPrice?: string | null;
+              id?: string | null;
+            }[]
+          | null;
         id?: string | null;
       }[]
     | null;
@@ -476,7 +523,7 @@ export interface Trip {
       }[]
     | null;
   /**
-   * The main body of the trip page. The toolbar across the top of the box has headings, bold, links, lists and images.
+   * The main body of the trip page. Insert Link preview or Multi-URL Preview between paragraphs from the toolbar’s block menu (or type /multiUrlPreview). Headings, links, lists, images and tables remain available.
    */
   description?: {
     root: {
@@ -627,7 +674,7 @@ export interface Trip {
          */
         heading: string;
         /**
-         * Insert a Link preview from the toolbar’s block menu (or type /linkPreview) and paste a URL to place a card among your text. Write the section content using the same rich-text editor and formatting options as the Overview — including tables. Use the toolbar’s “+” menu (or type /table) to insert one: rows and columns first, then the hover handles to add, remove, merge or resize. Handy for cost breakdowns, gear lists and season comparisons.
+         * Insert Link preview or Multi-URL Preview from the toolbar’s block menu (or type /multiUrlPreview) to place one card or a collection of URLs among your text, with a layout and animation of your choice. Write the section content using the same rich-text editor and formatting options as the Overview — including tables. Use the toolbar’s “+” menu (or type /table) to insert one: rows and columns first, then the hover handles to add, remove, merge or resize. Handy for cost breakdowns, gear lists and season comparisons.
          */
         content: {
           root: {
@@ -1008,11 +1055,21 @@ export interface Blog {
    */
   slug?: string | null;
   /**
-   * Drag the row handles to set the order on this page, or use each row’s Move Up / Move Down controls. Add as many Custom HTML or Link preview rows as the page needs — each one carries its own content, so a page can point at several places. Every other section reads the fields below and can be placed once; empty sections do not display. Removing a row hides that section without deleting its content. The booking card and article outline stay beside their content.
+   * Drag the row handles to set the order on this page, or use each row’s Move Up / Move Down controls. Add as many Custom HTML, Link preview or Multi-URL Preview rows as the page needs — each one carries its own content. Multi-URL Preview can also be inserted between paragraphs from the content editor’s block menu. Every other section reads the fields below and can be placed once; empty sections do not display. Removing a row hides that section without deleting its content. The booking card and article outline stay beside their content.
    */
   pageSections?:
     | {
-        kind: 'hero' | 'content' | 'linkPreview' | 'faqs' | 'author' | 'navigation' | 'planning' | 'related' | 'html';
+        kind:
+          | 'hero'
+          | 'content'
+          | 'linkPreview'
+          | 'multiUrlPreview'
+          | 'faqs'
+          | 'author'
+          | 'navigation'
+          | 'planning'
+          | 'related'
+          | 'html';
         heading?: string | null;
         /**
          * Published exactly as written: <script> tags, <style> blocks, iframes, forms and any other embed are kept and run on the public page. External scripts load in the order you paste them, so a widget’s loader can be followed by its init call. Only paste code you trust — it runs for every visitor with this site’s full rights. The optional heading above is the one thing rendered as plain text.
@@ -1043,6 +1100,52 @@ export interface Blog {
          * Optional. Shown struck through before the price.
          */
         linkPreviewOriginalPrice?: string | null;
+        multiPreviewHeading?: string | null;
+        /**
+         * A short introduction to this collection of links.
+         */
+        multiPreviewDescription?: string | null;
+        /**
+         * Stack the original cards, show a swipeable card slider, or a one-card carousel.
+         */
+        multiPreviewLayout?: ('list' | 'slider' | 'carousel') | null;
+        /**
+         * Five restrained motion styles, or None. Always respects the visitor’s reduced-motion preference.
+         */
+        multiPreviewAnimation?: ('fade' | 'rise' | 'slide' | 'zoom' | 'reveal' | 'none') | null;
+        /**
+         * Add up to 12 URLs and drag to reorder. Each card uses the linked page’s image, title and description, with the same optional overrides as Link preview. No URLs means no section or empty space on the public page.
+         */
+        multiPreviewLinks?:
+          | {
+              /**
+               * Paste a public https:// address, or a site path such as /trips/annapurna-base-camp. Blank rows are hidden. External links open in a new tab.
+               */
+              linkPreviewUrl?: string | null;
+              /**
+               * Leave empty to use the page’s own title.
+               */
+              linkPreviewTitle?: string | null;
+              /**
+               * Leave empty to use the page’s own description. Shown on one line.
+               */
+              linkPreviewDescription?: string | null;
+              /**
+               * Out of 5, e.g. 4.8. Leave empty to hide the stars.
+               */
+              linkPreviewRating?: number | null;
+              linkPreviewReviewCount?: number | null;
+              /**
+               * Shown in bold. Written exactly as it should appear.
+               */
+              linkPreviewPrice?: string | null;
+              /**
+               * Optional. Shown struck through before the price.
+               */
+              linkPreviewOriginalPrice?: string | null;
+              id?: string | null;
+            }[]
+          | null;
         id?: string | null;
       }[]
     | null;
@@ -1052,7 +1155,7 @@ export interface Blog {
   excerpt: string;
   featuredImage: number | Media;
   /**
-   * The post body. Insert a Link preview from the toolbar’s block menu (or type /linkPreview) and paste a URL to place a card among your text. Tables are available from the toolbar’s “+” menu (or type /table): pick rows and columns, then use the hover handles to add, remove, merge or resize. Handy for gear comparisons, cost breakdowns and at-a-glance facts.
+   * The post body. Insert Link preview or Multi-URL Preview from the toolbar’s block menu (or type /multiUrlPreview) to place one card or a collection of URLs among your text, with a layout and animation of your choice. Tables are available from the toolbar’s “+” menu (or type /table): pick rows and columns, then use the hover handles to add, remove, merge or resize. Handy for gear comparisons, cost breakdowns and at-a-glance facts.
    */
   content?: {
     root: {
@@ -1779,6 +1882,22 @@ export interface TripsSelect<T extends boolean = true> {
         linkPreviewReviewCount?: T;
         linkPreviewPrice?: T;
         linkPreviewOriginalPrice?: T;
+        multiPreviewHeading?: T;
+        multiPreviewDescription?: T;
+        multiPreviewLayout?: T;
+        multiPreviewAnimation?: T;
+        multiPreviewLinks?:
+          | T
+          | {
+              linkPreviewUrl?: T;
+              linkPreviewTitle?: T;
+              linkPreviewDescription?: T;
+              linkPreviewRating?: T;
+              linkPreviewReviewCount?: T;
+              linkPreviewPrice?: T;
+              linkPreviewOriginalPrice?: T;
+              id?: T;
+            };
         id?: T;
       };
   summary?: T;
@@ -1969,6 +2088,22 @@ export interface BlogSelect<T extends boolean = true> {
         linkPreviewReviewCount?: T;
         linkPreviewPrice?: T;
         linkPreviewOriginalPrice?: T;
+        multiPreviewHeading?: T;
+        multiPreviewDescription?: T;
+        multiPreviewLayout?: T;
+        multiPreviewAnimation?: T;
+        multiPreviewLinks?:
+          | T
+          | {
+              linkPreviewUrl?: T;
+              linkPreviewTitle?: T;
+              linkPreviewDescription?: T;
+              linkPreviewRating?: T;
+              linkPreviewReviewCount?: T;
+              linkPreviewPrice?: T;
+              linkPreviewOriginalPrice?: T;
+              id?: T;
+            };
         id?: T;
       };
   excerpt?: T;
