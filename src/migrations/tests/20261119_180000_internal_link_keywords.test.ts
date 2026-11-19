@@ -4,7 +4,7 @@ import test from 'node:test'
 
 import { PgDialect } from 'drizzle-orm/pg-core'
 
-import { down, up } from '../20261119_150000_internal_link_keywords'
+import { down, up } from '../20261119_180000_internal_link_keywords'
 import { migrations } from '../index'
 
 async function sqlFor(migrate: typeof up | typeof down) {
@@ -28,7 +28,7 @@ const TEXTS_TABLES = [
 ] as const
 
 test('the internal linking keyword migration is the newest registered migration', () => {
-  assert.equal(migrations.at(-1)?.name, '20261119_150000_internal_link_keywords')
+  assert.equal(migrations.at(-1)?.name, '20261119_180000_internal_link_keywords')
   assert.equal(migrations.at(-1)?.up, up)
   assert.equal(migrations.at(-1)?.down, down)
 })
@@ -80,7 +80,7 @@ test('rollback removes only the copied phrases and the new tables', async () => 
 test('the Payload snapshot includes the four new texts tables and their parent keys', () => {
   const snapshot = JSON.parse(
     readFileSync(
-      new URL('../20261119_150000_internal_link_keywords.json', import.meta.url),
+      new URL('../20261119_180000_internal_link_keywords.json', import.meta.url),
       'utf8',
     ),
   ) as {

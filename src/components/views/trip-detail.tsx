@@ -38,6 +38,7 @@ import { DeparturesSection } from '@/components/sections/departures-section'
 import { KeyTakeawaysSection } from '@/components/sections/key-takeaways-section'
 import { TripAudienceSection } from '@/components/sections/trip-audience-section'
 import { LinkPreviewSection } from '@/components/sections/link-preview-section'
+import { MultiUrlPreviewSection } from '@/components/sections/multi-url-preview-section'
 import { TripPackingSection } from '@/components/sections/trip-packing-section'
 import { KeyPointsPanel } from '@/components/sections/key-points-panel'
 import { ItinerarySection } from '@/components/sections/itinerary-section'
@@ -415,6 +416,7 @@ export function TripDetail({
     audience: <TripAudienceSection trip={trip} linker={linker} />,
     // The card's URL lives in its own row, so the row is what the section reads.
     linkPreview: (section) => <LinkPreviewSection source={section} />,
+    multiUrlPreview: (section) => <MultiUrlPreviewSection source={section} />,
     itinerary: <>{trip.itinerary?.length ? <ItinerarySection days={trip.itinerary} /> : null}</>,
     information: (
       <EssentialInformationSection

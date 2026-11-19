@@ -139,7 +139,7 @@ panel. A single route can override the policy for one page by passing a second a
 
 ## Deployment
 
-Migration **`20261119_150000_internal_link_keywords`** introduces the panel. It adds the shared
+Migration **`20261119_180000_internal_link_keywords`** introduces the panel. It adds the shared
 hasMany-string tables for Destinations and Pages (Trips and Blog already had one), and it copies
 every existing SEO keyword list into `internalLinkKeywords` for the live trip/post and each saved
 draft — so those auto-links do not disappear on deploy simply because nobody has opened the new panel

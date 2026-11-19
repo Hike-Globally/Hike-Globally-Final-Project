@@ -279,7 +279,7 @@ feature off is deleting four wrapper components.
 It is wired on the four detail routes: each awaits one `createInternalLinker({ collection, id })` and
 threads it down to every rich text block on the page, so they share one budget and the page cannot
 link to itself. With no database configured it yields an empty linker and every page renders
-byte-for-byte as it did before. Migration `20261119_150000_internal_link_keywords` adds the panel to
+byte-for-byte as it did before. Migration `20261119_180000_internal_link_keywords` adds the panel to
 Destinations and Pages and copies existing SEO keywords into it for Trips and Blog, so no trip's or
 post's links go dark on deploy. Destinations and Pages start empty — fill their panels to link to
 them. Full design, rules, limitations and the verify-after-deploy `curl`:

@@ -1,0 +1,326 @@
+/* Multi-URL Preview: one rhythm in a full page, a narrow reading column, or an accordion.
+   Container queries intentionally follow the actual content width, not the browser width. */
+.multi-url-preview {
+  --multi-gap: clamp(0.875rem, 2.5cqi, 1.25rem);
+  container: multi-preview / inline-size;
+  min-width: 0;
+  max-width: 100%;
+  color: var(--color-ink);
+  font-family: var(--font-heading);
+  text-align: start;
+}
+.multi-url-preview--section {
+  margin-block: 1.5rem 2rem;
+}
+.multi-url-preview--inline {
+  margin-block: 1.75rem;
+}
+.multi-url-preview:first-child {
+  margin-block-start: 0;
+}
+.multi-url-preview:last-child {
+  margin-block-end: 0;
+}
+.multi-url-preview .multi-url-preview__header {
+  margin: 0 4px 1.25rem;
+}
+.multi-url-preview .multi-url-preview__heading {
+  margin: 0;
+  padding: 0;
+  color: var(--color-ink);
+  font-family: var(--font-heading);
+  font-size: clamp(1.125rem, 3.2cqi, 1.375rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.multi-url-preview .multi-url-preview__intro {
+  max-width: 60ch;
+  margin: 0.5rem 0 0;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--color-ink-60);
+  overflow-wrap: anywhere;
+}
+.multi-url-preview .multi-url-preview__track {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--multi-gap);
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-slate-20) transparent;
+}
+.multi-url-preview .multi-url-preview__item {
+  display: flex;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+  font-size: 1rem;
+}
+.multi-url-preview__item::marker {
+  content: '';
+}
+.multi-url-preview__item .link-preview-card {
+  min-width: 0;
+  height: 100%;
+  color: var(--color-ink);
+  text-decoration: none;
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--color-ink) 5%, transparent);
+}
+.multi-url-preview__item .link-preview-body {
+  min-width: 0;
+}
+.multi-url-preview__item .link-preview-title,
+.multi-url-preview__item .link-preview-description {
+  overflow-wrap: anywhere;
+}
+.multi-url-preview__item .link-preview-price {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.multi-url-preview__item .link-preview-price-now {
+  font-size: clamp(1.125rem, 3cqi, 1.375rem);
+}
+
+.multi-url-preview:not([data-layout='list']):not([data-single]) .multi-url-preview__track {
+  grid-template-columns: none;
+  grid-auto-flow: column;
+  grid-auto-columns: 86%;
+  align-items: stretch;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 4px;
+  padding-block: 4px 0.75rem;
+  -webkit-overflow-scrolling: touch;
+}
+.multi-url-preview[data-layout='carousel']:not([data-single]) .multi-url-preview__track {
+  grid-auto-columns: 100%;
+}
+
+/* Portrait treatment only for the card slider. List and carousel retain the original card. */
+.multi-url-preview[data-layout='slider']:not([data-single]) .link-preview-card {
+  flex-flow: column nowrap;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  border-radius: 1rem;
+}
+.multi-url-preview[data-layout='slider']:not([data-single]) .link-preview-thumb {
+  flex: 0 0 auto;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  border-radius: 0;
+  box-shadow: none;
+}
+.multi-url-preview[data-layout='slider']:not([data-single]) .link-preview-body {
+  flex: 1 1 auto;
+  gap: 0.4rem;
+  padding: 1.125rem;
+}
+.multi-url-preview[data-layout='slider']:not([data-single]) .link-preview-title {
+  font-size: 1.0625rem;
+  line-height: 1.4;
+  -webkit-line-clamp: 2;
+}
+.multi-url-preview[data-layout='slider']:not([data-single]) .link-preview-description {
+  margin-top: 0;
+  font-size: 0.875rem;
+  -webkit-line-clamp: 2;
+}
+.multi-url-preview[data-layout='slider']:not([data-single]) .link-preview-meta {
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.multi-url-preview[data-layout='slider']:not([data-single]) .link-preview-meta > * + * {
+  padding-left: 0;
+  border-left: 0;
+}
+.multi-url-preview[data-layout='slider']:not([data-single]) .link-preview-price {
+  flex-flow: row wrap;
+  align-self: stretch;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  width: auto;
+  margin: 0 1.125rem;
+  padding: 0.875rem 0 1.125rem;
+  border-top: 1px solid var(--color-slate-20);
+  border-left: 0;
+  text-align: start;
+}
+.multi-url-preview[data-layout='slider']:not([data-single]) .link-preview-go {
+  display: none;
+}
+
+.multi-url-preview .multi-url-preview__navigation {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.75rem 4px 0;
+}
+.multi-url-preview__progress {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 1.25rem;
+  height: 2px;
+  overflow: hidden;
+  background: var(--color-slate-20);
+}
+.multi-url-preview__progress > span {
+  display: block;
+  height: 100%;
+  background: var(--color-deep);
+  transition: width 240ms ease;
+}
+.multi-url-preview__position {
+  flex: 0 0 auto;
+  color: var(--color-ink-60);
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.025em;
+  white-space: nowrap;
+}
+.multi-url-preview__buttons {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.5rem;
+}
+.multi-url-preview__buttons button {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  place-items: center;
+  border: 1px solid var(--color-slate-20);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-ink);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+.multi-url-preview__buttons button svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+.multi-url-preview__buttons button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+@media (hover: hover) {
+  .multi-url-preview__buttons button:not(:disabled):hover {
+    color: white;
+    background: var(--color-deep);
+    border-color: var(--color-deep);
+  }
+}
+.multi-url-preview__track:focus-visible,
+.multi-url-preview__buttons button:focus-visible {
+  outline: 2px solid var(--color-deep);
+  outline-offset: 2px;
+}
+
+@container multi-preview (min-width: 34rem) {
+  .multi-url-preview[data-layout='slider']:not([data-single]) .multi-url-preview__track {
+    grid-auto-columns: calc((100% - var(--multi-gap)) / 2);
+  }
+}
+@container multi-preview (min-width: 58rem) {
+  .multi-url-preview[data-layout='slider']:not([data-single]) .multi-url-preview__track {
+    grid-auto-columns: calc((100% - 2 * var(--multi-gap)) / 3);
+  }
+}
+/* The global card's viewport breakpoint cannot see a narrow desktop accordion. These rules can. */
+@container multi-preview (max-width: 36rem) {
+  .multi-url-preview:not([data-layout='slider']) .link-preview-card,
+  .multi-url-preview[data-single] .link-preview-card {
+    display: grid;
+    grid-template-columns: 4.25rem minmax(0, 1fr);
+    align-items: start;
+    gap: 0.875rem;
+    padding: 0.875rem;
+    border-radius: 1rem;
+  }
+  .multi-url-preview:not([data-layout='slider']) .link-preview-thumb,
+  .multi-url-preview[data-single] .link-preview-thumb {
+    width: 4.25rem;
+    height: 4.25rem;
+    border-radius: 0.625rem;
+  }
+  .multi-url-preview:not([data-layout='slider']) .link-preview-body,
+  .multi-url-preview[data-single] .link-preview-body {
+    align-self: center;
+  }
+  .multi-url-preview:not([data-layout='slider']) .link-preview-title,
+  .multi-url-preview[data-single] .link-preview-title {
+    font-size: 1rem;
+    -webkit-line-clamp: 3;
+  }
+  .multi-url-preview:not([data-layout='slider']) .link-preview-description,
+  .multi-url-preview[data-single] .link-preview-description {
+    font-size: 0.875rem;
+  }
+  .multi-url-preview:not([data-layout='slider']) .link-preview-meta,
+  .multi-url-preview[data-single] .link-preview-meta {
+    gap: 0.5rem;
+  }
+  .multi-url-preview:not([data-layout='slider']) .link-preview-meta > * + *,
+  .multi-url-preview[data-single] .link-preview-meta > * + * {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .multi-url-preview:not([data-layout='slider']) .link-preview-price,
+  .multi-url-preview[data-single] .link-preview-price {
+    grid-column: 1 / -1;
+    flex-flow: row wrap;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.75rem 0 0;
+    border-top: 1px solid var(--color-slate-20);
+    border-left: 0;
+  }
+  .multi-url-preview:not([data-layout='slider']) .link-preview-go,
+  .multi-url-preview[data-single] .link-preview-go {
+    display: none;
+  }
+}
+.multi-url-preview[data-animation='none'] *,
+.multi-url-preview[data-animation='none'] *::before,
+.multi-url-preview[data-animation='none'] *::after {
+  animation: none;
+  transition: none;
+}
+.multi-url-preview[data-animation='none'] .link-preview-card:hover {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .multi-url-preview *,
+  .multi-url-preview *::before,
+  .multi-url-preview *::after {
+    scroll-behavior: auto !important;
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}

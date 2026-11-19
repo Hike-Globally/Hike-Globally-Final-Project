@@ -18,6 +18,7 @@ import '@/components/content/custom-html-section.css'
 import '@/components/layout/affiliate-disclosure.css'
 import '@/components/sections/key-takeaways.css'
 import '@/components/sections/link-preview.css'
+import '@/components/sections/multi-url-preview.css'
 import './globals.css'
 
 /**
