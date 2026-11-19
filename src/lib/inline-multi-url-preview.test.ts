@@ -237,7 +237,7 @@ test('Single Blog renders inline and repeated page-section collections in the sa
   assert.equal(document.querySelectorAll('.link-preview-card').length, 6)
 })
 
-test('Single Trip renders Multi-URL Preview inside the actual Content sections accordion, not just Page sections', async () => {
+test('Single Trip renders Multi-URL Preview in the Essential Information accordion', async () => {
   const document = await documentOf(
     createElement(TripDetail, {
       settings,

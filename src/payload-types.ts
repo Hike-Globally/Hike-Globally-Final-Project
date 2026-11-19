@@ -669,7 +669,7 @@ export interface Trip {
       }[]
     | null;
   /**
-   * Add extra headed sections to the trip page. Their position is controlled by the Essential information row in Page sections; drag the entries here to reorder them within that section.
+   * Add extra headed sections to the trip page. Their position is controlled by the Essential information row in Page sections; drag the entries here to reorder them within Essential Information.
    */
   contentSections?:
     | {

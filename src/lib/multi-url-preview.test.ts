@@ -144,7 +144,7 @@ test('link tables use distinct short names for each collection and its versions'
   assert.equal(new Set(names).size, 4)
 })
 
-test('Blog body, Trip Content sections and other rendered Trip bodies expose the content editor', () => {
+test('Blog body, Trip Essential Information and other rendered Trip bodies expose the content editor', () => {
   const blog = flatten(Blog.fields).find((field) => 'name' in field && field.name === 'content')
   assert.ok(blog?.type === 'richText' && blog.editor)
   const fields = flatten(Trips.fields)

@@ -20,7 +20,7 @@ You can add several Multi-URL Preview sections to one page and move each collect
 **A Page sections row is not required for an inline collection.**
 
 - **Blog:** click between paragraphs in the **Content** editor.
-- **Trip:** open **Content sections**, add/edit an entry, and click inside that entry's **Content** editor. The collection stays inside that section's Essential information accordion.
+- **Trip:** open the **Essential Information** panel, add/edit a section, and click inside that section's **Content** editor. The collection stays inside its Essential Information accordion.
 - Trip **Overview**, **Why Choose This Trek**, **Route map and altitude chart content**, and **Additional departure notes** also have the same block menu.
 
 Use the editor's toolbar **block menu → Multi-URL Preview**, or type **`/multiUrlPreview`**. Fill in the same heading, layout, animation and URL rows in the inserted block. Continue writing below it. You can have multiple collections in the same body, with text, lists and tables between them. The existing single **Link preview** block remains available.
