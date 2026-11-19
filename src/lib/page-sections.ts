@@ -113,8 +113,8 @@ export function orderTripPageSections(sections: PageSection[]): PageSection[] {
     'overview',
     'highlights',
     'itinerary',
-    'information',
     'hotelsNearDestination',
+    'information',
     'departures',
     'faqs',
   ]
