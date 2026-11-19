@@ -453,6 +453,18 @@ test('a blocked host, an API endpoint or a network error all resolve to null', a
   )
 })
 
+test('a URL that points directly to a public raster image becomes the preview image', async () => {
+  await withFetch(
+    async () =>
+      new Response(new Uint8Array([1, 2, 3]), { headers: { 'content-type': 'image/webp' } }),
+    async () => {
+      assert.deepEqual(await fetchLinkPreviewMetadata('https://images.example.com/trek'), {
+        image: 'https://images.example.com/trek',
+      })
+    },
+  )
+})
+
 test('the page is requested the way a browser would ask for it', async () => {
   let sent: Headers | undefined
   await withFetch(

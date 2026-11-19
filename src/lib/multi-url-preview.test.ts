@@ -5,7 +5,7 @@ import type { Field } from 'payload'
 import { Blog } from '../collections/Blog'
 import { Trips } from '../collections/Trips'
 import { inlineLinkPreviewBlock, inlineMultiUrlPreviewBlock } from '../fields/content-editor'
-import { multiUrlPreviewFields } from '../fields/multi-url-preview'
+import { multiUrlPreviewFields, validateMultiPreviewImageUrl } from '../fields/multi-url-preview'
 import { pageSectionsField } from '../fields/page-sections'
 import {
   MAX_PREVIEW_LINKS,
@@ -88,12 +88,22 @@ test('page-section and inline fields share the layouts, animations and per-URL o
       'linkPreviewReviewCount',
       'linkPreviewPrice',
       'linkPreviewOriginalPrice',
+      'linkPreviewImage',
+      'linkPreviewImageUrl',
     ]) {
       assert.ok(
         controls.some((field) => 'name' in field && field.name === name),
         name,
       )
     }
+    const upload = controls.find((field) => 'name' in field && field.name === 'linkPreviewImage')
+    assert.ok(upload?.type === 'upload')
+    assert.equal(upload.relationTo, 'media')
+    const imageUrl = controls.find(
+      (field) => 'name' in field && field.name === 'linkPreviewImageUrl',
+    )
+    assert.ok(imageUrl?.type === 'text')
+    assert.equal(imageUrl.validate, validateMultiPreviewImageUrl)
     const layout = controls.find((field) => 'name' in field && field.name === 'multiPreviewLayout')
     assert.ok(layout?.type === 'select')
     assert.deepEqual(layout.options, multiPreviewLayouts)
@@ -105,6 +115,10 @@ test('page-section and inline fields share the layouts, animations and per-URL o
   }
   assert.equal(multiPreviewLayouts.length, 3)
   assert.equal(multiPreviewAnimations.filter(({ value }) => value !== 'none').length, 5)
+  assert.equal(validateMultiPreviewImageUrl('https://images.example.com/card.webp'), true)
+  assert.equal(validateMultiPreviewImageUrl('/media/card.webp'), true)
+  assert.equal(typeof validateMultiPreviewImageUrl('http://127.0.0.1/photo.jpg'), 'string')
+  assert.equal(typeof validateMultiPreviewImageUrl('javascript:alert(1)'), 'string')
 })
 
 test('collection fields appear only on their own section; inline blocks have no section condition', () => {
@@ -218,6 +232,8 @@ test('normalization drops invalid rows, trims overrides, keeps order and caps th
         linkPreviewReviewCount: 27,
         linkPreviewPrice: ' US$ 700 ',
         linkPreviewOriginalPrice: ' US$ 900 ',
+        linkPreviewImage: { url: '/media/uploaded.webp', mimeType: 'image/webp' },
+        linkPreviewImageUrl: 'https://images.example.com/remote.webp',
       },
       ...Array.from({ length: 20 }, (_, i) => ({ linkPreviewUrl: `/blog/${i}` })),
     ],
@@ -237,6 +253,8 @@ test('normalization drops invalid rows, trims overrides, keeps order and caps th
     linkPreviewReviewCount: 27,
     linkPreviewPrice: 'US$ 700',
     linkPreviewOriginalPrice: 'US$ 900',
+    linkPreviewImage: { url: '/media/uploaded.webp', mimeType: 'image/webp' },
+    linkPreviewImageUrl: 'https://images.example.com/remote.webp',
   })
   assert.equal(
     source.multiPreviewHeading,

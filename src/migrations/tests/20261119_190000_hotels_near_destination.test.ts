@@ -26,10 +26,14 @@ const hotelTables = [
   ['_trips_v_version_hotels_near_destination', '_trips_v'],
 ] as const
 
-test('Hotels Near Destination migration is the newest registered migration', () => {
-  assert.equal(migrations.at(-1)?.name, '20261119_190000_hotels_near_destination')
-  assert.equal(migrations.at(-1)?.up, up)
-  assert.equal(migrations.at(-1)?.down, down)
+test('Hotels Near Destination remains registered before the subsequent image migration', () => {
+  const index = migrations.findIndex(
+    ({ name }) => name === '20261119_190000_hotels_near_destination',
+  )
+  assert.ok(index >= 0)
+  assert.equal(migrations[index]?.up, up)
+  assert.equal(migrations[index]?.down, down)
+  assert.equal(migrations[index + 1]?.name, '20261119_200000_multi_url_preview_images')
 })
 
 test('migration creates localized, versioned hotel entries and backfills each trip layout', async () => {

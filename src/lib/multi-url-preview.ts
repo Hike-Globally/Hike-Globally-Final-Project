@@ -66,6 +66,15 @@ export function normalizeMultiUrlPreview(source: MultiUrlPreviewSource) {
           linkPreviewDescription: text(row.linkPreviewDescription),
           linkPreviewPrice: text(row.linkPreviewPrice),
           linkPreviewOriginalPrice: text(row.linkPreviewOriginalPrice),
+          linkPreviewImage: row.linkPreviewImage ?? null,
+          linkPreviewImageUrl: (() => {
+            const imageUrl = text(row.linkPreviewImageUrl)
+            return imageUrl &&
+              ((imageUrl.startsWith('/') && !imageUrl.startsWith('//')) ||
+                parseImageProxyUrl(imageUrl))
+              ? imageUrl
+              : undefined
+          })(),
           linkPreviewRating:
             typeof row.linkPreviewRating === 'number' ? row.linkPreviewRating : null,
           linkPreviewReviewCount:

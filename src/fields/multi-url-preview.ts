@@ -6,7 +6,20 @@ import {
   multiPreviewLayouts,
   validateMultiPreviewUrl,
 } from '../lib/multi-url-preview'
+import { parseImageProxyUrl } from '../lib/link-preview-image'
 import { linkPreviewSectionFields } from './link-preview'
+
+/** Optional image source: either a site path or an absolute public http(s) URL. */
+export function validateMultiPreviewImageUrl(value: unknown): true | string {
+  if (value === null || value === undefined || value === '') return true
+  if (typeof value !== 'string') return 'Enter an image URL.'
+  const url = value.trim()
+  if (!url || /[\\\u0000-\u001f\u007f]/.test(url)) return 'Enter a valid image URL.'
+  if (url.startsWith('/') && !url.startsWith('//')) return true
+  return parseImageProxyUrl(url)
+    ? true
+    : 'Use a public http:// or https:// image URL without a password or a custom port.'
+}
 
 /** Exactly the same fields in the page-layout row and the rich-text block. */
 export function multiUrlPreviewFields({
@@ -73,23 +86,55 @@ export function multiUrlPreviewFields({
       admin: {
         condition,
         initCollapsed: true,
-        description: `Add up to ${MAX_PREVIEW_LINKS} URLs and drag to reorder. Each card uses the linked page’s image, title and description, with the same optional overrides as Link preview. No URLs means no section or empty space on the public page.`,
+        description: `Add up to ${MAX_PREVIEW_LINKS} URLs and drag to reorder. Each card uses the linked page’s image, title and description, with optional overrides. Set each image by uploading from your device or pasting a public image URL. No URLs means no section or empty space on the public page.`,
         components: { RowLabel: '@/components/admin/multi-preview-link-label' },
       },
-      fields: linkPreviewSectionFields({ conditional: false }).map((field) =>
-        field.type === 'text' && field.name === 'linkPreviewUrl'
-          ? {
-              ...field,
-              maxLength: 2048,
-              validate: validateMultiPreviewUrl,
+      fields: [
+        ...linkPreviewSectionFields({ conditional: false }).map((field) =>
+          field.type === 'text' && field.name === 'linkPreviewUrl'
+            ? {
+                ...field,
+                maxLength: 2048,
+                validate: validateMultiPreviewUrl,
+                admin: {
+                  ...field.admin,
+                  description:
+                    'Paste a public https:// address, or a site path such as /trips/annapurna-base-camp. Blank rows are hidden. External links open in a new tab.',
+                },
+              }
+            : field,
+        ),
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'linkPreviewImage',
+              label: 'Image (upload from device)',
+              type: 'upload',
+              relationTo: 'media',
+              filterOptions: { mimeType: { like: 'image/%' } },
               admin: {
-                ...field.admin,
+                width: '50%',
                 description:
-                  'Paste a public https:// address, or a site path such as /trips/annapurna-base-camp. Blank rows are hidden. External links open in a new tab.',
+                  'Choose an image in the Media library or upload one from your device. This takes precedence over the image URL.',
               },
-            }
-          : field,
-      ),
+            },
+            {
+              name: 'linkPreviewImageUrl',
+              label: 'Image URL (optional)',
+              type: 'text',
+              maxLength: 2048,
+              validate: validateMultiPreviewImageUrl,
+              admin: {
+                width: '50%',
+                placeholder: 'https://example.com/photo.webp',
+                description:
+                  'Alternative to uploading: paste a public image URL. Leave both image fields empty to use the linked page’s image.',
+              },
+            },
+          ],
+        },
+      ],
     },
   ]
 }

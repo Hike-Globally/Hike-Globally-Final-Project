@@ -475,7 +475,7 @@ export interface Trip {
          */
         multiPreviewAnimation?: ('fade' | 'rise' | 'slide' | 'zoom' | 'reveal' | 'none') | null;
         /**
-         * Add up to 12 URLs and drag to reorder. Each card uses the linked page’s image, title and description, with the same optional overrides as Link preview. No URLs means no section or empty space on the public page.
+         * Add up to 12 URLs and drag to reorder. Each card uses the linked page’s image, title and description, with optional overrides. Set each image by uploading from your device or pasting a public image URL. No URLs means no section or empty space on the public page.
          */
         multiPreviewLinks?:
           | {
@@ -504,6 +504,14 @@ export interface Trip {
                * Optional. Shown struck through before the price.
                */
               linkPreviewOriginalPrice?: string | null;
+              /**
+               * Choose an image in the Media library or upload one from your device. This takes precedence over the image URL.
+               */
+              linkPreviewImage?: (number | null) | Media;
+              /**
+               * Alternative to uploading: paste a public image URL. Leave both image fields empty to use the linked page’s image.
+               */
+              linkPreviewImageUrl?: string | null;
               id?: string | null;
             }[]
           | null;
@@ -1049,7 +1057,7 @@ export interface Blog {
          */
         multiPreviewAnimation?: ('fade' | 'rise' | 'slide' | 'zoom' | 'reveal' | 'none') | null;
         /**
-         * Add up to 12 URLs and drag to reorder. Each card uses the linked page’s image, title and description, with the same optional overrides as Link preview. No URLs means no section or empty space on the public page.
+         * Add up to 12 URLs and drag to reorder. Each card uses the linked page’s image, title and description, with optional overrides. Set each image by uploading from your device or pasting a public image URL. No URLs means no section or empty space on the public page.
          */
         multiPreviewLinks?:
           | {
@@ -1078,6 +1086,14 @@ export interface Blog {
                * Optional. Shown struck through before the price.
                */
               linkPreviewOriginalPrice?: string | null;
+              /**
+               * Choose an image in the Media library or upload one from your device. This takes precedence over the image URL.
+               */
+              linkPreviewImage?: (number | null) | Media;
+              /**
+               * Alternative to uploading: paste a public image URL. Leave both image fields empty to use the linked page’s image.
+               */
+              linkPreviewImageUrl?: string | null;
               id?: string | null;
             }[]
           | null;
@@ -1836,6 +1852,8 @@ export interface TripsSelect<T extends boolean = true> {
               linkPreviewReviewCount?: T;
               linkPreviewPrice?: T;
               linkPreviewOriginalPrice?: T;
+              linkPreviewImage?: T;
+              linkPreviewImageUrl?: T;
               id?: T;
             };
         id?: T;
@@ -2050,6 +2068,8 @@ export interface BlogSelect<T extends boolean = true> {
               linkPreviewReviewCount?: T;
               linkPreviewPrice?: T;
               linkPreviewOriginalPrice?: T;
+              linkPreviewImage?: T;
+              linkPreviewImageUrl?: T;
               id?: T;
             };
         id?: T;
