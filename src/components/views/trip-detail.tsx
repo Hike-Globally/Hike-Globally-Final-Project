@@ -30,7 +30,10 @@ import { Breadcrumbs } from '@/components/sections/breadcrumbs'
 import { TripCard } from '@/components/cards/trip-card'
 import { Reveal } from '@/components/motion/reveal'
 import { Button } from '@/components/ui/button'
-import { EssentialInformationSection } from '@/components/sections/essential-information-section'
+import {
+  EssentialInformationSection,
+  HotelsNearDestinationSection,
+} from '@/components/sections/essential-information-section'
 import { TripBrochureButton } from '@/components/trips/trip-brochure-button'
 import { TripSectionNav } from '@/components/trips/trip-section-nav'
 import { FaqSection } from '@/components/sections/faq-section'
@@ -253,9 +256,7 @@ export function TripDetail({
     { icon: MapPin, label: dict.trip.destination, value: destination?.name ?? '—' },
   ].filter((fact): fact is NonNullable<typeof fact> => fact !== null)
 
-  const sections = orderTripPageSections(
-    resolvePageSections(trip.pageSections, tripSectionOptions),
-  )
+  const sections = orderTripPageSections(resolvePageSections(trip.pageSections, tripSectionOptions))
   const hasInquiry = sections.some(({ kind }) => kind === 'inquiry')
   const inquiryHref = hasInquiry ? '#inquiry' : sitePath('/contact')
   const bookingLink = resolveLink(trip.bookingLink?.link)
@@ -289,6 +290,12 @@ export function TripDetail({
       label: 'Essential Info',
       kind: 'information',
       hasContent: Boolean(trip.contentSections?.length),
+    },
+    {
+      id: 'hotels-near-destination',
+      label: dict.trip.hotelsNearDestination,
+      kind: 'hotelsNearDestination',
+      hasContent: Boolean(trip.hotelsNearDestination?.length),
     },
     {
       id: 'departures',
@@ -422,6 +429,13 @@ export function TripDetail({
       <EssentialInformationSection
         title={dict.trip.essentialInformation}
         sections={trip.contentSections ?? []}
+        linker={linker}
+      />
+    ),
+    hotelsNearDestination: (
+      <HotelsNearDestinationSection
+        title={dict.trip.hotelsNearDestination}
+        sections={trip.hotelsNearDestination ?? []}
         linker={linker}
       />
     ),

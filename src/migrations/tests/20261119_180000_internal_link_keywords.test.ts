@@ -27,10 +27,12 @@ const TEXTS_TABLES = [
   ['_pages_v_texts', '_pages_v'],
 ] as const
 
-test('the internal linking keyword migration is the newest registered migration', () => {
-  assert.equal(migrations.at(-1)?.name, '20261119_180000_internal_link_keywords')
-  assert.equal(migrations.at(-1)?.up, up)
-  assert.equal(migrations.at(-1)?.down, down)
+test('the internal linking keyword migration remains registered before later migrations', () => {
+  const migration = migrations.find(({ name }) => name === '20261119_180000_internal_link_keywords')
+  assert.ok(migration)
+  assert.equal(migration.up, up)
+  assert.equal(migration.down, down)
+  assert.ok(migrations.indexOf(migration) < migrations.length - 1)
 })
 
 test('destinations and pages get the shared hasMany-string table, live and versioned', async () => {

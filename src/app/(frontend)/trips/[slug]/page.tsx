@@ -66,9 +66,9 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
     getSettings(),
     /**
      * Automated internal keyword linking (see `src/lib/internal-links.ts`): the overview, "why
-     * choose this trek", the route map intro, departure notes, the audience cards and the
-     * essential-information accordions all share one budget, and link out to the destinations and
-     * posts they mention. Passing the trip as `self` is what stops it linking to itself.
+     * choose this trek", the route map intro, departure notes, the audience cards, and the
+     * Essential Information / Hotels Near Destination accordions share one budget. The links point
+     * to destinations and posts mentioned. Passing the trip as `self` stops it linking to itself.
      */
     createInternalLinker({ collection: 'trips', id: trip.id }),
   ])

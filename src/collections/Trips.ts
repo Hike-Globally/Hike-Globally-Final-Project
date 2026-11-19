@@ -542,6 +542,44 @@ export const Trips: CollectionConfig = {
         },
       ],
     },
+    {
+      type: 'collapsible',
+      label: 'Hotels Near Destination',
+      fields: [
+        {
+          name: 'hotelsNearDestination',
+          type: 'array',
+          localized: true,
+          labels: { singular: 'Hotel', plural: 'Hotels' },
+          admin: {
+            description:
+              'Add one entry per nearby hotel. Each entry appears as an open accordion; include the location, facilities, and useful booking details in its content.',
+            components: { Field: '@/components/admin/instant-trip-array' },
+            initCollapsed: true,
+          },
+          fields: [
+            {
+              name: 'heading',
+              type: 'text',
+              label: 'Hotel name',
+              required: true,
+              admin: { description: 'Displayed as this hotel’s accordion heading.' },
+            },
+            {
+              name: 'content',
+              type: 'richText',
+              editor: contentEditor(),
+              required: true,
+              admin: {
+                className: 'hg-trip-compact-editor',
+                description:
+                  'Describe the hotel and its distance from the destination. Add Link preview or Multi-URL Preview blocks for booking links when useful.',
+              },
+            },
+          ],
+        },
+      ],
+    },
 
     {
       type: 'collapsible',

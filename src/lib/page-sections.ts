@@ -10,6 +10,7 @@ export const tripSectionOptions = [
   { label: 'Highlights', value: 'highlights' },
   { label: 'Itinerary', value: 'itinerary' },
   { label: 'Essential information', value: 'information' },
+  { label: 'Hotels Near Destination', value: 'hotelsNearDestination' },
   { label: 'Departures', value: 'departures' },
   { label: 'FAQs', value: 'faqs' },
   // Optional supporting sections follow the primary sequence. Existing saved layouts are
@@ -103,7 +104,7 @@ export function resolvePageSections(
 }
 
 /**
- * Keep the trip's six main content sections in the same predictable sequence on every trip page.
+ * Keep the trip's main content sections in the same predictable sequence on every trip page.
  * The CMS can still hide sections; optional/supporting rows retain their saved order and are
  * rendered after this primary sequence. The hero remains first, with inquiry/related bands last.
  */
@@ -113,6 +114,7 @@ export function orderTripPageSections(sections: PageSection[]): PageSection[] {
     'highlights',
     'itinerary',
     'information',
+    'hotelsNearDestination',
     'departures',
     'faqs',
   ]
@@ -121,9 +123,7 @@ export function orderTripPageSections(sections: PageSection[]): PageSection[] {
   const take = (kind: string) => sections.filter((section) => section.kind === kind)
   const hero = take('hero')
   const body = primaryOrder.flatMap(take)
-  const supporting = sections.filter(
-    ({ kind }) => !primary.has(kind) && !edgeSections.has(kind),
-  )
+  const supporting = sections.filter(({ kind }) => !primary.has(kind) && !edgeSections.has(kind))
   const closing = sections.filter(({ kind }) => kind === 'inquiry' || kind === 'related')
 
   return [...hero, ...body, ...supporting, ...closing]
