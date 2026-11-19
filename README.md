@@ -248,15 +248,21 @@ output is the same whether an editor used the chip input or pasted a spreadsheet
 ignored the meta tag as a ranking signal for years; treat the list as a record of intent that keeps
 the title, the copy, Bing/Yandex and internal search pointed at the same terms.
 
+**This list is not the linking list.** Automated internal linking reads a separate
+**Keyword For Internal Linking** panel on the same document (see below): the phrases there — not
+these — become anchors, so a page can target one set of search terms and be linked by another.
+
 ### Internal linking
 
-The keyword list does a second job. On blog posts, trip pages, destination pages and CMS pages, a
-mention of another document's phrase in running copy becomes a real link to it — no editor action,
-and nothing written back into the CMS.
+Every document has a second chip list, **Keyword For Internal Linking**. The phrases an editor puts
+there are the ones that become anchors: on blog posts, trip pages, destination pages and CMS pages, a
+mention of one of those phrases in running copy becomes a real link to the document — with nothing
+written back into the CMS. The list is the only source; the SEO keywords, title and slug are not
+inferred, and an empty list means the page is never linked to.
 
 | Rule | Why |
 | ---- | --- |
-| Phrases come from `keywords`, then the title, then the slug | An editor-typed keyword is trusted as written; a derived phrase has to be two words and free of generic edges ("Best Treks in Nepal" is a heading, not an anchor). |
+| Phrases come only from the **Keyword For Internal Linking** panel | Nothing is inferred from the SEO keywords, the title or the slug. The panel is the switch: fill it to link to the page, clear it to stop. A phrase may be a short acronym or a generic-sounding heading — a human chose it. |
 | Longest phrase wins, first mention only, one link per target per page | Repeating an anchor text, or linking the same URL twice, is the pattern that reads as manipulation. |
 | At most 8 links per page, at least 140 characters of copy apart | Past that the value per link drops and clusters of adjacent anchors read as a link farm. |
 | Trips and destinations outrank posts when the budget runs out | The pages the operator earns from take the anchor. |
@@ -264,7 +270,7 @@ and nothing written back into the CMS.
 | Anchor text is the copy exactly as written | Rewriting it to the target's title is what Google's spam policy targets. |
 
 Linking happens **at render time, not at save time**: `src/lib/internal-links.ts` compiles the
-published documents into a phrase index, one `InternalLinker` per page render decides which mentions
+published documents' panels into a phrase index, one `InternalLinker` per page render decides which mentions
 win under the budget, and the `text` branch of `src/components/content/rich-text.tsx` emits the
 `<a>`. The CMS content is never modified, so a renamed slug cannot leave a dead link behind —
 `src/hooks/revalidate.ts` purges the index along with the pages that read it — and switching the
@@ -273,7 +279,10 @@ feature off is deleting four wrapper components.
 It is wired on the four detail routes: each awaits one `createInternalLinker({ collection, id })` and
 threads it down to every rich text block on the page, so they share one budget and the page cannot
 link to itself. With no database configured it yields an empty linker and every page renders
-byte-for-byte as it did before. Full design, rules, limitations and the verify-after-deploy `curl`:
+byte-for-byte as it did before. Migration `20261119_150000_internal_link_keywords` adds the panel to
+Destinations and Pages and copies existing SEO keywords into it for Trips and Blog, so no trip's or
+post's links go dark on deploy. Destinations and Pages start empty — fill their panels to link to
+them. Full design, rules, limitations and the verify-after-deploy `curl`:
 **[docs/content/internal-linking.md](docs/content/internal-linking.md)**. `npm test` covers the engine and the
 rendered markup in `src/lib/internal-links.test.ts`.
 

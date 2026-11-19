@@ -5,6 +5,7 @@ import { faqFields } from '../fields/faqs'
 import { contentEditor } from '../fields/content-editor'
 import { pageSectionsField } from '../fields/page-sections'
 import { blogSectionOptions } from '../lib/page-sections'
+import { internalLinkKeywordsSection } from '../fields/internal-link-keywords'
 import { keywordsSection } from '../fields/keywords'
 import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
@@ -133,6 +134,9 @@ export const Blog: CollectionConfig = {
     /* Keywords — the phrases this post is targeting. Its own panel, directly above the SEO
        group, so the list is written while the post is written. See src/fields/keywords.ts. */
     keywordsSection(),
+    /* The phrases that should link to this post from other pages. Separate from the SEO keywords
+       above: those are what the post targets, these are what an editor wants turned into links. */
+    internalLinkKeywordsSection(),
     metaField(),
     viewLiveField(),
   ],

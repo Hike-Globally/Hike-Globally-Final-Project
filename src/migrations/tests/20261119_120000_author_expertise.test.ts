@@ -20,10 +20,16 @@ async function sqlFor(migrate: typeof up | typeof down) {
   return statements.join('\n')
 }
 
-test('author expertise migration is registered after all existing migrations', () => {
-  assert.equal(migrations.at(-1)?.name, '20261119_120000_author_expertise')
-  assert.equal(migrations.at(-1)?.up, up)
-  assert.equal(migrations.at(-1)?.down, down)
+test('author expertise migration is registered in chronological order with its own up/down', () => {
+  const entry = migrations.find((migration) => migration.name === '20261119_120000_author_expertise')
+  assert.ok(entry)
+  assert.equal(entry.up, up)
+  assert.equal(entry.down, down)
+
+  // A new migration appended after this one must not disturb the order — `payload migrate` runs the
+  // array as written, so a name out of sequence would deploy changes in the wrong order.
+  const names = migrations.map((migration) => migration.name)
+  assert.deepEqual(names, [...names].sort())
 })
 
 test('author expertise migration adds nullable facts and live/versioned guide relationships', async () => {

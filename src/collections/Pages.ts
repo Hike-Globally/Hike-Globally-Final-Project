@@ -12,6 +12,7 @@ import { RichTextBlock } from '../blocks/RichText'
 import { Stats } from '../blocks/Stats'
 import { Testimonials } from '../blocks/Testimonials'
 import { adminOrEditor, publishedOrSignedIn } from '../access'
+import { internalLinkKeywordsSection } from '../fields/internal-link-keywords'
 import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
 import { viewLiveField } from '../fields/view-live'
@@ -89,6 +90,8 @@ export const Pages: CollectionConfig = {
       ],
       required: true,
     },
+    /* The phrases that should link to this page from other pages' copy. */
+    internalLinkKeywordsSection(),
     metaField(),
     viewLiveField(),
   ],

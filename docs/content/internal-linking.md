@@ -1,30 +1,34 @@
 # Automated internal keyword linking
 
-Every mention of a trip, destination or post in the site's rich text becomes a real link to it,
-without an editor having to add one. It runs on blog posts, trip pages, destination pages and CMS
-pages.
+Every phrase an editor nominates in a document's **Keyword For Internal Linking** panel becomes a
+real link to that document wherever it appears in the site's rich text — without an editor having to
+add the link by hand. It runs on blog posts, trip pages, destination pages and CMS pages.
 
 Internal links are the one ranking lever that decays silently: nobody goes back to a 2023 article to
 wire up a trip published in 2026, so the newest pages — the ones that most need authority — are the
-least linked. This closes that gap, and it does it from data the site already has.
+least linked. This closes that gap, and it does it with a list an editor controls.
 
 ## For editors
 
-**You do not have to do anything.** Publish a post that mentions "Annapurna Circuit Trek" and the
-phrase links to `/trips/annapurna-circuit-trek` on its own.
+**You choose the anchors.** Open a trip, post, destination or CMS page, fill in **Keyword For
+Internal Linking**, and every occurrence of those phrases elsewhere on the site links back to it.
+Publish a post that mentions "Annapurna Circuit Trek" and, if the trip's panel contains that phrase,
+the mention links to `/trips/annapurna-circuit-trek` on its own.
 
-Two things are worth knowing:
+Three things are worth knowing:
 
-| Thing                                        | Detail                                                                                                                                                                                                                  |
-| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| The phrases come from the **Keywords** panel | A document is linked by the keywords its editor typed, plus its title and its slug. Adding a keyword to a trip makes the whole site start linking to it by that phrase. See [README → Keywords](../../README.md#keywords). |
-| A link you add by hand always wins           | If you have already linked a mention, the automation will not add a second link to the same page anywhere else in that document. Where you and the automation disagree, you win.                                        |
+| Thing                                              | Detail                                                                                                                                                                                                                                                       |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| The phrases come only from the **panel**           | Not from the SEO keywords, the title or the slug. Adding a phrase to a trip makes the whole site start linking to it by that phrase; an editor can nominate an anchor that has nothing to do with the page's search keywords. See [README → Internal linking](../../README.md#internal-linking). |
+| An empty panel means **no links to that page**     | The list is the switch. There is no title/slug fallback, so a page nobody has filled in is simply not linked to. Clear the list to opt a page out.                                                                                                            |
+| A link you add by hand always wins                 | If you have already linked a mention, the automation will not add a second link to the same page anywhere else in that document. Where you and the automation disagree, you win.                                                                              |
 
 The automation never touches a heading, a bullet list, a quote, a table, an image caption or a link
 that is already there. It only ever works inside running paragraphs.
 
-If a link looks wrong, the fix is in the source document, not in the page it appeared on: change the
-**Keywords** or the title of the document being linked _to_.
+If a link looks wrong, the fix is in the document being linked _to_, not in the page it appeared on:
+change or remove the phrase in its **Keyword For Internal Linking** panel, or clear the whole list to
+switch its links off.
 
 ## The rules
 
@@ -41,11 +45,11 @@ All of them exist because the opposite is a documented over-optimization pattern
 | At least **140 characters of copy between two links** (`minGapChars`) | Two anchors in one sentence is a cluster. The count includes headings and lists — copy the reader travels through but that is never linked. |
 | On a tie, **trips and destinations outrank posts**                    | The money pages take the budget when it runs out (`COLLECTION_WEIGHT`).                                                                     |
 | The anchor text is the copy **exactly as written**                    | Never rewritten to the target's title, and never case-folded.                                                                               |
+| Only phrases an editor **nominated**                                  | Nothing is inferred from a title, a slug or an SEO keyword.                                                                                 |
 
-Phrases the code infers from a title or a slug have to be at least two words and eight characters,
-and cannot start or end on a generic word ("Best Treks in Nepal" is a list heading, not an anchor).
-A phrase an editor typed into **Keywords** bypasses that filter — it is trusted because a human chose
-it.
+A phrase shorter than two characters is ignored — a single letter would match almost every paragraph
+on the site. Nothing else is filtered: a short acronym ("EBC") and a phrase built from generic words
+("Best Treks in Nepal") are used if an editor typed them, because a human chose the anchor.
 
 ## How it works
 
@@ -64,8 +68,9 @@ renderer means the CMS content stays exactly as written and switching the featur
 
 | Piece          | File                                                           | Role                                                                                                                                                         |
 | -------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| The engine     | `src/lib/internal-links.ts`                                    | Phrase extraction, index compilation, the matcher, the per-page budget, text splitting. Pure — no Next.js, no Payload, no environment.                       |
-| The index read | `src/lib/data.ts` → `createInternalLinker()`                   | Four parallel queries for published trips, destinations, posts and pages, cached under `['internal-link-targets']` and tagged with all four collection tags. |
+| The panel      | `src/fields/internal-link-keywords.ts`                         | The one place anchor phrases are written: a localized chip input, one line in each collection.                                                              |
+| The engine     | `src/lib/internal-links.ts`                                    | Phrase normalization, index compilation, the matcher, the per-page budget, text splitting. Pure — no Next.js, no Payload, no environment.                   |
+| The index read | `src/lib/data.ts` → `createInternalLinker()`                   | Four parallel queries for published trips, destinations, posts and pages, selecting `internalLinkKeywords`, cached under `['internal-link-targets']`.       |
 | The renderer   | `src/components/content/rich-text.tsx`                         | Takes an optional `linker` prop: `collect()` before rendering, then each `text` node asks `planFor()` what it won.                                           |
 | The routes     | `blog/[slug]`, `trips/[slug]`, `destinations/[slug]`, `[slug]` | Each awaits one `createInternalLinker({ collection, id })` and threads it down, so the page cannot link to itself.                                           |
 
@@ -116,17 +121,17 @@ mentions an editor already emphasised, and therefore the ones they most likely l
 ## Tuning
 
 `INTERNAL_LINK_DEFAULTS` in `src/lib/internal-links.ts` holds the policy: `maxLinksPerPage`,
-`minGapChars`, `minPhraseLength`, `minDerivedPhraseLength`, `maxPhrases`. They are constants rather
-than CMS fields on purpose — this is an SEO decision, not an editorial one, and a per-document field
-means 400 documents with 400 different settings. A single route can override them for one page by
-passing a second argument to `createInternalLinker(self, overrides)`.
+`minGapChars`, `minPhraseLength`, `maxPhrases`. They are constants rather than CMS fields on purpose —
+this is an SEO decision, not an editorial one, and a per-document field means 400 documents with 400
+different settings. Which phrases become links is the editorial decision, and that lives in the
+panel. A single route can override the policy for one page by passing a second argument to
+`createInternalLinker(self, overrides)`.
 
 ## Extending it
 
-- **Destinations and Pages have no Keywords panel yet.** They are linked by title and slug today.
-  Adding `keywordsSection()` to `src/collections/Destinations.ts` and `Pages.ts` is a one-line change
-  each plus a migration; nothing in the engine changes, because `toInternalLinkRecord()` in
-  `src/lib/data.ts` already selects `keywords` for every collection.
+- **SEO keywords and linking phrases are deliberately separate.** `keywordsSection()` still feeds
+  `<meta name="keywords">`, Open Graph tags and JSON-LD; it no longer feeds this index. A document
+  can target one set of search terms and be linked by another.
 - **The listing pages and the homepage are not wired.** They render cards rather than prose, so there
   is little to link; wrapping them would be the same one-line change if that ever changes.
 - **An orphan-page report** falls out of the index for free: any target no page links to. That is
@@ -134,11 +139,19 @@ passing a second argument to `createInternalLinker(self, overrides)`.
 
 ## Deployment
 
-No migration, no schema change and no environment variable. The feature reads fields that already
-exist and renders through a component that already exists. Turning it off means dropping the
-`linker={linker}` argument from the four routes' `createInternalLinker()` calls — or just deleting
-the calls; the engine, the prop and the tests can all stay without affecting a single byte of
-output, because a `<RichText>` with no linker renders exactly what it rendered before.
+Migration **`20261119_150000_internal_link_keywords`** introduces the panel. It adds the shared
+hasMany-string tables for Destinations and Pages (Trips and Blog already had one), and it copies
+every existing SEO keyword list into `internalLinkKeywords` for the live trip/post and each saved
+draft — so those auto-links do not disappear on deploy simply because nobody has opened the new panel
+yet. **Destinations and Pages start empty**, because they never had a keyword list to copy; fill
+their panels to start linking to them. Run `npm run migrate` before deploying the application, as
+usual. There is no environment variable.
+
+Turning the feature off for one page means clearing that page's panel. Turning it off everywhere
+means dropping the `linker={linker}` argument from the four routes' `createInternalLinker()` calls —
+or just deleting the calls; the engine, the prop and the tests can all stay without affecting a
+single byte of output, because a `<RichText>` with no linker renders exactly what it rendered
+before.
 
 Verify it after a deploy the way a crawler would — with a plain GET, no JavaScript:
 

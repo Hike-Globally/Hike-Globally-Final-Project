@@ -5,12 +5,19 @@
  *
  * WHAT IT DOES
  *
- * Turns the phrases the site already declares it wants to rank for (each document's `keywords`
- * field, plus its title and slug) into real `<a href>` links inside rich text, at render time.
- * A post that mentions "Everest Base Camp Trek" in passing now links to
- * `/trips/everest-base-camp-trek` without an editor having to remember to do it — which is the
- * whole point: internal links are the one ranking lever that decays silently, because nobody
- * goes back to a 2023 article to wire up a trip published in 2026.
+ * Turns the phrases an editor nominated in a document's **Keyword For Internal Linking** panel
+ * into real `<a href>` links inside *other* pages' rich text, at render time. A trip whose panel
+ * says "Everest Base Camp Trek" is linked by that phrase wherever a post or another page happens
+ * to mention it — without an editor having to remember to do it, which is the whole point:
+ * internal links are the one ranking lever that decays silently, because nobody goes back to a
+ * 2023 article to wire up a trip published in 2026.
+ *
+ * The list is the ONLY source of phrases. A document's title, slug and SEO `keywords` are no
+ * longer inferred into anchors, and an empty list means the document is never linked to. That is
+ * a deliberate trade: full editorial control over which words become links, in exchange for the
+ * automation no longer guessing. The panel is defined in `src/fields/internal-link-keywords.ts`,
+ * and the migration that introduced it copied every trip's and post's existing SEO keywords into
+ * the new list so no page went dark on deploy.
  *
  * WHY AT RENDER TIME, NOT AT SAVE TIME
  *
@@ -50,6 +57,7 @@
  *  | Hard cap per page                       | Beyond ~8 links the value per link drops and copy suffers.  |
  *  | Minimum characters between two links    | Clusters of adjacent links read as a link farm.             |
  *  | Money pages outrank posts on a tie      | Trip and destination pages are what the site earns from.    |
+ *  | Only phrases an editor nominated        | Nothing is inferred from a title, a slug or an SEO keyword. |
  *  | Headings, lists, quotes, tables, code   | Verbatim or structural copy is not prose to link inside.    |
  *     and existing links are never touched  |                                                            |
  *
@@ -87,10 +95,13 @@ export type InternalLinkTarget = {
   id: number
   slug: string
   href: string
-  /** The document's display name: `title` everywhere except destinations, where it is `name`. */
-  title?: string | null
-  /** The document's own `keywords` list — the highest-signal phrases it has. */
-  keywords?: (string | null | undefined)[] | null
+  /**
+   * The phrases an editor typed into the document's **Keyword For Internal Linking** panel.
+   *
+   * The only source of anchors. Absent, `null` or empty means this document is never linked to
+   * automatically — there is no title/slug fallback.
+   */
+  internalLinkKeywords?: (string | null | undefined)[] | null
 }
 
 /** A phrase the matcher knows, with everything that answers to it. */
@@ -140,10 +151,14 @@ export const INTERNAL_LINK_DEFAULTS = {
    * links in the same sentence read as a link farm; roughly a sentence and a half does not.
    */
   minGapChars: 140,
-  /** Shortest phrase the matcher will consider at all. */
-  minPhraseLength: 4,
-  /** Shortest phrase derived from a title or slug (an editor-typed keyword can be shorter). */
-  minDerivedPhraseLength: 8,
+  /**
+   * Shortest phrase the matcher will consider at all.
+   *
+   * Two characters, not four: the phrases are chosen by an editor now, and a short acronym like
+   * "EBC" is a legitimate anchor. A single character is still refused, because "a" or "i" would
+   * match almost every paragraph on the site.
+   */
+  minPhraseLength: 2,
   /**
    * Safety valve on the compiled regex: past this many phrases the tail is dropped (lowest
    * priority first) rather than shipping a megabyte pattern to every render. The site has tens of
@@ -163,7 +178,6 @@ export type InternalLinkConfig = {
   maxLinksPerPage?: number
   minGapChars?: number
   minPhraseLength?: number
-  minDerivedPhraseLength?: number
   maxPhrases?: number
 }
 
@@ -192,62 +206,9 @@ export const COLLECTION_WEIGHT: Record<InternalLinkCollection, number> = {
   pages: 0,
 }
 
-/** Within one document: an editor typed the keyword, the title is derived, the slug is inferred. */
-const PHRASE_SOURCE_WEIGHT = { keyword: 3, title: 2, slug: 1 } as const
-
 /* -------------------------------------------------------------------------- */
 /* Phrase extraction                                                           */
 /* -------------------------------------------------------------------------- */
-
-/**
- * Words that make a *derived* phrase meaningless.
- *
- * "Best Treks in Nepal" is a title, not an anchor: linking the words "best" would be noise, and
- * the phrase is too generic to pass authority for anything. An editor who genuinely wants it
- * linked types it into the document's Keywords field, which bypasses this list entirely — the
- * filter applies only to phrases the code inferred from a title or a slug.
- */
-const GENERIC_EDGE_WORDS: ReadonlySet<string> = new Set([
-  // Articles, conjunctions, prepositions and pronouns at either end of a phrase.
-  'a',
-  'an',
-  'the',
-  'and',
-  'or',
-  'but',
-  'of',
-  'in',
-  'on',
-  'at',
-  'to',
-  'for',
-  'from',
-  'by',
-  'with',
-  'our',
-  'your',
-  'my',
-  'we',
-  'you',
-  'this',
-  'that',
-  'these',
-  'those',
-  // Marketing qualifiers: a title like "Top 10 Treks" is a list heading, not a link target.
-  'best',
-  'top',
-  'all',
-  'new',
-  'other',
-  'more',
-  'popular',
-  'featured',
-  'latest',
-  'welcome',
-  'overview',
-  'introduction',
-  'about',
-])
 
 /** Collapse whitespace, trim, and drop characters that cannot appear in a URL-safe phrase. */
 const normalizePhrase = (raw: string): string =>
@@ -262,68 +223,35 @@ const normalizePhrase = (raw: string): string =>
     .replace(/["'“”‘’\].,;:!?]+$/, '')
     .trim()
 
-const wordsOf = (phrase: string): string[] =>
-  phrase
-    .toLowerCase()
-    .split(/[^a-z0-9'&-]+/)
-    .filter(Boolean)
-
-/** A phrase worth deriving from a title or slug: multi-word, long enough, no generic edges. */
-const isUsableDerivedPhrase = (phrase: string, minLength: number): boolean => {
-  if (phrase.length < minLength) return false
-
-  const words = wordsOf(phrase)
-  // One-word derivations are where the noise lives ("Nepal", "News", "Trek"). A single word is
-  // only ever linked when an editor put it in the Keywords field themselves.
-  if (words.length < 2) return false
-  if (GENERIC_EDGE_WORDS.has(words[0]!) || GENERIC_EDGE_WORDS.has(words[words.length - 1]!)) {
-    return false
-  }
-
-  return true
-}
-
-/** `everest-base-camp-trek` → `everest base camp trek`. */
-export const humanizeSlug = (slug: string): string =>
-  slug
-    .split('/')
-    .filter(Boolean)
-    .pop()
-    ?.replace(/[-_+]+/g, ' ')
-    .trim() ?? ''
-
 /**
- * The phrases one document should be linked by, highest priority first.
+ * The phrases one document should be linked by.
  *
- * Three sources, in descending trust:
+ * One source, and only one: the `internalLinkKeywords` list an editor filled in under
+ * **Keyword For Internal Linking**. The phrases are trusted as written — no word-count floor, no
+ * "generic word" filter, no derivation from the title or slug — because a human chose them. Only
+ * the mechanical cleanup applies: whitespace collapsed, wrapping quotes and trailing punctuation
+ * removed, case folded, duplicates dropped, and a two-character floor (see `minPhraseLength`) so a
+ * stray single letter cannot be indexed.
  *
- *  1. `keywords` — an editor typed these, so they are taken as written (only normalized and
- *     length-checked). This is the field `src/fields/keywords.ts` already collects on trips and
- *     posts, and it is the reason this feature needs no new schema.
- *  2. the title — derived, so it has to clear the multi-word and generic-word filters.
- *  3. the slug — same, and usually identical to the title, which is why the two collapse into one
- *     entry (see `buildLinkTargets`).
+ * An empty or missing list yields no phrases, which is the switch that turns automated linking
+ * *to* this document off.
  */
-export function phrasesForTarget(target: InternalLinkTarget, overrides?: InternalLinkConfig) {
+export function phrasesForTarget(
+  target: InternalLinkTarget,
+  overrides?: InternalLinkConfig,
+): string[] {
   const settings = config(overrides)
-  const out: { phrase: string; weight: number }[] = []
+  const out: string[] = []
   const seen = new Set<string>()
 
-  const push = (raw: string | null | undefined, weight: number, derived: boolean) => {
-    if (!raw) return
-    const phrase = normalizePhrase(raw).toLowerCase()
-    if (phrase.length < settings.minPhraseLength) return
-    if (derived && !isUsableDerivedPhrase(phrase, settings.minDerivedPhraseLength)) return
-    if (seen.has(phrase)) return
+  for (const keyword of target.internalLinkKeywords ?? []) {
+    if (typeof keyword !== 'string') continue
+    const phrase = normalizePhrase(keyword).toLowerCase()
+    if (phrase.length < settings.minPhraseLength) continue
+    if (seen.has(phrase)) continue
     seen.add(phrase)
-    out.push({ phrase, weight })
+    out.push(phrase)
   }
-
-  for (const keyword of target.keywords ?? []) {
-    if (typeof keyword === 'string') push(keyword, PHRASE_SOURCE_WEIGHT.keyword, false)
-  }
-  push(target.title, PHRASE_SOURCE_WEIGHT.title, true)
-  push(humanizeSlug(target.slug), PHRASE_SOURCE_WEIGHT.slug, true)
 
   return out
 }
@@ -345,8 +273,7 @@ export function buildLinkTargets(
     collection: InternalLinkCollection
     id: number
     slug?: string | null
-    title?: string | null
-    keywords?: (string | null | undefined)[] | null
+    internalLinkKeywords?: (string | null | undefined)[] | null
     href: string
   }>,
 ): InternalLinkTarget[] {
@@ -361,8 +288,7 @@ export function buildLinkTargets(
       id: doc.id,
       slug,
       href: doc.href,
-      title: doc.title ?? null,
-      keywords: doc.keywords ?? null,
+      internalLinkKeywords: doc.internalLinkKeywords ?? null,
     })
   }
 
@@ -406,13 +332,13 @@ export function compileLinkIndex(
   overrides?: InternalLinkConfig,
 ): LinkIndex {
   const settings = config(overrides)
-  const byPhrase = new Map<string, { target: InternalLinkTarget; weight: number }[]>()
+  const byPhrase = new Map<string, InternalLinkTarget[]>()
 
   for (const target of targets) {
-    for (const { phrase, weight } of phrasesForTarget(target, settings)) {
+    for (const phrase of phrasesForTarget(target, settings)) {
       const bucket = byPhrase.get(phrase)
-      if (bucket) bucket.push({ target, weight })
-      else byPhrase.set(phrase, [{ target, weight }])
+      if (bucket) bucket.push(target)
+      else byPhrase.set(phrase, [target])
     }
   }
 
@@ -420,16 +346,12 @@ export function compileLinkIndex(
   for (const [phrase, entries] of byPhrase) {
     const sorted = entries
       .slice()
-      // Highest-priority target first: money pages over posts, then an editor's own keyword order,
-      // then document order. `sort` is stable, so equal weights keep the order they arrived in and
-      // the result never depends on Map iteration luck.
-      .sort(
-        (a, b) =>
-          COLLECTION_WEIGHT[b.target.collection] - COLLECTION_WEIGHT[a.target.collection] ||
-          b.weight - a.weight,
-      )
+      // Highest-priority target first: money pages over posts, then document order. `sort` is
+      // stable, so equal collections keep the order they arrived in and the result never depends
+      // on Map iteration luck.
+      .sort((a, b) => COLLECTION_WEIGHT[b.collection] - COLLECTION_WEIGHT[a.collection])
 
-    phrases.push({ phrase, targets: sorted.map((entry) => entry.target) })
+    phrases.push({ phrase, targets: sorted })
   }
 
   phrases.sort((a, b) => b.phrase.length - a.phrase.length || a.phrase.localeCompare(b.phrase))
