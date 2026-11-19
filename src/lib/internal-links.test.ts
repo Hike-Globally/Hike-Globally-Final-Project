@@ -26,7 +26,6 @@ import {
   buildLinkTargets,
   compileLinkIndex,
   findLinkCandidates,
-  humanizeSlug,
   InternalLinker,
   phrasesForTarget,
   splitAutoLinkedText,
@@ -46,8 +45,8 @@ type FixtureDoc = {
   collection: InternalLinkCollection
   id: number
   slug: string
-  title: string
-  keywords?: (string | null)[] | null
+  /** The **Keyword For Internal Linking** panel — the only phrase source. */
+  internalLinkKeywords?: (string | null)[] | null
   href: string
 }
 
@@ -56,52 +55,47 @@ const DOCS: FixtureDoc[] = [
     collection: 'trips',
     id: 1,
     slug: 'everest-base-camp-trek',
-    title: 'Everest Base Camp Trek',
-    // An editor's keyword list deliberately overlapping the title, plus one phrase the title does
-    // not contain — the abbreviation travellers actually search with.
-    keywords: ['everest base camp trek', 'EBC trek'],
+    // Two curated phrases: the full name and the abbreviation travellers actually use.
+    internalLinkKeywords: ['everest base camp trek', 'EBC trek'],
     href: '/trips/everest-base-camp-trek',
   },
   {
     collection: 'trips',
     id: 2,
     slug: 'annapurna-circuit-trek',
-    title: 'Annapurna Circuit Trek',
-    keywords: null,
+    // The title happens to match, but the anchor comes from this list, not from the title.
+    internalLinkKeywords: ['annapurna circuit trek'],
     href: '/trips/annapurna-circuit-trek',
   },
   {
     collection: 'destinations',
     id: 3,
     slug: 'khumbu',
-    // One word: never derived as a phrase (see the derivation rules below).
-    title: 'Khumbu',
-    keywords: null,
+    // An empty panel: this destination is never linked to, whatever its name is.
+    internalLinkKeywords: null,
     href: '/destinations/khumbu',
   },
   {
     collection: 'destinations',
     id: 4,
     slug: 'sagarmatha-national-park',
-    title: 'Sagarmatha National Park',
-    keywords: null,
+    internalLinkKeywords: ['sagarmatha national park'],
     href: '/destinations/sagarmatha-national-park',
   },
   {
     collection: 'blog',
     id: 5,
     slug: 'packing-for-everest',
-    title: 'Packing For Everest',
-    // "best" is a generic edge word for a *derived* phrase, but an editor typing it is trusted.
-    keywords: ['best trekking boots'],
+    // "best" would have been rejected as a generic edge when phrases were derived; a human
+    // typing it is trusted.
+    internalLinkKeywords: ['packing for everest', 'best trekking boots'],
     href: '/blog/packing-for-everest',
   },
   {
     collection: 'pages',
     id: 6,
     slug: 'about-us',
-    title: 'About Us',
-    keywords: null,
+    internalLinkKeywords: null,
     href: '/about-us',
   },
 ]
@@ -148,25 +142,38 @@ const filler = (characters: number): string => 'x'.repeat(characters)
 /* Phrase extraction                                                           */
 /* -------------------------------------------------------------------------- */
 
-test('humanizeSlug reads a slug back as words', () => {
-  assert.equal(humanizeSlug('everest-base-camp-trek'), 'everest base camp trek')
-  assert.equal(humanizeSlug('gokyo-lakes_3-passes'), 'gokyo lakes 3 passes')
-  // Only the last segment: a slug carrying a path prefix still yields the page's own words.
-  assert.equal(humanizeSlug('nested/about-us'), 'about us')
-  assert.equal(humanizeSlug(''), '')
-})
-
-test('an editor’s keyword list is taken as written', () => {
+test('an editor\u2019s curated list is taken as written', () => {
   const phrases = phrasesForTarget({
     collection: 'blog',
     id: 1,
     slug: 'x',
     href: '/blog/x',
-    keywords: ['  Everest   Base Camp TREK ', 'EBC trek', 'best trekking boots'],
-  }).map((entry) => entry.phrase)
+    internalLinkKeywords: ['  Everest   Base Camp TREK ', 'EBC trek', 'best trekking boots'],
+  })
 
   // Normalized and lowercased, but not filtered: "best …" survives because a human typed it.
   assert.deepEqual(phrases, ['everest base camp trek', 'ebc trek', 'best trekking boots'])
+})
+
+test('the title, the slug and the SEO keywords are not phrase sources', () => {
+  // A document with a title and a slug but an empty panel is not linked to at all. Nothing is
+  // inferred — the exclusive panel is the contract.
+  const [target] = buildLinkTargets([
+    {
+      collection: 'trips',
+      id: 1,
+      slug: 'everest-base-camp-trek',
+      href: '/trips/everest-base-camp-trek',
+      internalLinkKeywords: null,
+    },
+  ])
+
+  assert.deepEqual(phrasesForTarget(target!), [])
+  assert.equal(compileLinkIndex([target!]).pattern, null)
+  assert.deepEqual(
+    findLinkCandidates('Book the Everest Base Camp Trek', compileLinkIndex([target!])),
+    [],
+  )
 })
 
 test('a phrase shorter than the floor is never indexed', () => {
@@ -175,48 +182,25 @@ test('a phrase shorter than the floor is never indexed', () => {
     id: 1,
     slug: 'x',
     href: '/blog/x',
-    keywords: ['ebc', 'trek', null, '   ', 'khumbu valley'],
-  }).map((entry) => entry.phrase)
+    internalLinkKeywords: ['e', 'trek', null, '   ', 'khumbu valley'],
+  })
 
-  // "ebc" is 3 characters, under `minPhraseLength`; null and blank are not phrases at all.
-  assert.deepEqual(
-    phrases,
-    ['trek', 'khumbu valley'].filter((p) => p.length >= 4),
-  )
-  assert.ok(!phrases.includes('ebc'))
+  // A single character is refused — "a" would match almost every paragraph on the site — while a
+  // real three-letter acronym is kept.
+  assert.deepEqual(phrases, ['trek', 'khumbu valley'])
 })
 
-test('a derived phrase has to be multi-word and free of generic edges', () => {
-  const phrasesOf = (title: string, slug: string) =>
-    phrasesForTarget({ collection: 'trips', id: 1, slug, title, href: '/trips/x' }).map(
-      (entry) => entry.phrase,
-    )
-
-  // Title and slug say the same thing → one phrase, not two.
-  assert.deepEqual(phrasesOf('Everest Base Camp Trek', 'everest-base-camp-trek'), [
-    'everest base camp trek',
-  ])
-
-  // One word is where the noise lives: "Nepal", "News", "Trek" would link on every page.
-  assert.deepEqual(phrasesOf('Khumbu', 'khumbu'), [])
-
-  // Marketing qualifiers make a title a heading, not an anchor.
-  assert.deepEqual(phrasesOf('Best Treks In Nepal', 'best-treks-in-nepal'), [])
-  assert.deepEqual(phrasesOf('About Us', 'about-us'), [])
-
-  // A title and a slug that differ both get indexed, title first (it outranks the slug).
-  const both = phrasesForTarget({
-    collection: 'destinations',
+test('a curated phrase may be short or generic — nothing is second-guessed', () => {
+  const phrases = phrasesForTarget({
+    collection: 'trips',
     id: 1,
-    slug: 'sagarmatha-national-park',
-    title: 'Sagarmatha Park',
-    href: '/destinations/sagarmatha-national-park',
+    slug: 'x',
+    href: '/trips/x',
+    internalLinkKeywords: ['ebc', 'best treks in nepal', 'khumbu'],
   })
-  assert.deepEqual(
-    both.map((entry) => entry.phrase),
-    ['sagarmatha park', 'sagarmatha national park'],
-  )
-  assert.ok(both[0]!.weight > both[1]!.weight)
+
+  // No two-word floor, no generic-edge list: these are a human's choices, not inferred phrases.
+  assert.deepEqual(phrases, ['ebc', 'best treks in nepal', 'khumbu'])
 })
 
 test('buildLinkTargets drops documents with no slug and no href', () => {
@@ -252,14 +236,16 @@ test('the index groups phrases with the documents that answer to them', () => {
     phrases.get('sagarmatha national park')?.map((target) => target.href),
     ['/destinations/sagarmatha-national-park'],
   )
-  // Derived from the title, even though the post is about packing.
+  // Curated on the post itself, even though the post is about packing.
   assert.deepEqual(
     phrases.get('packing for everest')?.map((target) => target.href),
     ['/blog/packing-for-everest'],
   )
 })
 
-test('a one-word document title is not indexed, so "Khumbu" never auto-links', () => {
+test('a document with an empty panel is never linked to', () => {
+  // The Khumbu destination is in the fixture with `internalLinkKeywords: null` — its name, its
+  // slug and its (absent) SEO keywords are not fallbacks.
   assert.equal(
     INDEX.phrases.some((entry) => entry.phrase === 'khumbu'),
     false,
@@ -307,22 +293,19 @@ test('a phrase made of regex metacharacters is escaped, not compiled as a patter
         collection: 'blog',
         id: 1,
         slug: 'costs',
-        title: 'Trek Costs (2026)',
-        // A keyword with parentheses, a dot and a pipe — each would break a naive alternation.
-        keywords: ['everest permits (2026)', 'cost . per . day', 'tea|house'],
+        // Phrases with parentheses, dots and a pipe — each would break a naive alternation.
+        internalLinkKeywords: ['everest permits (2026)', 'cost . per . day', 'tea|house'],
         href: '/blog/costs',
       },
     ]),
   )
 
-  // Four phrases: the three keywords, plus the title "Trek Costs (2026)" derived from the document
-  // (the slug `costs` is one word and contributes nothing). The point is that all four compiled
-  // without the parentheses, dot or pipe being read as regex syntax.
+  // Three phrases, and every one of them compiled without the parentheses, dot or pipe being read
+  // as regex syntax.
   assert.deepEqual(index.phrases.map((entry) => entry.phrase).sort(), [
     'cost . per . day',
     'everest permits (2026)',
     'tea|house',
-    'trek costs (2026)',
   ])
 
   const found = findLinkCandidates('Ask about everest permits (2026) before you book.', index)
@@ -344,8 +327,7 @@ test('the phrase cap drops the tail rather than shipping an unbounded pattern', 
     collection: 'blog' as InternalLinkCollection,
     id: i,
     slug: `post-${i}`,
-    title: `Trekking Post Number ${i}`,
-    keywords: null,
+    internalLinkKeywords: [`trekking post number ${i}`],
     href: `/blog/post-${i}`,
   }))
 
@@ -365,16 +347,14 @@ test('two documents claiming one phrase are ordered by what the site earns from'
         collection: 'blog',
         id: 1,
         slug: 'everest-base-camp-trek-guide',
-        title: 'Everest Base Camp Trek',
-        keywords: null,
+        internalLinkKeywords: ['everest base camp trek'],
         href: '/blog/everest-base-camp-trek-guide',
       },
       {
         collection: 'trips',
         id: 2,
         slug: 'everest-base-camp-trek',
-        title: 'Everest Base Camp Trek',
-        keywords: null,
+        internalLinkKeywords: ['everest base camp trek'],
         href: '/trips/everest-base-camp-trek',
       },
     ]),

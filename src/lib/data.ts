@@ -1342,15 +1342,14 @@ export const internalLinkHref = (
 /**
  * What the four queries below pull per document: only what a phrase can be built from.
  *
- * `meta` comes along for its `noIndex` flag (a page told to stay out of the index must not be
- * linked to either), and `name` is selected next to `title` because destinations call it that.
- * No rich text, no images, no itineraries — these rows stay tiny.
+ * The phrases are the ones an editor typed into **Keyword For Internal Linking**
+ * (`internalLinkKeywords`); the title, the slug and the SEO `keywords` are no longer phrase
+ * sources. `meta` comes along for its `noIndex` flag (a page told to stay out of the index must
+ * not be linked to either). No rich text, no images, no itineraries — these rows stay tiny.
  */
 const internalLinkSelect = {
   slug: true,
-  title: true,
-  name: true,
-  keywords: true,
+  internalLinkKeywords: true,
   meta: true,
 } as const
 
@@ -1358,8 +1357,7 @@ type InternalLinkRecord = {
   collection: InternalLinkCollection
   id: number
   slug: string | null
-  title: string | null
-  keywords: string[] | null
+  internalLinkKeywords: string[] | null
   href: string
 }
 
@@ -1371,9 +1369,7 @@ const toInternalLinkRecord = (
   const record = doc as {
     id?: number
     slug?: string | null
-    title?: string | null
-    name?: string | null
-    keywords?: (string | null)[] | null
+    internalLinkKeywords?: (string | null)[] | null
     meta?: { noIndex?: boolean | null } | null
   }
 
@@ -1386,16 +1382,17 @@ const toInternalLinkRecord = (
   const href = internalLinkHref(collection, slug)
   if (!href || typeof record.id !== 'number') return null
 
-  const keywords = Array.isArray(record.keywords)
-    ? record.keywords.filter((keyword): keyword is string => typeof keyword === 'string')
+  const internalLinkKeywords = Array.isArray(record.internalLinkKeywords)
+    ? record.internalLinkKeywords.filter(
+        (keyword): keyword is string => typeof keyword === 'string',
+      )
     : null
 
   return {
     collection,
     id: record.id,
     slug,
-    title: record.title ?? record.name ?? null,
-    keywords,
+    internalLinkKeywords,
     href,
   }
 }

@@ -24,6 +24,7 @@ import * as migration_20261115_180000_link_preview from './20261115_180000_link_
 import * as migration_20261115_200000_link_preview_in_page_section from './20261115_200000_link_preview_in_page_section'
 import * as migration_20261119_120000_author_expertise from './20261119_120000_author_expertise'
 import * as migration_20261119_170704_multi_url_preview from './20261119_170704_multi_url_preview'
+import * as migration_20261119_180000_internal_link_keywords from './20261119_180000_internal_link_keywords'
 
 export const migrations = [
   {
@@ -155,5 +156,10 @@ export const migrations = [
     up: migration_20261119_170704_multi_url_preview.up,
     down: migration_20261119_170704_multi_url_preview.down,
     name: '20261119_170704_multi_url_preview',
+  },
+  {
+    up: migration_20261119_180000_internal_link_keywords.up,
+    down: migration_20261119_180000_internal_link_keywords.down,
+    name: '20261119_180000_internal_link_keywords',
   },
 ]

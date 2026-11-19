@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { adminOrEditor, publishedOrSignedIn } from '../access'
+import { internalLinkKeywordsSection } from '../fields/internal-link-keywords'
 import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
 import { viewLiveField } from '../fields/view-live'
@@ -145,6 +146,9 @@ export const Destinations: CollectionConfig = {
       maxDepth: 1,
       admin: { defaultColumns: ['title', 'durationDays', 'priceFrom'] },
     },
+    /* The phrases that should link to this destination from other pages. Destinations have no SEO
+       Keywords panel, so this is the only place their anchor phrases are written. */
+    internalLinkKeywordsSection(),
     metaField(),
     viewLiveField(),
   ],

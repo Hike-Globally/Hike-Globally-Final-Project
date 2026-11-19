@@ -5,6 +5,7 @@ import { adminOrEditor, publishedOrSignedIn } from '../access'
 import { faqFields } from '../fields/faqs'
 import { pageSectionsField } from '../fields/page-sections'
 import { tripSectionOptions } from '../lib/page-sections'
+import { internalLinkKeywordsSection } from '../fields/internal-link-keywords'
 import { keywordsSection } from '../fields/keywords'
 import { linkField } from '../fields/link'
 import { metaField } from '../fields/meta'
@@ -849,6 +850,9 @@ export const Trips: CollectionConfig = {
        targeting are filled in while the page is being written, not after.
        -------------------------------------------------------------------------- */
     keywordsSection(),
+    /* Which phrases should link to this trip from other pages — chosen by hand, not inferred
+       from the SEO keywords above. See src/fields/internal-link-keywords.ts. */
+    internalLinkKeywordsSection(),
     metaField(),
     viewLiveField(),
   ],

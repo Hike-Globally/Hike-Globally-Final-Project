@@ -368,6 +368,10 @@ export interface Destination {
     totalDocs?: number;
   };
   /**
+   * The phrases that should become a link to this page wherever they appear in another page's copy. Type one, press Enter, repeat — up to 20. These are the only phrases used: the SEO keywords, the title and the slug are not linked automatically. Matching is exact (case-insensitive), so write the phrase the way it appears in the copy. Leave this empty to stop this page being linked to.
+   */
+  internalLinkKeywords?: string[] | null;
+  /**
    * Override the automatically generated title/description and social preview.
    */
   meta?: {
@@ -411,20 +415,20 @@ export interface Trip {
     | {
         kind:
           | 'hero'
-          | 'keyTakeaways'
           | 'overview'
-          | 'whyChoose'
           | 'highlights'
+          | 'itinerary'
+          | 'information'
+          | 'departures'
+          | 'faqs'
+          | 'keyTakeaways'
+          | 'whyChoose'
           | 'audience'
           | 'linkPreview'
           | 'multiUrlPreview'
           | 'routeMap'
-          | 'itinerary'
-          | 'departures'
-          | 'information'
           | 'inclusions'
           | 'packing'
-          | 'faqs'
           | 'gallery'
           | 'inquiry'
           | 'related'
@@ -898,6 +902,10 @@ export interface Trip {
    */
   keywords?: string[] | null;
   /**
+   * The phrases that should become a link to this page wherever they appear in another page's copy. Type one, press Enter, repeat — up to 20. These are the only phrases used: the SEO keywords, the title and the slug are not linked automatically. Matching is exact (case-insensitive), so write the phrase the way it appears in the copy. Leave this empty to stop this page being linked to.
+   */
+  internalLinkKeywords?: string[] | null;
+  /**
    * Override the automatically generated title/description and social preview.
    */
   meta?: {
@@ -943,6 +951,10 @@ export interface Page {
     | InquiryBlock
     | CtaBlock
   )[];
+  /**
+   * The phrases that should become a link to this page wherever they appear in another page's copy. Type one, press Enter, repeat — up to 20. These are the only phrases used: the SEO keywords, the title and the slug are not linked automatically. Matching is exact (case-insensitive), so write the phrase the way it appears in the copy. Leave this empty to stop this page being linked to.
+   */
+  internalLinkKeywords?: string[] | null;
   /**
    * Override the automatically generated title/description and social preview.
    */
@@ -1250,6 +1262,10 @@ export interface Blog {
    * The phrases you want this page to rank for. Type one, press Enter, repeat — up to 20. Write them the way a traveller would search ("everest base camp trek cost"), lead with the most important, and use the same wording in the title and copy. They are published as meta keywords, as Open Graph article tags and in the structured data.
    */
   keywords?: string[] | null;
+  /**
+   * The phrases that should become a link to this page wherever they appear in another page's copy. Type one, press Enter, repeat — up to 20. These are the only phrases used: the SEO keywords, the title and the slug are not linked automatically. Matching is exact (case-insensitive), so write the phrase the way it appears in the copy. Leave this empty to stop this page being linked to.
+   */
+  internalLinkKeywords?: string[] | null;
   /**
    * Override the automatically generated title/description and social preview.
    */
@@ -1849,6 +1865,7 @@ export interface DestinationsSelect<T extends boolean = true> {
       };
   featured?: T;
   trips?: T;
+  internalLinkKeywords?: T;
   meta?:
     | T
     | {
@@ -2056,6 +2073,7 @@ export interface TripsSelect<T extends boolean = true> {
       };
   featured?: T;
   keywords?: T;
+  internalLinkKeywords?: T;
   meta?:
     | T
     | {
@@ -2164,6 +2182,7 @@ export interface BlogSelect<T extends boolean = true> {
   relatedPosts?: T;
   featured?: T;
   keywords?: T;
+  internalLinkKeywords?: T;
   meta?:
     | T
     | {
@@ -2198,6 +2217,7 @@ export interface PagesSelect<T extends boolean = true> {
         inquiry?: T | InquiryBlockSelect<T>;
         cta?: T | CtaBlockSelect<T>;
       };
+  internalLinkKeywords?: T;
   meta?:
     | T
     | {
