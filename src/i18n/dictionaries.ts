@@ -98,7 +98,14 @@ const en = {
     typeHeli: 'Helicopter tour',
     typeMultiSport: 'Multi-sport',
   },
+  author: {
+    education: 'Education',
+    credentials: 'Professional credentials',
+    website: 'Website',
+    profiles: 'Author profiles',
+  },
   trip: {
+    aboutGuide: 'About the itinerary expert',
     overview: 'Trip overview',
     itinerary: 'Detailed Itinerary',
     /** Label on the switch beside the itinerary heading — opens/closes every day at once. */
@@ -236,8 +243,7 @@ const en = {
   },
   inquiry: {
     title: 'Plan your trip',
-    subtitle:
-      'Tell us what you have in mind and we’ll help point you in the right direction.',
+    subtitle: 'Tell us what you have in mind and we’ll help point you in the right direction.',
     formTitle: 'Request a quote',
     name: 'Full name',
     email: 'Email address',
@@ -256,8 +262,7 @@ const en = {
     submitting: 'Sending…',
     required: 'Required',
     successTitle: 'Thank you — your enquiry is on its way',
-    successText:
-      'Thank you for getting in touch. We’ll be in contact about your enquiry.',
+    successText: 'Thank you for getting in touch. We’ll be in contact about your enquiry.',
     successBackHome: 'Back to the homepage',
     successBrowseTrips: 'Browse more trips',
     privacyNote: 'We only use your details to answer your enquiry. No newsletters, no resale.',

@@ -72,5 +72,5 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     createInternalLinker({ collection: 'blog', id: post.id }),
   ])
 
-  return <PostDetail post={post} related={related} siteName={settings.siteName} linker={linker} />
+  return <PostDetail post={post} related={related} settings={settings} linker={linker} />
 }

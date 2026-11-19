@@ -155,6 +155,34 @@ export interface User {
    */
   bio?: string | null;
   avatar?: (number | null) | Media;
+  /**
+   * Role shown under the author’s name, e.g. "Senior Trekking Guide". Published as `jobTitle` in the author’s structured data.
+   */
+  jobTitle?: string | null;
+  /**
+   * Verified educational background, including the institution where applicable. Leave blank if not supplied by the author.
+   */
+  education?: string | null;
+  /**
+   * Only qualifications and licences the author actually holds — one per row. Include the issuing body where possible; leave blank when unverified.
+   */
+  credentials?:
+    | {
+        credential: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Personal website or profile URL. Published as the author’s `url` in structured data — the link a reader can follow to verify who this person is.
+   */
+  website?: string | null;
+  socials?:
+    | {
+        platform: 'instagram' | 'facebook' | 'youtube' | 'tiktok' | 'linkedin' | 'x';
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -372,6 +400,10 @@ export interface Trip {
    * Auto-generated from the title. Edit carefully — changing it changes the live URL.
    */
   slug?: string | null;
+  /**
+   * The person who wrote or maintains this itinerary. Their public bio and qualifications are shown on the trip page. This is not a guarantee that they will lead every departure. Leave blank until assigned.
+   */
+  guide?: (number | null) | User;
   /**
    * Drag the row handles to set the order on this page, or use each row’s Move Up / Move Down controls. Add as many Custom HTML or Link preview rows as the page needs — each one carries its own content, so a page can point at several places. Every other section reads the fields below and can be placed once; empty sections do not display. Removing a row hides that section without deleting its content. The booking card and article outline stay beside their content.
    */
@@ -1576,6 +1608,22 @@ export interface UsersSelect<T extends boolean = true> {
   roles?: T;
   bio?: T;
   avatar?: T;
+  jobTitle?: T;
+  education?: T;
+  credentials?:
+    | T
+    | {
+        credential?: T;
+        id?: T;
+      };
+  website?: T;
+  socials?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -1717,6 +1765,7 @@ export interface DestinationsSelect<T extends boolean = true> {
 export interface TripsSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
+  guide?: T;
   pageSections?:
     | T
     | {

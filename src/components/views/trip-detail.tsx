@@ -21,6 +21,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 
+import { AuthorProfile } from '@/components/content/author-profile'
 import { RichText } from '@/components/content/rich-text'
 import { CtaCard } from '@/components/blocks/cta'
 import { JsonLd } from '@/components/seo/json-ld'
@@ -51,7 +52,7 @@ import { resolveLink } from '@/lib/links'
 import { cn } from '@/lib/utils'
 import { hasRichTextContent } from '@/lib/rich-text-content'
 import { breadcrumbJsonLd, faqJsonLd, touristTripJsonLd } from '@/lib/seo'
-import type { Media, Trip } from '@/payload-types'
+import type { Media, Setting, Trip } from '@/payload-types'
 
 /* ----------------------------------------------------------------------------
    Shared styling
@@ -215,10 +216,12 @@ function RouteMapSection({ trip, linker }: { trip: Trip; linker?: InternalLinker
 export function TripDetail({
   trip,
   related,
+  settings,
   linker,
 }: {
   trip: Trip
   related: TripCardData[]
+  settings: Pick<Setting, 'siteName' | 'logo' | 'socials'>
   /**
    * The page's automated internal keyword linking, created by the route (see
    * `src/lib/internal-links.ts`). Omitted, every section renders exactly as it did before.
@@ -476,6 +479,10 @@ export function TripDetail({
   // Custom HTML stays with the body sections so it uses the same main column and single sticky
   // booking sidebar instead of splitting the page into another full-width group.
   const groups = groupPageSections(sections, ['hero', 'inquiry', 'related'])
+  const lastBodyGroup = groups.findLast((group) => !group.fullWidth)
+  const guideProfile = (
+    <AuthorProfile author={trip.guide} label={dict.trip.aboutGuide} className="mt-0 mb-16" />
+  )
 
   const bookingAnchor =
     sections.find(({ kind }) => kind === 'highlights') ??
@@ -510,7 +517,10 @@ export function TripDetail({
             key={groupIndex}
             className="container-content grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14 3xl:grid-cols-[minmax(0,1fr)_26rem]"
           >
-            <div className="single-page-body min-w-0">{content}</div>
+            <div className="single-page-body min-w-0">
+              {content}
+              {group === lastBodyGroup ? guideProfile : null}
+            </div>
             <aside className="hidden lg:sticky lg:top-28 lg:mt-16 lg:block lg:self-start">
               <TripBookingCard
                 trip={trip}
@@ -522,6 +532,8 @@ export function TripDetail({
           </div>
         )
       })}
+      {/* A layout with no body column still needs visible attribution for its schema. */}
+      {!lastBodyGroup ? <div className="container-content">{guideProfile}</div> : null}
 
       <JsonLd
         data={[
@@ -537,7 +549,9 @@ export function TripDetail({
             // structured data requires (a relative one is dropped from the rich result).
             image: trip.heroImage,
             destinationName: destination?.name,
-            siteName: dict.structuredData.organization,
+            siteName: settings.siteName,
+            organizationLogo: settings.logo,
+            organizationSocials: settings.socials,
           }),
           ...(faqs.length && sections.some(({ kind }) => kind === 'faqs')
             ? [faqJsonLd(faqs.map((faq) => ({ question: faq.question, answer: faq.answer ?? '' })))]

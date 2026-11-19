@@ -77,6 +77,18 @@ export const Trips: CollectionConfig = {
     { name: 'title', type: 'text', localized: true, required: true },
     // Rendered in the document sidebar, not here (see `slugField`).
     slugField('title'),
+    {
+      name: 'guide',
+      label: 'Itinerary expert',
+      type: 'relationship',
+      relationTo: 'users',
+      index: true,
+      admin: {
+        position: 'sidebar',
+        description:
+          'The person who wrote or maintains this itinerary. Their public bio and qualifications are shown on the trip page. This is not a guarantee that they will lead every departure. Leave blank until assigned.',
+      },
+    },
     pageSectionsField(tripSectionOptions),
     {
       name: 'summary',

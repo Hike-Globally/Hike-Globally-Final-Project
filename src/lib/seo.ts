@@ -3,7 +3,9 @@ import type { Metadata } from 'next'
 import { MAX_KEYWORDS } from '@/fields/keywords'
 import { htmlLang, ogLocale } from '@/i18n/config'
 import type { Blog, Destination, Media, Trip } from '@/payload-types'
+import { authorProfile, type PublicAuthor } from './author-profile'
 import { lexicalToPlainText, truncate } from './format'
+import { httpUrl } from './http-url'
 import { resolveSiteUrl } from './site-url'
 
 // Normalized so a bare `hikeglobally.com` (no scheme) can never reach `new URL()` and blow up the
@@ -325,8 +327,12 @@ export const seoFromDoc = (
 
 type JsonLdInput = Record<string, unknown>
 
+/** The root layout emits the full Organization; page publishers reference the same entity. */
+export const organizationId = `${siteUrl}/#organization`
+
 export const organizationJsonLd = ({
   name,
+  legalName,
   url,
   logo,
   description,
@@ -336,39 +342,99 @@ export const organizationJsonLd = ({
   socials,
 }: {
   name: string
+  legalName?: string | null
   url: string
-  logo?: string
+  logo?: number | Media | string | null
   description?: string | null
   email?: string | null
   phone?: string | null
   address?: string | null
-  socials?: { platform: string; url: string }[]
+  socials?: { url: string }[] | null
 }): JsonLdInput => ({
   '@context': 'https://schema.org',
   '@type': ['Organization', 'TouristInformationCenter'],
+  '@id': organizationId,
   name,
+  legalName: legalName?.trim() || undefined,
   url,
-  logo,
-  description: description ?? undefined,
-  email: email ?? undefined,
-  telephone: phone ?? undefined,
-  address: address
-    ? { '@type': 'PostalAddress', streetAddress: address.replace(/\n/g, ', ') }
+  logo: schemaImageUrl(logo) ?? absoluteUrl('/images/logo.svg'),
+  description: description?.trim() || undefined,
+  email: email?.trim() || undefined,
+  telephone: phone?.trim() || undefined,
+  address: address?.trim()
+    ? { '@type': 'PostalAddress', streetAddress: address.trim().replace(/\n/g, ', ') }
     : undefined,
-  // A contact point is what the Knowledge Panel and "customer support" rich results read; without
-  // it the organization node describes a name and nothing a traveller can act on.
   contactPoint:
-    email || phone
+    email?.trim() || phone?.trim()
       ? {
           '@type': 'ContactPoint',
           contactType: 'customer service',
-          email: email ?? undefined,
-          telephone: phone ?? undefined,
+          email: email?.trim() || undefined,
+          telephone: phone?.trim() || undefined,
           availableLanguage: htmlLang,
         }
       : undefined,
-  sameAs: socials?.length ? socials.map((social) => social.url) : undefined,
+  sameAs: socialProfileUrls(socials),
 })
+
+const socialProfileUrls = (socials?: { url: string }[] | null): string[] | undefined => {
+  const urls = [...new Set((socials ?? []).flatMap((social) => httpUrl(social?.url) ?? []))]
+  return urls.length ? urls : undefined
+}
+
+/** Page-level publishers link to the full, site-wide Organization. */
+const publisherJsonLd = ({
+  name,
+  logo,
+  socials,
+}: {
+  name: string
+  logo?: number | Media | string | null
+  socials?: { url: string }[] | null
+}): JsonLdInput => ({
+  '@type': 'Organization',
+  '@id': organizationId,
+  name,
+  url: siteUrl,
+  logo: schemaImageUrl(logo) ?? absoluteUrl('/images/logo.svg'),
+  sameAs: socialProfileUrls(socials),
+})
+
+/** Only public, editor-supplied facts are published; absent profiles are not invented. */
+export const personJsonLd = (
+  author: PublicAuthor | number | null | undefined,
+): JsonLdInput | undefined => {
+  const profile = authorProfile(author)
+  if (!profile) return undefined
+
+  const credentials = [
+    ...(profile.education
+      ? [
+          {
+            '@type': 'EducationalOccupationalCredential',
+            credentialCategory: 'education',
+            name: profile.education,
+          },
+        ]
+      : []),
+    ...profile.credentials.map((name) => ({
+      '@type': 'EducationalOccupationalCredential',
+      credentialCategory: 'professional credential',
+      name,
+    })),
+  ]
+
+  return {
+    '@type': 'Person',
+    name: profile.name,
+    url: profile.website ?? profile.socials[0]?.url,
+    image: schemaImageUrl(profile.avatar),
+    description: profile.bio,
+    jobTitle: profile.jobTitle,
+    sameAs: profile.socials.length ? profile.socials.map((social) => social.url) : undefined,
+    hasCredential: credentials.length ? credentials : undefined,
+  }
+}
 
 export const websiteJsonLd = ({ name, url }: { name: string; url: string }): JsonLdInput => ({
   '@context': 'https://schema.org',
@@ -396,17 +462,26 @@ export const breadcrumbJsonLd = (items: { name: string; url: string }[]): JsonLd
 export const blogPostingJsonLd = ({
   post,
   url,
+  author,
   authorName,
   image,
   siteName,
+  organizationLogo,
+  organizationSocials,
   categories,
 }: {
   post: Blog
   url: string
+  /** Defaults to the post's populated author relationship. */
+  author?: PublicAuthor | number | null
+  /** Fallback for callers that only know the author's name. */
   authorName?: string | null
   /** Media document, media id or an already-absolute URL — resolved by `schemaImageUrl()`. */
   image?: number | Media | string | null
   siteName: string
+  /** The publisher's configured logo; resolved to an absolute URL, with the site logo fallback. */
+  organizationLogo?: number | Media | string | null
+  organizationSocials?: { url: string }[] | null
   /** Human-readable category names, published as `articleSection`. */
   categories?: string[]
 }): JsonLdInput => {
@@ -428,12 +503,14 @@ export const blogPostingJsonLd = ({
     keywords: normalizeKeywords(post.keywords).join(', ') || undefined,
     articleSection: categories?.length ? categories : undefined,
     wordCount: body ? body.split(/\s+/).length : undefined,
-    author: authorName ? { '@type': 'Person', name: authorName } : undefined,
-    publisher: {
-      '@type': 'Organization',
+    author:
+      personJsonLd(author === undefined ? post.author : author) ??
+      (authorName?.trim() ? { '@type': 'Person', name: authorName.trim() } : undefined),
+    publisher: publisherJsonLd({
       name: siteName,
-      url: siteUrl,
-    },
+      logo: organizationLogo,
+      socials: organizationSocials,
+    }),
     articleBody: truncate(body, 4000),
   }
 }
@@ -442,26 +519,49 @@ export const touristTripJsonLd = ({
   trip,
   url,
   image,
+  guide,
   destinationName,
   siteName,
+  organizationLogo,
+  organizationSocials,
 }: {
   trip: Trip
   url: string
   /** Media document, media id or an already-absolute URL — resolved by `schemaImageUrl()`. */
   image?: number | Media | string | null
+  /** Defaults to the trip's populated itinerary expert relationship. */
+  guide?: PublicAuthor | number | null
   destinationName?: string
   siteName: string
+  organizationLogo?: number | Media | string | null
+  organizationSocials?: { url: string }[] | null
 }): JsonLdInput => {
   const tripImage = schemaImageUrl(image)
+  const tripGuide = personJsonLd(guide === undefined ? trip.guide : guide)
+  const pageUrl = canonicalUrl(url)
 
   return {
     '@context': 'https://schema.org',
     '@type': 'TouristTrip',
+    '@id': `${pageUrl}#trip`,
     name: trip.meta?.title || trip.title,
     description: trip.meta?.description || trip.summary,
-    url: canonicalUrl(url),
+    url: pageUrl,
     image: tripImage ? [tripImage] : undefined,
     inLanguage: htmlLang,
+    // TouristTrip is not a CreativeWork: authorship belongs to the page describing it.
+    subjectOf: tripGuide
+      ? {
+          '@type': 'WebPage',
+          '@id': pageUrl,
+          url: pageUrl,
+          name: trip.title,
+          author: tripGuide,
+          mainEntity: { '@id': `${pageUrl}#trip` },
+          datePublished: trip.createdAt,
+          dateModified: trip.updatedAt,
+        }
+      : undefined,
     // The "Keywords" section of the trip, in the order the editor wrote it.
     keywords: normalizeKeywords(trip.keywords).join(', ') || undefined,
     touristType: trip.difficulty,
@@ -477,7 +577,11 @@ export const touristTripJsonLd = ({
           })),
         }
       : undefined,
-    provider: { '@type': 'Organization', name: siteName, url: siteUrl },
+    provider: publisherJsonLd({
+      name: siteName,
+      logo: organizationLogo,
+      socials: organizationSocials,
+    }),
     offers: {
       '@type': 'Offer',
       price: trip.priceFrom,
@@ -532,7 +636,7 @@ export const webPageJsonLd = ({
     image: pageImage ? [pageImage] : undefined,
     inLanguage: htmlLang,
     isPartOf: { '@type': 'WebSite', name: siteName, url: siteUrl },
-    publisher: { '@type': 'Organization', name: siteName, url: siteUrl },
+    publisher: { '@type': 'Organization', '@id': organizationId, name: siteName, url: siteUrl },
     mainEntity: items?.length
       ? {
           '@type': 'ItemList',

@@ -5,7 +5,7 @@ import { JsonLd } from '@/components/seo/json-ld'
 import { HomeFallback } from '@/components/views/home-fallback'
 import { getPage, getSettings } from '@/lib/data'
 import { isLivePreviewRequest } from '@/lib/live-preview-access'
-import { buildMetadata, organizationJsonLd, seoFromDoc, siteUrl, websiteJsonLd } from '@/lib/seo'
+import { buildMetadata, seoFromDoc, siteUrl, websiteJsonLd } from '@/lib/seo'
 
 import './homepage.css'
 
@@ -67,24 +67,8 @@ export default async function HomePage() {
     <div data-homepage="">
       {page ? <BlockRenderer blocks={page.blocks} homepage /> : <HomeFallback />}
 
-      <JsonLd
-        data={[
-          organizationJsonLd({
-            name: settings.legalName || settings.siteName,
-            url: siteUrl,
-            logo: `${siteUrl}/images/logo.svg`,
-            description: settings.tagline ?? undefined,
-            email: settings.email,
-            phone: settings.phone,
-            address: settings.address,
-            socials: settings.socials?.map((social) => ({
-              platform: social.platform,
-              url: social.url,
-            })),
-          }),
-          websiteJsonLd({ name: settings.siteName, url: siteUrl }),
-        ]}
-      />
+      {/* The full Organization is emitted once by the shared root layout. */}
+      <JsonLd data={websiteJsonLd({ name: settings.siteName, url: siteUrl })} />
     </div>
   )
 }

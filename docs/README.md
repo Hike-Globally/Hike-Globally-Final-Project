@@ -26,6 +26,7 @@ documents here go deeper on specific areas.
 | [internal-linking.md](content/internal-linking.md) | Automatic internal links from keywords — how editors use it and how the engine works. |
 | [trip-brochure.md](content/trip-brochure.md) | The downloadable trip brochure on the trip page. |
 | [trip-audience.md](content/trip-audience.md) | The *Who Is This Trip For / Not For* cards on the trip page. |
+| [author-expertise.md](content/author-expertise.md) | Public author qualifications, trip itinerary experts, and site-wide publisher identity. |
 
 ## Design
 

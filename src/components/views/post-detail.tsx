@@ -13,6 +13,7 @@ import { ArrowLeft, ArrowUpRight, CalendarDays, Clock } from 'lucide-react'
 import { ArticleReadingProgress } from '@/components/blog/article-reading-progress'
 import { ArticleShareButton } from '@/components/blog/article-share-button'
 import { ArticleTableOfContents } from '@/components/blog/article-table-of-contents'
+import { AuthorProfile } from '@/components/content/author-profile'
 import { RichText } from '@/components/content/rich-text'
 import { PostCard } from '@/components/cards/post-card'
 import { CtaCard } from '@/components/blocks/cta'
@@ -30,7 +31,7 @@ import { formatDate, readingTimeMinutes } from '@/lib/format'
 import { blogPostingJsonLd, breadcrumbJsonLd, faqJsonLd } from '@/lib/seo'
 import { getTripFaqGroups } from '@/lib/trip-faqs'
 import { cn } from '@/lib/utils'
-import type { Blog } from '@/payload-types'
+import type { Blog, Setting } from '@/payload-types'
 
 function TopographicLines() {
   return (
@@ -61,12 +62,12 @@ function TopographicLines() {
 export function PostDetail({
   post,
   related,
-  siteName,
+  settings,
   linker,
 }: {
   post: Blog
   related: PostCardData[]
-  siteName: string
+  settings: Pick<Setting, 'siteName' | 'logo' | 'socials'>
   /**
    * The page's automated internal keyword linking, created by the route (see
    * `src/lib/internal-links.ts`). Omitted, the body renders exactly as it did before.
@@ -74,8 +75,9 @@ export function PostDetail({
   linker?: InternalLinker | null
 }) {
   const dict = dictionary
+  const siteName = settings.siteName
   const author = post.author && typeof post.author !== 'number' ? post.author : null
-  const authorName = author?.name ?? null
+  const authorName = author?.name?.trim() || null
   const publishedAt = post.publishedAt ?? post.createdAt
   const minutes = readingTimeMinutes(post.content)
   const allHeadings = getArticleHeadings(post.content)
@@ -233,30 +235,7 @@ export function PostDetail({
         className="my-16 first:mt-0 last:mb-0 md:my-20"
       />
     ),
-    author: (
-      <>
-        {authorName && author?.bio ? (
-          <div className="mt-16 flex items-start gap-4 border-t border-slate-20 pt-7">
-            {author.avatar && typeof author.avatar !== 'number' ? (
-              <PayloadImage
-                media={author.avatar}
-                sizes="64px"
-                className="size-16 shrink-0 rounded-full ring-1 ring-slate-20"
-              />
-            ) : (
-              <span className="grid size-16 shrink-0 place-items-center rounded-full bg-mist font-heading text-subhead font-semibold text-ink">
-                {authorName.slice(0, 1)}
-              </span>
-            )}
-            <div className="min-w-0 pt-1">
-              <p className="eyebrow text-slate-80">{dict.blog.aboutAuthor}</p>
-              <p className="mt-1 font-heading text-subhead font-semibold text-ink">{authorName}</p>
-              <p className="mt-2 description-copy leading-relaxed text-ink-60">{author.bio}</p>
-            </div>
-          </div>
-        ) : null}
-      </>
-    ),
+    author: <AuthorProfile author={author} label={dict.blog.aboutAuthor} />,
     navigation: (
       <>
         <div className="mt-10 border-t border-slate-20 pt-6">
@@ -386,11 +365,15 @@ export function PostDetail({
           blogPostingJsonLd({
             post,
             url: sitePath(`/blog/${post.slug}`),
+            // Full expertise is published only when its visible profile section is enabled.
+            author: sections.some(({ kind }) => kind === 'author') ? author : null,
             authorName,
             // The Media document, not its `url`: `schemaImageUrl()` turns it into the absolute URL
             // structured data requires (a relative one is dropped from the rich result).
             image: post.featuredImage,
             siteName,
+            organizationLogo: settings.logo,
+            organizationSocials: settings.socials,
             categories: (post.categories ?? []).map(blogCategoryLabel),
           }),
           ...(faqs.length && sections.some(({ kind }) => kind === 'faqs')
