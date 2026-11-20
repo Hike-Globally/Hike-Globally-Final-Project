@@ -170,6 +170,8 @@ test('trip: existing CMS layouts render primary sections in canonical order and 
     { kind: 'related' },
     { id: 'custom-first', kind: 'html', html: '<p>First custom block</p>' },
     { kind: 'faqs' },
+    { kind: 'routeMap' },
+    { kind: 'audience' },
     { kind: 'itinerary' },
     { kind: 'overview' },
     { kind: 'keyTakeaways' },
@@ -189,9 +191,11 @@ test('trip: existing CMS layouts render primary sections in canonical order and 
       'hero',
       'overview',
       'highlights',
+      'audience',
       'itinerary',
-      'information',
       'hotelsNearDestination',
+      'information',
+      'routeMap',
       'departures',
       'faqs',
       'html',
@@ -209,7 +213,7 @@ test('trip: existing CMS layouts render primary sections in canonical order and 
 
 test('trip: optional core sections can still be omitted from a saved layout', () => {
   const layout = defaultPageSections(tripSectionOptions).filter(
-    ({ kind }) => !['highlights', 'hotelsNearDestination', 'departures'].includes(kind),
+    ({ kind }) => !['highlights', 'audience', 'hotelsNearDestination', 'routeMap', 'departures'].includes(kind),
   )
   assert.deepEqual(
     orderTripPageSections(layout)
