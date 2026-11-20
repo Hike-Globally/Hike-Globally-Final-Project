@@ -1,93 +1,86 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import Link from 'next/link'
+import { useState } from 'react'
 
-import { PostCard } from '@/components/cards/post-card'
+import { PayloadImageFill } from '@/components/ui/payload-image'
+import { sitePath } from '@/i18n/config'
 import { blogCategoryLabel, dictionary } from '@/i18n/dictionaries'
-import type { PostCard as PostCardData } from '@/lib/data'
-import { cn } from '@/lib/utils'
+import type { PostCard } from '@/lib/data'
+import { formatDate, readingTimeMinutes } from '@/lib/format'
 
-/**
- * Category filter for the journal. Filtering is client-side so /blog stays a static page —
- * see the note in `trips-explorer.tsx` for the trade-off.
- */
-export function BlogExplorer({ posts }: { posts: PostCardData[] }) {
-  const dict = dictionary
-  const [category, setCategory] = useState<string>('all')
-
-  const categories = useMemo(() => {
-    const set = new Set<string>()
-    for (const post of posts) {
-      for (const value of post.categories ?? []) set.add(value)
-    }
-    return Array.from(set)
-  }, [posts])
-
-  const filtered = useMemo(
-    () =>
-      category === 'all'
-        ? posts
-        : posts.filter((post) => post.categories?.includes(category as never)),
-    [posts, category],
-  )
-
-  const label = blogCategoryLabel
-
-  const [lead, ...rest] = filtered
-
-  if (categories.length === 0) {
-    return (
-      <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
-        {filtered.map((post, index) => (
-          <PostCard key={post.id} post={post} priority={index < 3} />
-        ))}
-      </div>
-    )
-  }
+// Archive-only card: the shared PostCard keeps its layout on other pages.
+function ArchiveCard({ post, featured, priority }: {
+  post: PostCard
+  featured?: boolean
+  priority?: boolean
+}) {
+  const href = sitePath(`/blog/${post.slug}`)
+  const [category, ...topics] = post.categories ?? []
+  const date = post.publishedAt ?? post.createdAt
+  const author = typeof post.author === 'object' ? post.author?.name : null
+  const { blog } = dictionary
 
   return (
-    <div>
-      <div className="mb-12 flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={() => setCategory('all')}
-          className={cn(
-            'cursor-pointer rounded-[7px] border px-4 py-2 text-small font-medium transition-[background-color,border-color,color,box-shadow] duration-250 ease-[var(--ease-brand)]',
-            category === 'all'
-              ? 'border-btn-primary bg-btn-primary text-white shadow-2xs'
-              : 'border-ink/18 bg-paper text-ink-80 hover:border-ink/45 hover:bg-mist hover:text-ink',
-          )}
-        >
-          {dict.blog.allCategories}
-        </button>
-        {categories.map((value) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => setCategory(value)}
-            className={cn(
-              'cursor-pointer rounded-[7px] border px-4 py-2 text-small font-medium transition-[background-color,border-color,color,box-shadow] duration-250 ease-[var(--ease-brand)]',
-              category === value
-                ? 'border-btn-primary bg-btn-primary text-white shadow-2xs'
-                : 'border-ink/18 bg-paper text-ink-80 hover:border-ink/45 hover:bg-mist hover:text-ink',
-            )}
-          >
-            {label(value)}
-          </button>
-        ))}
-      </div>
-
-      {lead ? (
-        <div className="mb-16">
-          <PostCard post={lead} featured priority />
+    <article className={featured ? 'blog-archive-card blog-archive-feature' : 'blog-archive-card'}>
+      <Link href={href} aria-label={post.title} tabIndex={-1} className="blog-archive-cover">
+        <PayloadImageFill
+          media={post.featuredImage}
+          sizes={featured ? '(min-width: 900px) 46vw, 94vw' : '(min-width: 900px) 30vw, (min-width: 600px) 46vw, 94vw'}
+          priority={priority}
+        />
+      </Link>
+      <div className="blog-archive-copy">
+        <div className="blog-archive-meta">
+          {category && <span className="blog-archive-category">{blogCategoryLabel(category)}</span>}
+          <time dateTime={date}>{formatDate(date)}</time>
         </div>
-      ) : null}
+        <h2><Link href={href}>{post.title}</Link></h2>
+        <p>{post.excerpt}</p>
+        <ul className="blog-archive-tags">
+          {topics.map((topic) => <li key={topic}>{blogCategoryLabel(topic)}</li>)}
+          {author && <li>{blog.by} {author}</li>}
+          <li>{blog.readTime.replace('{minutes}', String(readingTimeMinutes(post.excerpt ?? '')))}</li>
+        </ul>
+      </div>
+    </article>
+  )
+}
 
-      <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
-        {rest.map((post, index) => (
-          <PostCard key={post.id} post={post} priority={index < 2} />
+export function BlogExplorer({ posts }: { posts: PostCard[] }) {
+  const [category, setCategory] = useState('all')
+  const categories = Array.from(new Set(posts.flatMap((post) => post.categories ?? [])))
+  const filtered = category === 'all'
+    ? posts
+    : posts.filter((post) => post.categories?.some((topic) => topic === category))
+
+  // Repeat the reference's feature + three-card row without changing post order.
+  const groups = Array.from({ length: Math.ceil(filtered.length / 4) }, (_, index) =>
+    filtered.slice(index * 4, index * 4 + 4),
+  )
+
+  return (
+    <>
+      {categories.length > 0 && (
+        <div className="blog-archive-filter">
+          <select aria-label="Filter by topic" value={category} onChange={(event) => setCategory(event.target.value)}>
+            <option value="all">{dictionary.blog.allCategories}</option>
+            {categories.map((topic) => <option key={topic} value={topic}>{blogCategoryLabel(topic)}</option>)}
+          </select>
+        </div>
+      )}
+      <div className="blog-archive-rows" aria-live="polite">
+        {groups.map(([lead, ...rest], index) => (
+          <div key={lead.id} className="blog-archive-group">
+            <ArchiveCard post={lead} featured priority={index === 0} />
+            {rest.length > 0 && (
+              <div className="blog-archive-grid">
+                {rest.map((post) => <ArchiveCard key={post.id} post={post} />)}
+              </div>
+            )}
+          </div>
         ))}
       </div>
-    </div>
+    </>
   )
 }
