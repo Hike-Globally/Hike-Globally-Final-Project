@@ -437,16 +437,24 @@ export const personJsonLd = (
   }
 }
 
-export const websiteJsonLd = ({ name, url }: { name: string; url: string }): JsonLdInput => ({
+/**
+ * WebSite markup supports Google's site-name selection, not a sitelinks search box
+ * (removed November 21, 2024). Keep name, alternateName and url; omit SearchAction.
+ */
+export const websiteJsonLd = ({
+  name,
+  alternateName,
+  url,
+}: {
+  name: string
+  alternateName?: string
+  url: string
+}): JsonLdInput => ({
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name,
+  alternateName,
   url,
-  potentialAction: {
-    '@type': 'SearchAction',
-    target: `${url}/trips?q={search_term_string}`,
-    'query-input': 'required name=search_term_string',
-  },
 })
 
 export const breadcrumbJsonLd = (items: { name: string; url: string }[]): JsonLdInput => ({

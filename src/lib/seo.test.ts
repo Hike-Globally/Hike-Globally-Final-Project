@@ -29,7 +29,43 @@ const {
   seoFromDoc,
   touristTripJsonLd,
   webPageJsonLd,
+  websiteJsonLd,
 } = await import('./seo')
+
+test('WebSite emits site-name markup without the retired sitelinks SearchAction', () => {
+  const schema = JSON.parse(
+    JSON.stringify(websiteJsonLd({
+      name: 'Hike Globally',
+      alternateName: 'HikeGlobally',
+      url: 'https://hikeglobally.com',
+    })),
+  )
+
+  assert.deepEqual(schema, {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Hike Globally',
+    alternateName: 'HikeGlobally',
+    url: 'https://hikeglobally.com',
+  })
+  assert.equal('potentialAction' in schema, false)
+})
+
+test('WebSite preserves the supplied name and url when no alternate name is provided', () => {
+  const schema = JSON.parse(
+    JSON.stringify(websiteJsonLd({
+      name: 'Custom site name',
+      url: 'https://example.com',
+    })),
+  )
+
+  assert.deepEqual(schema, {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Custom site name',
+    url: 'https://example.com',
+  })
+})
 
 const pathCases: Array<[string | null | undefined, string]> = [
   // Already canonical.

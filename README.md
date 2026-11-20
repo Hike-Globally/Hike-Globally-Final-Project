@@ -340,7 +340,7 @@ ones.
 
 | Page | Open Graph | JSON-LD |
 | ---- | ---------- | ------- |
-| `/` | `website` + default share image | `Organization`, `WebSite` (with `SearchAction`), `FAQPage` when the block is used |
+| `/` | `website` + default share image | `Organization`, `WebSite` (`name`, `alternateName`, `url`), `FAQPage` when the block is used |
 | `/trips`, `/blog`, `/destinations` | `website` | `BreadcrumbList` + `CollectionPage` whose `ItemList` is the cards the page renders |
 | `/trips/[slug]` | `website` + trip hero | `BreadcrumbList`, `TouristTrip` (offer, itinerary, duration, keywords), `FAQPage` |
 | `/blog/[slug]` | `article` + `article:published_time` / `modified_time` / `tag` | `BreadcrumbList`, `BlogPosting` (author, `articleSection`, `wordCount`, keywords), `FAQPage` when the post has FAQs |
@@ -348,6 +348,11 @@ ones.
 | `/inquiry` | `website` | `BreadcrumbList`, `ContactPage` |
 | any CMS page (`/[slug]`) | `website` + page image | `BreadcrumbList`, `WebPage` |
 | `/inquiry/thank-you`, 404 | — | — (both `noindex`, so nothing is offered to the index) |
+
+**WebSite supports site names, not a search box.** The homepage keeps the CMS-configured `name`
+and canonical site `url`, with `HikeGlobally` as its `alternateName`. `SearchAction` is no longer
+emitted: Google removed the sitelinks search box on November 21, 2024. This change does not affect
+on-site search or guarantee which site name Google displays.
 
 **FAQPage is kept, but it is no longer a rich result.** Google stopped showing FAQ rich results
 entirely on May 7, 2026, and removed FAQ reporting from the Rich Results Test and Search Console
