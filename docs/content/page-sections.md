@@ -19,7 +19,7 @@ saved. See `docs/content/trip-audience.md`.
 
 ## Blog FAQs
 
-Blog posts have the same **FAQs** panel as trips, directly below the post body, with the same seven categories (General Questions, Best Time To Trek, Required Permits For The Trek, and so on). Each filled-in category is shown under its heading in a **Frequently Asked Questions** section that looks exactly like the one on trip pages; empty categories are hidden, and the questions are also published as `FAQPage` structured data.
+Blog posts have the same **FAQs** panel as trips, directly below the post body, with the same seven categories (General Questions, Best Time To Trek, Required Permits For The Trek, and so on). Each filled-in category is shown under its heading in a **Frequently Asked Questions** section that looks exactly like the one on trip pages; empty categories are hidden, and the questions are also published as `FAQPage` structured data — still parsed by Google for AI Overviews and LLM answers, even though FAQ rich results were removed in May 2026 (see the README's "Open Graph and structured data" section).
 
 The section's position comes from the **FAQs** row in Page sections, which sits right after **Article body & table of contents** by default. Posts without questions show nothing, so the row can stay in place until FAQs are added.
 

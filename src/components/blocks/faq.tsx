@@ -11,8 +11,10 @@ import type { FaqBlock } from '@/payload-types'
 
 /**
  * FAQ block — the only block that ships real interactivity (Radix accordion, ~4KB).
- * It also emits FAQPage structured data, which is what makes the questions eligible to
- * appear directly under your result in Google.
+ * It also emits FAQPage structured data. Google stopped showing FAQ rich results in
+ * May 2026, but it still parses FAQPage, so the markup feeds AI Overviews and LLM
+ * answers — the same audience /llms.txt serves. The visible section earns its place
+ * as content; the schema is a bonus, not the point.
  */
 export function Faq({ block }: { block: FaqBlock }) {
   const items = (block.items ?? []).filter((item) => Boolean(item?.question))

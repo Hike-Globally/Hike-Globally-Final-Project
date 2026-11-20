@@ -349,6 +349,14 @@ ones.
 | any CMS page (`/[slug]`) | `website` + page image | `BreadcrumbList`, `WebPage` |
 | `/inquiry/thank-you`, 404 | — | — (both `noindex`, so nothing is offered to the index) |
 
+**FAQPage is kept, but it is no longer a rich result.** Google stopped showing FAQ rich results
+entirely on May 7, 2026, and removed FAQ reporting from the Rich Results Test and Search Console
+later that summer. The `FAQPage` JSON-LD above is still emitted on `/`, `/trips/[slug]` and
+`/blog/[slug]` because Google still parses it — the Q&A markup feeds AI Overviews and LLM
+answers, the same audience `/llms.txt` serves — but it produces no SERP feature, so don't budget
+for it. The visible FAQ section earns its place as content (it answers real questions and keeps
+people on the page); the schema is a bonus, not the point.
+
 The root layout adds site-wide `og:site_name`, `og:locale` and a default share image for routes that
 return no metadata of their own. Note that a route returning its own `openGraph` block replaces that
 one wholesale — Next.js does not merge it key by key — so pages that want the site default pass
