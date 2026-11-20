@@ -64,7 +64,7 @@ API (no HTTP round-trip, fully typed).
 | `destinations` | Regions (Khumbu, Annapurna, Langtang, Mustang)     | `heroImage`, `gallery`, `region`, `bestSeasons`, `coordinates`, `description`, `gettingThere`                                                                                       |
 | `trips`        | Trekking packages                                  | `durationDays/Nights`, `groupSizeMax`, `maxAltitude`, `difficulty`, `priceFrom`, `highlights`, `itinerary` (day-by-day), `included`/`notIncluded`, `faqs`, `gallery`, `bookingLink` |
 | `blog`         | Journal                                            | `featuredImage`, `author`, `categories`, `publishedAt`, `content`, `faqs` (same categories as trips), `relatedPosts`                                                                |
-| `pages`        | Flexible pages                                     | `blocks` (localized) — hero, richText, featuredTrips, featuredDestinations, latestPosts, stats, gallery, testimonials, faq, inquiry, cta                                            |
+| `pages`        | Flexible pages                                     | `blocks` (localized) — hero, richText, featuredTrips, featuredDestinations, latestPosts, stats, gallery, faq, inquiry, cta                                            |
 | `users`        | Admin + editors                                    | role-based access (`admin`, `editor`)                                                                                                                                               |
 
 Globals: `header` (announcement, nav items, actions), `footer` (introduction, link columns,
@@ -86,7 +86,7 @@ The site is **English-only**: one locale, no language selector, no URL prefix.
 - Payload is still configured with its localization layer, holding a single locale (`en`). Fields
   keep `localized: true` and their `_locales` storage shape, which means adding a language later
   is a one-line change in `src/i18n/config.ts` — no database migration, no field rewrites.
-- `blocks`, and every array of translatable items (itinerary, FAQs, highlights, testimonials,
+- `blocks`, and every array of translatable items (itinerary, FAQs, highlights,
   stats, nav items), remain localized at the parent, exactly as before.
 - Localized fields are **never `required`**, so a save can never be blocked by a missing
   translation.

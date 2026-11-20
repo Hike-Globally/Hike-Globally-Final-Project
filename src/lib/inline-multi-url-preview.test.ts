@@ -49,8 +49,6 @@ const links: MultiUrlPreviewSource = {
     {
       linkPreviewUrl: '/resources/one',
       linkPreviewTitle: 'First resource',
-      linkPreviewRating: 4.6,
-      linkPreviewReviewCount: 83,
       linkPreviewPrice: 'US$ 700',
     },
     {
@@ -98,7 +96,8 @@ test('a Multi-URL Preview can sit between paragraphs and a table without disturb
   assert.equal(collection.getAttribute('data-animation'), 'zoom')
   assert.equal(collection.querySelector('h3')?.textContent, 'Keep exploring')
   assert.equal(collection.querySelectorAll('.link-preview-card').length, 2)
-  assert.match(collection.textContent ?? '', /4\.6.*83 reviews.*US\$ 700/)
+  assert.match(collection.textContent ?? '', /US\$ 700/)
+  assert.equal(collection.querySelector('.link-preview-stars, .link-preview-count'), null)
   assert.match(collection.textContent ?? '', /A useful guide/)
   assert.equal(
     hasRichTextContent(doc(preview(links))),

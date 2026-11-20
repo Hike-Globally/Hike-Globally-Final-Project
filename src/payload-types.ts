@@ -449,11 +449,6 @@ export interface Trip {
          */
         linkPreviewDescription?: string | null;
         /**
-         * Out of 5, e.g. 4.8. Leave empty to hide the stars.
-         */
-        linkPreviewRating?: number | null;
-        linkPreviewReviewCount?: number | null;
-        /**
          * Shown in bold. Written exactly as it should appear.
          */
         linkPreviewPrice?: string | null;
@@ -491,11 +486,6 @@ export interface Trip {
                * Leave empty to use the page’s own description. Shown on one line.
                */
               linkPreviewDescription?: string | null;
-              /**
-               * Out of 5, e.g. 4.8. Leave empty to hide the stars.
-               */
-              linkPreviewRating?: number | null;
-              linkPreviewReviewCount?: number | null;
               /**
                * Shown in bold. Written exactly as it should appear.
                */
@@ -877,7 +867,6 @@ export interface Page {
     | LatestPostsBlock
     | StatsBlock
     | GalleryBlock
-    | TestimonialsBlock
     | FaqBlock
     | InquiryBlock
     | CtaBlock
@@ -1031,11 +1020,6 @@ export interface Blog {
          */
         linkPreviewDescription?: string | null;
         /**
-         * Out of 5, e.g. 4.8. Leave empty to hide the stars.
-         */
-        linkPreviewRating?: number | null;
-        linkPreviewReviewCount?: number | null;
-        /**
          * Shown in bold. Written exactly as it should appear.
          */
         linkPreviewPrice?: string | null;
@@ -1073,11 +1057,6 @@ export interface Blog {
                * Leave empty to use the page’s own description. Shown on one line.
                */
               linkPreviewDescription?: string | null;
-              /**
-               * Out of 5, e.g. 4.8. Leave empty to hide the stars.
-               */
-              linkPreviewRating?: number | null;
-              linkPreviewReviewCount?: number | null;
               /**
                * Shown in bold. Written exactly as it should appear.
                */
@@ -1424,32 +1403,6 @@ export interface GalleryBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'gallery';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TestimonialsBlock".
- */
-export interface TestimonialsBlock {
-  heading: string;
-  subheading?: string | null;
-  items?:
-    | {
-        quote: string;
-        name: string;
-        /**
-         * e.g. EBC trek, April 2025
-         */
-        role?: string | null;
-        rating?: ('5' | '4' | '3') | null;
-        avatar?: (number | null) | Media;
-        trip?: (number | null) | Trip;
-        id?: string | null;
-      }[]
-    | null;
-  variant?: ('light' | 'dark') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'testimonials';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1834,8 +1787,6 @@ export interface TripsSelect<T extends boolean = true> {
         linkPreviewUrl?: T;
         linkPreviewTitle?: T;
         linkPreviewDescription?: T;
-        linkPreviewRating?: T;
-        linkPreviewReviewCount?: T;
         linkPreviewPrice?: T;
         linkPreviewOriginalPrice?: T;
         multiPreviewHeading?: T;
@@ -1848,8 +1799,6 @@ export interface TripsSelect<T extends boolean = true> {
               linkPreviewUrl?: T;
               linkPreviewTitle?: T;
               linkPreviewDescription?: T;
-              linkPreviewRating?: T;
-              linkPreviewReviewCount?: T;
               linkPreviewPrice?: T;
               linkPreviewOriginalPrice?: T;
               linkPreviewImage?: T;
@@ -2050,8 +1999,6 @@ export interface BlogSelect<T extends boolean = true> {
         linkPreviewUrl?: T;
         linkPreviewTitle?: T;
         linkPreviewDescription?: T;
-        linkPreviewRating?: T;
-        linkPreviewReviewCount?: T;
         linkPreviewPrice?: T;
         linkPreviewOriginalPrice?: T;
         multiPreviewHeading?: T;
@@ -2064,8 +2011,6 @@ export interface BlogSelect<T extends boolean = true> {
               linkPreviewUrl?: T;
               linkPreviewTitle?: T;
               linkPreviewDescription?: T;
-              linkPreviewRating?: T;
-              linkPreviewReviewCount?: T;
               linkPreviewPrice?: T;
               linkPreviewOriginalPrice?: T;
               linkPreviewImage?: T;
@@ -2162,7 +2107,6 @@ export interface PagesSelect<T extends boolean = true> {
         latestPosts?: T | LatestPostsBlockSelect<T>;
         stats?: T | StatsBlockSelect<T>;
         gallery?: T | GalleryBlockSelect<T>;
-        testimonials?: T | TestimonialsBlockSelect<T>;
         faq?: T | FaqBlockSelect<T>;
         inquiry?: T | InquiryBlockSelect<T>;
         cta?: T | CtaBlockSelect<T>;
@@ -2323,28 +2267,6 @@ export interface GalleryBlockSelect<T extends boolean = true> {
       };
   columns?: T;
   aspectRatio?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TestimonialsBlock_select".
- */
-export interface TestimonialsBlockSelect<T extends boolean = true> {
-  heading?: T;
-  subheading?: T;
-  items?:
-    | T
-    | {
-        quote?: T;
-        name?: T;
-        role?: T;
-        rating?: T;
-        avatar?: T;
-        trip?: T;
-        id?: T;
-      };
-  variant?: T;
   id?: T;
   blockName?: T;
 }

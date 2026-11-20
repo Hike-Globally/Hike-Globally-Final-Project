@@ -141,8 +141,6 @@ test('resolveLinkPreview still renders from the editor fields when the page cann
     {
       linkPreviewUrl: PAGE,
       linkPreviewTitle: 'Typed title',
-      linkPreviewRating: 4.8,
-      linkPreviewReviewCount: 230,
       linkPreviewPrice: 'US$ 700',
       linkPreviewOriginalPrice: 'US$ 1150',
     },
@@ -152,8 +150,6 @@ test('resolveLinkPreview still renders from the editor fields when the page cann
   assert.equal(card.title, 'Typed title')
   assert.equal(card.description, '')
   assert.equal(card.image, null)
-  assert.equal(card.rating, 4.8)
-  assert.equal(card.reviewCount, 230)
   assert.equal(card.price, 'US$ 700')
   assert.equal(card.originalPrice, 'US$ 1150')
 })
@@ -294,21 +290,6 @@ test('an unknown or unpublished page falls back to reading the page itself', asy
   assert.deepEqual(seen, ['https://hikeglobally.com/trips/not-published'])
   assert.equal(card?.image, '/api/media/file/other.jpg')
   assert.equal(card?.title, 'hikeglobally.com')
-})
-
-test('ratings are capped at 5 and bad numbers are dropped', async () => {
-  const high = await resolve(
-    { linkPreviewUrl: PAGE, linkPreviewRating: 7, linkPreviewReviewCount: -3 },
-    async () => null,
-  )
-  assert.equal(high?.rating, 5)
-  assert.equal(high?.reviewCount, null)
-
-  const nan = await resolve(
-    { linkPreviewUrl: PAGE, linkPreviewRating: Number.NaN },
-    async () => null,
-  )
-  assert.equal(nan?.rating, null)
 })
 
 /* ------------------------------------------------------------------------------------------------

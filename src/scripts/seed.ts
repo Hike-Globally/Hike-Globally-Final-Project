@@ -1688,8 +1688,6 @@ const run = async () => {
       destinations: 'Four regions, one mountain country',
       destinationsSub:
         'Start with the classic valleys, or go looking for the quiet ones behind the rain shadow.',
-      testimonials: 'What they said afterwards',
-      testimonialsSub: 'Unedited, straight out of the post-trip survey.',
       gallery: 'From the trail',
       gallerySub: 'Shot by guides and guests over the last two seasons.',
       faq: 'Questions we get every week',
@@ -1706,7 +1704,6 @@ const run = async () => {
           label: 'Years on the trail',
           description: 'Operated by our own team, never resold.',
         },
-        { value: '4.9', label: 'Average rating', description: 'Across 600+ verified reviews.' },
         {
           value: '1:6',
           label: 'Guide to guest ratio',
@@ -1777,35 +1774,6 @@ const run = async () => {
         limit: 6,
         layout: 'editorial',
         viewAllLink: { label: copy.viewDestinations, type: 'custom', url: '/destinations' },
-      },
-      {
-        blockType: 'testimonials',
-        heading: copy.testimonials,
-        subheading: copy.testimonialsSub,
-        variant: 'dark',
-        items: [
-          {
-            quote:
-              'Our guide noticed I was struggling at 4,600 m before I said anything and re-organised the whole day around it. That is the difference between an agency and a team.',
-            name: 'Marta Nowak',
-            role: 'Everest Base Camp, October 2025',
-            rating: '5',
-          },
-          {
-            quote:
-              'Third trip with Hike Globally. Same guide, same cook, same ridiculous amount of garlic soup. There is a reason I keep coming back.',
-            name: 'Thomas Reiter',
-            role: 'Annapurna Circuit, April 2025',
-            rating: '5',
-          },
-          {
-            quote:
-              'We asked for "quieter than the ABC, no camping, eight days". They built exactly that. I have never had an operator listen that carefully.',
-            name: 'Camille Fontaine',
-            role: 'Mardi Himal, November 2024',
-            rating: '5',
-          },
-        ],
       },
       {
         blockType: 'gallery',

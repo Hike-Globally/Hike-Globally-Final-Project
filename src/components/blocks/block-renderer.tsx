@@ -18,7 +18,6 @@ import { InquirySection } from './inquiry-block'
 import { LatestPosts } from './latest-posts'
 import { RichTextSection } from './rich-text-block'
 import { Stats } from './stats'
-import { Testimonials } from './testimonials'
 
 type Block = NonNullable<Page['blocks']>[number]
 
@@ -66,8 +65,6 @@ function renderBlock(
       return <Stats key={key} block={block} />
     case 'gallery':
       return <Gallery key={key} block={block} />
-    case 'testimonials':
-      return <Testimonials key={key} block={block} />
     case 'faq':
       return <Faq key={key} block={block} />
     case 'inquiry':

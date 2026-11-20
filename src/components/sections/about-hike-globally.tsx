@@ -34,7 +34,7 @@ const TICKER_DESTINATIONS = [
  * homepage and states, in plain terms, what the brand is: a travel booking platform selling
  * packages worldwide.
  *
- * A dark, immersive section (same register as the dark Stats/Testimonials CMS blocks) so it
+ * A dark, immersive section (same register as the dark Stats CMS block) so it
  * reads as a deliberate pause between the two light trip/destination grids around it. The
  * panel is flat navy — no cursor-tracked spotlight, no blurred corner glows — and the
  * interaction budget goes to two things instead of many small flourishes:

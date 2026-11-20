@@ -29,7 +29,7 @@ Trips and blog posts both have a **Link preview** row in Page sections. Choose *
 
 The URL and the card's details live in the row, not in a panel elsewhere on the form, so the card is edited in the one place it is placed. Being part of the (per-language) Page sections array, it is ordered, versioned and translated with the rest of the layout like any other section.
 
-A page can have **as many Link preview rows as it needs** — a trip often points at the operator, a partner's booking page and a related guide. Each row keeps its own URL, title, description, rating and prices, so the cards are different cards and can sit at different places in the layout. Row labels in the admin show the address a row points at (`3. Link preview — booking.com`, `7. Link preview — /blog/altitude`) so repeated rows stay tellable apart, and a row with no URL renders nothing, which is also how an empty row stays invisible until it is filled in.
+A page can have **as many Link preview rows as it needs** — a trip often points at the operator, a partner's booking page and a related guide. Each row keeps its own URL, title, description and prices, so the cards are different cards and can sit at different places in the layout. Row labels in the admin show the address a row points at (`3. Link preview — booking.com`, `7. Link preview — /blog/altitude`) so repeated rows stay tellable apart, and a row with no URL renders nothing, which is also how an empty row stays invisible until it is filled in.
 
 - **URL** — the only field that matters — can be a full `https://` address to any page, or a path on this site such as `/trips/annapurna-base-camp`. Pages on other sites open in a new tab; this site's own pages open in the same tab.
 - **A link to a page on this site** — a trip, a post or a destination — is answered from the CMS instead of the network, so the card shows **that document's own featured image**: a trip's hero image, a post's featured image, a destination's hero image (with the SEO group's sharing image as the fallback when a document has no featured image). The title and one-line summary come from the same document. Nothing is fetched, so the card cannot end up on the site icon because our own page was slow or not deployed yet, and a render makes no request to itself.
@@ -47,7 +47,7 @@ A page can have **as many Link preview rows as it needs** — a trip often point
 
   The proxy is public, so it is also kept narrow: only `http`/`https`, no credentials in the URL, ports 80/443 only, a public host (the resolved address is checked too, so a public name cannot point at a private network), manual redirects where each hop is re-checked, at most 3 of them, 8 seconds for the whole chain, a 4 MiB cap on the body, and a raster-only content-type whitelist (SVG is refused because it can carry script and would then run on this origin).
 
-- **Rating, number of reviews, price and original price** are typed in, since they are not part of a page's metadata. The rating is capped at 5. The original price is shown struck through before the price.
+- **Price and original price** are typed in, since they are not part of a page's metadata. The original price is shown struck through before the price.
 - The card deliberately has **no badges or ribbons** (no “Best seller”, no “Save US$ …”, no “Group discount” pill). It is the same card on trips and blog posts, and is styled in `src/components/sections/link-preview.css`.
 
 The row can be dragged like any other section, and it is part of version history. Migration `20261115_180000_link_preview` adds the row to every saved layout (after **Who is this trip for / not for** on trips, when present, and directly after the article body on posts). It does not change anything on a page until a URL is entered. Migration `20261115_200000_link_preview_in_page_section` then moves the URL and the card's details from the old document panel into that row (copying any card already filled in, then dropping the panel's columns) — see [Deployment](#deployment).
@@ -108,15 +108,32 @@ Run `npm run migrate` before deploying the updated application. Migration `20261
 
 Migration `20261115_180000_link_preview` adds the Link preview fields and enum values, and the **Link preview** row to saved layouts (see the Link preview section above). Nothing changes on a public page until a URL is entered.
 
-Migration `20261115_200000_link_preview_in_page_section` moves the card's **URL, title, description, rating, review count and prices from the document into the Link preview row**, so the row an editor adds has a URL box in it instead of only a Section select. Every value already typed into the old panel is copied into the `linkPreview` row of each locale, live and versioned, and only then are the old document columns dropped — no published card changes on deploy. Run `npm run migrate` before deploying the updated application, as usual.
+Migration `20261115_200000_link_preview_in_page_section` historically moved the card's **URL, title, description, rating, review count and prices from the document into the Link preview row**, so the row an editor adds has a URL box in it instead of only a Section select. Every value already typed into the old panel is copied into the `linkPreview` row of each locale, live and versioned, and only then are the old document columns dropped — no published card changes on deploy. Run `npm run migrate` before deploying the updated application, as usual.
 
 Migration `20261019_045205_blog_faqs` adds the blog FAQ fields and a **FAQs** row to every blog layout that was already saved — right after the article body (or at the end if that row was removed), in the live post and its version history. Nothing changes on screen until a post has questions.
 
 The admin import map is generated by the project's existing postinstall command; regenerate it with `npm run generate:importmap` if needed.
 
+## Reviews and ratings are not supported
+
+There is no Testimonials block, star-rating field, review count, or review structured data.
+Link preview and Multi-URL Preview cards retain their URLs, imagery, text, and prices only,
+including cards embedded in rich text. Trip difficulty levels are unrelated and remain unchanged.
+
+Migration `20261120_185728_remove_reviews` deletes saved testimonial blocks, card rating/review-count
+columns, and the old **Average rating** statistic from live pages and version history. It also
+removes the retired card fields recursively from rich-text JSON (including inline Multi-URL cards)
+without changing the other card fields or paragraph order. Historical migrations remain intact.
+
+**Back up the database before deploying.** This is intentional data deletion. `down` restores the
+SQL schema only; it cannot recover deleted testimonials, ratings, or statistics. Run
+`npm run migrate` before the updated app starts (the standard build already does this).
+Preview deployments also run build-time migrations when a database is configured, so use an isolated
+preview database rather than sharing production. Invalidate any externally cached pages after deployment.
+
 ## Verification
 
-- `npm test` covers the link card as well: URL validation, the metadata order (Open Graph, Twitter, `image_src`, JSON-LD, touch icon, body image), protocol-relative and relative images, unusable addresses, a blocked host, an API endpoint, a network error, a non-UTF-8 charset, chrome-like request headers, and the render rules (editor overrides, host fallback, rating caps).
-- `npm test` covers the CMS lookup for our own pages (which addresses are ours, and that a trip/post/destination contributes its own featured image, with the editor's sharing image taking precedence), the image proxy (private and metadata hosts, credentials, exotic ports, self-referential targets, the raster-only whitelist, and the candidate order that guarantees a picture), the card's markup (an image is always present and always proxied, the price block sits in the card's row rather than at its foot, rating/review/price rendering, external vs internal links), legacy defaults, saved ordering, full-width grouping, the repeat rules for Custom HTML and Link preview rows (and the single-row rule for every other section), localized field-hook behavior, and Custom HTML publishing — scripts, styles, embeds, forms and event handlers survive to the rendered markup, the heading stays escaped, empty rows render nothing, and only JavaScript `type`s are runnable.
+- `npm test` covers the link card as well: URL validation, the metadata order (Open Graph, Twitter, `image_src`, JSON-LD, touch icon, body image), protocol-relative and relative images, unusable addresses, a blocked host, an API endpoint, a network error, a non-UTF-8 charset, chrome-like request headers, and the render rules (editor overrides, host fallback).
+- `npm test` covers the CMS lookup for our own pages (which addresses are ours, and that a trip/post/destination contributes its own featured image, with the editor's sharing image taking precedence), the image proxy (private and metadata hosts, credentials, exotic ports, self-referential targets, the raster-only whitelist, and the candidate order that guarantees a picture), the card's markup (an image is always present and always proxied, the price block sits in the card's row rather than at its foot, price rendering and absence of ratings/review counts, external vs internal links), legacy defaults, saved ordering, full-width grouping, the repeat rules for Custom HTML and Link preview rows (and the single-row rule for every other section), localized field-hook behavior, and Custom HTML publishing — scripts, styles, embeds, forms and event handlers survive to the rendered markup, the heading stays escaped, empty rows render nothing, and only JavaScript `type`s are runnable.
 - `src/lib/custom-html.dom.test.ts` runs the real component in jsdom (the repo's only test-only dependency) and counts executions across every delivery path: a hard load, hydration, client-side navigation, an edit in live preview, a re-render of identical markup, and a StrictMode double mount. Each must run a pasted snippet exactly once — and an external `<script src>` must finish loading before the snippet pasted after it runs.
 - `npm run typecheck`, `npm run lint`, and `npm run build` check integration with Payload and Next.js.

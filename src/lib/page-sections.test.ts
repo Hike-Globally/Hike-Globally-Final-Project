@@ -228,8 +228,6 @@ test('the Link preview row owns the card, so it is a URL field inside the row', 
     'linkPreviewUrl',
     'linkPreviewTitle',
     'linkPreviewDescription',
-    'linkPreviewRating',
-    'linkPreviewReviewCount',
     'linkPreviewPrice',
     'linkPreviewOriginalPrice',
   ]

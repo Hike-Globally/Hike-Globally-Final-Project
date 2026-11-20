@@ -11,7 +11,7 @@
 5. Under **URLs**, add a row for each link. Drag the rows into the order you want.
 6. Save a draft, review the live preview at mobile/tablet/desktop sizes, then publish.
 
-Each URL row can independently override **title, description, rating, number of reviews, price and original price**, just like Link preview. Only enter accurate ratings/prices; they are editorial values, not extracted or invented by this feature. The original price is struck through. Empty overrides are omitted or use the linked page's metadata, as appropriate.
+Each URL row can independently override **title, description, price and original price**, just like Link preview. Only enter accurate prices; they are editorial values, not extracted or invented by this feature. The original price is struck through. Empty overrides are omitted or use the linked page's metadata, as appropriate.
 
 You can add several Multi-URL Preview sections to one page and move each collection independently. Their row labels show the heading and URL count. The individual URL labels show the override title or linked address. A blank URL row is skipped publicly; a collection with no valid URLs renders **nothing**, including no heading, controls or spacing wrapper.
 

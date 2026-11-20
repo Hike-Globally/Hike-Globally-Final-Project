@@ -5,7 +5,7 @@ import { resolveSiteUrl } from './site-url'
 
 /**
  * The "Link preview" section on trips and blog posts: an admin pastes a URL and the public page
- * shows a compact card for it (thumbnail, title, description, rating, prices).
+ * shows a compact card for it (thumbnail, title, description, prices).
  *
  * Only the URL is required. Title, description and image come from the page's own metadata, so the
  * card looks the same whether the address is another page on this site or somebody else's — the
@@ -16,7 +16,7 @@ import { resolveSiteUrl } from './site-url'
  *   image        `og:image` (and its `:url` / `:secure_url` forms) → `twitter:image` → `image_src`
  *                link → JSON-LD `image` → usable `<img>` photographs in the page
  *
- * Rating, review count and prices are typed in, since no page's metadata carries them. Editors can
+ * Prices are typed in, since no page's metadata carries them. Editors can
  * override the title and description; Multi-URL rows can also choose a thumbnail by uploading media
  * or entering a public image URL. Otherwise page images are preferred, with a generic local
  * photograph used only if none of them can be displayed.
@@ -36,8 +36,6 @@ export type LinkPreviewSource = {
   linkPreviewUrl?: string | null
   linkPreviewTitle?: string | null
   linkPreviewDescription?: string | null
-  linkPreviewRating?: number | null
-  linkPreviewReviewCount?: number | null
   linkPreviewPrice?: string | null
   linkPreviewOriginalPrice?: string | null
   /** Populated upload relation; only its public URL is needed by the card. */
@@ -63,8 +61,6 @@ export type ResolvedLinkPreview = {
   description: string
   image: string | null
   imageAlternatives?: string[]
-  rating: number | null
-  reviewCount: number | null
   price: string | null
   originalPrice: string | null
 }
@@ -523,11 +519,6 @@ function cleanText(value: string | null | undefined): string | null {
   return text ? text : null
 }
 
-function cleanNumber(value: number | null | undefined, max?: number): number | null {
-  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) return null
-  return max === undefined ? value : Math.min(value, max)
-}
-
 /**
  * An image that lives on this site — our own media, which is what a featured image is — is handed
  * to the card as a path. The card then loads it directly instead of through the image proxy: there
@@ -603,8 +594,6 @@ export async function resolveLinkPreview(
       cleanText(source.linkPreviewDescription) ?? own?.description ?? fetched?.description ?? '',
     image: firstPartyPath(selectedImage),
     imageAlternatives: [...new Set(imageAlternatives)],
-    rating: cleanNumber(source.linkPreviewRating, 5),
-    reviewCount: cleanNumber(source.linkPreviewReviewCount),
     price: cleanText(source.linkPreviewPrice),
     originalPrice: cleanText(source.linkPreviewOriginalPrice),
   }

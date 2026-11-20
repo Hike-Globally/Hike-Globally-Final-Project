@@ -75,10 +75,6 @@ export function normalizeMultiUrlPreview(source: MultiUrlPreviewSource) {
               ? imageUrl
               : undefined
           })(),
-          linkPreviewRating:
-            typeof row.linkPreviewRating === 'number' ? row.linkPreviewRating : null,
-          linkPreviewReviewCount:
-            typeof row.linkPreviewReviewCount === 'number' ? row.linkPreviewReviewCount : null,
         },
       ]
     })

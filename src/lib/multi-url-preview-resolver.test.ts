@@ -10,15 +10,13 @@ process.env.NEXT_PUBLIC_SITE_URL = 'https://hikeglobally.com'
 const source = (...links: LinkPreviewSource[]) => ({ multiPreviewLinks: links })
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-test('a collection reuses single-link metadata, images, overrides, rating limits and prices per URL', async () => {
+test('a collection reuses single-link metadata, images, overrides and prices per URL', async () => {
   const preview = await resolveMultiUrlPreview(
     {
       ...source(
         {
           linkPreviewUrl: 'https://example.com/one',
           linkPreviewTitle: 'Editor title',
-          linkPreviewRating: 8,
-          linkPreviewReviewCount: 123,
           linkPreviewPrice: 'US$ 700',
           linkPreviewOriginalPrice: 'US$ 900',
         },
@@ -43,8 +41,6 @@ test('a collection reuses single-link metadata, images, overrides, rating limits
   assert.equal(preview.animation, 'reveal')
   assert.equal(preview.cards[0].title, 'Editor title')
   assert.equal(preview.cards[0].description, 'Page description')
-  assert.equal(preview.cards[0].rating, 5)
-  assert.equal(preview.cards[0].reviewCount, 123)
   assert.equal(preview.cards[0].price, 'US$ 700')
   assert.equal(preview.cards[0].originalPrice, 'US$ 900')
   assert.equal(preview.cards[0].image, 'https://images.example.com/hero.jpg')
@@ -237,9 +233,8 @@ test('failed or invalid links do not break other cards, create empty slots or pe
       {
         linkPreviewUrl: 'https://example.com/failure',
         linkPreviewPrice: 'US$ 200',
-        linkPreviewRating: NaN,
       },
-      { linkPreviewUrl: '/blog/local', linkPreviewReviewCount: -2 },
+      { linkPreviewUrl: '/blog/local' },
     ),
     {
       metadata: async () => {
@@ -255,7 +250,5 @@ test('failed or invalid links do not break other cards, create empty slots or pe
   assert.equal(result?.cards.length, 2)
   assert.equal(result?.cards[0].title, 'example.com')
   assert.equal(result?.cards[0].price, 'US$ 200')
-  assert.equal(result?.cards[0].rating, null)
-  assert.equal(result?.cards[1].reviewCount, null)
   assert.equal(await resolveMultiUrlPreview(source({ linkPreviewUrl: '' })), null)
 })

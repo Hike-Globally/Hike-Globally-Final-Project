@@ -67,7 +67,7 @@ test('preview cards remain in content order, reuse metadata and respect override
     const html = await render(
       doc(
         paragraph('Before'),
-        preview('https://example.com/one', { linkPreviewPrice: '$100', linkPreviewRating: 4.5 }),
+        preview('https://example.com/one', { linkPreviewPrice: '$100' }),
         paragraph('Between'),
         preview('https://example.com/two', { linkPreviewTitle: 'Custom title' }),
         paragraph('After'),
@@ -80,7 +80,7 @@ test('preview cards remain in content order, reuse metadata and respect override
     assert.equal((html.match(/class="link-preview-card"/g) ?? []).length, 2)
     assert.match(html, /Page summary/)
     assert.match(html, /\$100/)
-    assert.match(html, /4\.5/)
+    assert.doesNotMatch(html, /link-preview-(rating|stars|count)/)
     assert.match(html, /target="_blank" rel="noopener noreferrer"/)
   } finally {
     globalThis.fetch = originalFetch

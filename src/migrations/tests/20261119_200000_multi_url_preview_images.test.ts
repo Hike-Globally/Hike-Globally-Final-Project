@@ -26,10 +26,12 @@ async function sqlFor(migrate: typeof up | typeof down) {
   return statements.join('\n')
 }
 
-test('Multi-URL Preview image migration is registered last', () => {
-  assert.equal(migrations.at(-1)?.name, '20261119_200000_multi_url_preview_images')
-  assert.equal(migrations.at(-1)?.up, up)
-  assert.equal(migrations.at(-1)?.down, down)
+test('Multi-URL Preview image migration remains registered before review removal', () => {
+  const index = migrations.findIndex(({ name }) => name === '20261119_200000_multi_url_preview_images')
+  assert.ok(index >= 0)
+  assert.equal(migrations[index]?.up, up)
+  assert.equal(migrations[index]?.down, down)
+  assert.equal(migrations[index + 1]?.name, '20261120_185728_remove_reviews')
 })
 
 test('image uploads and URL overrides are added to all localized and versioned URL rows', async () => {
