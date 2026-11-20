@@ -26,7 +26,8 @@ import type {
 import type { LlmsTxtDocument, LlmsTxtSources } from './llms-txt'
 import { getPayloadClient, isDatabaseConfigured } from './payload'
 import { isReservedPageSlug } from './site-routes'
-import type { SitemapDocument, SitemapSources } from './sitemap'
+import { EMPTY_SITEMAP_SOURCES, type SitemapDocument, type SitemapSources } from './sitemap'
+import { readSitemapDocuments } from './sitemap-records'
 import { pickAutomaticTrips } from './trip-selection'
 
 /**
@@ -444,11 +445,8 @@ export type PostCard = {
 /* -------------------------------------------------------------------------- */
 /* The `select` behind the slug readers                                        */
 /* -------------------------------------------------------------------------- */
-/* `getAll*Slugs()` feeds `generateStaticParams()` and `/sitemap.xml`, and both  */
-/* need more than a slug: the sitemap wants each document's real `updatedAt` (to */
-/* write an honest `<lastmod>`) and its `meta.noIndex` flag (a document told to  */
-/* stay out of the index must not be advertised in the sitemap either). One      */
-/* query per collection serves both, so the extra fields cost nothing.           */
+/* Slug readers remain lightweight and depth-zero. The sitemap uses a separate */
+/* populated and paginated reader below, without burdening getPage()/SSG.       */
 
 /** The fields the slug readers select — `meta` only for its `noIndex` flag. */
 const slugSelect = { slug: true, updatedAt: true, meta: true } as const
@@ -660,8 +658,8 @@ export const getRelatedTrips = (trip: Trip, limit = 3): Promise<TripCard[]> =>
   )
 
 /**
- * Every published trip, reduced to what the slug readers and the sitemap need.
- * Shared by `getAllTripSlugs()` and `getSitemapSources()`, so both see one cached query.
+ * Every published trip, reduced to what the lightweight slug reader needs.
+ * Used by `getAllTripSlugs()`; sitemap media has its own populated reader.
  */
 const readTripRecords = unstable_cache(
   async () => {
@@ -903,8 +901,8 @@ export const getDestinationTrips = (
 }
 
 /**
- * Every published destination, reduced to what the slug readers and the sitemap need.
- * Shared by `getAllDestinationSlugs()` and `getSitemapSources()`, so both see one cached query.
+ * Every published destination, reduced to what the lightweight slug reader needs.
+ * Used by `getAllDestinationSlugs()`; sitemap media has its own populated reader.
  */
 const readDestinationRecords = unstable_cache(
   async () => {
@@ -1056,8 +1054,8 @@ export const getRelatedPosts = (post: Blog, limit = 3): Promise<PostCard[]> =>
   )
 
 /**
- * Every published post, reduced to what the slug readers and the sitemap need.
- * Shared by `getAllPostSlugs()` and `getSitemapSources()`, so both see one cached query.
+ * Every published post, reduced to what the lightweight slug reader needs.
+ * Used by `getAllPostSlugs()`; sitemap media has its own populated reader.
  */
 const readPostRecords = unstable_cache(
   async () => {
@@ -1106,10 +1104,9 @@ export const getPage = cache(async (slug: string, includeDraft = false): Promise
 })
 
 /**
- * Every published page, reduced to what the slug readers and the sitemap need.
+ * Every published page, reduced to what the lightweight slug reader needs.
  *
- * The `home` document is included: it is served at `/`, so the sitemap uses its `updatedAt` as the
- * homepage's `<lastmod>` even though it never becomes an entry of its own.
+ * The `home` document is included so getPage('home') can use the same published-slug guard.
  */
 const readPageRecords = unstable_cache(
   async () => {
@@ -1143,24 +1140,26 @@ export const getAllPageSlugs = async (): Promise<string[]> =>
 /* -------------------------------------------------------------------------- */
 
 /**
- * Everything `/sitemap.xml` lists: each published trip, destination, post and page with its
- * `updatedAt` (the entry's `<lastmod>`) and its `noIndex` flag (which keeps it out of the file —
- * advertising a URL the page tells crawlers to skip is the contradiction Search Console reports
- * as an error).
- *
- * The four queries run in parallel and are the same cached ones `generateStaticParams()` already
- * uses, so the sitemap costs one extra database round trip per revalidation, not four.
+ * Dedicated, paginated sitemap reads populate only visible hero/gallery uploads and their video
+ * thumbnails. Slug readers stay depth-zero and cheap; no per-page HTTP requests are made.
  */
-export const getSitemapSources = async (): Promise<SitemapSources> => {
-  const [trips, destinations, posts, pages] = await Promise.all([
-    getTripRecords(),
-    getDestinationRecords(),
-    getPostRecords(),
-    getPageRecords(),
-  ])
+const readSitemapSources = unstable_cache(
+  async (): Promise<SitemapSources> => {
+    const payload = await getPayloadClient()
+    const [trips, destinations, posts, pages] = await Promise.all([
+      readSitemapDocuments(payload, 'trips'),
+      readSitemapDocuments(payload, 'destinations'),
+      readSitemapDocuments(payload, 'blog'),
+      readSitemapDocuments(payload, 'pages'),
+    ])
+    return { trips, destinations, posts, pages }
+  },
+  ['sitemap-with-media-v1'],
+  { tags: [CACHE_TAG.trips, CACHE_TAG.destinations, CACHE_TAG.posts, CACHE_TAG.pages], revalidate: REVALIDATE_SECONDS },
+)
 
-  return { trips, destinations, posts, pages }
-}
+export const getSitemapSources = (): Promise<SitemapSources> =>
+  safeQuery(readSitemapSources, EMPTY_SITEMAP_SOURCES)
 
 /* -------------------------------------------------------------------------- */
 /* llms.txt                                                                    */

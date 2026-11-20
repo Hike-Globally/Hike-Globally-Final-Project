@@ -94,6 +94,16 @@ test('video uploads keep their original file and render as videos, not broken im
   assert.equal(background?.props.src, '/api/media/file/clip.mp4')
 })
 
+test('video thumbnails are used as posters in both video layouts', () => {
+  const video = { ...image, url: '/api/media/file/clip.mp4', mimeType: 'video/mp4', videoThumbnail: image }
+  const inline = PayloadImage({ media: video, sizes: '100vw' })
+  assert.equal(inline?.props.children.props.poster, '/api/media/file/original.jpg')
+  const background = PayloadImageFill({ media: video, sizes: '100vw' })
+  assert.equal(background?.props.poster, '/api/media/file/original.jpg')
+  const unresolved = PayloadImageFill({ media: { ...video, videoThumbnail: 23 }, sizes: '100vw' })
+  assert.equal(unresolved?.props.poster, undefined)
+})
+
 test('missing originals do not silently fall back to low-resolution derivatives', () => {
   const missing = { ...image, url: null }
   assert.equal(originalMediaUrl(missing), null)

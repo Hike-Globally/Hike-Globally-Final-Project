@@ -80,6 +80,7 @@ export function PayloadImage({
       <div className={cn('relative overflow-hidden', className)}>
         <video
           src={src}
+          poster={originalMediaUrl(media.videoThumbnail) ?? undefined}
           controls
           playsInline
           preload="metadata"
@@ -127,6 +128,7 @@ export function PayloadImageFill({
     return (
       <video
         src={src}
+        poster={originalMediaUrl(media.videoThumbnail) ?? undefined}
         autoPlay
         muted
         loop

@@ -249,3 +249,27 @@ export const populatePublishedAt: CollectionBeforeChangeHook = ({ data, operatio
 
   return data
 }
+
+/** Upload metadata is populated inside cached pages and sitemap media records. */
+const revalidateMediaPages = () => {
+  if (revalidationDisabled()) return
+  try {
+    for (const tag of [CACHE_TAG.trips, CACHE_TAG.destinations, CACHE_TAG.posts, CACHE_TAG.pages]) {
+      revalidateTag(tag, { expire: 0 })
+    }
+    revalidatePath('/', 'layout')
+    revalidatePath('/sitemap.xml')
+  } catch (error) {
+    console.warn(`[revalidate] skipped — ${(error as Error).message}`)
+  }
+}
+
+export const revalidateMedia: CollectionAfterChangeHook = ({ doc }) => {
+  revalidateMediaPages()
+  return doc
+}
+
+export const revalidateMediaDelete: CollectionAfterDeleteHook = ({ doc }) => {
+  revalidateMediaPages()
+  return doc
+}

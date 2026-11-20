@@ -23,11 +23,12 @@ async function sqlFor(migrate: typeof up | typeof down) {
   return statements.join('\n')
 }
 
-test('review removal is registered after the image migration', () => {
-  assert.equal(migrations.at(-2)?.name, '20261119_200000_multi_url_preview_images')
-  assert.equal(migrations.at(-1)?.name, '20261120_185728_remove_reviews')
-  assert.equal(migrations.at(-1)?.up, up)
-  assert.equal(migrations.at(-1)?.down, down)
+test('review removal remains registered after the image migration', () => {
+  const index = migrations.findIndex(({ name }) => name === '20261120_185728_remove_reviews')
+  assert.ok(index > 0)
+  assert.equal(migrations[index - 1]?.name, '20261119_200000_multi_url_preview_images')
+  assert.equal(migrations[index]?.up, up)
+  assert.equal(migrations[index]?.down, down)
 })
 
 test('schema delta only removes testimonials and card rating/count columns', () => {

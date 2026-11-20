@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url'
 import type { CollectionConfig } from 'payload'
 
 import { adminOrEditor, anyone } from '../access'
+import { revalidateMedia, revalidateMediaDelete } from '../hooks/revalidate'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -17,6 +18,7 @@ const dirname = path.dirname(filename)
  */
 export const Media: CollectionConfig = {
   slug: 'media',
+  hooks: { afterChange: [revalidateMedia], afterDelete: [revalidateMediaDelete] },
   access: {
     read: anyone,
     create: adminOrEditor,
@@ -93,7 +95,18 @@ export const Media: CollectionConfig = {
       name: 'caption',
       type: 'text',
       localized: true,
-      admin: { description: 'Optional caption shown under gallery images.' },
+      admin: { description: 'Optional image caption. For videos, describe the actual clip here; this is required for inclusion in the video sitemap.' },
+    },
+    {
+      name: 'videoThumbnail',
+      label: 'Video thumbnail',
+      type: 'upload',
+      relationTo: 'media',
+      filterOptions: { mimeType: { contains: 'image/' } },
+      admin: {
+        condition: (_, data) => data?.mimeType?.startsWith('video/'),
+        description: 'A representative still from this video. Together with Alt (video title) and Caption (description), enables a video sitemap entry. No entry is emitted until all three are set.',
+      },
     },
     {
       name: 'credit',
