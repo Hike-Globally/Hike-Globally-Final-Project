@@ -112,9 +112,11 @@ export function orderTripPageSections(sections: PageSection[]): PageSection[] {
   const primaryOrder = [
     'overview',
     'highlights',
+    'audience',
     'itinerary',
     'hotelsNearDestination',
     'information',
+    'routeMap',
     'departures',
     'faqs',
   ]
