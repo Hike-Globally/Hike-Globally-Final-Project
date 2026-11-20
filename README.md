@@ -189,6 +189,31 @@ image/video file endpoint). The rest of `/api/`, `/admin`, `/preview/` and `/cdn
 blocked. This narrow exception is essential: advertising an upload in a sitemap is useless if
 robots.txt forbids fetching its bytes. Robots rules are crawler guidance, not access control.
 
+### Blog RSS feed
+
+`/feed.xml` is an **RSS 2.0** subscription feed with the latest **50 published, indexable blog
+posts**, newest publication first. Every public page advertises it with a
+`<link rel="alternate" type="application/rss+xml">` in the root head, so readers can discover it
+even when a page replaces its own metadata/canonical. Subscribe using
+`https://hikeglobally.com/feed.xml` (or the origin configured in `NEXT_PUBLIC_SITE_URL`).
+
+Items contain a title, canonical article link, stable permalink GUID, plain-text excerpt (safely
+encoded for RSS readers), and the actual publication date (`createdAt` only as the fallback).
+Edits retain the GUID and publication date; the channel's `lastBuildDate` comes from real record
+dates, not the generation clock. Drafts, noindex posts, malformed entries, and duplicate URLs are
+excluded. No full article bodies, private author emails, or demo fallback posts are syndicated.
+With no database/posts, the endpoint remains a valid empty feed.
+
+The feed is cached for an hour, with immediate invalidation on public blog publishes, edits,
+renames, unpublishes and deletions, and on site-settings changes. Draft autosaves leave the public
+feed alone. The endpoint is not a landing page and is not included in the page sitemap. No schema
+change or migration is needed. Tests cover XML escaping, dates, ordering/limits, filtering,
+canonical GUIDs, query access, discovery, and the real revalidation hooks.
+
+After deployment, fetch `/feed.xml` and check the `application/rss+xml; charset=utf-8` content
+type, then inspect a blog page's head for the alternate link. This helps subscriptions and content
+discovery; it does not guarantee indexing or higher search rankings.
+
 ### llms.txt
 
 `/llms.txt` is the same site described to a language model instead of to a crawler. The proposal at

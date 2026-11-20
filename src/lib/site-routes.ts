@@ -17,6 +17,8 @@ const RESERVED_PAGE_SLUGS = new Set<string>([
   ...Object.values(routes),
   // The homepage's page document — it is served at `/`, not `/${slug}`.
   'home',
+  // Generated subscription endpoint, never a CMS landing page.
+  'feed.xml',
   // Preview entry point, Payload admin and the REST/GraphQL API.
   'preview',
   'admin',

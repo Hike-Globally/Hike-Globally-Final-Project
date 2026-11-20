@@ -11,6 +11,7 @@ import { authorProfile } from '../lib/author-profile'
 import { CACHE_TAG, revalidationDisabled } from '../lib/cache-tags'
 import type { User } from '../payload-types'
 import { LLMS_TXT_PATH } from '../lib/llms-txt'
+import { RSS_FEED_PATH } from '../lib/rss'
 import {
   shouldRevalidateAfterChange,
   shouldRevalidateAfterDelete,
@@ -116,6 +117,7 @@ const revalidateDocument = async ({
   // 1-hour window expires.
   paths.push('/sitemap.xml')
   paths.push(LLMS_TXT_PATH)
+  if (collection === 'blog') paths.push(RSS_FEED_PATH)
 
   if (revalidationDisabled()) return
 
@@ -225,6 +227,7 @@ export const revalidateGlobal =
       try {
         revalidatePath('/', 'layout')
         revalidateTag(tag, { expire: 0 })
+        if (global === 'settings') revalidatePath(RSS_FEED_PATH)
       } catch (error) {
         console.warn(`[revalidate] skipped — ${(error as Error).message}`)
       }
