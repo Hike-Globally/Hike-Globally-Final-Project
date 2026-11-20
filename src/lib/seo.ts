@@ -321,8 +321,9 @@ export const seoFromDoc = (
 /* ==========================================================================
    Structured data (schema.org)
    ==========================================================================
-   JSON-LD is how Google turns a page into a rich result: trip prices, FAQs,
-   breadcrumbs and review ratings can all appear directly in the SERP.
+   JSON-LD is how Google turns a page into a rich result: trip prices, breadcrumbs
+   and review ratings can all appear directly in the SERP. (FAQ rich results were
+   removed in May 2026 — FAQPage is still emitted, but for AI/LLM parsing, not SERP.)
    ========================================================================== */
 
 type JsonLdInput = Record<string, unknown>
@@ -683,6 +684,14 @@ export const touristDestinationJsonLd = ({
       : undefined,
 })
 
+/**
+ * FAQPage structured data.
+ *
+ * Google removed FAQ rich results entirely on 2026-05-07, so this no longer produces
+ * a SERP feature. It is kept because Google still parses FAQPage — the Q&A markup
+ * feeds AI Overviews and LLM answers, the same audience /llms.txt serves. Keep the
+ * visible FAQ section for its content value; don't budget for rich results.
+ */
 export const faqJsonLd = (faqs: { question: string; answer: string }[]): JsonLdInput => ({
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
