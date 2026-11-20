@@ -28,6 +28,7 @@ import { getPayloadClient, isDatabaseConfigured } from './payload'
 import { isReservedPageSlug } from './site-routes'
 import { EMPTY_SITEMAP_SOURCES, type SitemapDocument, type SitemapSources } from './sitemap'
 import { readSitemapDocuments } from './sitemap-records'
+import { readRssPosts, type RssPost } from './rss'
 import { pickAutomaticTrips } from './trip-selection'
 
 /**
@@ -966,6 +967,17 @@ export const getPosts = (limit = 100): Promise<PostCard[]> =>
       { tags: [CACHE_TAG.posts], revalidate: REVALIDATE_SECONDS },
     ),
     defaultPosts.slice(0, limit),
+  )
+
+/** RSS must never publish the demo cards used by the database-less blog UI. */
+export const getRssPosts = (): Promise<RssPost[]> =>
+  safeQuery(
+    unstable_cache(
+      async () => readRssPosts(await getPayloadClient()),
+      ['rss-posts'],
+      { tags: [CACHE_TAG.posts], revalidate: REVALIDATE_SECONDS },
+    ),
+    [],
   )
 
 export const getFeaturedPosts = (limit = 3): Promise<PostCard[]> =>

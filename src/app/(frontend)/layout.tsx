@@ -12,7 +12,8 @@ import { dictionary } from '@/i18n/dictionaries'
 import { htmlLang, ogLocale } from '@/i18n/config'
 import { getSettings } from '@/lib/data'
 import { faviconIcons } from '@/lib/favicon'
-import { imageUrl, organizationJsonLd, siteUrl } from '@/lib/seo'
+import { RSS_FEED_PATH } from '@/lib/rss'
+import { absoluteUrl, imageUrl, organizationJsonLd, siteUrl } from '@/lib/seo'
 import { resolveSiteUrlObject } from '@/lib/site-url'
 import '@/components/content/custom-html-section.css'
 import '@/components/layout/affiliate-disclosure.css'
@@ -168,6 +169,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           sharing that name is what made AdSense report "ads.txt status: not found" while the repo
           looked correct — see README, "AdSense says ads.txt status is not found". */}
       <head>
+        {/* Explicit link survives child routes replacing metadata.alternates with their canonical. */}
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title={`${settings.siteName} — Blog RSS feed`}
+          href={absoluteUrl(RSS_FEED_PATH)}
+        />
         {/* Google tag (gtag.js) */}
         {/* eslint-disable-next-line @next/next/next-script-for-ga -- gtag.txt is pasted verbatim as requested, rather than the @next/third-parties wrapper */}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-WWQBTLKKBW"></script>
