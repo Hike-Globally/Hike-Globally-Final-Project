@@ -14,7 +14,8 @@ import { siteUrl } from '@/lib/seo'
  * crawler and only ever show up as errors in a site audit.
  *
  * Payload's admin and REST/GraphQL API are excluded for the same reason as before: they are not
- * content, and crawling them wastes a crawl budget that belongs to trip pages.
+ * content, and crawling them wastes a crawl budget that belongs to trip pages. Public uploaded
+ * files are the narrow exception: blocking /api/media/file/ would defeat media sitemap discovery.
  */
 const disallow = ['/admin', '/api/', '/preview/', '/cdn-cgi/']
 
@@ -23,7 +24,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: '/',
+        // Public uploads must be crawlable for image/video discovery; other API routes stay blocked.
+        allow: ['/', '/api/media/file/'],
         disallow,
       },
     ],

@@ -214,9 +214,13 @@ export interface Media {
    */
   alt: string;
   /**
-   * Optional caption shown under gallery images.
+   * Optional image caption. For videos, describe the actual clip here; this is required for inclusion in the video sitemap.
    */
   caption?: string | null;
+  /**
+   * A representative still from this video. Together with Alt (video title) and Caption (description), enables a video sitemap entry. No entry is emitted until all three are set.
+   */
+  videoThumbnail?: (number | null) | Media;
   /**
    * Optional photographer / attribution.
    */
@@ -1660,6 +1664,7 @@ export interface UsersSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
+  videoThumbnail?: T;
   credit?: T;
   prefix?: T;
   _objectKey?: T;

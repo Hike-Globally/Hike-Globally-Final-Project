@@ -11,7 +11,9 @@ import { buildSitemap } from '@/lib/sitemap'
  * same `canonicalUrl()` helper as each page's `<link rel="canonical">`, `<lastmod>` from the
  * document's own `updatedAt`, and no noindex document ever listed. The homepage, the three
  * listing pages (`/trips`, `/destinations`, `/blog`) and `/inquiry` come from the route table
- * there; trips, destinations, posts and CMS pages come from the database.
+ * there; trips, destinations, posts and CMS pages come from the database. Original image URLs
+ * and fully described videos are included on their actual landing-page entries (image/video
+ * namespaces are emitted by Next); sitemap media never points at optimizer derivatives.
  *
  * Refreshed on a schedule (`revalidate` below) and immediately on every publish: Payload's
  * revalidation hooks purge `/sitemap.xml` alongside the page they changed (see

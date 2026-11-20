@@ -3,6 +3,8 @@ import type { MetadataRoute } from 'next'
 import { routes, sitePath } from '@/i18n/config'
 import { canonicalUrl } from './seo'
 import { isReservedPageSlug } from './site-routes'
+import { sitemapAssetUrl, sitemapMediaXml, type SitemapMedia } from './sitemap-media'
+import { HOME_HERO_IMAGE_URL } from './site-assets'
 
 /**
  * ============================================================================
@@ -38,7 +40,7 @@ import { isReservedPageSlug } from './site-routes'
  */
 
 /** One document that has a public URL, as much of it as the sitemap needs. */
-export type SitemapDocument = {
+export type SitemapDocument = SitemapMedia & {
   slug?: string | null
   /** The document's `updatedAt` — the honest `<lastmod>` for its URL. */
   updatedAt?: string | null
@@ -169,10 +171,16 @@ export const buildSitemap = (
   }
 
   const entries: MetadataRoute.Sitemap = []
+  const home = collections.pages.find((doc) => doc.slug === 'home')
+  // HomeFallback has a bundled hero; a CMS homepage only advertises the blocks it renders.
+  const hasHomeRecord = sources.pages.some((doc) => doc.slug === 'home')
+  const homeHero = !hasHomeRecord ? sitemapAssetUrl(HOME_HERO_IMAGE_URL) : undefined
+  const homepageMedia = sitemapMediaXml(home ?? { images: homeHero ? [homeHero] : [] })
 
   for (const { path, priority, changeFrequency, feeds } of STATIC_ROUTES) {
     entries.push({
       url: canonicalUrl(path),
+      ...(path === '/' ? homepageMedia : {}),
       lastModified: newestUpdate(feeds.flatMap((feed) => collections[feed])),
       changeFrequency,
       priority,
@@ -186,6 +194,7 @@ export const buildSitemap = (
       entries.push({
         // `slug` is checked by `published()` above.
         url: canonicalUrl(path(document.slug as string)),
+        ...sitemapMediaXml(document),
         lastModified: newestUpdate([document]),
         changeFrequency,
         priority,

@@ -156,8 +156,38 @@ rule holds for pages written later, not just the ones written today.
 | A CMS page whose slug a route owns is not listed | `home` is served at `/`, `trips` at `/trips`, and so on (`src/lib/site-routes.ts`, shared with `[slug]/page.tsx`). Listing the page anyway would print a URL the sitemap already contains.                                       |
 | Publishing rebuilds it immediately               | Payload's revalidation hooks purge `/sitemap.xml` next to the page they changed, so a trip published now is in the sitemap now — not after the 1-hour fallback window. `npm test` covers the rules in `src/lib/sitemap.test.ts`. |
 
-`/robots.txt` (`src/app/robots.ts`) is the other half: it allows everything except `/admin`, `/api/`,
-`/preview/` and `/cdn-cgi/`, sets `Host`, and points crawlers at the sitemap.
+**Images and videos use this same sitemap**, not a second endpoint. Next.js emits the image/video
+namespaces automatically. Entries include original hero/featured images on trips, destinations and
+posts, visible trip galleries, the first four destination gallery items (matching the page), and
+hero/gallery blocks on CMS pages. The homepage uses its actual bundled hero image; its CMS media
+is attached to `/`, never `/home`. Hidden sections, PDFs, unresolved upload IDs, and noindex
+content do not contribute media. Inline rich-text uploads and third-party embeds are not included.
+
+`src/lib/sitemap-records.ts` reads published documents in batches of 200 with media and video
+thumbnails populated; it does not fetch each page or make slug lookups heavier. The result is
+cached for an hour and invalidated on content publishes and media changes/deletes. Original URLs
+are absolute (including external storage URLs), deduplicated, and XML-escaped; image lists are
+limited to 1,000 images per landing page.
+
+**For a video entry:** in **Library → Media**, open the video, set **Alt** to its real title,
+write an accurate **Caption** describing the clip, and choose a representative still in
+**Video thumbnail**. The still also appears as the video player's poster. A video is omitted until
+all three fields and its file URL are available—no made-up thumbnail, description, duration, or
+publication date. Google still decides whether to index or display a video; a gallery video is not
+guaranteed a video search result.
+
+Migration `20261120_190941_sitemap_video_thumbnail` adds one nullable thumbnail relation and index
+to Media. It does not delete or rewrite existing content. Run `npm run migrate` before starting the
+updated app (the standard build already runs it when a database is configured). Use an isolated
+preview database. To verify after deployment, inspect `/sitemap.xml` for `image:image` and, after
+completing a video's metadata, `video:video`. For external storage, verify the CDN is crawlable and
+verify that domain in Search Console when applicable. Submit `/sitemap.xml` in Search Console;
+its discovery extensions do not guarantee indexing or higher rankings.
+
+`/robots.txt` (`src/app/robots.ts`) allows public pages and **`/api/media/file/`** (the public
+image/video file endpoint). The rest of `/api/`, `/admin`, `/preview/` and `/cdn-cgi/` remain
+blocked. This narrow exception is essential: advertising an upload in a sitemap is useless if
+robots.txt forbids fetching its bytes. Robots rules are crawler guidance, not access control.
 
 ### llms.txt
 

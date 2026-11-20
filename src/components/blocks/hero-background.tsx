@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { HOME_HERO_IMAGE_URL } from '@/lib/site-assets'
 
 /**
  * Homepage hero photograph — bundled with the site at `public/images/home/hero-bg.webp`
@@ -8,7 +9,7 @@ import Image from 'next/image'
  * there is no extra DNS/TLS handshake in the critical path, no remote-host allowlist to keep in
  * `next.config.mjs`, and the picture cannot change or disappear under us.
  */
-export const HOME_HERO_IMAGE_URL = '/images/home/hero-bg.webp'
+export { HOME_HERO_IMAGE_URL } from '@/lib/site-assets'
 
 /** The shared, decorative background used by both homepage hero render paths. */
 export function HomepageHeroBackground() {
