@@ -23,6 +23,7 @@
  */
 
 import Link from 'next/link'
+import Image from '@/components/ui/next-image'
 import {
   useEffect,
   useLayoutEffect,
@@ -598,22 +599,17 @@ export function RopeCarousel({
             }}
           >
             {item.image ? (
-              // A plain <img> on purpose: the cards are transformed at 60fps by the
-              // physics loop; resolveMediaImage serves the original upload, and
-              // the reference build animates plain imgs too.
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              // A single <img> (no wrapper) is what the card animation expects;
+              // next/image still renders one and now hands the browser a proper
+              // AVIF/WebP srcset for the card slot instead of the original upload.
+              <Image
                 src={item.image.src}
                 alt={item.image.alt}
+                fill
+                sizes="(max-width: 768px) 52vw, 300px"
                 draggable={false}
                 loading={i < 5 ? 'eager' : 'lazy'}
-                decoding="async"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  display: 'block',
-                }}
+                style={{ objectFit: 'cover', display: 'block' }}
               />
             ) : null}
             <div
