@@ -1,5 +1,5 @@
 /* Link preview card — a premium listing card: a large rounded thumbnail, a site eyebrow, a two-line
-   title and description, a rating row, and the price block held in the vertical centre of the card
+   title and description, and the price block held in the vertical centre of the card
    (never pinned to its foot). Colours come from the site tokens in globals.css; no badges or
    ribbons on purpose — depth comes from layered shadows, a hairline sheen and hover motion. */
 
@@ -143,68 +143,6 @@
   line-height: 1.5;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
-}
-
-/* ── Rating ────────────────────────────────────────────────────────────────────────────────── */
-
-.link-preview-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.65rem;
-  margin-top: 0.6rem;
-}
-
-/* A hairline between the rating and the review count, so neither needs its own pill. */
-.link-preview-meta > * + * {
-  padding-left: 0.7rem;
-  border-left: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
-}
-
-.link-preview-rating {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  white-space: nowrap;
-}
-
-.link-preview-score {
-  color: var(--color-ink);
-  font-size: 0.9375rem;
-  font-variant-numeric: tabular-nums;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.link-preview-stars {
-  position: relative;
-  display: inline-block;
-  line-height: 0;
-}
-
-.link-preview-stars-row {
-  display: inline-flex;
-  gap: 1px;
-  white-space: nowrap;
-}
-
-.link-preview-stars-row--empty {
-  color: var(--color-slate-20);
-}
-
-.link-preview-stars-row--filled {
-  position: absolute;
-  top: 0;
-  left: 0;
-  overflow: hidden;
-  color: #e9a13a;
-}
-
-.link-preview-count {
-  color: var(--color-ink-60);
-  font-size: 0.875rem;
-  line-height: 1.4;
-  white-space: nowrap;
 }
 
 /* ── Price ─────────────────────────────────────────────────────────────────────────────────── */

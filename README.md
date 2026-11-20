@@ -331,6 +331,16 @@ npm run migrate:status   # confirm it is recorded
 
 `npm run build` already runs the migrations before `next build`, so a deploy needs no extra step.
 
+### Reviews and ratings
+
+This project does not use customer reviews, testimonials, star ratings, or review counts, and emits
+no `Review` / `AggregateRating` structured data. Link cards still support imagery, text, links, and
+prices. Trip difficulty levels are not customer ratings and remain available.
+
+Migration `20261120_185728_remove_reviews` intentionally deletes legacy testimonial and rating data
+from published content, drafts, and version history. **Back up the database before deployment**;
+rollback restores the schema, not deleted content. See [the migration notes](docs/content/page-sections.md#reviews-and-ratings-are-not-supported).
+
 ### Open Graph and structured data
 
 Every page builds its metadata with `buildMetadata()` — canonical, `og:*`, `twitter:*`, robots — and

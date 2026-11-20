@@ -13,7 +13,7 @@ import { validateLinkPreviewUrl } from '../lib/link-preview'
  *
  * Only the URL really matters — with no URL the row renders nothing, and the card's image, title
  * and description come from the linked page's own metadata (Open Graph / Twitter / `<title>`).
- * Rating, review count and prices are typed in, since no page's metadata carries them.
+ * Prices are typed in, since no page's metadata carries them.
  */
 
 /** Every field in a Link preview row shares one condition: the row's Section is Link preview. */
@@ -64,30 +64,11 @@ export function linkPreviewSectionFields({ conditional = true }: { conditional?:
       admin: { condition },
       fields: [
         {
-          name: 'linkPreviewRating',
-          type: 'number',
-          label: 'Rating',
-          min: 0,
-          max: 5,
-          admin: {
-            width: '25%',
-            step: 0.1,
-            description: 'Out of 5, e.g. 4.8. Leave empty to hide the stars.',
-          },
-        },
-        {
-          name: 'linkPreviewReviewCount',
-          type: 'number',
-          label: 'Number of reviews',
-          min: 0,
-          admin: { width: '25%' },
-        },
-        {
           name: 'linkPreviewPrice',
           type: 'text',
           label: 'Price',
           admin: {
-            width: '25%',
+            width: '50%',
             placeholder: 'US$ 700',
             description: 'Shown in bold. Written exactly as it should appear.',
           },
@@ -97,7 +78,7 @@ export function linkPreviewSectionFields({ conditional = true }: { conditional?:
           type: 'text',
           label: 'Original price',
           admin: {
-            width: '25%',
+            width: '50%',
             placeholder: 'US$ 1150',
             description: 'Optional. Shown struck through before the price.',
           },

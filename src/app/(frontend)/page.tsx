@@ -26,7 +26,7 @@ const HOMEPAGE_META_DESCRIPTION =
  * HOMEPAGE — `/`
  * ============================================================================
  * Driven by the Payload page whose slug is `home`, so the entire homepage is
- * editable from the CMS (hero, featured trips, testimonials, FAQ, form…).
+ * editable from the CMS (hero, featured trips, FAQ, form…).
  * If no such page exists yet, a curated fallback composed of real CMS content
  * renders instead — the site never shows an empty shell.
  */

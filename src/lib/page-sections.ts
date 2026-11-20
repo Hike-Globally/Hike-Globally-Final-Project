@@ -54,8 +54,6 @@ export type PageSection = MultiUrlPreviewSource & {
   linkPreviewUrl?: string | null
   linkPreviewTitle?: string | null
   linkPreviewDescription?: string | null
-  linkPreviewRating?: number | null
-  linkPreviewReviewCount?: number | null
   linkPreviewPrice?: string | null
   linkPreviewOriginalPrice?: string | null
 }

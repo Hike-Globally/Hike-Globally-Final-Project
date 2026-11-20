@@ -5,7 +5,7 @@
  *   - the card prefers page imagery and has a local photographic fallback;
  *   - the price block is part of the card's middle row (after the body, before the open arrow),
  *     not a separate strip at the foot of the box;
- *   - the rating, the review count and the "was" price are all present when the row sets them;
+ *   - the "was" price is present when the row sets it;
  *   - external links open in a new tab, internal ones stay in the current one.
  */
 
@@ -40,8 +40,6 @@ const card = (overrides: Partial<ResolvedLinkPreview> = {}): ResolvedLinkPreview
   title: 'Blue Lagoon Retreat, Grindavík',
   description: 'Geothermal spa hotel with a private lagoon entrance.',
   image: 'https://cf.bstatic.com/xdata/images/hotel/max1024x768/12345.jpg',
-  rating: 4.6,
-  reviewCount: 1234,
   price: '$289',
   originalPrice: '$410',
   ...overrides,
@@ -81,14 +79,11 @@ test('the price sits in the card row, between the body and the open arrow', () =
   assert.match(html, /class="link-preview-price-now"[^>]*>\$289</)
 })
 
-test('rating, review count and prices all appear when the row sets them', () => {
-  const html = render()
-  assert.match(html, />4\.6</)
-  assert.match(html, />1,234 reviews</)
-  assert.match(
-    html,
-    /class="link-preview-stars-row link-preview-stars-row--filled"[^>]*style="width:92%"/,
-  )
+test('legacy rating and review values never render stars or counts', () => {
+  const legacy = { ...card(), rating: 4.6, reviewCount: 1234 }
+  const html = renderToStaticMarkup(createElement(LinkPreviewCard, { card: legacy }))
+  assert.doesNotMatch(html, /link-preview-(rating|score|stars|count|meta)|1,234 reviews|>4\.6</)
+  assert.match(html, /class="link-preview-price-now"[^>]*>\$289</)
 })
 
 test('the host is printed once, as an eyebrow above the title', () => {

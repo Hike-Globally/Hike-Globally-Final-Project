@@ -321,9 +321,10 @@ export const seoFromDoc = (
 /* ==========================================================================
    Structured data (schema.org)
    ==========================================================================
-   JSON-LD is how Google turns a page into a rich result: trip prices, breadcrumbs
-   and review ratings can all appear directly in the SERP. (FAQ rich results were
-   removed in May 2026 — FAQPage is still emitted, but for AI/LLM parsing, not SERP.)
+   JSON-LD describes page content to search engines; supported types such as
+   breadcrumbs may appear in the SERP. No review or rating markup is emitted.
+   (FAQ rich results were removed in May 2026 — FAQPage is still emitted, but for
+   AI/LLM parsing, not SERP.)
    ========================================================================== */
 
 type JsonLdInput = Record<string, unknown>

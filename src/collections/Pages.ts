@@ -10,7 +10,6 @@ import { Inquiry } from '../blocks/Inquiry'
 import { LatestPosts } from '../blocks/LatestPosts'
 import { RichTextBlock } from '../blocks/RichText'
 import { Stats } from '../blocks/Stats'
-import { Testimonials } from '../blocks/Testimonials'
 import { adminOrEditor, publishedOrSignedIn } from '../access'
 import { internalLinkKeywordsSection } from '../fields/internal-link-keywords'
 import { metaField } from '../fields/meta'
@@ -83,7 +82,6 @@ export const Pages: CollectionConfig = {
         LatestPosts,
         Stats,
         Gallery,
-        Testimonials,
         Faq,
         Inquiry,
         Cta,

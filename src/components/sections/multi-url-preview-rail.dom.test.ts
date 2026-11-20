@@ -103,8 +103,6 @@ const cards: ResolvedLinkPreview[] = Array.from({ length: 4 }, (_, index) => ({
   title: `Resource ${index + 1}`,
   description: 'A useful trail guide.',
   image: null,
-  rating: 4.6,
-  reviewCount: 82,
   price: 'US$ 700',
   originalPrice: 'US$ 900',
 }))

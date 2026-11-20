@@ -27,6 +27,7 @@ import * as migration_20261119_170704_multi_url_preview from './20261119_170704_
 import * as migration_20261119_180000_internal_link_keywords from './20261119_180000_internal_link_keywords'
 import * as migration_20261119_190000_hotels_near_destination from './20261119_190000_hotels_near_destination'
 import * as migration_20261119_200000_multi_url_preview_images from './20261119_200000_multi_url_preview_images'
+import * as migration_20261120_185728_remove_reviews from './20261120_185728_remove_reviews'
 
 export const migrations = [
   {
@@ -173,5 +174,10 @@ export const migrations = [
     up: migration_20261119_200000_multi_url_preview_images.up,
     down: migration_20261119_200000_multi_url_preview_images.down,
     name: '20261119_200000_multi_url_preview_images',
+  },
+  {
+    up: migration_20261120_185728_remove_reviews.up,
+    down: migration_20261120_185728_remove_reviews.down,
+    name: '20261120_185728_remove_reviews',
   },
 ]
