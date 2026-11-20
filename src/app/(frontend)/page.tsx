@@ -68,7 +68,13 @@ export default async function HomePage() {
       {page ? <BlockRenderer blocks={page.blocks} homepage /> : <HomeFallback />}
 
       {/* The full Organization is emitted once by the shared root layout. */}
-      <JsonLd data={websiteJsonLd({ name: settings.siteName, url: siteUrl })} />
+      <JsonLd
+        data={websiteJsonLd({
+          name: settings.siteName,
+          alternateName: 'HikeGlobally',
+          url: siteUrl,
+        })}
+      />
     </div>
   )
 }
