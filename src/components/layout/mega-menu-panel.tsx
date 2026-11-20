@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from '@/components/ui/next-image'
 import Link from 'next/link'
 import { ArrowRight, ArrowUpRight, Clock, Mountain, X } from 'lucide-react'
 
@@ -168,12 +169,13 @@ function DestinationsDesktopMega({
 
             <Link href={preview.href} className="pn-mega-dest-card" onClick={onNavigate}>
               {preview.image ? (
-                /* eslint-disable-next-line @next/next/no-img-element -- serves the original uploaded bytes matching PayloadImage/unoptimized policy */
-                <img
+                <Image
                   key={preview.image.src}
                   src={preview.image.src}
                   alt={preview.image.alt}
-                  style={{ objectPosition: preview.image.objectPosition }}
+                  fill
+                  sizes="(max-width: 1180px) 34vw, 400px"
+                  style={{ objectFit: 'cover', objectPosition: preview.image.objectPosition }}
                   className="pn-mega-dest-card-img"
                 />
               ) : null}
@@ -337,11 +339,15 @@ function TripsDesktopMega({
                 >
                   <div className="pn-mega-trip-media">
                     {trip.image ? (
-                      /* eslint-disable-next-line @next/next/no-img-element -- serves original uploaded bytes matching PayloadImage/unoptimized policy */
-                      <img
+                      <Image
                         src={trip.image.src}
                         alt={trip.image.alt}
-                        style={{ objectPosition: trip.image.objectPosition }}
+                        fill
+                        sizes="(max-width: 1180px) 30vw, 380px"
+                        style={{
+                          objectFit: 'cover',
+                          objectPosition: trip.image.objectPosition,
+                        }}
                         className="pn-mega-trip-img"
                       />
                     ) : null}
@@ -487,11 +493,12 @@ export function MobileMegaMenu({
             onClick={onNavigate}
           >
             {featuredDestination.image ? (
-              /* eslint-disable-next-line @next/next/no-img-element -- serves original uploaded bytes matching PayloadImage/unoptimized policy */
-              <img
+              <Image
                 src={featuredDestination.image.src}
                 alt={featuredDestination.image.alt}
-                style={{ objectPosition: featuredDestination.image.objectPosition }}
+                fill
+                sizes="100vw"
+                style={{ objectFit: 'cover', objectPosition: featuredDestination.image.objectPosition }}
                 className="pn-mega-dest-card-img"
               />
             ) : null}
@@ -619,12 +626,16 @@ export function MobileMegaMenu({
               >
                 <div className="pn-mobile-trip-media">
                   {trip.image ? (
-                    /* eslint-disable-next-line @next/next/no-img-element -- serves original uploaded bytes matching PayloadImage/unoptimized policy */
-                    <img
+                    <Image
                       src={trip.image.src}
                       alt=""
                       aria-hidden="true"
-                      style={{ objectPosition: trip.image.objectPosition }}
+                      fill
+                      sizes="84px"
+                      style={{
+                        objectFit: 'cover',
+                        objectPosition: trip.image.objectPosition,
+                      }}
                       className="pn-mobile-mega-thumb"
                     />
                   ) : null}

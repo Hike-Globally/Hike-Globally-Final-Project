@@ -33,9 +33,24 @@ const nextConfig = {
   },
 
   images: {
-    // Serve original bytes everywhere (including bundled design assets), not a resized or
-    // re-encoded /_next/image variant. CMS uploads also use their original media.url.
-    unoptimized: true,
+    /**
+     * Responsive optimization is ON for photographic media. Browsers get an AVIF/WebP `srcset`
+     * (via `/_next/image`, cached at the edge for 31 days) instead of the multi-megabyte camera
+     * original — the single biggest Core Web Vitals win available to this site. The original
+     * upload is only ever fetched server-side by the optimizer (or by JSON-LD/OG builders, which
+     * need the absolute URL) and is never re-encoded when written to storage.
+     *
+     * Notes:
+     * - SVG and GIF uploads are passed through untouched by `PayloadImage` (the optimizer would
+     *   rasterize an animated GIF to its first frame, and won't serve SVG at all).
+     * - The `/images/*` bundled design assets and `/api/media/file/*` CMS route handlers are all
+     *   same-origin, so no `localPatterns` restriction is needed. New *remote* storage hosts must
+     *   be allow-listed in `remotePatterns` below or the optimizer refuses them (by design).
+     * - `sizes` is a required prop on every image component, so the browser picks the right
+     *   candidate for the slot, not the viewport.
+     */
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 2678400, // 31 days — matches the media route's `s-maxage=2592000` edge cache
     remotePatterns: [
       // Vercel Blob storage in production
       { protocol: 'https', hostname: '*.public.blob.vercel-storage.com' },

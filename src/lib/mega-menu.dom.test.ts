@@ -221,8 +221,14 @@ test('Destinations desktop mega menu lists regions, updates photo preview on hov
 
     // Featured showcase starts on Khumbu
     const showcaseTitle = () => host.container.querySelector('.pn-mega-dest-card-title')?.textContent
-    const showcaseImg = () =>
-      host.container.querySelector('.pn-mega-dest-card-img')?.getAttribute('src')
+    // Optimized images render as /_next/image?url=<encoded original>&w=…&q=… — decode the
+    // source URL out of it so the assertion tracks *which* image is shown, not the optimizer params.
+    const showcaseImg = () => {
+      const src =
+        host.container.querySelector('.pn-mega-dest-card-img')?.getAttribute('src') ?? ''
+      const match = /[?&]url=([^&]+)/.exec(src)
+      return match?.[1] ? decodeURIComponent(match[1]) : src
+    }
     assert.equal(showcaseTitle(), 'Khumbu')
     assert.equal(showcaseImg(), '/images/admin/himalaya-01.jpg')
 

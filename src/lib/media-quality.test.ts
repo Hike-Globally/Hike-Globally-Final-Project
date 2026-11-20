@@ -33,15 +33,53 @@ test('every frontend media resolver prefers the original over generated crops', 
   assert.deepEqual(imageDimensions(image), { width: 4000, height: 3000 })
 })
 
-test('both image layouts serve the original without Next re-encoding or a srcset', () => {
+test('image layouts route through the Next optimizer instead of serving raw originals', () => {
   for (const Component of [PayloadImage, PayloadImageFill]) {
     const element = Component({ media: image, sizes: '100vw' })
     assert.ok(element)
     const img = Component === PayloadImage ? element.props.children : element
+    // The original upload is the optimizer's input — the stored file stays byte-for-byte.
     assert.equal(img.props.src, '/api/media/file/original.jpg')
-    assert.equal(img.props.unoptimized, true)
+    // …but the browser gets the optimizer's AVIF/WebP srcset, never the camera original.
+    assert.ok(!img.props.unoptimized)
+    assert.equal(img.props.sizes, '100vw')
     assert.equal(img.props.width ?? image.width, image.width)
   }
+})
+
+test('non-priority images lazy-load; priority images defer loading to the preload', () => {
+  const lazy = PayloadImage({ media: image, sizes: '100vw' })
+  assert.equal(lazy?.props.children.props.loading, 'lazy')
+  const eager = PayloadImage({ media: image, sizes: '100vw', priority: true })
+  assert.equal(eager?.props.children.props.priority, true)
+  assert.equal(eager?.props.children.props.loading, undefined)
+})
+
+test('SVG and GIF uploads bypass the optimizer and render exactly as stored', () => {
+  const svg = PayloadImage({
+    media: { ...image, url: '/api/media/file/logo.svg', mimeType: 'image/svg+xml' },
+    sizes: '300px',
+  })
+  assert.equal(svg?.props.children.props.unoptimized, true)
+
+  const gif = PayloadImage({
+    media: { ...image, url: '/api/media/file/clip.gif', mimeType: 'image/gif' },
+    sizes: '100vw',
+  })
+  assert.equal(gif?.props.children.props.unoptimized, true)
+
+  const fillSvg = PayloadImageFill({
+    media: { ...image, url: '/api/media/file/mark.svg', mimeType: 'image/svg+xml' },
+    sizes: '100vw',
+  })
+  assert.equal(fillSvg?.props.unoptimized, true)
+
+  // Extension-only SVG (mimeType missing) still bypasses.
+  const extensionSvg = PayloadImage({
+    media: { ...image, url: '/api/media/file/icon.svg', mimeType: null },
+    sizes: '100px',
+  })
+  assert.equal(extensionSvg?.props.children.props.unoptimized, true)
 })
 
 test('video uploads keep their original file and render as videos, not broken images', () => {
