@@ -169,6 +169,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           sharing that name is what made AdSense report "ads.txt status: not found" while the repo
           looked correct — see README, "AdSense says ads.txt status is not found". */}
       <head>
+        <meta
+          name="google-site-verification"
+          content="ifr0lQC0vSpJEnOHwV3BpQ6Zk4uYFFdI5tpkK0H7UG0"
+        />
         {/* Explicit link survives child routes replacing metadata.alternates with their canonical. */}
         <link
           rel="alternate"
