@@ -35,21 +35,6 @@
   pointer-events: none;
 }
 
-/* Very fine survey grid — a quiet premium texture, not a competing pattern. */
-.browse-places::after {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  content: '';
-  background-image:
-    linear-gradient(to right, color-mix(in srgb, var(--color-mist) 6%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in srgb, var(--color-mist) 5%, transparent) 1px, transparent 1px);
-  background-size: 5.5rem 5.5rem;
-  mask-image: linear-gradient(to bottom, transparent, black 18%, black 82%, transparent);
-  opacity: 0.5;
-  pointer-events: none;
-}
-
 .browse-places__heading {
   position: relative;
   z-index: 1;
@@ -187,7 +172,9 @@
   position: absolute;
   inset: 0;
   z-index: 1;
+  pointer-events: none;
   background:
+    linear-gradient(color-mix(in srgb, var(--color-ink) 40%, transparent), color-mix(in srgb, var(--color-ink) 40%, transparent)),
     linear-gradient(
       to top,
       color-mix(in srgb, var(--color-ink) 94%, transparent) 0%,

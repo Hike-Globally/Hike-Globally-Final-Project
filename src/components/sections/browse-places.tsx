@@ -214,7 +214,7 @@ export function BrowsePlaces() {
 
   const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
     // Touch gets the browser's native horizontal swipe; mouse/pen get drag-to-scroll.
-    if (event.pointerType === 'touch') return
+    if (event.pointerType === 'touch' || event.button !== 0) return
     const track = trackRef.current
     if (!track) return
 
@@ -226,8 +226,6 @@ export function BrowsePlaces() {
       pointerId: event.pointerId,
     }
     pauseStateRef.current.drag = true
-    track.dataset.dragging = 'true'
-    if (typeof track.setPointerCapture === 'function') track.setPointerCapture(event.pointerId)
   }
 
   const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
@@ -236,7 +234,14 @@ export function BrowsePlaces() {
     if (!drag.active || !track) return
 
     const delta = event.clientX - drag.startX
-    if (Math.abs(delta) > 4) drag.moved = true
+    if (!drag.moved) {
+      if (Math.abs(delta) <= 4) return
+      drag.moved = true
+      track.dataset.dragging = 'true'
+      // Capture only once a drag starts. Capturing on pointerdown retargets a
+      // normal click to the track instead of the category link underneath.
+      if (typeof track.setPointerCapture === 'function') track.setPointerCapture(event.pointerId)
+    }
     const loopWidth = getLoopWidth(track, setSize)
     track.scrollLeft = normalizeLoopPosition(drag.startLeft - delta, loopWidth)
   }
@@ -354,6 +359,7 @@ export function BrowsePlaces() {
         tabIndex={0}
         className="browse-places__track container-gutter no-scrollbar"
         data-place-carousel=""
+        onDragStart={(event) => event.preventDefault()}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={finishDrag}

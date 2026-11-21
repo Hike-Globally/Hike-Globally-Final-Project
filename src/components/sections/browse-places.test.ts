@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import test from 'node:test'
 
-import { PLACE_CATEGORY_VALUES, placeCategories } from '../../lib/place-categories'
+import { PLACE_CATEGORY_VALUES, placeCategories, placeCategoryPath } from '../../lib/place-categories'
 import { isReservedPageSlug } from '../../lib/site-routes'
 
 const repoRoot = path.resolve(import.meta.dirname, '../../..')
@@ -93,6 +93,32 @@ test('cards and place links use the nine dedicated, unprefixed category URLs', (
   for (const value of PLACE_CATEGORY_VALUES) {
     assert.equal(placeCategories.some((category) => category.value === value), true)
   }
+})
+
+test('the carousel keeps card links clickable while still supporting drag', () => {
+  const source = read('src/components/sections/browse-places.tsx')
+  const card = read('src/components/cards/place-category-card.tsx')
+  const down = source.slice(source.indexOf('const onPointerDown'), source.indexOf('const onPointerMove'))
+  const move = source.slice(source.indexOf('const onPointerMove'), source.indexOf('const onKeyDown'))
+
+  // Capturing on pointerdown retargets a click from the link to the track.
+  assert.doesNotMatch(down, /setPointerCapture/)
+  assert.match(move, /Math\.abs\(delta\) <= 4\) return/)
+  assert.match(move, /setPointerCapture\(event\.pointerId\)/)
+  assert.match(source, /onClickCapture/)
+  assert.match(card, /href=\{placeCategoryPath\(category\.value\)\}/)
+  assert.match(card, /draggable=\{false\}/)
+  for (const category of placeCategories) {
+    assert.equal(placeCategoryPath(category.value), `/places/${category.value}`)
+  }
+})
+
+test('the section has no grid and cards have a full-image dark overlay', () => {
+  const css = read('src/components/sections/browse-places.css')
+  const card = read('src/components/cards/place-category-card.tsx')
+  assert.doesNotMatch(css, /\.browse-places::after/)
+  assert.match(css, /\.browse-places__scrim\s*\{[\s\S]*?linear-gradient\(color-mix\(in srgb, var\(--color-ink\) 40%/)
+  assert.match(card, /className="browse-places__scrim"/)
 })
 
 test('single trip and blog pages expose their mapped place categories', () => {
