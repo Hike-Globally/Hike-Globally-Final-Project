@@ -17,9 +17,10 @@ async function sqlFor(migrate: typeof up | typeof down) {
   return statements.join('\n')
 }
 
-test('thumbnail migration is last and only adds an optional media relationship', async () => {
-  assert.equal(migrations.at(-1)?.up, up)
-  assert.equal(migrations.at(-1)?.down, down)
+test('thumbnail migration is registered and only adds an optional media relationship', async () => {
+  const registered = migrations.find((migration) => migration.name === '20261120_190941_sitemap_video_thumbnail')
+  assert.equal(registered?.up, up)
+  assert.equal(registered?.down, down)
   const sql = await sqlFor(up)
   assert.match(sql, /ADD COLUMN "video_thumbnail_id" integer;/)
   assert.match(sql, /REFERENCES "public"."media"\("id"\) ON DELETE set null/)

@@ -1883,11 +1883,7 @@ const run = async () => {
         title: 'Home',
         slug: 'home',
         blocks: homeBlocks(),
-        meta: {
-          title: 'Hike Globally | Family Tours, Trekking & Travel Guides',
-          description:
-            'Discover family tours, treks and global destinations with Hike Globally. Explore travel guides, expert tips and inspiring ideas for your next adventure.',
-        },
+        // Leave SEO overrides empty so the homepage uses its current editorial defaults.
         _status: 'published',
       },
     })

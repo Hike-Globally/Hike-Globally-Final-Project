@@ -17,9 +17,9 @@ export const revalidate = 3600
  * They are used whenever the CMS `home` page has no SEO override of its own. An editor can still
  * replace them from the admin (Pages → Home → "SEO & social sharing"), and that value wins.
  */
-const HOMEPAGE_META_TITLE = 'Hike Globally | Family Tours, Trekking & Travel Guides'
+const HOMEPAGE_META_TITLE = 'Nepal Trekking: Trips, Regions & Travel Guides | Hike Globally'
 const HOMEPAGE_META_DESCRIPTION =
-  'Discover family tours, treks and global destinations with Hike Globally. Explore travel guides, expert tips and inspiring ideas for your next adventure.'
+  'Compare Nepal trek itineraries from independent operators, explore regions such as Everest and Annapurna, and find packing and training guides for the trail.'
 
 /**
  * ============================================================================

@@ -63,7 +63,7 @@ const en = {
     copyright: '© {year} {site}. All rights reserved.',
   },
   trips: {
-    listingTitle: 'Trekking trips & expeditions',
+    listingTitle: 'Nepal treks & expeditions',
     listingSubtitle:
       'Explore trekking routes from the Khumbu to Dolpo. Compare itineraries, difficulty and starting prices for trips run by independent operators.',
     filterTitle: 'Find your trip',
@@ -176,10 +176,10 @@ const en = {
     notFound: 'That trip no longer exists.',
   },
   destinations: {
-    listingTitle: 'Destinations',
+    listingTitle: 'Trekking regions of Nepal',
     homeSectionTitle: 'Destinations in Nepal',
     listingSubtitle:
-      'Eight mountain regions, one country that rearranges your sense of scale. Start with the classics or go looking for the quiet ones.',
+      'Explore Nepal’s trekking regions, from the Everest trails of Khumbu to the Annapurna foothills. Find routes, travel seasons and how to get there.',
     tripsCount_one: '{count} trip',
     tripsCount_other: '{count} trips',
     bestTime: 'Best time to visit',
@@ -205,9 +205,9 @@ const en = {
     regionOther: 'Other',
   },
   blog: {
-    listingTitle: 'The Hike Globally journal',
+    listingTitle: 'Nepal trekking guides & packing lists',
     listingSubtitle:
-      'Trip reports, packing lists, and hard-won advice from guides who spend 200 days a year on the trail.',
+      'Read how to train for high passes, what to pack for autumn in the Khumbu and what life on the trail is like for porters.',
     /** Eyebrow of the `/blog` hero band, above the display headline. */
     heroEyebrow: 'Dispatches from the Himalaya',
     /** Side note beside the hero's jump link, as on `/trips` and `/destinations`. */

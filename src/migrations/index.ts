@@ -30,6 +30,8 @@ import * as migration_20261119_200000_multi_url_preview_images from './20261119_
 import * as migration_20261120_185728_remove_reviews from './20261120_185728_remove_reviews'
 import * as migration_20261120_190941_sitemap_video_thumbnail from './20261120_190941_sitemap_video_thumbnail'
 
+import * as migration_20261120_200000_home_seo_defaults from './20261120_200000_home_seo_defaults'
+
 export const migrations = [
   {
     up: migration_20261003_075051_initial.up,
@@ -185,5 +187,10 @@ export const migrations = [
     up: migration_20261120_190941_sitemap_video_thumbnail.up,
     down: migration_20261120_190941_sitemap_video_thumbnail.down,
     name: '20261120_190941_sitemap_video_thumbnail',
+  },
+  {
+    up: migration_20261120_200000_home_seo_defaults.up,
+    down: migration_20261120_200000_home_seo_defaults.down,
+    name: '20261120_200000_home_seo_defaults',
   },
 ]

@@ -92,7 +92,7 @@ export default async function DestinationsPage({ searchParams }: ArchiveProps) {
 
           <p className="eyebrow mt-10 text-mist">The destination atlas · Nepal</p>
           <h1 className="heading-display hero-title mt-5 max-w-3xl text-white">
-            The Himalaya, <span className="text-mist">in all its scale.</span>
+            {dict.destinations.listingTitle}
           </h1>
           <p className="lead hero-description mt-6 max-w-2xl text-mist">
             {dict.destinations.listingSubtitle}
