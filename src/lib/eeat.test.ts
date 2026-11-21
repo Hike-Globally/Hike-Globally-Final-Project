@@ -238,6 +238,7 @@ test('Organization identity includes configured logo, contact details and valid 
     socials: [...settings.socials!, { url: 'javascript:alert(1)' }, ...settings.socials!],
   })
   assert.equal(organization['@id'], organizationId)
+  assert.equal(organization['@type'], 'Organization')
   assert.equal(organization.name, settings.siteName)
   assert.equal(organization.legalName, 'Example Operator Ltd')
   assert.equal(organization.logo, 'https://hikeglobally.com/images/test-logo.svg')
@@ -268,7 +269,7 @@ test('Organization identity includes configured logo, contact details and valid 
   assert.equal(minimal.legalName, undefined)
 })
 
-test('blog publishers and trip providers point at the full site-wide Organization', () => {
+test('blog and trip-page publishers point at the full site-wide Organization', () => {
   const identity = {
     siteName: settings.siteName,
     organizationLogo: settings.logo,
@@ -279,12 +280,13 @@ test('blog publishers and trip providers point at the full site-wide Organizatio
     url: '/blog/test-field-notes',
     ...identity,
   }).publisher
-  const provider = touristTripJsonLd({
+  const tour = touristTripJsonLd({
     trip,
     url: '/trips/test-mountain-trek',
     ...identity,
-  }).provider
-  assert.deepEqual(provider, publisher)
+  })
+  assert.equal(tour.provider, undefined)
+  assert.deepEqual((tour.subjectOf as Record<string, unknown>).publisher, publisher)
   assert.deepEqual(publisher, {
     '@type': 'Organization',
     '@id': organizationId,
@@ -309,14 +311,16 @@ test('trip expertise belongs to its describing WebPage, not an unsupported Touri
   assert.equal(page['@id'], 'https://hikeglobally.com/trips/test-mountain-trek')
   assert.deepEqual(page.author, personJsonLd(author))
   assert.deepEqual(page.mainEntity, { '@id': data['@id'] })
-  assert.equal((data.offers as Record<string, unknown>).price, trip.priceFrom)
+  assert.equal(data.offers, undefined)
   for (const guide of [undefined, null, 42]) {
     const unattributed = touristTripJsonLd({
       trip: { ...trip, guide },
       url: '/trips/test',
       siteName: settings.siteName,
     })
-    assert.equal(unattributed.subjectOf, undefined)
+    const pageWithoutGuide = unattributed.subjectOf as Record<string, unknown>
+    assert.equal(pageWithoutGuide.author, undefined)
+    assert.deepEqual(pageWithoutGuide.publisher, page.publisher)
   }
 })
 
@@ -409,7 +413,11 @@ test('trip detail renders its expert exactly once, including full-width-only lay
       (tour.subjectOf as Record<string, unknown>).author,
       serialized(personJsonLd(author)),
     )
-    assert.equal((tour.provider as Record<string, unknown>).name, settings.siteName)
+    assert.equal(tour.provider, undefined)
+    assert.equal(tour.offers, undefined)
+    assert.match(document.body.textContent ?? '', /Hike Globally is a travel affiliate platform/)
+    assert.match(document.body.textContent ?? '', /may earn a commission/)
+    assert.equal(((tour.subjectOf as Record<string, unknown>).publisher as Record<string, unknown>)['@id'], organizationId)
     assert.doesNotMatch(html, /private-account|private-password/)
   }
   const noGuide = documentOf(

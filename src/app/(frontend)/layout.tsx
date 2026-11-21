@@ -235,7 +235,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             legalName: settings.legalName,
             url: siteUrl,
             logo: settings.logo,
-            description: settings.tagline,
+            description: dict.common.affiliateDescription,
             email: settings.email,
             phone: settings.phone,
             address: settings.address,

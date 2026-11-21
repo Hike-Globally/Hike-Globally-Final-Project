@@ -42,15 +42,15 @@ profile appears after the trip's body sections (or after the full-width sections
 body column). It does not promise that this person will lead every departure.
 
 `TouristTrip` is not a CreativeWork, so the expert is described as the `author` of its `subjectOf`
-`WebPage`, not as an unsupported `TouristTrip.author`. The existing trip, itinerary, price, and
-provider markup remain in place.
+`WebPage`, not as an unsupported `TouristTrip.author`. The page identifies Hike Globally as its publisher even without a guide.
+The trip does not claim a provider, offer, or availability: Hike Globally is a travel affiliate platform.
 
 ## Complete the organization details
 
 In **Settings**, confirm the site name, legal name, logo, public email, telephone, address, and
 organization social profiles. The public root layout emits the full Organization on every page,
 including `/blog/[slug]` and `/trips/[slug]`, using `/#organization` as the shared identifier.
-Blog publishers and trip providers reference that same entity and include its configured logo
+Blog posts and trip pages reference that same entity and include its configured logo
 and social profiles. With no uploaded logo, the bundled `/images/logo.svg` is used.
 
 Organization verification still needs genuine external evidence where applicable. No verification
@@ -66,7 +66,7 @@ It does not replace existing biographies, assign experts, or populate qualificat
 After deploying and completing the CMS details:
 
 1. Open an attributed blog post and trip; confirm the correct person's visible profile and links.
-2. Inspect each page's JSON-LD: one full Organization, matching publisher/provider `@id`, and the
+2. Inspect each page's JSON-LD: one full Organization, matching publisher `@id`, and the
    corresponding Person with only the facts actually supplied.
 3. Validate the deployed pages with a structured-data validator and re-run the original audit.
    Scores depend on real content and external reputation as well as technical markup.

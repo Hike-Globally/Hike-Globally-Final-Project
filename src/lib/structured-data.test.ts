@@ -2,7 +2,7 @@
  * Structured-data coverage — the schema.org counterpart to `canonical-coverage.test.ts`.
  *
  * Every public page must describe itself to search engines with JSON-LD, and it must be the right
- * kind of node: a trip is a `TouristTrip` with an offer, a post is a `BlogPosting`, a listing is a
+ * kind of node: a trip is a `TouristTrip` with a publisher on its describing page, a post is a `BlogPosting`, a listing is a
  * `CollectionPage` whose `ItemList` is the cards the page actually renders. Rich results are built
  * from this markup, so a page that silently stops emitting it loses them with nothing failing in
  * the build — which is why the rule is enforced here.

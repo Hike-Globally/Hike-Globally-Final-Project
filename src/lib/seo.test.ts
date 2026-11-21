@@ -357,7 +357,7 @@ test('touristTripJsonLd carries the keyword list, duration and an absolute image
   assert.equal(jsonLd.keywords, 'everest base camp trek, ebc trek')
   assert.equal(jsonLd.duration, 'P14D')
   assert.deepEqual(jsonLd.image, ['https://hikeglobally.com/api/media/file/everest.jpg'])
-  assert.deepEqual((jsonLd.offers as Record<string, unknown>).price, 1850)
+  assert.equal(jsonLd.offers, undefined)
 })
 
 test('webPageJsonLd lists a collection with canonical URLs', () => {

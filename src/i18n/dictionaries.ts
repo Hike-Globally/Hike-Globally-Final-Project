@@ -9,8 +9,12 @@
  * All *content* (trips, destinations, posts, page blocks, navigation) still comes from Payload.
  */
 
+const affiliateDescription =
+  'Hike Globally is a travel affiliate platform. We publish trip guides and connect travelers with independent operators who run the trips.'
+
 const en = {
   common: {
+    affiliateDescription,
     readMore: 'Read more',
     viewAll: 'View all',
     viewTrip: 'View trip',
@@ -55,14 +59,13 @@ const en = {
     aboutUs: 'About us',
     privacy: 'Privacy',
     terms: 'Terms',
-    introductionFallback:
-      'Hike Globally offers curated travel packages and unforgettable adventures, helping you explore breathtaking destinations and create memories that last a lifetime.',
+    introductionFallback: affiliateDescription,
     copyright: '© {year} {site}. All rights reserved.',
   },
   trips: {
     listingTitle: 'Trekking trips & expeditions',
     listingSubtitle:
-      'Small groups, local Sherpa guides, and itineraries we have walked ourselves — from the Khumbu to the hidden valleys of Dolpo.',
+      'Explore trekking routes from the Khumbu to Dolpo. Compare itineraries, difficulty and starting prices for trips run by independent operators.',
     filterTitle: 'Find your trip',
     difficulty: 'Difficulty',
     duration: 'Duration',
