@@ -1,0 +1,92 @@
+name: tmp-i18n-translate
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build frontend translation dictionaries
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import time
+          import urllib.parse
+          import urllib.request
+
+          SOURCE = 'tools/i18n-source-strings.json'
+          ENDPOINT = 'https://clients5.google.com/translate_a/t'
+          BATCH_SIZE = 50
+
+          with open(SOURCE, encoding='utf-8') as handle:
+              source_strings = json.load(handle)
+
+          def request_translations(language, batch):
+              params = [
+                  ('client', 'dict-chrome-ex'),
+                  ('sl', 'en'),
+                  ('tl', language),
+              ] + [('q', value) for value in batch]
+              url = ENDPOINT + '?' + urllib.parse.urlencode(params)
+              request = urllib.request.Request(
+                  url,
+                  headers={'User-Agent': 'Mozilla/5.0 (compatible; HikeGloballyI18n/1.0)'},
+              )
+              for attempt in range(4):
+                  try:
+                      with urllib.request.urlopen(request, timeout=30) as response:
+                          payload = json.load(response)
+                      if not isinstance(payload, list) or len(payload) != len(batch):
+                          raise ValueError(f'unexpected response shape: {payload!r}')
+                      result = []
+                      for value in payload:
+                          if isinstance(value, str):
+                              result.append(value)
+                          elif isinstance(value, list) and value and isinstance(value[0], str):
+                              result.append(value[0])
+                          else:
+                              raise ValueError(f'unexpected translation item: {value!r}')
+                      return result
+                  except Exception:
+                      if attempt == 3:
+                          raise
+                      time.sleep(1 + attempt)
+
+          output = {}
+          for language in ('de', 'fr'):
+              translated = []
+              for start in range(0, len(source_strings), BATCH_SIZE):
+                  batch = source_strings[start:start + BATCH_SIZE]
+                  try:
+                      translated.extend(request_translations(language, batch))
+                  except Exception:
+                      # Fall back to one request per string if a batched request is rejected.
+                      for value in batch:
+                          translated.append(request_translations(language, [value])[0])
+                  time.sleep(0.15)
+              if len(translated) != len(source_strings):
+                  raise RuntimeError(
+                      f'{language}: expected {len(source_strings)} translations, got {len(translated)}'
+                  )
+              output[language] = dict(zip(source_strings, translated))
+
+          with open('translations.json', 'w', encoding='utf-8') as handle:
+              json.dump(output, handle, ensure_ascii=False, indent=2)
+              handle.write('\n')
+          print(f'Wrote translations for {len(source_strings)} English strings in de and fr')
+          PY
+
+      - name: Upload translations
+        uses: actions/upload-artifact@v4
+        with:
+          name: i18n-translations
+          path: translations.json
+          if-no-files-found: error
