@@ -28,8 +28,13 @@ import {
   type PageSection,
 } from './page-sections'
 
+// Collapsibles and rows expose their children through `fields`; the redesigned admin deliberately
+// uses those presentational wrappers instead of tabs, so the persisted schema stays flat.
 const flatten = (fields: Field[]): Field[] =>
   fields.flatMap((field) => [field, ...('fields' in field ? flatten(field.fields) : [])])
+
+const isCollapsible = (field: Field): field is Extract<Field, { type: 'collapsible' }> =>
+  field.type === 'collapsible'
 
 test('the exact Multi-URL Preview name is available on both detail pages and in the block menu', () => {
   assert.equal(MULTI_URL_PREVIEW_NAME, 'Multi-URL Preview')
@@ -117,6 +122,34 @@ test('page-section and inline fields share the layouts, animations and per-URL o
   assert.equal(validateMultiPreviewImageUrl('/media/card.webp'), true)
   assert.equal(typeof validateMultiPreviewImageUrl('http://127.0.0.1/photo.jpg'), 'string')
   assert.equal(typeof validateMultiPreviewImageUrl('javascript:alert(1)'), 'string')
+})
+
+test('the admin starts with compact collapsed groups and a direct URL field in every row', () => {
+  for (const fields of [multiUrlPreviewFields(), multiUrlPreviewFields({ conditional: false })]) {
+    const sectionGroups = flatten(fields)
+      .filter(isCollapsible)
+      .filter(({ label }) => label !== 'Optional card details')
+    assert.deepEqual(
+      sectionGroups.map(({ label }) => label),
+      ['Heading & intro', 'Layout & motion'],
+    )
+    for (const group of sectionGroups) assert.equal(group.admin?.initCollapsed, true)
+
+    const links = fields.find((field) => 'name' in field && field.name === 'multiPreviewLinks')
+    assert.ok(links?.type === 'array')
+    assert.equal(links.admin?.initCollapsed, true)
+
+    const url = links.fields.find(
+      (field) => 'name' in field && field.name === 'linkPreviewUrl',
+    )
+    assert.ok(url?.type === 'text')
+    const rowGroups = flatten(links.fields).filter(isCollapsible)
+    assert.deepEqual(
+      rowGroups.map(({ label }) => label),
+      ['Optional card details'],
+    )
+    for (const group of rowGroups) assert.equal(group.admin?.initCollapsed, true)
+  }
 })
 
 test('collection fields appear only on their own section; inline blocks have no section condition', () => {
