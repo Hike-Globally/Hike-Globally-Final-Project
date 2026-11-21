@@ -387,7 +387,7 @@ export function BrowsePlaces() {
               key={`${primary ? 'primary' : 'loop'}-${category.value}`}
               category={category}
               index={index % setSize}
-              priority={primary && index < 2}
+              showImage={false}
               decorative={!primary}
             />
           )

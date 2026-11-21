@@ -17,12 +17,15 @@ export function PlaceCategoryCard({
   category,
   index,
   priority = false,
+  showImage = true,
   decorative = false,
   className,
 }: {
   category: PlaceCategory
   index: number
   priority?: boolean
+  /** The homepage carousel can use a solid background instead of a photograph. */
+  showImage?: boolean
   /** Duplicated marquee cards are hidden from assistive tech and tab order. */
   decorative?: boolean
   className?: string
@@ -37,17 +40,21 @@ export function PlaceCategoryCard({
       tabIndex={decorative ? -1 : undefined}
       className={cn('browse-places__card group', className)}
     >
-      <Image
-        src={category.image}
-        alt=""
-        fill
-        sizes="(min-width: 1536px) 22vw, (min-width: 1024px) 28vw, (min-width: 640px) 42vw, 82vw"
-        priority={priority}
-        draggable={false}
-        aria-hidden="true"
-        className="browse-places__image"
-      />
-      <span className="browse-places__scrim" aria-hidden="true" />
+      {showImage && (
+        <>
+          <Image
+            src={category.image}
+            alt=""
+            fill
+            sizes="(min-width: 1536px) 22vw, (min-width: 1024px) 28vw, (min-width: 640px) 42vw, 82vw"
+            priority={priority}
+            draggable={false}
+            aria-hidden="true"
+            className="browse-places__image"
+          />
+          <span className="browse-places__scrim" aria-hidden="true" />
+        </>
+      )}
 
       <div className="browse-places__card-top" aria-hidden="true">
         <span className="browse-places__number">{number}</span>
