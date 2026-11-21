@@ -149,6 +149,14 @@ test('the admin starts with compact collapsed groups and a direct URL field in e
       ['Optional card details'],
     )
     for (const group of rowGroups) assert.equal(group.admin?.initCollapsed, true)
+
+    // The upload picker must not share a half-width row with the image URL.
+    const upload = rowGroups[0].fields.find(
+      (field) => 'name' in field && field.name === 'linkPreviewImage',
+    )
+    assert.ok(upload?.type === 'upload')
+    assert.equal(upload.admin?.width, undefined)
+    assert.equal(upload.admin?.className, 'hg-multi-url-preview__upload')
   }
 })
 
