@@ -1,15 +1,18 @@
+import type { CSSProperties } from 'react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, ArrowUpRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react'
 
 import { CtaCard } from '@/components/blocks/cta'
 import { PlaceCategoryCard } from '@/components/cards/place-category-card'
 import { PostCard } from '@/components/cards/post-card'
 import { TripCard } from '@/components/cards/trip-card'
 import { JsonLd } from '@/components/seo/json-ld'
-import { PageHeader } from '@/components/sections/page-header'
+import { Breadcrumbs } from '@/components/sections/breadcrumbs'
+import { PlaceGlyph } from '@/components/sections/place-glyph'
 import { SectionHeading } from '@/components/sections/section-heading'
+import { PayloadImageFill } from '@/components/ui/payload-image'
 import { dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
 import { getPlaceCategoryContent, getSettings } from '@/lib/data'
@@ -20,7 +23,9 @@ import {
   placeCategoryMedia,
   placeCategoryPath,
 } from '@/lib/place-categories'
+import { getPlaceTheme, placeThemeStyle } from '@/lib/place-themes'
 import { breadcrumbJsonLd, buildMetadata, webPageJsonLd } from '@/lib/seo'
+import type { Media } from '@/payload-types'
 
 import '../places.css'
 
@@ -51,57 +56,153 @@ export async function generateMetadata({
   })
 }
 
-/** `/places/<category>` — one curated, indexable page per Browse Places category. */
-export default async function PlaceCategoryPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}) {
+/**
+ * The full-bleed photographic backdrop behind the hero and the quote
+ * interlude — the one shared navy wash, so copy over the image keeps the
+ * site's documented scrim contrast wherever it sits.
+ */
+function PlaceBackdrop({ media, priority = false }: { media: Media; priority?: boolean }) {
+  return (
+    <>
+      <PayloadImageFill
+        media={media}
+        sizes="100vw"
+        priority={priority}
+        className="-z-10"
+        imageClassName="object-cover"
+      />
+      <div className="absolute inset-0 -z-10 bg-ink/72" />
+      <div className="absolute inset-x-0 bottom-0 -z-10 h-2/3 bg-gradient-to-t from-ink/85 via-ink/40 to-transparent" />
+    </>
+  )
+}
+
+/**
+ * The within-page chapter marker that opens each editorial chapter.
+ *
+ * Purely decorative: the visible words live in the section's own heading, so
+ * screen readers skip the roman numeral and its hairline (`aria-hidden`).
+ */
+function ChapterMark({ numeral }: { numeral: 'I' | 'II' | 'III' | 'IV' }) {
+  return (
+    <p className="place-chapter" aria-hidden="true">
+      <span className="place-chapter__num">{numeral}</span>
+      <span className="place-chapter__rule" />
+    </p>
+  )
+}
+
+/**
+ * `/places/<category>` — one themed, editorial page per Browse Places category.
+ *
+ * The shared skeleton runs as four chapters (the landscape → trips → field
+ * notes → keep exploring) around a full-bleed quote interlude. What makes each
+ * of the nine pages its own destination is the theme published on the root
+ * element: an accent set mixed from the locked palette (`@/lib/place-themes`),
+ * a survey-line glyph, a field quote and three quick facts.
+ */
+export default async function PlaceCategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const category = getPlaceCategory(slug)
   if (!category) notFound()
 
   const dict = dictionary
   const media = placeCategoryMedia(category)
+  const theme = getPlaceTheme(category.value)
   const [settings, content] = await Promise.all([
     getSettings(),
     getPlaceCategoryContent(category.value, 3),
   ])
-  const categoryNumber = String(
-    placeCategories.findIndex((item) => item.value === category.value) + 1,
-  ).padStart(2, '0')
+
+  const categoryIndex = placeCategories.findIndex((item) => item.value === category.value)
+  const categoryNumber = String(categoryIndex + 1).padStart(2, '0')
+  const previousCategory =
+    placeCategories[(categoryIndex - 1 + placeCategories.length) % placeCategories.length]!
+  const nextCategory = placeCategories[(categoryIndex + 1) % placeCategories.length]!
   const related = placeCategories.filter((item) => item.value !== category.value).slice(0, 3)
 
   return (
-    <div data-places-page={category.value}>
-      <PageHeader
-        eyebrow="BROWSE PLACES"
-        title={category.label}
-        lead={category.intro}
-        background={media}
-        breadcrumbs={[
-          { label: dict.nav.home, href: sitePath('/') },
-          { label: 'All places', href: PLACE_INDEX_PATH },
-          { label: category.label },
-        ]}
+    <div
+      data-places-page={category.value}
+      className="place-themed"
+      style={placeThemeStyle(theme) as CSSProperties}
+    >
+      {/* ---------------------------------------------------------------- */}
+      {/* Hero — the themed masthead for this landscape.                    */}
+      {/* ---------------------------------------------------------------- */}
+      <section
+        data-header-hero
+        className="hero-region place-hero relative isolate flex items-end overflow-hidden bg-ink text-mist"
       >
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-label font-medium tracking-[0.14em] text-mist uppercase">
-          <span className="inline-flex items-center gap-2">
-            <span>Curated landscape</span>
-            <span>{categoryNumber} / 09</span>
-          </span>
-          <Link
-            href={PLACE_INDEX_PATH}
-            className="group inline-flex items-center gap-2 border-b border-mist/45 pb-1 transition-colors hover:border-mist"
-          >
-            <ArrowLeft className="size-3.5 transition-transform duration-300 group-hover:-translate-x-0.5" />
-            Back to all places
-          </Link>
-        </div>
-      </PageHeader>
+        <PlaceBackdrop media={media} priority />
+        <PlaceGlyph value={category.value} strokeWidth={1} className="place-hero__watermark" />
 
-      <section aria-labelledby="place-trips-heading" className="py-16 md:py-24">
+        <div className="container-content relative w-full pt-28 pb-16 sm:pb-20 md:pt-36 md:pb-28">
+          <Breadcrumbs
+            items={[
+              { label: dict.nav.home, href: sitePath('/') },
+              { label: 'All places', href: PLACE_INDEX_PATH },
+              { label: category.label },
+            ]}
+            className="mb-6"
+          />
+
+          <p className="eyebrow place-hero__eyebrow">BROWSE PLACES</p>
+
+          <h1 className="heading-display hero-title mt-4 max-w-4xl text-white">{category.label}</h1>
+
+          <p className="lead hero-description mt-6 max-w-2xl text-mist">{category.description}</p>
+
+          <div className="place-hero__meta">
+            <span className="place-hero__meta-item">
+              <span>Curated landscape</span>
+              <span className="place-hero__meta-count">{categoryNumber} / 09</span>
+            </span>
+            <Link href={PLACE_INDEX_PATH} className="group place-hero__back">
+              <ArrowLeft className="size-3.5 transition-transform duration-300 group-hover:-translate-x-0.5" />
+              Back to all places
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* Chapter I — the landscape: long-form intro and the themed facts.  */}
+      {/* ---------------------------------------------------------------- */}
+      <section aria-labelledby="place-intro-heading" className="place-intro py-16 md:py-24">
+        <div className="container-content place-intro__grid">
+          <div className="place-intro__rail" aria-hidden="true">
+            <span className="place-intro__num">I</span>
+            <PlaceGlyph value={category.value} className="place-intro__glyph" />
+          </div>
+
+          <div className="place-intro__copy">
+            <h2 id="place-intro-heading" className="heading-lg">
+              The landscape
+            </h2>
+            <p className="place-intro__lead">{category.intro}</p>
+
+            <dl className="place-facts">
+              {theme.facts.map((fact) => (
+                <div key={fact.label} className="place-facts__item">
+                  <dt className="eyebrow place-facts__label">{fact.label}</dt>
+                  <dd className="place-facts__value">{fact.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* Chapter II — curated trips tagged with this landscape.            */}
+      {/* ---------------------------------------------------------------- */}
+      <section
+        aria-labelledby="place-trips-heading"
+        className="place-chapter-section place-trips py-16 md:py-24"
+      >
         <div className="container-content">
+          <ChapterMark numeral="II" />
           <SectionHeading
             eyebrow="CURATED TRIPS"
             title="Trips shaped by this landscape"
@@ -134,11 +235,30 @@ export default async function PlaceCategoryPage({
         </div>
       </section>
 
+      {/* ---------------------------------------------------------------- */}
+      {/* Interlude — the field quote, full bleed over the landscape.       */}
+      {/* ---------------------------------------------------------------- */}
+      <figure className="place-quote">
+        <PlaceBackdrop media={media} />
+        <PlaceGlyph value={category.value} strokeWidth={1} className="place-quote__watermark" />
+
+        <div className="container-content place-quote__inner">
+          <p className="eyebrow place-quote__eyebrow">FROM THE FIELD</p>
+          <blockquote className="place-quote__text">
+            <p>{theme.pull}</p>
+          </blockquote>
+        </div>
+      </figure>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* Chapter III — field notes, on the tinted band.                    */}
+      {/* ---------------------------------------------------------------- */}
       <section
         aria-labelledby="place-notes-heading"
-        className="border-y border-slate-20 bg-mist py-16 md:py-24"
+        className="place-chapter-section place-band border-y border-slate-20 py-16 md:py-24"
       >
         <div className="container-content">
+          <ChapterMark numeral="III" />
           <SectionHeading
             eyebrow="FIELD NOTES"
             title="Guides and journal entries connected to this landscape"
@@ -164,8 +284,15 @@ export default async function PlaceCategoryPage({
         </div>
       </section>
 
-      <section aria-labelledby="more-places-heading" className="py-16 md:py-24">
+      {/* ---------------------------------------------------------------- */}
+      {/* Chapter IV — more landscapes, plus the prev/next pager.           */}
+      {/* ---------------------------------------------------------------- */}
+      <section
+        aria-labelledby="more-places-heading"
+        className="place-chapter-section py-16 md:py-24"
+      >
         <div className="container-content">
+          <ChapterMark numeral="IV" />
           <SectionHeading
             eyebrow="KEEP EXPLORING"
             title="Continue exploring"
@@ -183,6 +310,26 @@ export default async function PlaceCategoryPage({
               />
             ))}
           </div>
+
+          <nav className="place-pager" aria-label="More places">
+            <Link href={placeCategoryPath(previousCategory.value)} className="place-pager__link">
+              <span className="eyebrow place-pager__label">Previous place</span>
+              <span className="place-pager__name">
+                <ArrowLeft className="size-4 place-pager__arrow" aria-hidden="true" />
+                {previousCategory.label}
+              </span>
+            </Link>
+            <Link
+              href={placeCategoryPath(nextCategory.value)}
+              className="place-pager__link place-pager__link--next"
+            >
+              <span className="eyebrow place-pager__label">Next place</span>
+              <span className="place-pager__name">
+                {nextCategory.label}
+                <ArrowRight className="size-4 place-pager__arrow" aria-hidden="true" />
+              </span>
+            </Link>
+          </nav>
         </div>
       </section>
 
