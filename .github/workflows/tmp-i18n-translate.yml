@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   translate:
@@ -15,6 +15,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
 
       - name: Build frontend translation dictionaries
         shell: bash
@@ -26,6 +29,7 @@ jobs:
           import urllib.request
 
           SOURCE = 'tools/i18n-source-strings.json'
+          OUTPUT = 'tools/i18n-translations.generated.json'
           ENDPOINT = 'https://clients5.google.com/translate_a/t'
           BATCH_SIZE = 50
 
@@ -81,15 +85,22 @@ jobs:
                   )
               output[language] = dict(zip(source_strings, translated))
 
-          with open('translations.json', 'w', encoding='utf-8') as handle:
+          with open(OUTPUT, 'w', encoding='utf-8') as handle:
               json.dump(output, handle, ensure_ascii=False, indent=2)
               handle.write('\n')
           print(f'Wrote translations for {len(source_strings)} English strings in de and fr')
           PY
 
-      - name: Upload translations
-        uses: actions/upload-artifact@v4
-        with:
-          name: i18n-translations
-          path: translations.json
-          if-no-files-found: error
+      - name: Commit generated translations
+        shell: bash
+        run: |
+          if git diff --quiet -- tools/i18n-translations.generated.json; then
+            echo 'Generated translations are unchanged.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git add tools/i18n-translations.generated.json
+          git commit -m 'chore: generated frontend translation dictionaries [skip ci]'
+          git push origin "HEAD:refs/heads/${GITHUB_REF_NAME}"
