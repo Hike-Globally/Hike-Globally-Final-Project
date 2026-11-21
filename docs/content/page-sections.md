@@ -60,6 +60,49 @@ Choose **Section → Multi-URL Preview** to add up to **12 independently configu
 
 It is also available **inside content**, not only as a Page sections row: in a Blog body, the Trip **Essential Information → Content** editor, or the **Hotels Near Destination → Content** editor, choose **Multi-URL Preview** from the block menu (or type `/multiUrlPreview`) between paragraphs. The collection stays in that body or accordion. See the [Multi-URL Preview editor and deployment guide](multi-url-preview.md) for all placements, responsive layouts, keyboard/touch controls, reduced motion and migration `20261119_170704_multi_url_preview`.
 
+## Boxed Content
+
+**Boxed Content** is the editorial image-and-copy plate from the shared rich-text editor: an
+image on the left at desktop sizes, a heading and a short description on the right, stacked on
+mobile. It is a Lexical block, not a Page sections row, so it lives wherever the content is
+written and travels with that content in version history.
+
+**Where it is offered.** Every rich-text field in the dashboard carries it, because they all run
+on one editor definition (`contentEditor()` in `src/fields/content-editor.ts`, which is also the
+root editor in `payload.config.ts`). That covers the Single Trip dashboard — **Overview**,
+**Essential Information → Content** (every Content Section row), **Hotels Near Destination →
+Content**, **Why Choose This Trek**, **Route map and altitude chart content**, **Additional
+departure notes**, and both **Who Is This Trip For / Not For** descriptions — plus the Single Blog
+dashboard's **post body**, the destination **description** and **getting there** copy, and the
+Pages builder's **Rich text** block.
+
+Two things worth knowing, because they are what made the block appear to vanish:
+
+- Each rich-text field used to be able to name a _different_ editor. A field that named none fell
+  back to the root editor, which was a reduced copy with no block menu at all — so the block
+  silently disappeared from those fields with no error anywhere. The root editor and the shared
+  editor are now the same definition, so there is no reduced fallback left to fall into, and a new
+  rich-text field gets the block automatically.
+- Content Section, Hotel, Itinerary and departure rows are added by a custom instant-array
+  component (`src/components/admin/instant-trip-array.tsx`). A row added on the page builds its
+  editor from the same shared editor, so the **first, newly added** Content Section has the block
+  menu too — not just rows that came back from the server after a save.
+
+**How to insert it.** Place the cursor between two paragraphs and either:
+
+- choose **Boxed Content** from the toolbar's **blocks** dropdown (the row of square icons at the
+  right of the toolbar — it lists Link preview, Multi-URL Preview and Boxed Content), or
+- type `/boxed` in the body and pick **Boxed Content** from the slash menu.
+
+It needs a **Heading** (120 characters), a **Description** (900 characters) and an **Image**
+chosen from the media library; the image's alt text is what screen readers announce. The block
+renders nothing at all until the heading or description has text, so a half-filled draft never
+leaves an empty image well on the public page. Its heading joins the article's table of contents
+and reading time like any other subheading, and the description is included in the post's
+plain-text SEO copy.
+
+No migration is involved: the block is stored in the existing rich-text JSON.
+
 ## Custom HTML, CSS and JavaScript
 
 A Custom HTML row publishes **exactly what the editor pasted** — nothing is filtered or rewritten on

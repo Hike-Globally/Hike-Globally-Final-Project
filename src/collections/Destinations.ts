@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { adminOrEditor, publishedOrSignedIn } from '../access'
+import { contentEditor } from '../fields/content-editor'
 import { internalLinkKeywordsSection } from '../fields/internal-link-keywords'
 import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
@@ -57,10 +58,14 @@ export const Destinations: CollectionConfig = {
     {
       name: 'description',
       type: 'richText',
+      editor: contentEditor(),
       localized: true,
       // Deliberately NOT required: a localized required field would block saving a language
       // until every field is translated. Fallback serves the default language instead.
-      admin: { description: 'The main body of the destination page.' },
+      admin: {
+        description:
+          'The main body of the destination page. Insert Boxed Content from the toolbar’s block menu for an image-and-copy feature.',
+      },
     },
     {
       type: 'row',
@@ -111,22 +116,26 @@ export const Destinations: CollectionConfig = {
     {
       name: 'gettingThere',
       type: 'richText',
+      editor: contentEditor(),
       localized: true,
-      admin: { description: 'How travellers reach the region (flights, drives, permits).' },
+      admin: {
+        description:
+          'How travellers reach the region (flights, drives, permits). Boxed Content is available from the block menu.',
+      },
     },
     {
       name: 'gallery',
       type: 'array',
       labels: { singular: 'Image', plural: 'Gallery' },
-      fields: [
-        { name: 'image', type: 'upload', relationTo: 'media', required: true },
-      ],
+      fields: [{ name: 'image', type: 'upload', relationTo: 'media', required: true }],
     },
     {
       name: 'featured',
       type: 'checkbox',
       defaultValue: false,
-      admin: { description: 'Featured destinations surface on the homepage and get pinned on listings.' },
+      admin: {
+        description: 'Featured destinations surface on the homepage and get pinned on listings.',
+      },
     },
     {
       /**

@@ -298,7 +298,7 @@ export interface Destination {
   tagline?: string | null;
   heroImage: number | Media;
   /**
-   * The main body of the destination page.
+   * The main body of the destination page. Insert Boxed Content from the toolbar’s block menu for an image-and-copy feature.
    */
   description?: {
     root: {
@@ -339,7 +339,7 @@ export interface Destination {
     longitude?: number | null;
   };
   /**
-   * How travellers reach the region (flights, drives, permits).
+   * How travellers reach the region (flights, drives, permits). Boxed Content is available from the block menu.
    */
   gettingThere?: {
     root: {
@@ -558,6 +558,9 @@ export interface Trip {
       }[]
     | null;
   tripForHeading?: string | null;
+  /**
+   * Insert Boxed Content from the toolbar’s block menu for an image-and-copy feature inside this panel.
+   */
   tripForDescription?: {
     root: {
       type: string;
@@ -574,6 +577,9 @@ export interface Trip {
     [k: string]: unknown;
   } | null;
   tripNotForHeading?: string | null;
+  /**
+   * Insert Boxed Content from the toolbar’s block menu for an image-and-copy feature inside this panel.
+   */
   tripNotForDescription?: {
     root: {
       type: string;

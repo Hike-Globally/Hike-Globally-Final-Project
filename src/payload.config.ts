@@ -3,11 +3,6 @@ import { tmpdir } from 'os'
 import { fileURLToPath } from 'url'
 
 import { postgresAdapter, sql } from '@payloadcms/db-postgres'
-import {
-  EXPERIMENTAL_TableFeature,
-  FixedToolbarFeature,
-  lexicalEditor,
-} from '@payloadcms/richtext-lexical'
 import { buildConfig } from 'payload'
 import sharp from 'sharp'
 
@@ -21,6 +16,7 @@ import { Users } from './collections/Users'
 import { Footer } from './globals/Footer'
 import { Header } from './globals/Header'
 import { Settings } from './globals/Settings'
+import { contentEditor } from './fields/content-editor'
 import { defaultLocale, localeMeta, locales } from './i18n/config'
 import { migrations } from './migrations'
 import { faviconIcons } from './lib/favicon'
@@ -127,16 +123,15 @@ export default buildConfig({
   // adding/removing rows and columns, merging cells, marking a header row or column and dragging
   // column widths. It is enabled on the shared editor, so every rich-text field has it — the
   // trip's post-itinerary content sections and a blog post's body included.
-  editor: lexicalEditor({
-    features: ({ defaultFeatures }) => [
-      ...defaultFeatures,
-      FixedToolbarFeature(),
-      EXPERIMENTAL_TableFeature(),
-    ],
-    admin: {
-      placeholder: 'Start writing…',
-    },
-  }),
+  //
+  // This root editor IS the shared content editor (`src/fields/content-editor.ts`), not a reduced
+  // copy of it. Trips, posts, destinations and the Pages rich-text block each pass that same
+  // editor explicitly, so their ribbons carry the inline content blocks — Link preview,
+  // Multi-URL Preview and Boxed Content. Any rich-text field that forgets to pass it falls back to
+  // THIS editor; when the two diverged, that fallback silently dropped the whole block menu, which
+  // is how Boxed Content went missing from several editors after it shipped. Sharing one
+  // definition means a field can never lose the menu by omission again.
+  editor: contentEditor(),
 
   db: postgresAdapter({
     pool: {
