@@ -152,7 +152,7 @@
     transform 500ms var(--ease-brand);
 }
 
-/* Photo-less homepage cards: a dark, legible glass surface with a subtle
+/* Homepage cards: a dark, legible glass surface with a subtle
    category-coloured glow. Photo cards elsewhere retain their existing style. */
 .browse-places .browse-places__card {
   border-color: color-mix(in srgb, var(--color-mist) 28%, transparent);
@@ -195,6 +195,18 @@
 .browse-places__card:hover .browse-places__image,
 .browse-places__card:focus-visible .browse-places__image {
   transform: scale(1.055);
+}
+
+/* Keep the category photo a quiet, blurred texture behind the glass and text. */
+.browse-places__image--glass,
+.browse-places__card:hover .browse-places__image--glass,
+.browse-places__card:focus-visible .browse-places__image--glass {
+  z-index: 0;
+  object-fit: cover;
+  opacity: 0.12;
+  filter: blur(10px);
+  transform: scale(1.12);
+  pointer-events: none;
 }
 
 .browse-places__scrim {

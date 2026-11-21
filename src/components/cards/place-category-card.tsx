@@ -19,15 +19,15 @@ export function PlaceCategoryCard({
   category,
   index,
   priority = false,
-  showImage = true,
+  glass = false,
   decorative = false,
   className,
 }: {
   category: PlaceCategory
   index: number
   priority?: boolean
-  /** The homepage carousel uses a glass surface instead of a photograph. */
-  showImage?: boolean
+  /** The homepage carousel uses a subtle frosted photograph. */
+  glass?: boolean
   /** Duplicated marquee cards are hidden from assistive tech and tab order. */
   decorative?: boolean
   className?: string
@@ -41,30 +41,23 @@ export function PlaceCategoryCard({
       aria-hidden={decorative || undefined}
       tabIndex={decorative ? -1 : undefined}
       className={cn('browse-places__card group', className)}
-      // The photo-less marquee card is frosted glass: its category accent (the
-      // on-dark theme step) tints the glow behind the frost, so each card
-      // carries its own landscape colour. Photo cards ignore the variable.
       style={
-        showImage
-          ? undefined
-          : ({ '--place-accent-lt': getPlaceTheme(category.value).accentLt } as CSSProperties)
+        glass
+          ? ({ '--place-accent-lt': getPlaceTheme(category.value).accentLt } as CSSProperties)
+          : undefined
       }
     >
-      {showImage && (
-        <>
-          <Image
-            src={category.image}
-            alt=""
-            fill
-            sizes="(min-width: 1536px) 22vw, (min-width: 1024px) 28vw, (min-width: 640px) 42vw, 82vw"
-            priority={priority}
-            draggable={false}
-            aria-hidden="true"
-            className="browse-places__image"
-          />
-          <span className="browse-places__scrim" aria-hidden="true" />
-        </>
-      )}
+      <Image
+        src={category.image}
+        alt=""
+        fill
+        sizes="(min-width: 1536px) 22vw, (min-width: 1024px) 28vw, (min-width: 640px) 42vw, 82vw"
+        priority={priority}
+        draggable={false}
+        aria-hidden="true"
+        className={cn('browse-places__image', glass && 'browse-places__image--glass')}
+      />
+      {!glass && <span className="browse-places__scrim" aria-hidden="true" />}
 
       <div className="browse-places__card-top" aria-hidden="true">
         <span className="browse-places__number">{number}</span>

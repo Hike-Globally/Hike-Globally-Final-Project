@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import test from 'node:test'
 
@@ -113,7 +113,7 @@ test('the carousel keeps card links clickable while still supporting drag', () =
   }
 })
 
-test('homepage cards use category-tinted glass while other places pages keep their photos', () => {
+test('homepage glass cards use faint blurred category photos while other places pages keep their photos', () => {
   const css = read('src/components/sections/browse-places.css')
   const card = read('src/components/cards/place-category-card.tsx')
   const carousel = read('src/components/sections/browse-places.tsx')
@@ -123,12 +123,21 @@ test('homepage cards use category-tinted glass while other places pages keep the
   assert.match(glassRule, /backdrop-filter:\s*blur\(/)
   assert.match(glassRule, /--place-accent-lt/)
   assert.match(glassRule, /transparent/)
+  const imageRule = css.match(/\.browse-places__image--glass,[\s\S]*?\{([^}]+)\}/)?.[1]
+  assert.ok(imageRule)
+  assert.match(imageRule, /opacity:\s*0\.12/)
+  assert.match(imageRule, /filter:\s*blur\(10px\)/)
   assert.match(card, /getPlaceTheme\(category\.value\)\.accentLt/)
-  assert.match(carousel, /<PlaceCategoryCard[\s\S]*?showImage=\{false\}/)
-  assert.match(card, /showImage = true/)
-  assert.match(card, /\{showImage && \(\s*<>\s*<Image[\s\S]*?className="browse-places__scrim"/)
+  assert.match(carousel, /<PlaceCategoryCard[\s\S]*?\s+glass\s/)
+  assert.match(card, /glass = false/)
+  assert.match(card, /src=\{category\.image\}/)
+  assert.match(card, /glass && 'browse-places__image--glass'/)
+  assert.match(card, /!glass && <span className="browse-places__scrim"/)
+  for (const category of placeCategories) {
+    assert.ok(existsSync(path.join(repoRoot, 'public', category.image)), `${category.label} image exists`)
+  }
   for (const file of ['src/app/(frontend)/places/page.tsx', 'src/app/(frontend)/places/[slug]/page.tsx']) {
-    assert.doesNotMatch(read(file), /showImage=\{false\}/)
+    assert.doesNotMatch(read(file), /\s+glass(?:\s|=)/)
   }
 })
 
