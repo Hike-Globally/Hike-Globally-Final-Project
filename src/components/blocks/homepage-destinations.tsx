@@ -1,5 +1,4 @@
 import { DestinationCarousel } from '@/components/cards/destination-carousel'
-import { BrowsePlaces } from '@/components/sections/browse-places'
 import { sitePath } from '@/i18n/config'
 import { dictionary } from '@/i18n/dictionaries'
 import { NEPAL_REGION_CARDS, WORLD_REGION_CARDS } from '@/lib/homepage-destinations'
@@ -10,6 +9,10 @@ import { NEPAL_REGION_CARDS, WORLD_REGION_CARDS } from '@/lib/homepage-destinati
  *  2. "Destinations Around The World" — the six continents.
  *
  * Both use the same carousel, animation and type scale as each other.
+ *
+ * "Browse places" is deliberately *not* rendered here: it already appears once, high on
+ * the homepage (right after "Find your match"), and repeating it after the second
+ * destination slider put a duplicate section immediately above "Latest Blogs and Stories".
  */
 export function HomepageDestinations() {
   return (
@@ -30,9 +33,6 @@ export function HomepageDestinations() {
         titleClassName="home-section-title"
         descriptionClassName="home-section-intro"
       />
-      {/* Fixed immediately after "Destinations Around The World" in both the CMS
-          homepage and the database-less fallback. */}
-      <BrowsePlaces />
     </>
   )
 }
