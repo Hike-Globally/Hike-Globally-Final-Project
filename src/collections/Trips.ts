@@ -125,6 +125,10 @@ export const Trips: CollectionConfig = {
       editor: contentEditor(),
       localized: true,
       label: 'Overview',
+      admin: {
+        description:
+          'Use the block menu to insert Boxed Content: upload an image and add a heading and description for a responsive, image-left feature.',
+      },
     },
 
     /* --------------------------------------------------------------------------

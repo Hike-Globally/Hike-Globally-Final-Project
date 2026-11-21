@@ -8,6 +8,7 @@ type LexicalNode = {
   type?: unknown
   tag?: unknown
   text?: unknown
+  fields?: unknown
   children?: unknown
 }
 
@@ -42,6 +43,18 @@ export const getArticleHeadings = (content: unknown): ArticleHeading[] => {
   const headings: ArticleHeading[] = []
   const usedIds = new Map<string, number>()
 
+  const pushHeading = (label: string, level: 2 | 3): void => {
+    const baseId = slugifyHeading(label) || `section-${headings.length + 1}`
+    const duplicateCount = usedIds.get(baseId) ?? 0
+    usedIds.set(baseId, duplicateCount + 1)
+
+    headings.push({
+      id: `story-${duplicateCount === 0 ? baseId : `${baseId}-${duplicateCount + 1}`}`,
+      label,
+      level,
+    })
+  }
+
   const visit = (value: unknown): void => {
     const node = asNode(value)
     if (!node) return
@@ -49,15 +62,19 @@ export const getArticleHeadings = (content: unknown): ArticleHeading[] => {
     const headingTag = node.tag ?? 'h2'
     if (node.type === 'heading' && (headingTag === 'h2' || headingTag === 'h3')) {
       const label = textFromNode(node).replace(/\s+/g, ' ').trim()
-      const baseId = slugifyHeading(label) || `section-${headings.length + 1}`
-      const duplicateCount = usedIds.get(baseId) ?? 0
-      usedIds.set(baseId, duplicateCount + 1)
+      pushHeading(label, headingTag === 'h2' ? 2 : 3)
+    }
 
-      headings.push({
-        id: `story-${duplicateCount === 0 ? baseId : `${baseId}-${duplicateCount + 1}`}`,
-        label,
-        level: headingTag === 'h2' ? 2 : 3,
-      })
+    if (node.type === 'block' && node.fields && typeof node.fields === 'object') {
+      const fields = node.fields as Record<string, unknown>
+      const boxedHeading = fields.heading
+      if (
+        fields.blockType === 'boxedContent' &&
+        typeof boxedHeading === 'string' &&
+        boxedHeading.trim()
+      ) {
+        pushHeading(boxedHeading.trim(), 2)
+      }
     }
 
     if (Array.isArray(node.children)) node.children.forEach(visit)

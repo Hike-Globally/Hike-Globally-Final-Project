@@ -98,6 +98,13 @@ export const lexicalToPlainText = (content: unknown): string => {
     if (!node || typeof node !== 'object') return
     const record = node as Record<string, unknown>
     if (typeof record.text === 'string') parts.push(record.text)
+    if (record.type === 'block' && record.fields && typeof record.fields === 'object') {
+      const fields = record.fields as Record<string, unknown>
+      if (fields.blockType === 'boxedContent') {
+        if (typeof fields.heading === 'string') parts.push(fields.heading)
+        if (typeof fields.description === 'string') parts.push(fields.description)
+      }
+    }
     if (Array.isArray(record.children)) record.children.forEach(walk)
   }
   walk(lexicalRoot(content))
