@@ -22,6 +22,10 @@ const TRACK_ID = 'browse-places-track'
 const HELP_ID = 'browse-places-help'
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
 const MANUAL_COOLDOWN_MS = 2800
+/** How long clicks stay suppressed after a drag/swipe (covers the trailing click). */
+const CLICK_SUPPRESS_MS = 500
+/** A touch that travels further than this is a swipe, not a tap on a card. */
+const TOUCH_SWIPE_THRESHOLD_PX = 8
 
 const getReducedMotionSnapshot = (): boolean =>
   typeof window !== 'undefined' &&
@@ -77,8 +81,16 @@ export function BrowsePlaces() {
     pointerId: null,
   })
   const cooldownRef = useRef(0)
-  const suppressClickRef = useRef(false)
-  const resetSuppressTimerRef = useRef<number | undefined>(undefined)
+  /**
+   * Clicks are ignored until this timestamp after a drag/swipe ends. A boolean
+   * reset by `setTimeout(0)` races the click event (the timer can fire first,
+   * letting a drag navigate), and touch swipes never set it at all — both made
+   * browsing the marquee unexpectedly change the page to a category. A
+   * timestamp covers the click however the browser orders the tasks.
+   */
+  const suppressClickUntilRef = useRef(0)
+  /** Touch swipe tracking: a swipe must not become a tap on the card it ends over. */
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null)
   const [manuallyPaused, setManuallyPaused] = useState(false)
   const reducedMotion = useSyncExternalStore(
     subscribeToReducedMotion,
@@ -111,9 +123,6 @@ export function BrowsePlaces() {
     return () => {
       document.removeEventListener('visibilitychange', onVisibilityChange)
       observer?.disconnect()
-      if (resetSuppressTimerRef.current !== undefined) {
-        window.clearTimeout(resetSuppressTimerRef.current)
-      }
     }
   }, [])
 
@@ -188,14 +197,10 @@ export function BrowsePlaces() {
       delete track.dataset.dragging
 
       if (drag.moved) {
-        suppressClickRef.current = true
-        if (resetSuppressTimerRef.current !== undefined) {
-          window.clearTimeout(resetSuppressTimerRef.current)
-        }
-        resetSuppressTimerRef.current = window.setTimeout(() => {
-          suppressClickRef.current = false
-          resetSuppressTimerRef.current = undefined
-        }, 0)
+        // The click that follows this drag must not navigate: the pointer
+        // captured the track, so the click would otherwise land on whatever
+        // card the drag ended over.
+        suppressClickUntilRef.current = Date.now() + CLICK_SUPPRESS_MS
       }
 
       if (
@@ -364,19 +369,32 @@ export function BrowsePlaces() {
         onPointerMove={onPointerMove}
         onPointerUp={finishDrag}
         onPointerCancel={finishDrag}
-        onTouchStart={() => {
+        onTouchStart={(event) => {
           pauseStateRef.current.drag = true
           pauseBriefly()
+          const touch = event.touches[0]
+          touchStartRef.current = touch ? { x: touch.clientX, y: touch.clientY } : null
         }}
-        onTouchEnd={() => {
+        onTouchEnd={(event) => {
           pauseStateRef.current.drag = false
           pauseBriefly()
+          // A swipe ends with a synthetic click on the card under the finger;
+          // without suppression, browsing the marquee would navigate to
+          // whatever category the swipe happened to stop over.
+          const start = touchStartRef.current
+          const touch = event.changedTouches[0]
+          if (start && touch) {
+            const travelled = Math.hypot(touch.clientX - start.x, touch.clientY - start.y)
+            if (travelled > TOUCH_SWIPE_THRESHOLD_PX) {
+              suppressClickUntilRef.current = Date.now() + CLICK_SUPPRESS_MS
+            }
+          }
+          touchStartRef.current = null
         }}
         onClickCapture={(event) => {
-          if (!suppressClickRef.current) return
+          if (Date.now() >= suppressClickUntilRef.current) return
           event.preventDefault()
           event.stopPropagation()
-          suppressClickRef.current = false
         }}
         onKeyDown={onKeyDown}
       >

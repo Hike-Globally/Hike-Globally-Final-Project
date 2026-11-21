@@ -131,6 +131,45 @@ test('single trip and blog pages expose their mapped place categories', () => {
   assert.match(read('src/components/views/post-detail.tsx'), /placeCategoryLabels/)
 })
 
+test('browsing the marquee never navigates: drags and swipes suppress the trailing click', () => {
+  const source = read('src/components/sections/browse-places.tsx')
+
+  // Click suppression is timestamp-based. A boolean reset by setTimeout(0)
+  // races the click event (the timer can fire first, letting a drag navigate),
+  // and touch swipes never set it at all — both made the page change to
+  // whatever category the gesture happened to end over.
+  assert.match(source, /suppressClickUntilRef/)
+  assert.match(source, /CLICK_SUPPRESS_MS/)
+  assert.doesNotMatch(source, /suppressClickRef/)
+  assert.doesNotMatch(source, /resetSuppressTimerRef/)
+  assert.match(source, /Date\.now\(\) >= suppressClickUntilRef\.current/)
+
+  // Touch: a swipe is measured from its start point and suppresses the
+  // synthetic click the browser fires on the card under the finger.
+  assert.match(source, /touchStartRef/)
+  assert.match(source, /TOUCH_SWIPE_THRESHOLD_PX/)
+  assert.match(source, /event\.changedTouches\[0\]/)
+  assert.match(source, /Math\.hypot\(touch\.clientX - start\.x, touch\.clientY - start\.y\)/)
+
+  // A clean tap/click (no travel) still navigates: suppression is only armed
+  // after a gesture that actually moved.
+  const touchEnd = source.slice(source.indexOf('onTouchEnd'), source.indexOf('onClickCapture'))
+  assert.match(touchEnd, /travelled > TOUCH_SWIPE_THRESHOLD_PX/)
+})
+
+test('the category page hero links nowhere but home and the places index', () => {
+  const page = read('src/app/(frontend)/places/[slug]/page.tsx')
+  const hero = page.slice(page.indexOf('data-header-hero'), page.indexOf('Chapter I'))
+
+  // Clicking the hero must never change the page to another category: the only
+  // links inside it are the breadcrumbs and the back-to-index link.
+  assert.match(hero, /href: sitePath\('\/'\)/)
+  assert.match(hero, /href: PLACE_INDEX_PATH/)
+  assert.match(hero, /<Link href=\{PLACE_INDEX_PATH\}/)
+  assert.doesNotMatch(hero, /placeCategoryPath/)
+  assert.doesNotMatch(hero, /<Link[^>]*href=\{[^}]*category/)
+})
+
 test('the new routes join sitemap, llms, reserved slugs, revalidation and translations', () => {
   assert.equal(isReservedPageSlug('places'), true)
   assert.match(read('src/i18n/config.ts'), /places: 'places'/)
