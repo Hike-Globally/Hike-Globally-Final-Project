@@ -47,6 +47,16 @@ test('image layouts route through the Next optimizer instead of serving raw orig
   }
 })
 
+test('explicit unoptimized opt-in serves the stored original upload directly', () => {
+  for (const Component of [PayloadImage, PayloadImageFill]) {
+    const element = Component({ media: image, unoptimized: true })
+    assert.ok(element)
+    const img = Component === PayloadImage ? element.props.children : element
+    assert.equal(img.props.src, '/api/media/file/original.jpg')
+    assert.equal(img.props.unoptimized, true)
+  }
+})
+
 test('non-priority images lazy-load; priority images defer loading to the preload', () => {
   const lazy = PayloadImage({ media: image, sizes: '100vw' })
   assert.equal(lazy?.props.children.props.loading, 'lazy')
@@ -95,7 +105,12 @@ test('video uploads keep their original file and render as videos, not broken im
 })
 
 test('video thumbnails are used as posters in both video layouts', () => {
-  const video = { ...image, url: '/api/media/file/clip.mp4', mimeType: 'video/mp4', videoThumbnail: image }
+  const video = {
+    ...image,
+    url: '/api/media/file/clip.mp4',
+    mimeType: 'video/mp4',
+    videoThumbnail: image,
+  }
   const inline = PayloadImage({ media: video, sizes: '100vw' })
   assert.equal(inline?.props.children.props.poster, '/api/media/file/original.jpg')
   const background = PayloadImageFill({ media: video, sizes: '100vw' })

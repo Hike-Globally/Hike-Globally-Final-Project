@@ -32,6 +32,10 @@ const image = {
   mimeType: 'image/jpeg',
   width: 1600,
   height: 1200,
+  sizes: {
+    thumbnail: { url: '/api/media/file/mountain-pass-400x300.jpg', width: 400, height: 300 },
+    card: { url: '/api/media/file/mountain-pass-1024x768.jpg', width: 1024, height: 768 },
+  },
   updatedAt: '2026-11-21T00:00:00.000Z',
   createdAt: '2026-11-21T00:00:00.000Z',
 }
@@ -206,10 +210,12 @@ test('Boxed Content renders an accessible image-left / copy-right feature in doc
     feature.querySelector('p')?.textContent,
     'Take the high trail.\nPause where the valley opens.',
   )
-  assert.equal(
-    feature.querySelector('.boxed-content__media img')?.getAttribute('alt'),
-    'A quiet mountain pass at sunrise',
-  )
+  const photo = feature.querySelector('.boxed-content__media img')
+  assert.equal(photo?.getAttribute('alt'), 'A quiet mountain pass at sunrise')
+  // Boxed Content serves the untouched original upload directly rather than
+  // routing through `/_next/image` downscaling or q=75 recompression.
+  assert.equal(photo?.getAttribute('src'), '/api/media/file/mountain-pass.jpg')
+  assert.equal(photo?.getAttribute('srcset'), null)
   assert.equal(
     feature
       .querySelector('.boxed-content__frame')
@@ -302,7 +308,7 @@ test('Boxed Content distinguishes media vs copy-only frames and renders cleanly 
   assert.deepEqual(subheadings, ['Rest day in Namche', 'Hydration on the trail'])
 })
 
-test('Boxed Content CSS uses #d8f3dc surface with WCAG AA contrast, container-query responsiveness, and zero-gap geometry', () => {
+test('Boxed Content CSS uses an alluring alpine-twilight surface with WCAG AA/AAA contrast, ungraded original photos, container-query responsiveness, and zero-gap geometry', () => {
   const globalsCss = readFileSync(new URL('../app/(frontend)/globals.css', import.meta.url), 'utf8')
 
   const channel = (c: number) => {
@@ -323,13 +329,24 @@ test('Boxed Content CSS uses #d8f3dc surface with WCAG AA contrast, container-qu
     return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)
   }
 
-  assert.match(globalsCss, /--color-boxed-surface:\s*#d8f3dc\s*;/i)
-  const ink = globalsCss.match(/--color-ink:\s*(#[0-9a-fA-F]{6})\s*;/)?.[1]
-  const ink80 = globalsCss.match(/--color-ink-80:\s*(#[0-9a-fA-F]{6})\s*;/)?.[1]
-  const accent = globalsCss.match(/--color-boxed-accent:\s*(#[0-9a-fA-F]{6})\s*;/)?.[1]
-  assert.ok(ink && contrast(ink, '#d8f3dc') >= 4.5, 'title ink meets WCAG AA on #d8f3dc')
-  assert.ok(ink80 && contrast(ink80, '#d8f3dc') >= 4.5, 'description ink meets WCAG AA on #d8f3dc')
-  assert.ok(accent && contrast(accent, '#d8f3dc') >= 3, 'accent rule meets 3:1 on #d8f3dc')
+  const token = (name: string) =>
+    globalsCss.match(new RegExp(`--color-${name}:\\s*(#[0-9a-fA-F]{6})\\s*;`))?.[1]
+
+  const surface = token('boxed-surface')
+  const surfaceDeep = token('boxed-surface-deep')
+  const surfaceMid = token('boxed-surface-mid')
+  const surfaceLit = token('boxed-surface-lit')
+  const glow = token('boxed-glow')
+  const title = token('boxed-title')
+  const copy = token('boxed-copy')
+  const accent = token('boxed-accent')
+
+  assert.ok(surface && surfaceDeep && surfaceMid && surfaceLit && glow && title && copy && accent)
+  for (const bg of [surface, surfaceDeep, surfaceMid, surfaceLit, glow]) {
+    assert.ok(contrast(title, bg) >= 4.5, `title meets WCAG AA on ${bg}`)
+    assert.ok(contrast(copy, bg) >= 4.5, `description meets WCAG AA on ${bg}`)
+    assert.ok(contrast(accent, bg) >= 3, `accent rule meets 3:1 on ${bg}`)
+  }
 
   const boxedStart = globalsCss.indexOf('.boxed-content {')
   assert.ok(boxedStart !== -1, 'expected .boxed-content styles in globals.css')
@@ -338,8 +355,11 @@ test('Boxed Content CSS uses #d8f3dc surface with WCAG AA contrast, container-qu
     globalsCss.indexOf('Single pages — running copy', boxedStart),
   )
 
-  // Surface color & container-driven responsiveness
+  // Layered alpine-twilight surface, ungraded original photo & container-driven responsiveness
   assert.match(boxedSection, /background-color:\s*var\(--color-boxed-surface\)/)
+  assert.match(boxedSection, /linear-gradient\(/)
+  assert.match(boxedSection, /radial-gradient\(/)
+  assert.match(boxedSection, /\.boxed-content__photo\s*\{\s*filter:\s*none;/)
   assert.match(boxedSection, /container:\s*boxed-content\s*\/\s*inline-size/)
   assert.match(boxedSection, /@container boxed-content\s*\(min-width:\s*34rem\)/)
 

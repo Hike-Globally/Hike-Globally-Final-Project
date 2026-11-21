@@ -48,11 +48,7 @@ export function BoxedContent({
       <div className={cn('boxed-content__frame', showMedia && 'boxed-content__frame--with-media')}>
         {showMedia && media ? (
           <div className="boxed-content__media photo-plate">
-            <PayloadImageFill
-              media={media}
-              sizes="(min-width: 1280px) 24rem, (min-width: 640px) 42vw, 94vw"
-              className="boxed-content__photo"
-            />
+            <PayloadImageFill media={media} unoptimized className="boxed-content__photo" />
           </div>
         ) : null}
 
