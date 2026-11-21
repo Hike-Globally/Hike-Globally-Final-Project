@@ -113,12 +113,18 @@ test('the carousel keeps card links clickable while still supporting drag', () =
   }
 })
 
-test('the section has no grid and cards have a full-image dark overlay', () => {
+test('homepage cards have solid backgrounds without removing photos from other places pages', () => {
   const css = read('src/components/sections/browse-places.css')
   const card = read('src/components/cards/place-category-card.tsx')
+  const carousel = read('src/components/sections/browse-places.tsx')
   assert.doesNotMatch(css, /\.browse-places::after/)
-  assert.match(css, /\.browse-places__scrim\s*\{[\s\S]*?linear-gradient\(color-mix\(in srgb, var\(--color-ink\) 40%/)
-  assert.match(card, /className="browse-places__scrim"/)
+  assert.match(css, /\.browse-places \.browse-places__card\s*\{\s*background:/)
+  assert.match(carousel, /<PlaceCategoryCard[\s\S]*?showImage=\{false\}/)
+  assert.match(card, /showImage = true/)
+  assert.match(card, /\{showImage && \(\s*<>\s*<Image[\s\S]*?className="browse-places__scrim"/)
+  for (const file of ['src/app/(frontend)/places/page.tsx', 'src/app/(frontend)/places/[slug]/page.tsx']) {
+    assert.doesNotMatch(read(file), /showImage=\{false\}/)
+  }
 })
 
 test('single trip and blog pages expose their mapped place categories', () => {

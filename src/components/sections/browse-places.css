@@ -152,6 +152,11 @@
     transform 500ms var(--ease-brand);
 }
 
+/* The homepage cards use a solid background rather than category photos. */
+.browse-places .browse-places__card {
+  background: color-mix(in srgb, var(--color-ink) 65%, var(--color-ink-80));
+}
+
 .browse-places__card:hover {
   border-color: color-mix(in srgb, var(--color-mist) 52%, transparent);
   transform: translateY(-2px);
