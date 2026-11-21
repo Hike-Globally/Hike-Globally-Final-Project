@@ -43,6 +43,7 @@ export function PlaceCategoryCard({
         fill
         sizes="(min-width: 1536px) 22vw, (min-width: 1024px) 28vw, (min-width: 640px) 42vw, 82vw"
         priority={priority}
+        draggable={false}
         aria-hidden="true"
         className="browse-places__image"
       />
