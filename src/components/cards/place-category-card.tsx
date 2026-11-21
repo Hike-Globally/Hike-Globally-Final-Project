@@ -1,8 +1,10 @@
+import type { CSSProperties } from 'react'
 import { ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
 
 import Image from '@/components/ui/next-image'
 import { placeCategoryPath, type PlaceCategory } from '@/lib/place-categories'
+import { getPlaceTheme } from '@/lib/place-themes'
 import { cn } from '@/lib/utils'
 
 /**
@@ -24,7 +26,7 @@ export function PlaceCategoryCard({
   category: PlaceCategory
   index: number
   priority?: boolean
-  /** The homepage carousel can use a solid background instead of a photograph. */
+  /** The homepage carousel uses a glass surface instead of a photograph. */
   showImage?: boolean
   /** Duplicated marquee cards are hidden from assistive tech and tab order. */
   decorative?: boolean
@@ -39,6 +41,14 @@ export function PlaceCategoryCard({
       aria-hidden={decorative || undefined}
       tabIndex={decorative ? -1 : undefined}
       className={cn('browse-places__card group', className)}
+      // The photo-less marquee card is frosted glass: its category accent (the
+      // on-dark theme step) tints the glow behind the frost, so each card
+      // carries its own landscape colour. Photo cards ignore the variable.
+      style={
+        showImage
+          ? undefined
+          : ({ '--place-accent-lt': getPlaceTheme(category.value).accentLt } as CSSProperties)
+      }
     >
       {showImage && (
         <>
