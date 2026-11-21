@@ -113,12 +113,17 @@ test('the carousel keeps card links clickable while still supporting drag', () =
   }
 })
 
-test('homepage cards have solid backgrounds without removing photos from other places pages', () => {
+test('homepage cards use category-tinted glass while other places pages keep their photos', () => {
   const css = read('src/components/sections/browse-places.css')
   const card = read('src/components/cards/place-category-card.tsx')
   const carousel = read('src/components/sections/browse-places.tsx')
   assert.doesNotMatch(css, /\.browse-places::after/)
-  assert.match(css, /\.browse-places \.browse-places__card\s*\{\s*background:/)
+  const glassRule = css.match(/\.browse-places \.browse-places__card\s*\{([^}]+)\}/)?.[1]
+  assert.ok(glassRule, 'glass styling is scoped to the homepage cards')
+  assert.match(glassRule, /backdrop-filter:\s*blur\(/)
+  assert.match(glassRule, /--place-accent-lt/)
+  assert.match(glassRule, /transparent/)
+  assert.match(card, /getPlaceTheme\(category\.value\)\.accentLt/)
   assert.match(carousel, /<PlaceCategoryCard[\s\S]*?showImage=\{false\}/)
   assert.match(card, /showImage = true/)
   assert.match(card, /\{showImage && \(\s*<>\s*<Image[\s\S]*?className="browse-places__scrim"/)

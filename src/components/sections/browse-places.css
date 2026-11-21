@@ -152,9 +152,33 @@
     transform 500ms var(--ease-brand);
 }
 
-/* The homepage cards use a solid background rather than category photos. */
+/* Photo-less homepage cards: a dark, legible glass surface with a subtle
+   category-coloured glow. Photo cards elsewhere retain their existing style. */
 .browse-places .browse-places__card {
-  background: color-mix(in srgb, var(--color-ink) 65%, var(--color-ink-80));
+  border-color: color-mix(in srgb, var(--color-mist) 28%, transparent);
+  border-radius: 1rem;
+  background: var(--color-ink-80); /* fallback when transparency is unsupported */
+  background:
+    radial-gradient(ellipse at 85% 5%, color-mix(in srgb, var(--place-accent-lt, var(--color-deep)) 32%, transparent), transparent 55%),
+    linear-gradient(145deg, color-mix(in srgb, var(--color-mist) 13%, transparent), transparent 48%),
+    color-mix(in srgb, var(--color-ink) 76%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--color-mist) 18%, transparent),
+    0 1rem 2.5rem color-mix(in srgb, var(--color-ink) 30%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(130%);
+  backdrop-filter: blur(18px) saturate(130%);
+  transition:
+    border-color 500ms var(--ease-brand),
+    box-shadow 500ms var(--ease-brand),
+    transform 500ms var(--ease-brand);
+}
+
+.browse-places .browse-places__card:hover,
+.browse-places .browse-places__card:focus-visible {
+  border-color: color-mix(in srgb, var(--color-mist) 55%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--color-mist) 30%, transparent),
+    0 1.25rem 3rem color-mix(in srgb, var(--color-ink) 40%, transparent);
 }
 
 .browse-places__card:hover {
@@ -325,6 +349,7 @@
 @media (prefers-reduced-motion: reduce) {
   .browse-places__control,
   .browse-places__card,
+  .browse-places .browse-places__card,
   .browse-places__image,
   .browse-places__action svg {
     transition: none;
