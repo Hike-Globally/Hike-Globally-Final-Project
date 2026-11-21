@@ -44,6 +44,7 @@ import { LinkPreviewSection } from '@/components/sections/link-preview-section'
 import { MultiUrlPreviewSection } from '@/components/sections/multi-url-preview-section'
 import { TripPackingSection } from '@/components/sections/trip-packing-section'
 import { KeyPointsPanel } from '@/components/sections/key-points-panel'
+import { PlaceCategoryLinks } from '@/components/sections/place-category-links'
 import { ItinerarySection } from '@/components/sections/itinerary-section'
 import { surface } from '@/components/ui/surface'
 import { PayloadImageFill, PayloadImage } from '@/components/ui/payload-image'
@@ -604,6 +605,7 @@ export function TripDetail({
           </Fragment>
         )
       })}
+      <PlaceCategoryLinks values={trip.placeCategories} className="mt-16 md:mt-24" />
       <p className="container-content my-8 text-small">
         {dict.common.affiliateDescription} We may earn a commission if you book through a partner link.
       </p>

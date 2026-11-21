@@ -5,6 +5,7 @@ import { canonicalUrl } from './seo'
 import { isReservedPageSlug } from './site-routes'
 import { sitemapAssetUrl, sitemapMediaXml, type SitemapMedia } from './sitemap-media'
 import { HOME_HERO_IMAGE_URL } from './site-assets'
+import { PLACE_INDEX_PATH, placeCategories, placeCategoryPath } from './place-categories'
 
 /**
  * ============================================================================
@@ -98,6 +99,15 @@ const STATIC_ROUTES: {
   { path: sitePath(routes.about), priority: 0.6, changeFrequency: 'monthly', feeds: [] },
   { path: sitePath(routes.privacy), priority: 0.3, changeFrequency: 'yearly', feeds: [] },
   { path: sitePath(routes.terms), priority: 0.3, changeFrequency: 'yearly', feeds: [] },
+  // Browse Places has one index and nine dedicated category pages. Their lastmod follows the
+  // trips and posts an editor maps into them through `placeCategories`.
+  { path: PLACE_INDEX_PATH, priority: 0.7, changeFrequency: 'weekly', feeds: ['trips', 'posts'] },
+  ...placeCategories.map((category) => ({
+    path: placeCategoryPath(category.value),
+    priority: 0.7,
+    changeFrequency: 'weekly' as const,
+    feeds: ['trips', 'posts'] as (keyof SitemapSources)[],
+  })),
 ]
 
 /** Where each collection's documents live, and how prominently they rank. */

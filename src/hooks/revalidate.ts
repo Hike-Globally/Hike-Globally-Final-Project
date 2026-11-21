@@ -11,6 +11,7 @@ import { authorProfile } from '../lib/author-profile'
 import { CACHE_TAG, revalidationDisabled } from '../lib/cache-tags'
 import type { User } from '../payload-types'
 import { LLMS_TXT_PATH } from '../lib/llms-txt'
+import { PLACE_INDEX_PATH, placeCategoryPaths } from '../lib/place-categories'
 import { RSS_FEED_PATH } from '../lib/rss'
 import {
   shouldRevalidateAfterChange,
@@ -110,6 +111,13 @@ const revalidateDocument = async ({
   if (previousSlug && previousSlug !== slug) {
     paths.push(`/${[segment, previousSlug].filter(Boolean).join('/')}`)
     tags.push(documentTag(collection, previousSlug))
+  }
+
+  // A trip or post can be mapped into any Browse Places category, so every
+  // place page must rebuild when one of those documents changes. The list is
+  // fixed and short (one index plus nine category pages).
+  if (collection === 'trips' || collection === 'blog') {
+    paths.push(PLACE_INDEX_PATH, ...placeCategoryPaths())
   }
 
   // `/sitemap.xml` and `/llms.txt` both list this document's slug and title, so a publish, rename

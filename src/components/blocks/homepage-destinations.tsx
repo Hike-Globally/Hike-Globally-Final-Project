@@ -1,4 +1,5 @@
 import { DestinationCarousel } from '@/components/cards/destination-carousel'
+import { BrowsePlaces } from '@/components/sections/browse-places'
 import { sitePath } from '@/i18n/config'
 import { dictionary } from '@/i18n/dictionaries'
 import { NEPAL_REGION_CARDS, WORLD_REGION_CARDS } from '@/lib/homepage-destinations'
@@ -29,6 +30,9 @@ export function HomepageDestinations() {
         titleClassName="home-section-title"
         descriptionClassName="home-section-intro"
       />
+      {/* Fixed immediately after "Destinations Around The World" in both the CMS
+          homepage and the database-less fallback. */}
+      <BrowsePlaces />
     </>
   )
 }

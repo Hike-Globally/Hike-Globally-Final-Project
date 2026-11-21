@@ -1,6 +1,7 @@
 import { sitePath } from '@/i18n/config'
 import { DIFFICULTY_LEVELS } from './difficulty'
 import { truncate } from './format'
+import { PLACE_INDEX_PATH, placeCategories, placeCategoryPath } from './place-categories'
 import { canonicalUrl } from './seo'
 import { isReservedPageSlug } from './site-routes'
 
@@ -21,10 +22,10 @@ import { isReservedPageSlug } from './site-routes'
  * dropped when only a short context fits.
  *
  * WHY IT IS GENERATED, NOT HAND-WRITTEN. Two thirds of this file is a list of published trips,
- * destinations, posts and pages. A checked-in `public/llms.txt` would go stale the moment an editor
- * publishes a trip — the exact failure mode the sitemap avoids by being a route. So the data comes
- * from the same cached Payload readers as `/sitemap.xml`, the same `canonicalUrl()` spelling, and
- * the same exclusion rules:
+ * destinations, posts, pages and the fixed Browse Places collections. A checked-in
+ * `public/llms.txt` would go stale the moment an editor publishes a trip — the exact failure mode
+ * the sitemap avoids by being a route. So the data comes from the same cached Payload readers as
+ * `/sitemap.xml`, the same `canonicalUrl()` spelling, and the same exclusion rules:
  *
  *  1. ONLY PUBLISHED, INDEXABLE DOCUMENTS — no drafts, and nothing whose SEO panel asks search
  *     engines to skip it. If a page is `noindex`, this file must not advertise it either;
@@ -201,6 +202,18 @@ const staticEntries = (): string[] => [
   ),
 ]
 
+/** The fixed Browse Places index and its nine landscape-specific collections. */
+const placeEntries = (): string[] => [
+  entry(
+    'Browse places',
+    PLACE_INDEX_PATH,
+    'Nine curated landscape collections linking trips and field notes by the feature that defines a place.',
+  ),
+  ...placeCategories.map((category) =>
+    entry(category.label, placeCategoryPath(category.value), category.description),
+  ),
+]
+
 /**
  * Builds the whole file: heading, summary, the prose that explains what each kind of page holds,
  * then the link lists. `sources` is everything `getLlmsTxtSources()` found; the defaults mean a
@@ -273,6 +286,7 @@ export const buildLlmsTxt = (
     section('Trips', trips),
     section('Destinations', destinations),
     section('Journal', posts),
+    section('Places', placeEntries()),
     section('Pages', pageEntries),
     section('Optional', optionalEntries),
   ]

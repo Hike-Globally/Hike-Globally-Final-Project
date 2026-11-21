@@ -552,6 +552,22 @@ export interface Trip {
     | 'strenuous-extreme'
     | 'extreme';
   bestSeasons?: ('spring' | 'summer' | 'autumn' | 'winter')[] | null;
+  /**
+   * Choose one or more categories. Tagged trips and articles appear on the matching place pages; leave empty to exclude this document.
+   */
+  placeCategories?:
+    | (
+        | 'lakes'
+        | 'waterfalls'
+        | 'mountain-passes'
+        | 'canyons'
+        | 'base-camps'
+        | 'caves'
+        | 'bike-tours'
+        | 'mountain-peaks'
+        | 'temples'
+      )[]
+    | null;
   priceFrom: number;
   priceCurrency: 'USD' | 'EUR' | 'NPR';
   priceUnit?: ('per-person' | 'per-group') | null;
@@ -659,9 +675,6 @@ export interface Trip {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Reasons to choose this trek. Displayed before Highlights.
-   */
   whyChooseThisTrek?: {
     root: {
       type: string;
@@ -1170,6 +1183,22 @@ export interface Blog {
         | 'sustainability'
         | 'trip-reports'
         | 'news'
+      )[]
+    | null;
+  /**
+   * Choose one or more categories. Tagged trips and articles appear on the matching place pages; leave empty to exclude this document.
+   */
+  placeCategories?:
+    | (
+        | 'lakes'
+        | 'waterfalls'
+        | 'mountain-passes'
+        | 'canyons'
+        | 'base-camps'
+        | 'caves'
+        | 'bike-tours'
+        | 'mountain-peaks'
+        | 'temples'
       )[]
     | null;
   /**
@@ -1829,6 +1858,7 @@ export interface TripsSelect<T extends boolean = true> {
   maxAltitude?: T;
   difficulty?: T;
   bestSeasons?: T;
+  placeCategories?: T;
   priceFrom?: T;
   priceCurrency?: T;
   priceUnit?: T;
@@ -2079,6 +2109,7 @@ export interface BlogSelect<T extends boolean = true> {
   author?: T;
   publishedAt?: T;
   categories?: T;
+  placeCategories?: T;
   relatedPosts?: T;
   featured?: T;
   keywords?: T;

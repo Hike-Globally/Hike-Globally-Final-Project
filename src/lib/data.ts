@@ -40,6 +40,7 @@ import {
   type TripFilters,
 } from './catalog'
 
+import type { PlaceCategoryValue } from './place-categories'
 import { pickAutomaticTrips } from './trip-selection'
 
 /**
@@ -164,6 +165,7 @@ export const defaultFeaturedTrips: TripCard[] = [
     priceFrom: 1850,
     priceCurrency: 'USD',
     featured: true,
+    placeCategories: ['base-camps', 'mountain-peaks', 'mountain-passes', 'temples'],
     destination: { id: 1, name: 'Khumbu', slug: 'khumbu' },
   },
   {
@@ -187,6 +189,7 @@ export const defaultFeaturedTrips: TripCard[] = [
     priceFrom: 1350,
     priceCurrency: 'USD',
     featured: true,
+    placeCategories: ['lakes', 'waterfalls', 'base-camps', 'mountain-peaks'],
     destination: { id: 2, name: 'Annapurna', slug: 'annapurna' },
   },
   {
@@ -210,6 +213,7 @@ export const defaultFeaturedTrips: TripCard[] = [
     priceFrom: 980,
     priceCurrency: 'USD',
     featured: true,
+    placeCategories: ['canyons', 'caves', 'bike-tours', 'mountain-passes', 'waterfalls'],
     destination: { id: 3, name: 'Langtang', slug: 'langtang' },
   },
 ]
@@ -325,6 +329,7 @@ export const defaultPosts: PostCard[] = [
     publishedAt: '2026-03-24T00:00:00.000Z',
     createdAt: '2026-03-24T00:00:00.000Z',
     featured: true,
+    placeCategories: ['mountain-peaks', 'mountain-passes', 'bike-tours'],
   },
   {
     id: 2,
@@ -344,6 +349,7 @@ export const defaultPosts: PostCard[] = [
     publishedAt: '2026-03-06T00:00:00.000Z',
     createdAt: '2026-03-06T00:00:00.000Z',
     featured: true,
+    placeCategories: ['base-camps', 'mountain-peaks', 'caves'],
   },
   {
     id: 3,
@@ -363,6 +369,7 @@ export const defaultPosts: PostCard[] = [
     publishedAt: '2026-02-18T00:00:00.000Z',
     createdAt: '2026-02-18T00:00:00.000Z',
     featured: true,
+    placeCategories: ['base-camps', 'mountain-passes'],
   },
   {
     id: 4,
@@ -382,6 +389,7 @@ export const defaultPosts: PostCard[] = [
     publishedAt: '2026-02-01T00:00:00.000Z',
     createdAt: '2026-02-01T00:00:00.000Z',
     featured: false,
+    placeCategories: ['lakes', 'waterfalls', 'temples', 'canyons'],
   },
   {
     id: 5,
@@ -401,6 +409,7 @@ export const defaultPosts: PostCard[] = [
     publishedAt: '2026-01-15T00:00:00.000Z',
     createdAt: '2026-01-15T00:00:00.000Z',
     featured: false,
+    placeCategories: ['base-camps', 'mountain-passes', 'bike-tours'],
   },
 ]
 
@@ -425,6 +434,7 @@ export type TripCard = {
   priceCurrency: Trip['priceCurrency']
   priceUnit?: Trip['priceUnit']
   featured?: boolean | null
+  placeCategories?: PlaceCategoryValue[] | null
   destination: number | ({ id: number; name: string; slug: string } | null)
 }
 
@@ -450,6 +460,7 @@ export type PostCard = {
   publishedAt?: string | null
   createdAt: string
   categories?: Blog['categories']
+  placeCategories?: PlaceCategoryValue[] | null
   featured?: boolean | null
   author?: number | ({ id: number; name: string; avatar?: number | Media | null } | null)
 }
@@ -486,6 +497,7 @@ const tripCardSelect = {
   priceCurrency: true,
   priceUnit: true,
   featured: true,
+  placeCategories: true,
   destination: true,
 } as const
 
@@ -883,6 +895,7 @@ const postCardSelect = {
   publishedAt: true,
   createdAt: true,
   categories: true,
+  placeCategories: true,
   featured: true,
   author: true,
 } as const
@@ -1006,6 +1019,67 @@ export const getRelatedPosts = (post: Blog, limit = 3): Promise<PostCard[]> =>
   )
 
 export const getAllPostSlugs = publishedSlugsFor('blog', CACHE_TAG.posts)
+
+export type PlaceCategoryContent = {
+  trips: TripCard[]
+  posts: PostCard[]
+}
+
+/**
+ * Published trips and posts mapped to one Browse Places category.
+ *
+ * A tagged document can appear on several place pages, so a shared query with
+ * the `placeCategories` has-many select is enough. The fallback keeps all nine
+ * database-less category pages populated with the same demo content used by
+ * the homepage and listings.
+ */
+export const getPlaceCategoryContent = (
+  slug: PlaceCategoryValue,
+  limit = 3,
+): Promise<PlaceCategoryContent> =>
+  safeQuery(
+    unstable_cache(
+      async () => {
+        const payload = await getPayloadClient()
+        const where: Where = {
+          and: [{ _status: { equals: 'published' } }, { placeCategories: { in: [slug] } }],
+        }
+        const [trips, posts] = await Promise.all([
+          payload.find({
+            collection: 'trips',
+            locale: SITE_LOCALE,
+            depth: 1,
+            limit,
+            sort: '-featured',
+            where,
+            select: tripCardSelect,
+          }),
+          payload.find({
+            collection: 'blog',
+            locale: SITE_LOCALE,
+            depth: 1,
+            limit,
+            sort: '-publishedAt',
+            where,
+            select: postCardSelect,
+          }),
+        ])
+
+        return {
+          trips: trips.docs as unknown as TripCard[],
+          posts: posts.docs as unknown as PostCard[],
+        }
+      },
+      ['place-category', slug, String(limit)],
+      { tags: [CACHE_TAG.trips, CACHE_TAG.posts], revalidate: REVALIDATE_SECONDS },
+    ),
+    {
+      trips: defaultFeaturedTrips
+        .filter((trip) => trip.placeCategories?.includes(slug))
+        .slice(0, limit),
+      posts: defaultPosts.filter((post) => post.placeCategories?.includes(slug)).slice(0, limit),
+    },
+  )
 
 /* -------------------------------------------------------------------------- */
 /* Flexible pages                                                              */

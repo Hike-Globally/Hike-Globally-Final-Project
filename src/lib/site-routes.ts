@@ -4,11 +4,12 @@ import { routes } from '@/i18n/config'
  * Route slugs that belong to a dedicated route instead of the CMS.
  *
  * A page in the Pages collection with one of these slugs never gets its own URL: the static route
- * wins, so `/[slug]` returns 404 for it. Two places have to agree on that list —
+ * wins, so `/[slug]` returns 404 for it. Three places have to agree on that list —
  *
- *  - `src/app/(frontend)/[slug]/page.tsx` refuses to render them, and
+ *  - `src/app/(frontend)/[slug]/page.tsx` refuses to render them,
  *  - `src/lib/sitemap.ts` refuses to list them (the same URL would otherwise appear twice:
- *    once as `/trips`, the listing page, and once as `/trips`, the shadowed page).
+ *    once as `/trips`, the listing page, and once as `/trips`, the shadowed page), and
+ *  - `src/lib/llms-txt.ts` refuses to advertise a shadowed page document.
  *
  * — which is why it lives here rather than in either file.
  */

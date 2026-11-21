@@ -24,6 +24,6 @@ test('legacy CMS enquiry links point directly to contact while preserving parame
 })
 
 test('dedicated information pages reserve their CMS slugs', () => {
-  for (const slug of ['about', 'contact', 'privacy', 'terms', 'inquiry'])
+  for (const slug of ['about', 'contact', 'privacy', 'terms', 'inquiry', 'places'])
     assert.equal(isReservedPageSlug(slug), true)
 })

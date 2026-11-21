@@ -25,6 +25,8 @@ import {
 import { getFrontendLocaleFromCookie } from '../i18n/frontend-locale'
 import { clearTranslationCache, loadTranslations } from '../i18n/load-translations'
 import { translateString } from '../i18n/translate'
+import { truncate } from './format'
+import { placeCategories } from './place-categories'
 import { translations as de } from '../i18n/translations/de'
 import { translations as fr } from '../i18n/translations/fr'
 
@@ -95,6 +97,36 @@ test('translation lookup changes static, dynamic and branded copy with English f
     'A brand new CMS sentence.',
   )
   assert.equal(translateString('Read more', 'en', de), 'Read more')
+})
+
+test('Browse Places copy is translated in DE/FR without locale-prefixed URLs', () => {
+  assert.equal(translateString('Browse places', 'de', de), 'Orte entdecken')
+  assert.equal(translateString('Browse places', 'fr', fr), 'Découvrir des lieux')
+  assert.equal(translateString('View all places', 'de', de), 'Alle Orte ansehen')
+  assert.equal(translateString('View all places', 'fr', fr), 'Voir tous les lieux')
+  assert.equal(
+    translateString('Lakes adventures · Hike Globally', 'de', de),
+    'Seen erleben · Hike Globally',
+  )
+  assert.equal(
+    translateString('Lakes adventures · Hike Globally', 'fr', fr),
+    'Aventures au bord des lacs · Hike Globally',
+  )
+
+  for (const category of placeCategories) {
+    const title = `${category.label} adventures`
+    assert.notEqual(translateString(title, 'de', de), title)
+    assert.notEqual(translateString(title, 'fr', fr), title)
+    assert.notEqual(translateString(category.intro, 'de', de), category.intro)
+    assert.notEqual(translateString(category.intro, 'fr', fr), category.intro)
+
+    // `buildMetadata()` shortens long descriptions; those exact strings need a dictionary entry too.
+    const description = truncate(category.intro, 160)
+    if (description !== category.intro) {
+      assert.notEqual(translateString(description, 'de', de), description)
+      assert.notEqual(translateString(description, 'fr', fr), description)
+    }
+  }
 })
 
 test('DE/FR dictionaries load lazily from the frontend-only translation files', async () => {
