@@ -4,6 +4,7 @@ import { dictionary, t } from '@/i18n/dictionaries'
 import { routes, sitePath } from '@/i18n/config'
 import { getAllPageSlugs, getFooter, getSettings } from '@/lib/data'
 import { resolveLink, type ResolvedLink } from '@/lib/links'
+import { withPlacesFooterLink } from '@/lib/places-navigation'
 import { mailtoHref, protectedEmailHtmlProps } from '@/lib/public-email'
 import type { Setting } from '@/payload-types'
 
@@ -318,7 +319,11 @@ export async function Footer() {
   )
 
   const rightColumns: FooterColumn[] = [
-    ...(cmsColumns.length ? columnsWithSitemap : fallbackColumns),
+    ...withPlacesFooterLink(cmsColumns.length ? columnsWithSitemap : fallbackColumns, {
+      href: sitePath('/places'),
+      label: dict.nav.places,
+      newTab: false,
+    }),
     ...(cmsColumns.length && !hasCompanyColumn && !hasAbout
       ? [
           {
