@@ -120,4 +120,5 @@ export const routes = {
   about: 'about',
   privacy: 'privacy',
   terms: 'terms',
+  sitemap: 'sitemap',
 } as const

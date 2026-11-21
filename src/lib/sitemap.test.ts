@@ -29,7 +29,7 @@ const PLACE_URLS = [
   `${ORIGIN}/places`,
   ...placeCategories.map((category) => `${ORIGIN}/places/${category.value}`),
 ]
-const STATIC_ROUTE_COUNT = 8 + PLACE_URLS.length
+const STATIC_ROUTE_COUNT = 9 + PLACE_URLS.length
 
 const document = (overrides: Partial<SitemapDocument> = {}): SitemapDocument => ({
   slug: 'a-document',
@@ -79,6 +79,7 @@ test('URLs are the canonical spelling of each page', () => {
   ])
 
   assert.deepEqual(urls(entries).slice(8), [
+    `${ORIGIN}/sitemap`,
     ...PLACE_URLS,
     `${ORIGIN}/trips/everest-base-camp`,
     `${ORIGIN}/destinations/khumbu`,
@@ -132,6 +133,7 @@ test('two documents sharing a slug still produce one entry for that URL', () => 
     `${ORIGIN}/about`,
     `${ORIGIN}/privacy`,
     `${ORIGIN}/terms`,
+    `${ORIGIN}/sitemap`,
     ...PLACE_URLS,
     `${ORIGIN}/trips/one`,
   ])
@@ -236,7 +238,7 @@ test('an unparseable date is ignored instead of being written into the XML', () 
   assert.equal(lastModifiedOf(entries, `${ORIGIN}/trips/broken`), undefined)
 })
 
-test('with no content at all the sitemap is still the eighteen static routes', () => {
+test('with no content at all the sitemap is still the nine static routes', () => {
   const entries = buildSitemap()
 
   assert.equal(entries.length, STATIC_ROUTE_COUNT)
