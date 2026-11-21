@@ -85,6 +85,7 @@ const expectedStructuredData: Record<string, string[]> = {
   'src/app/(frontend)/privacy/page.tsx': ['breadcrumbJsonLd', 'webPageJsonLd'],
   'src/app/(frontend)/terms/page.tsx': ['breadcrumbJsonLd', 'webPageJsonLd'],
   'src/app/(frontend)/places/page.tsx': ['breadcrumbJsonLd', 'webPageJsonLd'],
+  'src/app/(frontend)/sitemap/page.tsx': ['breadcrumbJsonLd', 'webPageJsonLd'],
   'src/app/(frontend)/places/[slug]/page.tsx': ['breadcrumbJsonLd', 'webPageJsonLd'],
   // Deliberately empty: the page is `noindex` and describes nothing worth indexing.
   'src/app/(frontend)/inquiry/thank-you/page.tsx': [],

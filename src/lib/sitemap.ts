@@ -99,6 +99,13 @@ const STATIC_ROUTES: {
   { path: sitePath(routes.about), priority: 0.6, changeFrequency: 'monthly', feeds: [] },
   { path: sitePath(routes.privacy), priority: 0.3, changeFrequency: 'yearly', feeds: [] },
   { path: sitePath(routes.terms), priority: 0.3, changeFrequency: 'yearly', feeds: [] },
+  // The /sitemap chart lists the collections, so it follows them like a listing page.
+  {
+    path: sitePath(routes.sitemap),
+    priority: 0.5,
+    changeFrequency: 'monthly',
+    feeds: ['trips', 'destinations', 'posts', 'pages'],
+  },
   // Browse Places has one index and nine dedicated category pages. Their lastmod follows the
   // trips and posts an editor maps into them through `placeCategories`.
   { path: PLACE_INDEX_PATH, priority: 0.7, changeFrequency: 'weekly', feeds: ['trips', 'posts'] },

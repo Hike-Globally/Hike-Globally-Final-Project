@@ -1135,6 +1135,132 @@ export const getSitemapSources = (): Promise<SitemapSources> =>
   safeQuery(readSitemapSources, EMPTY_SITEMAP_SOURCES)
 
 /* -------------------------------------------------------------------------- */
+/* Navigation chart (the /sitemap index)                                        */
+/* -------------------------------------------------------------------------- */
+
+/** One CMS landing page as the navigation chart lists it. */
+export type ChartPage = {
+  title: string
+  slug: string
+  summary: string | null
+}
+
+/** Everything the /sitemap page prints, in one cached read. */
+export type ChartSources = {
+  trips: number
+  destinations: number
+  posts: number
+  /** Published CMS pages, minus slugs a dedicated route owns. */
+  pages: ChartPage[]
+  /** Tagged journeys per Browse Places category, by category value. */
+  placeCounts: Record<string, number>
+}
+
+/**
+ * The one cached reader behind the /sitemap chart page: per-collection counts, the published
+ * CMS landing pages, and the per-landscape tag counts. Kept separate from the full sitemap reader
+ * (`readSitemapSources` above) because that one carries gallery media for the XML file and this
+ * one needs only slim rows.
+ */
+const readChartSources = unstable_cache(
+  async (): Promise<ChartSources> => {
+    const payload = await getPayloadClient()
+    const [trips, destinations, posts, pages] = await Promise.all([
+      collectPages((page) =>
+        payload.find({
+          collection: 'trips',
+          locale: SITE_LOCALE,
+          depth: 0,
+          limit: 500,
+          sort: 'id',
+          page,
+          select: { placeCategories: true },
+          where: { _status: { equals: 'published' } },
+        }),
+      ),
+      collectPages((page) =>
+        payload.find({
+          collection: 'destinations',
+          locale: SITE_LOCALE,
+          depth: 0,
+          limit: 500,
+          sort: 'id',
+          page,
+          select: { name: true },
+          where: { _status: { equals: 'published' } },
+        }),
+      ),
+      collectPages((page) =>
+        payload.find({
+          collection: 'blog',
+          locale: SITE_LOCALE,
+          depth: 0,
+          limit: 500,
+          sort: 'id',
+          page,
+          select: { placeCategories: true },
+          where: { _status: { equals: 'published' } },
+        }),
+      ),
+      collectPages((page) =>
+        payload.find({
+          collection: 'pages',
+          locale: SITE_LOCALE,
+          depth: 0,
+          limit: 500,
+          sort: 'id',
+          page,
+          select: { title: true, slug: true, meta: { noIndex: true, description: true } },
+          where: { _status: { equals: 'published' } },
+        }),
+      ),
+    ])
+
+    const placeCounts: Record<string, number> = {}
+    const bump = (value: string | null | undefined) => {
+      if (!value) return
+      placeCounts[value] = (placeCounts[value] ?? 0) + 1
+    }
+    for (const trip of trips) {
+      const categories = (trip as { placeCategories?: unknown }).placeCategories
+      if (Array.isArray(categories)) categories.forEach((value) => bump(value as string))
+    }
+    for (const post of posts) {
+      const categories = (post as { placeCategories?: unknown }).placeCategories
+      if (Array.isArray(categories)) categories.forEach((value) => bump(value as string))
+    }
+
+    const chartPages: ChartPage[] = pages
+      .map((page) => {
+        const record = page as { title?: string | null; slug?: string | null; meta?: { noIndex?: boolean | null; description?: string | null } | null }
+        if (!record.slug || record.meta?.noIndex || isReservedPageSlug(record.slug)) return null
+        return {
+          title: record.title ?? record.slug,
+          slug: record.slug,
+          summary: record.meta?.description ?? null,
+        }
+      })
+      .filter((page): page is ChartPage => page !== null)
+
+    return {
+      trips: trips.length,
+      destinations: destinations.length,
+      posts: posts.length,
+      pages: chartPages,
+      placeCounts,
+    }
+  },
+  ['sitemap-chart-sources-v1'],
+  { tags: [CACHE_TAG.trips, CACHE_TAG.destinations, CACHE_TAG.posts, CACHE_TAG.pages], revalidate: REVALIDATE_SECONDS },
+)
+
+export const getChartSources = (): Promise<ChartSources> =>
+  safeQuery(
+    readChartSources,
+    { trips: 0, destinations: 0, posts: 0, pages: [], placeCounts: {} },
+  )
+
+/* -------------------------------------------------------------------------- */
 /* llms.txt                                                                    */
 /* -------------------------------------------------------------------------- */
 

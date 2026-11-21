@@ -200,6 +200,11 @@ const staticEntries = (): string[] => [
     sitePath('/contact'),
     'Enquiry form, email address and the promised reply time.',
   ),
+  entry(
+    'Sitemap',
+    sitePath('/sitemap'),
+    'The human-readable index of every public page, layer by layer.',
+  ),
 ]
 
 /** The fixed Browse Places index and its nine landscape-specific collections. */
