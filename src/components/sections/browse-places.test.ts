@@ -9,32 +9,40 @@ import { isReservedPageSlug } from '../../lib/site-routes'
 const repoRoot = path.resolve(import.meta.dirname, '../../..')
 const read = (file: string): string => readFileSync(path.join(repoRoot, file), 'utf8')
 
-const nthIndexOf = (source: string, needle: string, occurrence: number): number => {
-  let index = -1
-  for (let count = 0; count < occurrence; count += 1) {
-    index = source.indexOf(needle, index + 1)
-    if (index === -1) return -1
-  }
-  return index
-}
+test('the homepage renders Browse Places exactly once, high on the page', () => {
+  const destinations = read('src/components/blocks/homepage-destinations.tsx')
 
-test('Browse Places sits immediately after Destinations Around The World on both homepage paths', () => {
-  const homepage = read('src/components/blocks/homepage-destinations.tsx')
-  const secondCarousel = nthIndexOf(homepage, '<DestinationCarousel', 2)
-  const browsePlaces = homepage.indexOf('<BrowsePlaces')
-  assert.ok(secondCarousel >= 0)
-  assert.ok(browsePlaces > secondCarousel)
-  assert.match(homepage, /title="Destinations Around The World"/)
-  assert.match(homepage, /import \{ BrowsePlaces \} from '@\/components\/sections\/browse-places'/)
+  // The destination sliders must not re-render Browse Places: a second copy used to land
+  // immediately above "Latest Blogs and Stories".
+  assert.match(destinations, /title="Destinations Around The World"/)
+  assert.doesNotMatch(destinations, /<BrowsePlaces/)
+  assert.doesNotMatch(destinations, /sections\/browse-places/)
 
   const route = read('src/app/(frontend)/page.tsx')
   assert.match(route, /<BlockRenderer blocks=\{page\.blocks\} homepage \/>/)
   assert.match(route, /<HomeFallback \/>/)
+
+  // Both homepage paths keep exactly one Browse Places instance, next to the difficulty
+  // levels in the first section, and still render the shared destination sections. The
+  // second copy used to come from `HomepageDestinations`, directly above "Latest Blogs
+  // and Stories"; that component is now the only place the section could be duplicated,
+  // so asserting it renders none is the regression guard.
   for (const file of [
     'src/components/blocks/block-renderer.tsx',
     'src/components/views/home-fallback.tsx',
   ]) {
-    assert.match(read(file), /HomepageDestinations/, `${file} must render the shared homepage sections`)
+    const source = read(file)
+    assert.equal(
+      (source.match(/<BrowsePlaces \/>/g) ?? []).length,
+      1,
+      `${file} renders one Browse Places`,
+    )
+    assert.match(
+      source,
+      /<DifficultyLevels \/>\s*<BrowsePlaces \/>/,
+      `${file} keeps Browse Places first`,
+    )
+    assert.match(source, /HomepageDestinations/, `${file} must render the shared homepage sections`)
   }
 })
 
