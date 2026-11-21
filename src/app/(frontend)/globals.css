@@ -926,6 +926,78 @@
     font-size: var(--text-small);
     line-height: var(--text-small--line-height);
   }
+
+  /* Boxed Content — an editorial image-and-copy plate inserted from the Trip / Blog editor. */
+  .boxed-content {
+    margin-block: clamp(2rem, 4vw, 3.25rem);
+  }
+  .boxed-content__frame {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    overflow: hidden;
+    border: 1px solid var(--color-slate-20);
+    background: var(--color-mist);
+  }
+  .boxed-content__media {
+    position: relative;
+    min-width: 0;
+    min-height: 13.5rem;
+    aspect-ratio: 1.42 / 1;
+  }
+  .boxed-content__photo {
+    filter: var(--image-grade);
+  }
+  .boxed-content__copy {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(1.5rem, 4vw, 3.5rem);
+  }
+  .boxed-content__accent {
+    display: block;
+    width: 2.5rem;
+    height: 2px;
+    margin-bottom: 1.5rem;
+    background: var(--color-sage);
+  }
+  .prose-hg .boxed-content__title {
+    max-width: 16ch;
+    margin: 0;
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-size: var(--text-section);
+    font-weight: 400;
+    letter-spacing: 0.002em;
+    line-height: var(--text-section--line-height);
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+  }
+  .prose-hg .boxed-content__title--subheading {
+    font-family: var(--font-heading);
+    font-size: var(--text-card);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: var(--text-card--line-height);
+  }
+  .prose-hg .boxed-content__description {
+    max-width: 38rem;
+    margin: 1.25rem 0 0;
+    color: var(--color-ink-80);
+    font-size: var(--text-lead);
+    line-height: var(--text-lead--line-height);
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+  }
+  @media (width >= 768px) {
+    .boxed-content__frame {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+    .boxed-content__media {
+      min-height: 18rem;
+      aspect-ratio: 1 / 1;
+    }
+  }
 }
 
 /* ==========================================================================
@@ -955,6 +1027,10 @@
   .single-page-body .prose-hg strong {
     color: var(--color-ink);
   }
+  .single-page-body .prose-hg .boxed-content__description {
+    font-size: var(--text-lead);
+    line-height: var(--text-lead--line-height);
+  }
 }
 
 /* ==========================================================================
@@ -977,7 +1053,7 @@
     scroll-margin-top: 8rem;
   }
 
-  .blog-prose h2[id]::before {
+  .blog-prose h2[id]:not(.boxed-content__title)::before {
     display: block;
     width: 2.25rem;
     height: 1px;

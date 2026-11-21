@@ -1,5 +1,6 @@
 import { InlineLinkPreview } from '@/components/sections/inline-link-preview'
 import { MultiUrlPreviewSection } from '@/components/sections/multi-url-preview-section'
+import { BoxedContent } from '@/components/sections/boxed-content'
 import Link from 'next/link'
 import type { CSSProperties, ReactNode } from 'react'
 
@@ -243,8 +244,17 @@ const renderNode = (node: RichTextNode, index: number, context: RenderContext): 
   if (!node) return null
   const key = `${node.type ?? 'node'}-${index}`
   const storedHeadingTag = node.tag ?? 'h2'
+  const boxedContentHeading =
+    node.type === 'block' &&
+    node.fields?.blockType === 'boxedContent' &&
+    typeof node.fields.heading === 'string'
+      ? node.fields.heading.trim()
+      : ''
+  const boxedContentHeadingTag = context.headingTag === 'h3' ? 'h3' : 'h2'
   const isOutlineHeading =
-    node.type === 'heading' && (storedHeadingTag === 'h2' || storedHeadingTag === 'h3')
+    (node.type === 'heading' && (storedHeadingTag === 'h2' || storedHeadingTag === 'h3')) ||
+    (Boolean(boxedContentHeading) &&
+      (boxedContentHeadingTag === 'h2' || boxedContentHeadingTag === 'h3'))
   const headingId = isOutlineHeading ? context.headingIds?.[context.headingIndex] : undefined
   if (isOutlineHeading) context.headingIndex += 1
   const children = renderNodes(node.children, context)
@@ -412,6 +422,16 @@ const renderNode = (node: RichTextNode, index: number, context: RenderContext): 
       }
       if (node.fields?.blockType === 'multiUrlPreview') {
         return <MultiUrlPreviewSection key={key} source={node.fields} placement="inline" />
+      }
+      if (node.fields?.blockType === 'boxedContent') {
+        return (
+          <BoxedContent
+            key={key}
+            source={node.fields}
+            headingId={headingId}
+            headingTag={boxedContentHeadingTag}
+          />
+        )
       }
       return null
     }

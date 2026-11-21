@@ -69,7 +69,7 @@ export const Blog: CollectionConfig = {
       localized: true,
       admin: {
         description:
-          'The post body. Insert Link preview or Multi-URL Preview from the toolbar’s block menu (or type /multiUrlPreview) to place one card or a collection of URLs among your text, with a layout and animation of your choice. Tables are available from the toolbar’s “+” menu (or type /table): pick rows and columns, then use the hover handles to add, remove, merge or resize. Handy for gear comparisons, cost breakdowns and at-a-glance facts.',
+          'The post body. Insert Link preview, Multi-URL Preview, or Boxed Content from the toolbar’s block menu to place a card, a collection of URLs, or an image-and-copy feature among your text. Tables are available from the toolbar’s “+” menu (or type /table): pick rows and columns, then use the hover handles to add, remove, merge or resize. Handy for gear comparisons, cost breakdowns and at-a-glance facts.',
       },
     },
     /* FAQs — the same categorised question lists as a trip (src/fields/faqs.ts), rendered as the
@@ -125,7 +125,9 @@ export const Blog: CollectionConfig = {
       name: 'featured',
       type: 'checkbox',
       defaultValue: false,
-      admin: { description: 'Featured posts are pinned on /blog and can be highlighted on the homepage.' },
+      admin: {
+        description: 'Featured posts are pinned on /blog and can be highlighted on the homepage.',
+      },
     },
     /* Keywords — the phrases this post is targeting. Its own panel, directly above the SEO
        group, so the list is written while the post is written. See src/fields/keywords.ts. */

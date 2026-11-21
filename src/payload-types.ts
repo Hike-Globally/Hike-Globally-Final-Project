@@ -493,6 +493,9 @@ export interface Trip {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Use the block menu to insert Boxed Content: upload an image and add a heading and description for a responsive, image-left feature.
+   */
   description?: {
     root: {
       type: string;
@@ -1048,7 +1051,7 @@ export interface Blog {
   excerpt: string;
   featuredImage: number | Media;
   /**
-   * The post body. Insert Link preview or Multi-URL Preview from the toolbar’s block menu (or type /multiUrlPreview) to place one card or a collection of URLs among your text, with a layout and animation of your choice. Tables are available from the toolbar’s “+” menu (or type /table): pick rows and columns, then use the hover handles to add, remove, merge or resize. Handy for gear comparisons, cost breakdowns and at-a-glance facts.
+   * The post body. Insert Link preview, Multi-URL Preview, or Boxed Content from the toolbar’s block menu to place a card, a collection of URLs, or an image-and-copy feature among your text. Tables are available from the toolbar’s “+” menu (or type /table): pick rows and columns, then use the hover handles to add, remove, merge or resize. Handy for gear comparisons, cost breakdowns and at-a-glance facts.
    */
   content?: {
     root: {

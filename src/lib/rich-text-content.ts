@@ -7,7 +7,12 @@ export function hasRichTextContent(value: unknown): boolean {
     root?: unknown
     text?: string
     type?: string
-    fields?: MultiUrlPreviewSource & { blockType?: string; linkPreviewUrl?: unknown }
+    fields?: MultiUrlPreviewSource & {
+      blockType?: string
+      linkPreviewUrl?: unknown
+      heading?: unknown
+      description?: unknown
+    }
     children?: unknown[]
   }
   if (node.root) return hasRichTextContent(node.root)
@@ -19,6 +24,14 @@ export function hasRichTextContent(value: unknown): boolean {
   }
   if (node.type === 'block' && node.fields?.blockType === 'multiUrlPreview') {
     return normalizeMultiUrlPreview(node.fields).links.length > 0
+  }
+  if (node.type === 'block' && node.fields?.blockType === 'boxedContent') {
+    const heading = node.fields.heading
+    const description = node.fields.description
+    return (
+      (typeof heading === 'string' && Boolean(heading.trim())) ||
+      (typeof description === 'string' && Boolean(description.trim()))
+    )
   }
   if (node.type === 'upload' || node.type === 'horizontalrule') return true
   return Array.isArray(node.children) && node.children.some(hasRichTextContent)
