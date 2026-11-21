@@ -354,7 +354,7 @@ export const organizationJsonLd = ({
   socials?: { url: string }[] | null
 }): JsonLdInput => ({
   '@context': 'https://schema.org',
-  '@type': ['Organization', 'TouristInformationCenter'],
+  '@type': 'Organization',
   '@id': organizationId,
   name,
   legalName: legalName?.trim() || undefined,
@@ -560,18 +560,21 @@ export const touristTripJsonLd = ({
     image: tripImage ? [tripImage] : undefined,
     inLanguage: htmlLang,
     // TouristTrip is not a CreativeWork: authorship belongs to the page describing it.
-    subjectOf: tripGuide
-      ? {
-          '@type': 'WebPage',
-          '@id': pageUrl,
-          url: pageUrl,
-          name: trip.title,
-          author: tripGuide,
-          mainEntity: { '@id': `${pageUrl}#trip` },
-          datePublished: trip.createdAt,
-          dateModified: trip.updatedAt,
-        }
-      : undefined,
+    subjectOf: {
+      '@type': 'WebPage',
+      '@id': pageUrl,
+      url: pageUrl,
+      name: trip.title,
+      author: tripGuide,
+      publisher: publisherJsonLd({
+        name: siteName,
+        logo: organizationLogo,
+        socials: organizationSocials,
+      }),
+      mainEntity: { '@id': `${pageUrl}#trip` },
+      datePublished: trip.createdAt,
+      dateModified: trip.updatedAt,
+    },
     // The "Keywords" section of the trip, in the order the editor wrote it.
     keywords: normalizeKeywords(trip.keywords).join(', ') || undefined,
     touristType: trip.difficulty,
@@ -587,18 +590,8 @@ export const touristTripJsonLd = ({
           })),
         }
       : undefined,
-    provider: publisherJsonLd({
-      name: siteName,
-      logo: organizationLogo,
-      socials: organizationSocials,
-    }),
-    offers: {
-      '@type': 'Offer',
-      price: trip.priceFrom,
-      priceCurrency: trip.priceCurrency,
-      availability: 'https://schema.org/InStock',
-      url: canonicalUrl(url),
-    },
+    // A listing price is not a verified operator offer. Do not infer a provider
+    // from the publisher or availability from the presence of a booking link.
     ...(destinationName
       ? {
           touristDestination: {

@@ -604,6 +604,9 @@ export function TripDetail({
           </Fragment>
         )
       })}
+      <p className="container-content my-8 text-small">
+        {dict.common.affiliateDescription} We may earn a commission if you book through a partner link.
+      </p>
       {/* A layout with no body column still needs visible attribution for its schema. */}
       {!lastBodyGroup ? <div className="container-content">{guideProfile}</div> : null}
 
