@@ -10,6 +10,7 @@ import {
 } from '@/components/sections/curated-trips-section'
 import { HeroScrollCover } from '@/components/motion/hero-scroll-cover'
 import { DifficultyLevels } from '@/components/sections/difficulty-levels'
+import { BrowsePlaces } from '@/components/sections/browse-places'
 import { LatestBlogsSection } from '@/components/sections/latest-blogs-section'
 import { Button } from '@/components/ui/button'
 import { dictionary } from '@/i18n/dictionaries'
@@ -109,7 +110,12 @@ export async function HomeFallback() {
   return (
     <HeroScrollCover
       hero={heroSection}
-      firstSection={<DifficultyLevels />}
+      firstSection={
+        <>
+          <DifficultyLevels />
+          <BrowsePlaces />
+        </>
+      }
       subsequentSections={
         <>
           {firstSection}

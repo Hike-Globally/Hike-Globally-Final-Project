@@ -5,6 +5,7 @@ import type { InternalLinker } from '@/lib/internal-links'
 import { HeroScrollCover } from '@/components/motion/hero-scroll-cover'
 import { AboutHikeGlobally } from '@/components/sections/about-hike-globally'
 import { DifficultyLevels } from '@/components/sections/difficulty-levels'
+import { BrowsePlaces } from '@/components/sections/browse-places'
 import { LatestBlogsSection } from '@/components/sections/latest-blogs-section'
 
 import { Cta } from './cta'
@@ -113,49 +114,31 @@ export async function BlockRenderer({
       if (heroBlock.blockType === 'hero') {
         const heroElement = <Hero block={heroBlock} homepage={true} />
 
-        // "About Hike Globally" always follows the Curated Travel Packages section
-        // (the `featuredTrips` block), wherever an editor has placed it on the page.
-        const aboutElement = <AboutHikeGlobally key="about-hike-globally" />
-
-        // "Latest Blogs and Stories" always precedes the inquiry ("Plan your trip") section,
-        // which is where the homepage ends.
-        const journalElement = <LatestBlogsSection key="latest-blogs-and-stories" />
-
-        // One CMS block → the nodes it renders on the homepage, policy sections included.
-        // The homepage's destination sliders are fixed (Nepal regions + continents), so a CMS
-        // `featuredDestinations` block renders them instead of its own card list.
-        const nodesFor = (block: Block, index: number): ReactNode[] => [
-          ...(block.blockType === 'inquiry' ? [journalElement] : []),
-          block.blockType === 'featuredDestinations' ? (
-            <HomepageDestinations key={`${block.blockType}-${index}`} />
-          ) : (
-            renderBlock(block, index, false, false, false, linker)
-          ),
-          ...(block.blockType === 'featuredTrips' ? [aboutElement] : []),
-        ]
-
-        const groups = otherBlocks.map((block, index) => nodesFor(block, index))
-        const [firstGroup, ...restGroups] = groups
-        // A page with no inquiry block still gets the journal board — as its last section.
-        const hasInquiry = otherBlocks.some((block) => block.blockType === 'inquiry')
-
+        // Homepage sections follow an intentional editorial sequence, regardless of
+        // the order in which their CMS blocks happen to be arranged.
+        const tripsBlock = otherBlocks.find((block) => block.blockType === 'featuredTrips')
+        const inquiryBlock = otherBlocks.find((block) => block.blockType === 'inquiry')
         const firstSectionElement = (
           <>
             <DifficultyLevels />
-            {firstGroup}
-            {restGroups.length === 0 && !hasInquiry ? journalElement : null}
+            <BrowsePlaces />
+            {tripsBlock ? renderBlock(tripsBlock, 0, false, false, false, linker) : null}
           </>
         )
-        const subsequentElements = [
-          ...restGroups.flat(),
-          ...(restGroups.length > 0 && !hasInquiry ? [journalElement] : []),
-        ]
+        const subsequentElements = (
+          <>
+            <AboutHikeGlobally />
+            <HomepageDestinations />
+            <LatestBlogsSection />
+            {inquiryBlock ? renderBlock(inquiryBlock, 0, false, false, false, linker) : null}
+          </>
+        )
 
         return (
           <HeroScrollCover
             hero={heroElement}
             firstSection={firstSectionElement}
-            subsequentSections={<>{subsequentElements}</>}
+            subsequentSections={subsequentElements}
           />
         )
       }
