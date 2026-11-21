@@ -1,6 +1,9 @@
 name: tmp-i18n-translate
 
 on:
+  push:
+    branches:
+      - arena/5dbdade2-hike-globally-final-project
   workflow_dispatch:
 
 permissions:
