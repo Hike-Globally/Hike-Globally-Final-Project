@@ -1,6 +1,7 @@
 import { useId } from 'react'
 
 import { PayloadImageFill } from '@/components/ui/payload-image'
+import { cn } from '@/lib/utils'
 import type { Media } from '@/payload-types'
 
 type HeadingTag = 'h2' | 'h3'
@@ -9,8 +10,9 @@ type HeadingTag = 'h2' | 'h3'
  * A Boxed Content node from the shared Trip / Blog Lexical editor.
  *
  * The block is deliberately rendered as a self-contained editorial plate: image first in the DOM
- * (and therefore on the left at desktop sizes), then the heading and description. Incomplete draft
- * blocks degrade gracefully rather than leaving an empty image well on the public page.
+ * (and therefore on the left when its container is wide enough), then the heading and description.
+ * Incomplete draft blocks degrade gracefully to a single full-width copy column rather than leaving
+ * an empty image well or half-empty grid on the public page.
  */
 export function BoxedContent({
   source,
@@ -34,6 +36,7 @@ export function BoxedContent({
 
   const Heading = headingTag
   const resolvedHeadingId = headingId ?? `boxed-content-${generatedId}`
+  const showMedia = Boolean(hasImage && media)
 
   return (
     <section
@@ -42,12 +45,12 @@ export function BoxedContent({
       aria-label={heading ? undefined : 'Featured content'}
       data-boxed-content
     >
-      <div className="boxed-content__frame">
-        {hasImage && media ? (
+      <div className={cn('boxed-content__frame', showMedia && 'boxed-content__frame--with-media')}>
+        {showMedia && media ? (
           <div className="boxed-content__media photo-plate">
             <PayloadImageFill
               media={media}
-              sizes="(min-width: 1024px) 30rem, (min-width: 768px) 50vw, 100vw"
+              sizes="(min-width: 1280px) 24rem, (min-width: 640px) 42vw, 94vw"
               className="boxed-content__photo"
             />
           </div>
@@ -58,7 +61,10 @@ export function BoxedContent({
           {heading ? (
             <Heading
               id={resolvedHeadingId}
-              className={`boxed-content__title${headingTag === 'h3' ? ' boxed-content__title--subheading' : ''}`}
+              className={cn(
+                'boxed-content__title',
+                headingTag === 'h3' && 'boxed-content__title--subheading',
+              )}
             >
               {heading}
             </Heading>

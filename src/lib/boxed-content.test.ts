@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import test from 'node:test'
 import { createElement } from 'react'
 import { renderToReadableStream } from 'react-dom/server'
@@ -10,7 +11,9 @@ import { Destinations } from '../collections/Destinations'
 import { Pages } from '../collections/Pages'
 import { Trips } from '../collections/Trips'
 import { RichText } from '../components/content/rich-text'
+import { EssentialInformationSection } from '../components/sections/essential-information-section'
 import { inlineBoxedContentBlock } from '../fields/content-editor'
+import type { Trip } from '../payload-types'
 import { getArticleHeadings } from './article-headings'
 import { lexicalToPlainText, readingTimeMinutes } from './format'
 import { hasRichTextContent } from './rich-text-content'
@@ -257,4 +260,102 @@ test('Boxed Content participates in article outlines, reading time, SEO text and
   assert.equal(hasRichTextContent(doc(boxedContent({}))), false)
   assert.equal(hasRichTextContent(doc(boxedContent({ image }))), false)
   assert.equal(hasRichTextContent(doc(boxedContent({ description: 'A real feature.' }))), true)
+})
+
+test('Boxed Content distinguishes media vs copy-only frames and renders cleanly inside Trip Content Sections', async () => {
+  const sections = [
+    {
+      id: 'acclimatisation',
+      heading: 'Acclimatisation and pacing',
+      content: doc(
+        boxedContent({
+          heading: 'Rest day in Namche',
+          description: 'Climb high to Everest View Hotel, then sleep lower in the amphitheatre.',
+          image,
+        }),
+        boxedContent({
+          heading: 'Hydration on the trail',
+          description: 'Drink three to four litres daily above 3,000 metres.',
+        }),
+      ),
+    },
+  ] as unknown as NonNullable<Trip['contentSections']>
+
+  const stream = await renderToReadableStream(
+    createElement(EssentialInformationSection, {
+      title: 'Essential Information',
+      sections,
+    }),
+  )
+  const document = new JSDOM(await new Response(stream).text()).window.document
+  const features = document.querySelectorAll<HTMLElement>('[data-boxed-content]')
+  assert.equal(features.length, 2)
+
+  const withMediaFrame = features[0]?.querySelector('.boxed-content__frame')
+  const withoutMediaFrame = features[1]?.querySelector('.boxed-content__frame')
+  assert.equal(withMediaFrame?.classList.contains('boxed-content__frame--with-media'), true)
+  assert.equal(withoutMediaFrame?.classList.contains('boxed-content__frame--with-media'), false)
+  assert.equal(withoutMediaFrame?.querySelector('.boxed-content__media'), null)
+
+  // Inside Essential Information accordions, Boxed Content headings step down to H3 subheadings.
+  const subheadings = Array.from(features).map((item) => item.querySelector('h3')?.textContent)
+  assert.deepEqual(subheadings, ['Rest day in Namche', 'Hydration on the trail'])
+})
+
+test('Boxed Content CSS uses #d8f3dc surface with WCAG AA contrast, container-query responsiveness, and zero-gap geometry', () => {
+  const globalsCss = readFileSync(new URL('../app/(frontend)/globals.css', import.meta.url), 'utf8')
+
+  const channel = (c: number) => {
+    const v = c / 255
+    return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4
+  }
+  const luminance = (hex: string) => {
+    const n = parseInt(hex.slice(1), 16)
+    return (
+      0.2126 * channel((n >> 16) & 255) +
+      0.7152 * channel((n >> 8) & 255) +
+      0.0722 * channel(n & 255)
+    )
+  }
+  const contrast = (a: string, b: string) => {
+    const l1 = luminance(a)
+    const l2 = luminance(b)
+    return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)
+  }
+
+  assert.match(globalsCss, /--color-boxed-surface:\s*#d8f3dc\s*;/i)
+  const ink = globalsCss.match(/--color-ink:\s*(#[0-9a-fA-F]{6})\s*;/)?.[1]
+  const ink80 = globalsCss.match(/--color-ink-80:\s*(#[0-9a-fA-F]{6})\s*;/)?.[1]
+  const accent = globalsCss.match(/--color-boxed-accent:\s*(#[0-9a-fA-F]{6})\s*;/)?.[1]
+  assert.ok(ink && contrast(ink, '#d8f3dc') >= 4.5, 'title ink meets WCAG AA on #d8f3dc')
+  assert.ok(ink80 && contrast(ink80, '#d8f3dc') >= 4.5, 'description ink meets WCAG AA on #d8f3dc')
+  assert.ok(accent && contrast(accent, '#d8f3dc') >= 3, 'accent rule meets 3:1 on #d8f3dc')
+
+  const boxedStart = globalsCss.indexOf('.boxed-content {')
+  assert.ok(boxedStart !== -1, 'expected .boxed-content styles in globals.css')
+  const boxedSection = globalsCss.slice(
+    boxedStart,
+    globalsCss.indexOf('Single pages — running copy', boxedStart),
+  )
+
+  // Surface color & container-driven responsiveness
+  assert.match(boxedSection, /background-color:\s*var\(--color-boxed-surface\)/)
+  assert.match(boxedSection, /container:\s*boxed-content\s*\/\s*inline-size/)
+  assert.match(boxedSection, /@container boxed-content\s*\(min-width:\s*34rem\)/)
+
+  // Zero-gap geometry: no forced 1:1 square on side-by-side media, no 16ch title cap,
+  // copy-only cards stay single-column, and outer margins collapse cleanly in content sections.
+  assert.doesNotMatch(boxedSection, /aspect-ratio:\s*1\s*\/\s*1/)
+  assert.doesNotMatch(boxedSection, /max-width:\s*16ch/)
+  assert.match(boxedSection, /\.boxed-content__frame--with-media\s*\{/)
+  assert.match(
+    boxedSection,
+    /\.boxed-content__frame--with-media\s+\.boxed-content__media\s*\{[\s\S]*?aspect-ratio:\s*auto;[\s\S]*?height:\s*100%;/,
+  )
+  assert.match(boxedSection, /\.boxed-content:first-child\s*\{\s*margin-block-start:\s*0;/)
+  assert.match(boxedSection, /\.boxed-content:last-child\s*\{\s*margin-block-end:\s*0;/)
+  assert.match(
+    boxedSection,
+    /\.boxed-content\s*\+\s*\.boxed-content\s*\{\s*margin-block-start:\s*1rem;/,
+  )
 })
