@@ -2753,10 +2753,17 @@ $hg-icon-publish: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   box-shadow: var(--hg-shadow-lg);
 }
 
+.template-default .rs__menu-list {
+  /* Keep wheel and touch scrolling inside long option lists. React Select
+     still calculates the available height and whether to open above or below. */
+  overscroll-behavior-y: contain;
+}
+
 .template-default .rs__option {
   padding: var(--hg-space-2) var(--hg-space-3);
   color: var(--hg-text);
   font-size: var(--hg-fs-14);
+  overflow-wrap: anywhere;
 }
 
 .template-default .rs__option--is-focused {
@@ -2829,7 +2836,9 @@ $hg-icon-publish: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   border-radius: var(--hg-radius-card);
   background-color: var(--hg-bg-surface);
   box-shadow: var(--hg-shadow-sm);
-  overflow: hidden;
+  /* Menus in nested fields must be able to extend beyond the card. Round
+     the header and content separately rather than clipping the whole panel. */
+  overflow: visible;
 }
 
 .template-default .collapsible--style-default:hover {
@@ -2840,7 +2849,7 @@ $hg-icon-publish: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   padding: var(--hg-space-3) var(--hg-space-4);
   border: 0;
   border-bottom: 1px solid var(--hg-border);
-  border-radius: 0;
+  border-radius: inherit;
   background-color: var(--hg-bg-subtle);
   transition: background-color var(--hg-transition);
 }
@@ -2851,13 +2860,22 @@ $hg-icon-publish: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   border-bottom-color: transparent;
 }
 
+.template-default
+  .collapsible--style-default:not(.collapsible--collapsed)
+  > .collapsible__toggle-wrap {
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
+}
+
 .template-default .collapsible--style-default > .collapsible__toggle-wrap:hover {
   background-color: var(--hg-primary-soft);
 }
 
 .template-default .collapsible__content {
   padding: var(--hg-space-4);
-  border-radius: 0;
+  border-radius: inherit;
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
   background-color: var(--hg-bg-surface);
 }
 
@@ -3205,6 +3223,32 @@ $hg-icon-audience-not-for: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   > .collapsible
   > .collapsible__content {
   padding: var(--hg-space-3);
+}
+
+/* Let the full-width media picker wrap its actions in narrow nested panels. */
+.template-default .hg-multi-url-preview__upload .upload__dropzoneContent {
+  align-items: center;
+  border: 0;
+  background: transparent;
+}
+
+.template-default .hg-multi-url-preview__upload .upload__dropzoneContent__buttons {
+  position: static;
+  min-width: 0;
+  max-width: 100%;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.template-default .hg-multi-url-preview__upload .upload__dropzoneContent__buttons .btn {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.template-default .hg-multi-url-preview__upload .upload__dragAndDropText {
+  flex-shrink: 1;
 }
 
 /* Collapsed URL rows read as a short index, a card name and a quiet destination. */
