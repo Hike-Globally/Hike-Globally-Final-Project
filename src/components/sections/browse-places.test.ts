@@ -126,7 +126,7 @@ test('homepage glass cards use faint blurred category photos while other places 
   const imageRule = css.match(/\.browse-places__image--glass,[\s\S]*?\{([^}]+)\}/)?.[1]
   assert.ok(imageRule)
   assert.match(imageRule, /opacity:\s*0\.12/)
-  assert.match(imageRule, /filter:\s*blur\(10px\)/)
+  assert.match(imageRule, /filter:\s*blur\(3px\)/)
   assert.match(card, /getPlaceTheme\(category\.value\)\.accentLt/)
   assert.match(carousel, /<PlaceCategoryCard[\s\S]*?\s+glass\s/)
   assert.match(card, /glass = false/)

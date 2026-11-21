@@ -204,7 +204,7 @@
   z-index: 0;
   object-fit: cover;
   opacity: 0.12;
-  filter: blur(10px);
+  filter: blur(3px);
   transform: scale(1.12);
   pointer-events: none;
 }
