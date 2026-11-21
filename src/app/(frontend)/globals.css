@@ -126,6 +126,14 @@
   --color-quote-surface: #292a2b;
   --color-quote-edge: #e74848;
 
+  /* --- Boxed Content plate -------------------------------------------------
+     Soft alpine-meadow mint surface (#d8f3dc) with a harmonised mint hairline
+     and deep forest accent (ink on #d8f3dc = 11.38:1 AAA, ink-80 = 6.07:1 AA,
+     boxed-accent = 5.41:1 AA). */
+  --color-boxed-surface: #d8f3dc;
+  --color-boxed-border: #b7e4c7;
+  --color-boxed-accent: #2d6a4f;
+
   /* --- Button palette & radius ---
      Dedicated interactive tokens tuned for clear hierarchy, tactile hover/press
      states, and >= 4.8:1 WCAG AA contrast across light and dark surfaces. */
@@ -964,22 +972,48 @@
     line-height: var(--text-small--line-height);
   }
 
-  /* Boxed Content — an editorial image-and-copy plate inserted from the Trip / Blog editor. */
+  /* Boxed Content — an editorial image-and-copy plate inserted from the Trip / Blog editor.
+     Container queries adapt the layout to the actual content column (mobile, narrow accordion,
+     audience card, blog measure, or wide desktop page) so the plate never squeezes copy into a
+     cramped strip or opens an empty square gap beside short descriptions. */
   .boxed-content {
-    margin-block: clamp(2rem, 4vw, 3.25rem);
+    container: boxed-content / inline-size;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    margin-block: 1.5rem;
+    text-align: start;
+  }
+  .prose-hg > .boxed-content:first-child,
+  .boxed-content:first-child {
+    margin-block-start: 0;
+  }
+  .prose-hg > .boxed-content:last-child,
+  .boxed-content:last-child {
+    margin-block-end: 0;
+  }
+  .prose-hg > .boxed-content + .boxed-content,
+  .boxed-content + .boxed-content {
+    margin-block-start: 1rem;
   }
   .boxed-content__frame {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+    min-width: 0;
     overflow: hidden;
-    border: 1px solid var(--color-slate-20);
-    background: var(--color-mist);
+    border: 1px solid var(--color-boxed-border);
+    background-color: var(--color-boxed-surface);
   }
   .boxed-content__media {
     position: relative;
+    width: 100%;
     min-width: 0;
-    min-height: 13.5rem;
-    aspect-ratio: 1.42 / 1;
+    min-height: 10rem;
+    max-height: 14.5rem;
+    aspect-ratio: 16 / 10;
+    border-bottom: 1px solid var(--color-boxed-border);
+    background-color: color-mix(in srgb, var(--color-ink) 6%, var(--color-boxed-surface));
   }
   .boxed-content__photo {
     filter: var(--image-grade);
@@ -989,50 +1023,60 @@
     min-width: 0;
     flex-direction: column;
     justify-content: center;
-    padding: clamp(1.5rem, 4vw, 3.5rem);
+    gap: 0.5rem;
+    padding: clamp(1rem, 4cqi, 1.375rem) clamp(1.125rem, 4.5cqi, 1.5rem);
   }
   .boxed-content__accent {
     display: block;
-    width: 2.5rem;
+    width: 2.25rem;
     height: 2px;
-    margin-bottom: 1.5rem;
-    background: var(--color-sage);
+    margin-bottom: 0.125rem;
+    background-color: var(--color-boxed-accent);
   }
-  .prose-hg .boxed-content__title {
-    max-width: 16ch;
+  .prose-hg .boxed-content__title,
+  .prose-hg .boxed-content__title--subheading,
+  .boxed-content__title {
+    max-width: none;
     margin: 0;
     color: var(--color-ink);
-    font-family: var(--font-display);
-    font-size: var(--text-section);
-    font-weight: 400;
-    letter-spacing: 0.002em;
-    line-height: var(--text-section--line-height);
-    overflow-wrap: anywhere;
-    text-wrap: balance;
-  }
-  .prose-hg .boxed-content__title--subheading {
     font-family: var(--font-heading);
     font-size: var(--text-card);
     font-weight: 600;
     letter-spacing: -0.015em;
     line-height: var(--text-card--line-height);
+    overflow-wrap: anywhere;
+    text-wrap: balance;
   }
-  .prose-hg .boxed-content__description {
-    max-width: 38rem;
-    margin: 1.25rem 0 0;
+  .boxed-content__title[id] {
+    scroll-margin-top: 8rem;
+  }
+  .prose-hg .boxed-content__description,
+  .boxed-content__description {
+    max-width: 65ch;
+    margin: 0;
     color: var(--color-ink-80);
-    font-size: var(--text-lead);
-    line-height: var(--text-lead--line-height);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
     overflow-wrap: anywhere;
     white-space: pre-line;
   }
-  @media (width >= 768px) {
-    .boxed-content__frame {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  @container boxed-content (min-width: 34rem) {
+    .boxed-content__frame--with-media {
+      grid-template-columns: minmax(12rem, min(38%, 23rem)) minmax(0, 1fr);
+      align-items: stretch;
     }
-    .boxed-content__media {
-      min-height: 18rem;
-      aspect-ratio: 1 / 1;
+    .boxed-content__frame--with-media .boxed-content__media {
+      aspect-ratio: auto;
+      height: 100%;
+      min-height: 11.5rem;
+      max-height: none;
+      align-self: stretch;
+      border-right: 1px solid var(--color-boxed-border);
+      border-bottom: 0;
+    }
+    .boxed-content__copy {
+      gap: 0.625rem;
+      padding: clamp(1.125rem, 3.2cqi, 1.75rem) clamp(1.25rem, 3.8cqi, 2rem);
     }
   }
 }
@@ -1065,8 +1109,9 @@
     color: var(--color-ink);
   }
   .single-page-body .prose-hg .boxed-content__description {
-    font-size: var(--text-lead);
-    line-height: var(--text-lead--line-height);
+    color: var(--color-ink);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
   }
 }
 

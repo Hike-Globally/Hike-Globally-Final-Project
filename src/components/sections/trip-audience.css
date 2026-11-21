@@ -170,11 +170,11 @@
   margin-top: 0;
 }
 
-.trip-audience-copy p {
+.trip-audience-copy p:not(.boxed-content__description) {
   line-height: 1.72;
 }
 
-.trip-audience-copy h3 {
+.trip-audience-copy h3:not(.boxed-content__title) {
   margin-top: 1.75rem;
 }
 

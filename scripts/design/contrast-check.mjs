@@ -65,7 +65,10 @@ export const mix = (a, b, t) => {
   }
   const [ar, ag, ab] = parts(a)
   const [br, bg, bb] = parts(b)
-  const to = (x, y) => Math.round(x * (1 - t) + y * t).toString(16).padStart(2, '0')
+  const to = (x, y) =>
+    Math.round(x * (1 - t) + y * t)
+      .toString(16)
+      .padStart(2, '0')
   return `#${to(ar, br)}${to(ag, bg)}${to(ab, bb)}`
 }
 
@@ -127,6 +130,9 @@ const pairs = [
   ['window day (deep-90)', need('deep-90'), need('haze-20'), TEXT],
   ['available day (ink)', need('ink'), need('sage-20'), TEXT],
   ['sold-out day (ink-60)', need('ink-60'), need('mist'), TEXT],
+  ['ink on boxed content', need('ink'), need('boxed-surface'), TEXT],
+  ['prose on boxed content', need('ink-80'), need('boxed-surface'), TEXT],
+  ['accent on boxed content', need('boxed-accent'), need('boxed-surface'), LARGE],
 
   // --- dark sections (navy) ----------------------------------------------
   ['copy on navy', need('mist'), INK, TEXT],
