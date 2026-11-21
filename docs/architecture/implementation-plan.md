@@ -81,11 +81,15 @@ Every public collection has:
 
 ### Language rules that matter
 
-The site is **English-only**: one locale, no language selector, no URL prefix.
+Payload remains **English-only**: one CMS locale, no admin language selector, and no database
+migration. The public frontend adds a cookie-driven **EN / DE / FR** language switcher. It keeps
+the same unprefixed URLs, does not generate locale-specific hreflang pages, and uses editable
+frontend dictionaries (`src/i18n/translations/`) for UI/static copy and CMS strings; unknown CMS
+strings fall back to English.
 
-- Payload is still configured with its localization layer, holding a single locale (`en`). Fields
-  keep `localized: true` and their `_locales` storage shape, which means adding a language later
-  is a one-line change in `src/i18n/config.ts` — no database migration, no field rewrites.
+- `src/i18n/config.ts` keeps `locales = ['en']` for Payload and separately declares
+  `frontendLocales = ['en', 'de', 'fr']` for the switcher. Fields keep `localized: true` and
+  their `_locales` storage shape, so the backend schema is untouched.
 - `blocks`, and every array of translatable items (itinerary, FAQs, highlights,
   stats, nav items), remain localized at the parent, exactly as before.
 - Localized fields are **never `required`**, so a save can never be blocked by a missing
@@ -217,7 +221,7 @@ Then: seed content (4 destinations, 6 trips, 5 journal posts, 2 flexible pages, 
 | -------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Payload embedded in Next.js            | Headless CMS on its own host                | One deploy, no CORS, typed local API, live preview on the same origin. Cost: the CMS and the site scale together.                                                                          |
 | Localized `blocks` field               | Shared block structure, translated children | Payload does not persist localized children of a non-localized container. Keeping the field localized means re-adding a language later needs no schema change.                             |
-| Single locale, localization layer kept | Strip `localized` from every field          | Dropping the layer would rewrite the content tables (`_locales` JSONB → plain columns) in a migration for no functional gain; with one locale the admin simply shows no language selector. |
+| Single CMS locale; frontend-only EN/DE/FR switcher | Add Payload locales and locale-prefixed routes | The switcher needs no schema/DB migration and keeps every existing URL unchanged; Payload keeps one locale and the admin shows no language selector. DE/FR copy comes from editable frontend dictionaries with English fallback. |
 | UI strings in TypeScript               | UI strings in the CMS                       | Zero queries per render, compile-time completeness, no layout-breaking translations. Cost: a deploy to change a button label.                                                              |
 | Tag-based invalidation + 1 h ISR       | No caching, or short ISR only               | Content changes go live in seconds; the 1 h window is only a safety net for anything a hook misses.                                                                                        |
 | Formsubmit.co                          | Payload form collection                     | Brief requirement; keeps submission data out of our database and needs no email piping. Cost: submissions live with a third party.                                                         |

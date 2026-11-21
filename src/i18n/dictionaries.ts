@@ -7,12 +7,22 @@
  *   Con — changing a button label needs a deploy instead of a CMS save.
  *
  * All *content* (trips, destinations, posts, page blocks, navigation) still comes from Payload.
+ *
+ * `en` is the English source dictionary. The editable DE/FR UI dictionaries below are built
+ * from `ui-translations.ts`; full frontend dictionaries (including CMS fallback strings) are
+ * loaded lazily by the cookie-driven translation runtime. Payload stays single-locale and URLs
+ * are unchanged. Existing components keep importing `dictionary` — the English source — and
+ * their rendered output is translated in the browser for DE/FR visitors.
  */
+
+import type { FrontendLocale } from './config'
+import { normalizeTranslationKey } from './translate'
+import { uiTranslations } from './ui-translations'
 
 const affiliateDescription =
   'Hike Globally is a travel affiliate platform. We publish trip guides and connect travelers with independent operators who run the trips.'
 
-const en = {
+export const en = {
   common: {
     affiliateDescription,
     readMore: 'Read more',
@@ -312,8 +322,39 @@ type Widen<T> = {
 
 export type Dictionary = Widen<typeof en>
 
-/** The one and only UI dictionary. */
+/** English source dictionary, kept as the default for existing server/client imports. */
 export const dictionary: Dictionary = en
+
+function localizeValue(value: unknown, translations: Record<string, string>): unknown {
+  if (typeof value === 'string') {
+    return translations[normalizeTranslationKey(value)] ?? value
+  }
+  if (Array.isArray(value)) {
+    return value.map((item) => localizeValue(item, translations))
+  }
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>).map(([key, item]) => [
+        key,
+        localizeValue(item, translations),
+      ]),
+    )
+  }
+  return value
+}
+
+/** Typed, editable UI dictionaries for the frontend-only language switcher. */
+export const de: Dictionary = localizeValue(en, uiTranslations.de) as Dictionary
+export const fr: Dictionary = localizeValue(en, uiTranslations.fr) as Dictionary
+
+export const dictionaries: Record<FrontendLocale, Dictionary> = {
+  en: dictionary,
+  de,
+  fr,
+}
+
+export const getDictionary = (locale: FrontendLocale): Dictionary =>
+  dictionaries[locale] ?? dictionary
 
 /** Tiny ICU-style interpolation: t('{count} trips', { count: 12 }) */
 export const t = (template: string, values: Record<string, string | number> = {}): string =>
@@ -341,11 +382,14 @@ export const plural = (
  * the same readable name for `'health-safety'`, so the lookup lives here instead of being
  * re-implemented in a component (and silently missing the structured data).
  */
-export const blogCategoryLabel = (value: string): string => {
-  const key = `category${value
+const categoryKey = (value: string): keyof Dictionary['blog'] =>
+  `category${value
     .split('-')
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join('')}`
+    .join('')}` as keyof Dictionary['blog']
 
-  return dictionary.blog[key as keyof Dictionary['blog']] ?? value
-}
+export const blogCategoryLabelForDictionary = (value: string, dict: Dictionary): string =>
+  dict.blog[categoryKey(value)] ?? value
+
+export const blogCategoryLabel = (value: string): string =>
+  blogCategoryLabelForDictionary(value, dictionary)

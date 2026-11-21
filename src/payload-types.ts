@@ -659,9 +659,6 @@ export interface Trip {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Reasons to choose this trek. Displayed before Highlights.
-   */
   whyChooseThisTrek?: {
     root: {
       type: string;
