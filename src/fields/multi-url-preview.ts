@@ -7,7 +7,6 @@ import {
   validateMultiPreviewUrl,
 } from '../lib/multi-url-preview'
 import { parseImageProxyUrl } from '../lib/link-preview-image'
-import { linkPreviewSectionFields } from './link-preview'
 
 /** Optional image source: either a site path or an absolute public http(s) URL. */
 export function validateMultiPreviewImageUrl(value: unknown): true | string {
@@ -21,7 +20,15 @@ export function validateMultiPreviewImageUrl(value: unknown): true | string {
     : 'Use a public http:// or https:// image URL without a password or a custom port.'
 }
 
-/** Exactly the same fields in the page-layout row and the rich-text block. */
+/**
+ * Exactly the same persisted fields in the page-layout row and the rich-text block.
+ *
+ * The admin UI deliberately starts small: the section copy and presentation controls are
+ * collapsed, URL rows are collapsed, and each row exposes only its URL until the editor opens
+ * "Optional card details". These are presentational `collapsible`/`row` fields — they do not add
+ * a nesting key to the saved document — so the frontend resolver and every field name, default,
+ * condition, validation and database table remain unchanged.
+ */
 export function multiUrlPreviewFields({
   conditional = true,
 }: { conditional?: boolean } = {}): Field[] {
@@ -31,46 +38,62 @@ export function multiUrlPreviewFields({
     : undefined
   return [
     {
-      name: 'multiPreviewHeading',
-      label: 'Heading (optional)',
-      type: 'text',
-      maxLength: 120,
-      admin: { condition, placeholder: 'More worth exploring' },
-    },
-    {
-      name: 'multiPreviewDescription',
-      label: 'Introduction (optional)',
-      type: 'textarea',
-      maxLength: 400,
-      admin: { condition, description: 'A short introduction to this collection of links.' },
-    },
-    {
-      type: 'row',
-      admin: { condition },
+      type: 'collapsible',
+      label: 'Heading & intro',
+      admin: {
+        condition,
+        className: 'hg-multi-url-preview__copy',
+        initCollapsed: true,
+        description: 'Optional. Shown above the URL cards.',
+      },
       fields: [
         {
-          name: 'multiPreviewLayout',
-          label: 'Layout',
-          type: 'select',
-          defaultValue: 'slider',
-          options: [...multiPreviewLayouts],
-          admin: {
-            width: '50%',
-            description:
-              'Stack the original cards, show a swipeable card slider, or a one-card carousel.',
-          },
+          name: 'multiPreviewHeading',
+          label: 'Heading',
+          type: 'text',
+          maxLength: 120,
+          admin: { condition, placeholder: 'More worth exploring' },
         },
         {
-          name: 'multiPreviewAnimation',
-          label: 'Animation',
-          type: 'select',
-          defaultValue: 'rise',
-          options: [...multiPreviewAnimations],
-          admin: {
-            width: '50%',
-            description:
-              'Five restrained motion styles, or None. Always respects the visitor’s reduced-motion preference.',
-          },
+          name: 'multiPreviewDescription',
+          label: 'Introduction',
+          type: 'textarea',
+          maxLength: 400,
+          admin: { condition },
+        },
+      ],
+    },
+    {
+      type: 'collapsible',
+      label: 'Layout & motion',
+      admin: {
+        condition,
+        className: 'hg-multi-url-preview__display',
+        initCollapsed: true,
+        description: 'Optional. Defaults to Slider and Rise.',
+      },
+      fields: [
+        {
+          type: 'row',
+          admin: { condition },
+          fields: [
+            {
+              name: 'multiPreviewLayout',
+              label: 'Layout',
+              type: 'select',
+              defaultValue: 'slider',
+              options: [...multiPreviewLayouts],
+              admin: { width: '50%' },
+            },
+            {
+              name: 'multiPreviewAnimation',
+              label: 'Animation',
+              type: 'select',
+              defaultValue: 'rise',
+              options: [...multiPreviewAnimations],
+              admin: { width: '50%' },
+            },
+          ],
         },
       ],
     },
@@ -85,52 +108,92 @@ export function multiUrlPreviewFields({
       labels: { singular: 'URL', plural: 'URLs' },
       admin: {
         condition,
+        className: 'hg-multi-url-preview__links',
         initCollapsed: true,
-        description: `Add up to ${MAX_PREVIEW_LINKS} URLs and drag to reorder. Each card uses the linked page’s image, title and description, with optional overrides. Set each image by uploading from your device or pasting a public image URL. No URLs means no section or empty space on the public page.`,
+        description: `Add up to ${MAX_PREVIEW_LINKS} URLs, then drag to reorder. Blank rows are hidden.`,
         components: { RowLabel: '@/components/admin/multi-preview-link-label' },
       },
       fields: [
-        ...linkPreviewSectionFields({ conditional: false }).map((field) =>
-          field.type === 'text' && field.name === 'linkPreviewUrl'
-            ? {
-                ...field,
-                maxLength: 2048,
-                validate: validateMultiPreviewUrl,
-                admin: {
-                  ...field.admin,
-                  description:
-                    'Paste a public https:// address, or a site path such as /trips/annapurna-base-camp. Blank rows are hidden. External links open in a new tab.',
-                },
-              }
-            : field,
-        ),
         {
-          type: 'row',
+          name: 'linkPreviewUrl',
+          label: 'URL',
+          type: 'text',
+          maxLength: 2048,
+          validate: validateMultiPreviewUrl,
+          admin: {
+            className: 'hg-multi-url-preview__url',
+            placeholder: '/trips/annapurna-base-camp or https://example.com/guide',
+            description:
+              'Use a site path or a public https:// address. The linked page supplies the card details.',
+          },
+        },
+        {
+          type: 'collapsible',
+          label: 'Optional card details',
+          admin: {
+            className: 'hg-multi-url-preview__overrides',
+            initCollapsed: true,
+            description:
+              'Leave blank to use the linked page’s content. Uploaded images take precedence over image URLs.',
+          },
           fields: [
             {
-              name: 'linkPreviewImage',
-              label: 'Image (upload from device)',
-              type: 'upload',
-              relationTo: 'media',
-              filterOptions: { mimeType: { like: 'image/%' } },
-              admin: {
-                width: '50%',
-                description:
-                  'Choose an image in the Media library or upload one from your device. This takes precedence over the image URL.',
-              },
+              type: 'row',
+              fields: [
+                {
+                  name: 'linkPreviewTitle',
+                  type: 'text',
+                  label: 'Title',
+                  admin: { width: '50%' },
+                },
+                {
+                  name: 'linkPreviewDescription',
+                  type: 'textarea',
+                  label: 'Description',
+                  admin: { width: '50%' },
+                },
+              ],
             },
             {
-              name: 'linkPreviewImageUrl',
-              label: 'Image URL (optional)',
-              type: 'text',
-              maxLength: 2048,
-              validate: validateMultiPreviewImageUrl,
-              admin: {
-                width: '50%',
-                placeholder: 'https://example.com/photo.webp',
-                description:
-                  'Alternative to uploading: paste a public image URL. Leave both image fields empty to use the linked page’s image.',
-              },
+              type: 'row',
+              fields: [
+                {
+                  name: 'linkPreviewPrice',
+                  type: 'text',
+                  label: 'Price',
+                  admin: { width: '50%', placeholder: 'US$ 700' },
+                },
+                {
+                  name: 'linkPreviewOriginalPrice',
+                  type: 'text',
+                  label: 'Original price',
+                  admin: { width: '50%', placeholder: 'US$ 1150' },
+                },
+              ],
+            },
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'linkPreviewImage',
+                  label: 'Upload image',
+                  type: 'upload',
+                  relationTo: 'media',
+                  filterOptions: { mimeType: { like: 'image/%' } },
+                  admin: { width: '50%' },
+                },
+                {
+                  name: 'linkPreviewImageUrl',
+                  label: 'Image URL',
+                  type: 'text',
+                  maxLength: 2048,
+                  validate: validateMultiPreviewImageUrl,
+                  admin: {
+                    width: '50%',
+                    placeholder: 'https://example.com/photo.webp',
+                  },
+                },
+              ],
             },
           ],
         },

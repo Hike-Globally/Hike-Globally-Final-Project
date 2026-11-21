@@ -3121,6 +3121,141 @@ $hg-icon-audience-not-for: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   padding: var(--hg-space-5);
 }
 
+/* -- Multi-URL Preview: compact, collapsible admin navigation --------------
+   Only the URL is visible when a card row is opened. Section copy, presentation
+   settings and optional overrides are quiet, clearly named collapsed panels,
+   so Trip and Blog editors do not meet every field at once. The classes are
+   attached to Payload fields in src/fields/multi-url-preview.ts; no frontend
+   component or stylesheet is affected. */
+.template-default :is(.hg-multi-url-preview__copy, .hg-multi-url-preview__display) {
+  margin-bottom: var(--hg-space-3);
+}
+
+.template-default
+  :is(.hg-multi-url-preview__copy, .hg-multi-url-preview__display)
+  > .collapsible {
+  box-shadow: none;
+}
+
+.template-default .hg-multi-url-preview__links {
+  margin-top: var(--hg-space-2);
+}
+
+.template-default
+  :is(
+    .hg-multi-url-preview__copy,
+    .hg-multi-url-preview__display,
+    .hg-multi-url-preview__links,
+    .hg-multi-url-preview__overrides
+  )
+  > .field-description {
+  margin-top: var(--hg-space-1);
+  color: var(--hg-text-muted);
+  font-size: var(--hg-fs-12);
+}
+
+.template-default .hg-multi-url-preview__links .array-field__row {
+  border-radius: var(--hg-radius-control);
+  box-shadow: none;
+}
+
+.template-default
+  .hg-multi-url-preview__links
+  .array-field__row
+  > .collapsible__content {
+  padding: var(--hg-space-3);
+}
+
+.template-default
+  .hg-multi-url-preview__links
+  .array-field__row
+  > .collapsible__content
+  > .render-fields
+  > .field-type {
+  margin-bottom: var(--hg-space-3);
+}
+
+.template-default
+  .hg-multi-url-preview__links
+  .array-field__row
+  > .collapsible__content
+  > .render-fields
+  > .field-type:last-child {
+  margin-bottom: 0;
+}
+
+.template-default .hg-multi-url-preview__overrides > .collapsible {
+  border: 0;
+  border-top: 1px solid var(--hg-border);
+  border-radius: 0;
+  background-color: var(--hg-bg-subtle);
+  box-shadow: none;
+}
+
+.template-default
+  .hg-multi-url-preview__overrides
+  > .collapsible
+  > .collapsible__toggle-wrap {
+  border-bottom-color: transparent;
+  background-color: transparent;
+}
+
+.template-default
+  .hg-multi-url-preview__overrides
+  > .collapsible
+  > .collapsible__content {
+  padding: var(--hg-space-3);
+}
+
+/* Collapsed URL rows read as a short index, a card name and a quiet destination. */
+.template-default .hg-multi-preview-link-label {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--hg-space-2);
+}
+
+.template-default .hg-multi-preview-link-label__index {
+  display: inline-grid;
+  min-width: var(--hg-space-5);
+  height: var(--hg-space-5);
+  flex: none;
+  place-items: center;
+  border-radius: var(--hg-radius-pill);
+  background-color: var(--hg-primary-soft);
+  color: var(--hg-primary);
+  font-size: var(--hg-fs-12);
+  font-weight: var(--hg-fw-semibold);
+}
+
+.template-default .hg-multi-preview-link-label__name {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: var(--hg-fw-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.template-default .hg-multi-preview-link-label__meta,
+.template-default .hg-multi-preview-link-label__badge {
+  flex: none;
+  color: var(--hg-text-muted);
+  font-size: var(--hg-fs-12);
+}
+
+.template-default .hg-multi-preview-link-label__badge {
+  padding: 0 var(--hg-space-2);
+  border: 1px solid var(--hg-border);
+  border-radius: var(--hg-radius-pill);
+  background-color: var(--hg-bg-subtle);
+}
+
+@media (max-width: 768px) {
+  .template-default .hg-multi-preview-link-label__meta {
+    display: none;
+  }
+}
+
 /* --------------------------------------------------------------------------
    10. BADGES, BANNERS, POPUPS, MODALS, DRAWERS, TOASTS
    -------------------------------------------------------------------------- */

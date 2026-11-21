@@ -28,7 +28,7 @@ export function pageSectionsField(options: { label: string; value: string }[]): 
     admin: {
       initCollapsed: true,
       description:
-        'Drag the row handles to set the order on this page, or use each row’s Move Up / Move Down controls. Add as many Custom HTML, Link preview or Multi-URL Preview rows as the page needs — each one carries its own content. Multi-URL Preview can also be inserted between paragraphs from the content editor’s block menu. Every other section reads the fields below and can be placed once; empty sections do not display. Removing a row hides that section without deleting its content. The booking card and article outline stay beside their content.',
+        'Drag rows to set the page order. Link preview and Multi-URL Preview rows are repeatable; empty sections stay hidden.',
       components: { RowLabel: '@/components/admin/page-section-label' },
     },
     fields: [

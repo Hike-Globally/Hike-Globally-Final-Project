@@ -410,7 +410,7 @@ export interface Trip {
   slug?: string | null;
   guide?: (number | null) | User;
   /**
-   * Drag the row handles to set the order on this page, or use each row’s Move Up / Move Down controls. Add as many Custom HTML, Link preview or Multi-URL Preview rows as the page needs — each one carries its own content. Multi-URL Preview can also be inserted between paragraphs from the content editor’s block menu. Every other section reads the fields below and can be placed once; empty sections do not display. Removing a row hides that section without deleting its content. The booking card and article outline stay beside their content.
+   * Drag rows to set the page order. Link preview and Multi-URL Preview rows are repeatable; empty sections stay hidden.
    */
   pageSections?:
     | {
@@ -461,50 +461,23 @@ export interface Trip {
          */
         linkPreviewOriginalPrice?: string | null;
         multiPreviewHeading?: string | null;
-        /**
-         * A short introduction to this collection of links.
-         */
         multiPreviewDescription?: string | null;
-        /**
-         * Stack the original cards, show a swipeable card slider, or a one-card carousel.
-         */
         multiPreviewLayout?: ('list' | 'slider' | 'carousel') | null;
-        /**
-         * Five restrained motion styles, or None. Always respects the visitor’s reduced-motion preference.
-         */
         multiPreviewAnimation?: ('fade' | 'rise' | 'slide' | 'zoom' | 'reveal' | 'none') | null;
         /**
-         * Add up to 12 URLs and drag to reorder. Each card uses the linked page’s image, title and description, with optional overrides. Set each image by uploading from your device or pasting a public image URL. No URLs means no section or empty space on the public page.
+         * Add up to 12 URLs, then drag to reorder. Blank rows are hidden.
          */
         multiPreviewLinks?:
           | {
               /**
-               * Paste a public https:// address, or a site path such as /trips/annapurna-base-camp. Blank rows are hidden. External links open in a new tab.
+               * Use a site path or a public https:// address. The linked page supplies the card details.
                */
               linkPreviewUrl?: string | null;
-              /**
-               * Leave empty to use the page’s own title.
-               */
               linkPreviewTitle?: string | null;
-              /**
-               * Leave empty to use the page’s own description. Shown on one line.
-               */
               linkPreviewDescription?: string | null;
-              /**
-               * Shown in bold. Written exactly as it should appear.
-               */
               linkPreviewPrice?: string | null;
-              /**
-               * Optional. Shown struck through before the price.
-               */
               linkPreviewOriginalPrice?: string | null;
-              /**
-               * Choose an image in the Media library or upload one from your device. This takes precedence over the image URL.
-               */
               linkPreviewImage?: (number | null) | Media;
-              /**
-               * Alternative to uploading: paste a public image URL. Leave both image fields empty to use the linked page’s image.
-               */
               linkPreviewImageUrl?: string | null;
               id?: string | null;
             }[]
@@ -1004,7 +977,7 @@ export interface Blog {
    */
   slug?: string | null;
   /**
-   * Drag the row handles to set the order on this page, or use each row’s Move Up / Move Down controls. Add as many Custom HTML, Link preview or Multi-URL Preview rows as the page needs — each one carries its own content. Multi-URL Preview can also be inserted between paragraphs from the content editor’s block menu. Every other section reads the fields below and can be placed once; empty sections do not display. Removing a row hides that section without deleting its content. The booking card and article outline stay beside their content.
+   * Drag rows to set the page order. Link preview and Multi-URL Preview rows are repeatable; empty sections stay hidden.
    */
   pageSections?:
     | {
@@ -1045,50 +1018,23 @@ export interface Blog {
          */
         linkPreviewOriginalPrice?: string | null;
         multiPreviewHeading?: string | null;
-        /**
-         * A short introduction to this collection of links.
-         */
         multiPreviewDescription?: string | null;
-        /**
-         * Stack the original cards, show a swipeable card slider, or a one-card carousel.
-         */
         multiPreviewLayout?: ('list' | 'slider' | 'carousel') | null;
-        /**
-         * Five restrained motion styles, or None. Always respects the visitor’s reduced-motion preference.
-         */
         multiPreviewAnimation?: ('fade' | 'rise' | 'slide' | 'zoom' | 'reveal' | 'none') | null;
         /**
-         * Add up to 12 URLs and drag to reorder. Each card uses the linked page’s image, title and description, with optional overrides. Set each image by uploading from your device or pasting a public image URL. No URLs means no section or empty space on the public page.
+         * Add up to 12 URLs, then drag to reorder. Blank rows are hidden.
          */
         multiPreviewLinks?:
           | {
               /**
-               * Paste a public https:// address, or a site path such as /trips/annapurna-base-camp. Blank rows are hidden. External links open in a new tab.
+               * Use a site path or a public https:// address. The linked page supplies the card details.
                */
               linkPreviewUrl?: string | null;
-              /**
-               * Leave empty to use the page’s own title.
-               */
               linkPreviewTitle?: string | null;
-              /**
-               * Leave empty to use the page’s own description. Shown on one line.
-               */
               linkPreviewDescription?: string | null;
-              /**
-               * Shown in bold. Written exactly as it should appear.
-               */
               linkPreviewPrice?: string | null;
-              /**
-               * Optional. Shown struck through before the price.
-               */
               linkPreviewOriginalPrice?: string | null;
-              /**
-               * Choose an image in the Media library or upload one from your device. This takes precedence over the image URL.
-               */
               linkPreviewImage?: (number | null) | Media;
-              /**
-               * Alternative to uploading: paste a public image URL. Leave both image fields empty to use the linked page’s image.
-               */
               linkPreviewImageUrl?: string | null;
               id?: string | null;
             }[]
