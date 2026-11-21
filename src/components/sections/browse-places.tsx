@@ -405,7 +405,7 @@ export function BrowsePlaces() {
               key={`${primary ? 'primary' : 'loop'}-${category.value}`}
               category={category}
               index={index % setSize}
-              showImage={false}
+              glass
               decorative={!primary}
             />
           )
