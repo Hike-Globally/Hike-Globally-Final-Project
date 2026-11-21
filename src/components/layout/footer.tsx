@@ -244,6 +244,17 @@ export async function Footer() {
     }))
     .filter((column) => column.links.length > 0)
 
+  /* The navigation chart is guaranteed to appear under the Company column: the CMS owns the
+     column, this code only appends the one link the footer always carries. Any column that
+     already links to it (or a heading that is not Company) is left exactly as the CMS wrote it. */
+  const sitemapHref = sitePath('/sitemap')
+  const sitemapLink = { href: sitemapHref, label: dict.footer.sitemap, newTab: false }
+  const columnsWithSitemap = cmsColumns.map((column) => {
+    const isCompany = column.heading === dict.footer.company
+    if (!isCompany || column.links.some((link) => link.href === sitemapHref)) return column
+    return { ...column, links: [...column.links, sitemapLink] }
+  })
+
   const fallbackColumns: FooterColumn[] = [
     {
       heading: dict.nav.trips,
@@ -258,6 +269,7 @@ export async function Footer() {
       links: [
         { href: sitePath('/about'), label: dict.footer.aboutUs, newTab: false },
         { href: sitePath('/contact'), label: dict.nav.contact, newTab: false },
+        { href: sitePath('/sitemap'), label: dict.footer.sitemap, newTab: false },
       ],
     },
   ]
@@ -300,14 +312,21 @@ export async function Footer() {
       : []),
   ]
 
+  const hasCompanyColumn = columnsWithSitemap.some((column) => column.heading === dict.footer.company)
+  const hasAbout = columnsWithSitemap.some((column) =>
+    column.links.some((link) => link.href === '/about'),
+  )
+
   const rightColumns: FooterColumn[] = [
-    ...(cmsColumns.length ? cmsColumns : fallbackColumns),
-    ...(cmsColumns.length &&
-    !cmsColumns.some((column) => column.links.some((link) => link.href === '/about'))
+    ...(cmsColumns.length ? columnsWithSitemap : fallbackColumns),
+    ...(cmsColumns.length && !hasCompanyColumn && !hasAbout
       ? [
           {
             heading: dict.footer.company,
-            links: [{ href: sitePath('/about'), label: dict.footer.aboutUs, newTab: false }],
+            links: [
+              { href: sitePath('/about'), label: dict.footer.aboutUs, newTab: false },
+              sitemapLink,
+            ],
           },
         ]
       : []),

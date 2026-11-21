@@ -67,6 +67,7 @@ export const en = {
     contactUs: 'Contact us',
     allTrips: 'All trips',
     aboutUs: 'About us',
+    sitemap: 'Sitemap',
     privacy: 'Privacy',
     terms: 'Terms',
     introductionFallback: affiliateDescription,

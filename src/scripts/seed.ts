@@ -1989,6 +1989,7 @@ const run = async () => {
             { link: { label: 'About us', type: 'custom', url: '/about' } },
             { link: { label: 'Journal', type: 'custom', url: '/blog' } },
             { link: { label: 'Contact', type: 'custom', url: '/contact' } },
+            { link: { label: 'Sitemap', type: 'custom', url: '/sitemap' } },
           ],
         },
         {
