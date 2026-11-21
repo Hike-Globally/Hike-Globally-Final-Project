@@ -1,7 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { archiveHref, filterQuery } from '@/lib/catalog'
+import { blogCategoryOptions } from '@/lib/blog-categories'
 
 import { PayloadImageFill } from '@/components/ui/payload-image'
 import { sitePath } from '@/i18n/config'
@@ -10,7 +12,11 @@ import type { PostCard } from '@/lib/data'
 import { formatDate, readingTimeMinutes } from '@/lib/format'
 
 // Archive-only card: the shared PostCard keeps its layout on other pages.
-function ArchiveCard({ post, featured, priority }: {
+function ArchiveCard({
+  post,
+  featured,
+  priority,
+}: {
   post: PostCard
   featured?: boolean
   priority?: boolean
@@ -26,7 +32,11 @@ function ArchiveCard({ post, featured, priority }: {
       <Link href={href} aria-label={post.title} tabIndex={-1} className="blog-archive-cover">
         <PayloadImageFill
           media={post.featuredImage}
-          sizes={featured ? '(min-width: 900px) 46vw, 94vw' : '(min-width: 900px) 30vw, (min-width: 600px) 46vw, 94vw'}
+          sizes={
+            featured
+              ? '(min-width: 900px) 46vw, 94vw'
+              : '(min-width: 900px) 30vw, (min-width: 600px) 46vw, 94vw'
+          }
           priority={priority}
         />
       </Link>
@@ -35,47 +45,65 @@ function ArchiveCard({ post, featured, priority }: {
           {category && <span className="blog-archive-category">{blogCategoryLabel(category)}</span>}
           <time dateTime={date}>{formatDate(date)}</time>
         </div>
-        <h2><Link href={href}>{post.title}</Link></h2>
+        <h2>
+          <Link href={href}>{post.title}</Link>
+        </h2>
         <p>{post.excerpt}</p>
         <ul className="blog-archive-tags">
-          {topics.map((topic) => <li key={topic}>{blogCategoryLabel(topic)}</li>)}
-          {author && <li>{blog.by} {author}</li>}
-          <li>{blog.readTime.replace('{minutes}', String(readingTimeMinutes(post.excerpt ?? '')))}</li>
+          {topics.map((topic) => (
+            <li key={topic}>{blogCategoryLabel(topic)}</li>
+          ))}
+          {author && (
+            <li>
+              {blog.by} {author}
+            </li>
+          )}
+          <li>
+            {blog.readTime.replace('{minutes}', String(readingTimeMinutes(post.excerpt ?? '')))}
+          </li>
         </ul>
       </div>
     </article>
   )
 }
 
-export function BlogExplorer({ posts }: { posts: PostCard[] }) {
-  const [category, setCategory] = useState('all')
-  const categories = Array.from(new Set(posts.flatMap((post) => post.categories ?? [])))
-  const filtered = category === 'all'
-    ? posts
-    : posts.filter((post) => post.categories?.some((topic) => topic === category))
-
+export function BlogExplorer({ posts, category }: { posts: PostCard[]; category: string }) {
+  const router = useRouter()
   // Repeat the reference's feature + three-card row without changing post order.
-  const groups = Array.from({ length: Math.ceil(filtered.length / 4) }, (_, index) =>
-    filtered.slice(index * 4, index * 4 + 4),
+  const groups = Array.from({ length: Math.ceil(posts.length / 4) }, (_, index) =>
+    posts.slice(index * 4, index * 4 + 4),
   )
 
   return (
     <>
-      {categories.length > 0 && (
-        <div className="blog-archive-filter">
-          <select aria-label="Filter by topic" value={category} onChange={(event) => setCategory(event.target.value)}>
-            <option value="all">{dictionary.blog.allCategories}</option>
-            {categories.map((topic) => <option key={topic} value={topic}>{blogCategoryLabel(topic)}</option>)}
-          </select>
-        </div>
-      )}
+      <div className="blog-archive-filter">
+        <select
+          aria-label="Filter by topic"
+          value={category}
+          onChange={(event) =>
+            router.push(archiveHref('blog', 1, filterQuery({ category: event.target.value })), {
+              scroll: false,
+            })
+          }
+        >
+          <option value="all">{dictionary.blog.allCategories}</option>
+          {blogCategoryOptions.map(({ value: topic }) => (
+            <option key={topic} value={topic}>
+              {blogCategoryLabel(topic)}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="blog-archive-rows" aria-live="polite">
+        {!posts.length && <p>{dictionary.common.noResultsTitle}</p>}
         {groups.map(([lead, ...rest], index) => (
           <div key={lead.id} className="blog-archive-group">
             <ArchiveCard post={lead} featured priority={index === 0} />
             {rest.length > 0 && (
               <div className="blog-archive-grid">
-                {rest.map((post) => <ArchiveCard key={post.id} post={post} />)}
+                {rest.map((post) => (
+                  <ArchiveCard key={post.id} post={post} />
+                ))}
               </div>
             )}
           </div>

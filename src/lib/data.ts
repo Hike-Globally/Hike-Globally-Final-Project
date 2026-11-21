@@ -26,9 +26,20 @@ import type {
 import type { LlmsTxtDocument, LlmsTxtSources } from './llms-txt'
 import { getPayloadClient, isDatabaseConfigured } from './payload'
 import { isReservedPageSlug } from './site-routes'
-import { EMPTY_SITEMAP_SOURCES, type SitemapDocument, type SitemapSources } from './sitemap'
+import { EMPTY_SITEMAP_SOURCES, type SitemapSources } from './sitemap'
 import { readSitemapDocuments } from './sitemap-records'
 import { readRssPosts, type RssPost } from './rss'
+import {
+  PAGE_SIZE,
+  collectPages,
+  readPublishedSlugs,
+  tripConditions,
+  tripSorts,
+  type Archive,
+  type CatalogPage,
+  type TripFilters,
+} from './catalog'
+
 import { pickAutomaticTrips } from './trip-selection'
 
 /**
@@ -443,35 +454,17 @@ export type PostCard = {
   author?: number | ({ id: number; name: string; avatar?: number | Media | null } | null)
 }
 
-/* -------------------------------------------------------------------------- */
-/* The `select` behind the slug readers                                        */
-/* -------------------------------------------------------------------------- */
-/* Slug readers remain lightweight and depth-zero. The sitemap uses a separate */
-/* populated and paginated reader below, without burdening getPage()/SSG.       */
-
-/** The fields the slug readers select — `meta` only for its `noIndex` flag. */
-const slugSelect = { slug: true, updatedAt: true, meta: true } as const
-
-/** Narrows a `select`ed document into the shape the sitemap consumes. */
-const toSitemapDocument = (doc: unknown): SitemapDocument => {
-  const record = doc as {
-    slug?: string | null
-    updatedAt?: string | null
-    meta?: { noIndex?: boolean | null } | null
-  }
-
-  return {
-    slug: record.slug ?? null,
-    updatedAt: record.updatedAt ?? null,
-    noIndex: record.meta?.noIndex ?? false,
-  }
-}
-
-/** The slugs of a reader's documents, dropping any that do not have one. */
-const slugsOf = (documents: SitemapDocument[]): string[] =>
-  documents
-    .map((document) => document.slug)
-    .filter((slug): slug is string => typeof slug === 'string' && slug.length > 0)
+const publishedSlugsFor = (collection: Archive | 'pages', tag: string) =>
+  cache(() =>
+    safeQuery(
+      unstable_cache(
+        async () => readPublishedSlugs(await getPayloadClient(), collection),
+        ['published-slugs-v2', collection],
+        { tags: [tag], revalidate: REVALIDATE_SECONDS },
+      ),
+      [],
+    ),
+  )
 
 /* -------------------------------------------------------------------------- */
 /* Trips                                                                       */
@@ -658,32 +651,7 @@ export const getRelatedTrips = (trip: Trip, limit = 3): Promise<TripCard[]> =>
     [],
   )
 
-/**
- * Every published trip, reduced to what the lightweight slug reader needs.
- * Used by `getAllTripSlugs()`; sitemap media has its own populated reader.
- */
-const readTripRecords = unstable_cache(
-  async () => {
-    const payload = await getPayloadClient()
-    const response = await payload.find({
-      collection: 'trips',
-      locale: SITE_LOCALE,
-      depth: 0,
-      limit: 1000,
-      select: slugSelect,
-      where: { _status: { equals: 'published' } },
-    })
-
-    return response.docs.map(toSitemapDocument)
-  },
-  ['published-trips'],
-  { tags: [CACHE_TAG.trips], revalidate: REVALIDATE_SECONDS },
-)
-
-const getTripRecords = cache((): Promise<SitemapDocument[]> => safeQuery(readTripRecords, []))
-
-/** Every published trip slug — feeds generateStaticParams() and the sitemap. */
-export const getAllTripSlugs = async (): Promise<string[]> => slugsOf(await getTripRecords())
+export const getAllTripSlugs = publishedSlugsFor('trips', CACHE_TAG.trips)
 
 /** Lightweight list used to populate the inquiry form's "trip of interest" dropdown. */
 export const getTripOptions = (): Promise<{ id: number; title: string; slug: string }[]> =>
@@ -901,35 +869,7 @@ export const getDestinationTrips = (
   )
 }
 
-/**
- * Every published destination, reduced to what the lightweight slug reader needs.
- * Used by `getAllDestinationSlugs()`; sitemap media has its own populated reader.
- */
-const readDestinationRecords = unstable_cache(
-  async () => {
-    const payload = await getPayloadClient()
-    const response = await payload.find({
-      collection: 'destinations',
-      locale: SITE_LOCALE,
-      depth: 0,
-      limit: 1000,
-      select: slugSelect,
-      where: { _status: { equals: 'published' } },
-    })
-
-    return response.docs.map(toSitemapDocument)
-  },
-  ['published-destinations'],
-  { tags: [CACHE_TAG.destinations], revalidate: REVALIDATE_SECONDS },
-)
-
-const getDestinationRecords = cache(
-  (): Promise<SitemapDocument[]> => safeQuery(readDestinationRecords, []),
-)
-
-/** Every published destination slug — feeds generateStaticParams() and the sitemap. */
-export const getAllDestinationSlugs = async (): Promise<string[]> =>
-  slugsOf(await getDestinationRecords())
+export const getAllDestinationSlugs = publishedSlugsFor('destinations', CACHE_TAG.destinations)
 
 /* -------------------------------------------------------------------------- */
 /* Blog                                                                        */
@@ -1065,32 +1005,7 @@ export const getRelatedPosts = (post: Blog, limit = 3): Promise<PostCard[]> =>
     [],
   )
 
-/**
- * Every published post, reduced to what the lightweight slug reader needs.
- * Used by `getAllPostSlugs()`; sitemap media has its own populated reader.
- */
-const readPostRecords = unstable_cache(
-  async () => {
-    const payload = await getPayloadClient()
-    const response = await payload.find({
-      collection: 'blog',
-      locale: SITE_LOCALE,
-      depth: 0,
-      limit: 1000,
-      select: slugSelect,
-      where: { _status: { equals: 'published' } },
-    })
-
-    return response.docs.map(toSitemapDocument)
-  },
-  ['published-posts'],
-  { tags: [CACHE_TAG.posts], revalidate: REVALIDATE_SECONDS },
-)
-
-const getPostRecords = cache((): Promise<SitemapDocument[]> => safeQuery(readPostRecords, []))
-
-/** Every published post slug — feeds generateStaticParams() and the sitemap. */
-export const getAllPostSlugs = async (): Promise<string[]> => slugsOf(await getPostRecords())
+export const getAllPostSlugs = publishedSlugsFor('blog', CACHE_TAG.posts)
 
 /* -------------------------------------------------------------------------- */
 /* Flexible pages                                                              */
@@ -1101,9 +1016,9 @@ export const getPage = cache(async (slug: string, includeDraft = false): Promise
     return safeQuery(() => findDocumentBySlug<Page>('pages', slug, 2, true), null)
   }
 
-  // `getPageRecords()` holds every published page (including `home`) under one shared Data Cache
+  // `getPublishedPageSlugs()` holds every published page (including `home`) under one shared Data Cache
   // entry, so unknown/bot slugs on `/[slug]` fail fast with zero Postgres queries or cache bloat.
-  const publishedSlugs = slugsOf(await getPageRecords())
+  const publishedSlugs = await getPublishedPageSlugs()
   if (!publishedSlugs.includes(slug)) return null
 
   return safeQuery(
@@ -1115,37 +1030,9 @@ export const getPage = cache(async (slug: string, includeDraft = false): Promise
   )
 })
 
-/**
- * Every published page, reduced to what the lightweight slug reader needs.
- *
- * The `home` document is included so getPage('home') can use the same published-slug guard.
- */
-const readPageRecords = unstable_cache(
-  async () => {
-    const payload = await getPayloadClient()
-    const response = await payload.find({
-      collection: 'pages',
-      locale: SITE_LOCALE,
-      depth: 0,
-      limit: 1000,
-      select: slugSelect,
-      where: { _status: { equals: 'published' } },
-    })
-
-    return response.docs.map(toSitemapDocument)
-  },
-  ['published-pages'],
-  { tags: [CACHE_TAG.pages], revalidate: REVALIDATE_SECONDS },
-)
-
-const getPageRecords = cache((): Promise<SitemapDocument[]> => safeQuery(readPageRecords, []))
-
-/**
- * Slugs of every published page that has a URL of its own — i.e. every page except the homepage
- * (served at `/`) and the handful a dedicated route owns (see `src/lib/site-routes.ts`).
- */
-export const getAllPageSlugs = async (): Promise<string[]> =>
-  slugsOf(await getPageRecords()).filter((slug) => !isReservedPageSlug(slug))
+const getPublishedPageSlugs = publishedSlugsFor('pages', CACHE_TAG.pages)
+export const getAllPageSlugs = async () =>
+  (await getPublishedPageSlugs()).filter((slug) => !isReservedPageSlug(slug))
 
 /* -------------------------------------------------------------------------- */
 /* Sitemap                                                                     */
@@ -1225,7 +1112,7 @@ const toLlmsTxtDocument = (doc: unknown): LlmsTxtDocument => {
  * Published trips, reduced to the facts `/llms.txt` prints on a trip line (duration, type,
  * difficulty, altitude, price) plus the summary.
  *
- * A separate reader from the sitemap's rather than a wider `slugSelect`: that one feeds
+ * A separate reader from the sitemap's rather than a wider slug query: that one feeds
  * `generateStaticParams()` and is hit on every cold route, while this one is fetched when something
  * asks for `/llms.txt`. Keeping them apart means adding a field here cannot quietly make every
  * page's slug query heavier.
@@ -1233,27 +1120,31 @@ const toLlmsTxtDocument = (doc: unknown): LlmsTxtDocument => {
 const readLlmsTxtTrips = unstable_cache(
   async () => {
     const payload = await getPayloadClient()
-    const response = await payload.find({
-      collection: 'trips',
-      locale: SITE_LOCALE,
-      depth: 0,
-      limit: 1000,
-      select: {
-        title: true,
-        slug: true,
-        summary: true,
-        tripType: true,
-        durationDays: true,
-        difficulty: true,
-        maxAltitude: true,
-        priceFrom: true,
-        priceCurrency: true,
-        meta: true,
-      },
-      where: { _status: { equals: 'published' } },
-    })
+    const rows = await collectPages((page) =>
+      payload.find({
+        collection: 'trips',
+        locale: SITE_LOCALE,
+        depth: 0,
+        limit: 500,
+        sort: 'id',
+        page,
+        select: {
+          title: true,
+          slug: true,
+          summary: true,
+          tripType: true,
+          durationDays: true,
+          difficulty: true,
+          maxAltitude: true,
+          priceFrom: true,
+          priceCurrency: true,
+          meta: true,
+        },
+        where: { _status: { equals: 'published' } },
+      }),
+    )
 
-    return response.docs.map(toLlmsTxtDocument)
+    return rows.map(toLlmsTxtDocument)
   },
   ['llms-txt-trips'],
   { tags: [CACHE_TAG.trips], revalidate: REVALIDATE_SECONDS },
@@ -1262,16 +1153,20 @@ const readLlmsTxtTrips = unstable_cache(
 const readLlmsTxtDestinations = unstable_cache(
   async () => {
     const payload = await getPayloadClient()
-    const response = await payload.find({
-      collection: 'destinations',
-      locale: SITE_LOCALE,
-      depth: 0,
-      limit: 1000,
-      select: { name: true, slug: true, tagline: true, meta: true },
-      where: { _status: { equals: 'published' } },
-    })
+    const rows = await collectPages((page) =>
+      payload.find({
+        collection: 'destinations',
+        locale: SITE_LOCALE,
+        depth: 0,
+        limit: 500,
+        sort: 'id',
+        page,
+        select: { name: true, slug: true, tagline: true, meta: true },
+        where: { _status: { equals: 'published' } },
+      }),
+    )
 
-    return response.docs.map(toLlmsTxtDocument)
+    return rows.map(toLlmsTxtDocument)
   },
   ['llms-txt-destinations'],
   { tags: [CACHE_TAG.destinations], revalidate: REVALIDATE_SECONDS },
@@ -1280,16 +1175,20 @@ const readLlmsTxtDestinations = unstable_cache(
 const readLlmsTxtPosts = unstable_cache(
   async () => {
     const payload = await getPayloadClient()
-    const response = await payload.find({
-      collection: 'blog',
-      locale: SITE_LOCALE,
-      depth: 0,
-      limit: 1000,
-      select: { title: true, slug: true, excerpt: true, meta: true },
-      where: { _status: { equals: 'published' } },
-    })
+    const rows = await collectPages((page) =>
+      payload.find({
+        collection: 'blog',
+        locale: SITE_LOCALE,
+        depth: 0,
+        limit: 500,
+        sort: 'id',
+        page,
+        select: { title: true, slug: true, excerpt: true, meta: true },
+        where: { _status: { equals: 'published' } },
+      }),
+    )
 
-    return response.docs.map(toLlmsTxtDocument)
+    return rows.map(toLlmsTxtDocument)
   },
   ['llms-txt-posts'],
   { tags: [CACHE_TAG.posts], revalidate: REVALIDATE_SECONDS },
@@ -1298,16 +1197,20 @@ const readLlmsTxtPosts = unstable_cache(
 const readLlmsTxtPages = unstable_cache(
   async () => {
     const payload = await getPayloadClient()
-    const response = await payload.find({
-      collection: 'pages',
-      locale: SITE_LOCALE,
-      depth: 0,
-      limit: 1000,
-      select: { title: true, slug: true, meta: true },
-      where: { _status: { equals: 'published' } },
-    })
+    const rows = await collectPages((page) =>
+      payload.find({
+        collection: 'pages',
+        locale: SITE_LOCALE,
+        depth: 0,
+        limit: 500,
+        sort: 'id',
+        page,
+        select: { title: true, slug: true, meta: true },
+        where: { _status: { equals: 'published' } },
+      }),
+    )
 
-    return response.docs.map(toLlmsTxtDocument)
+    return rows.map(toLlmsTxtDocument)
   },
   ['llms-txt-pages'],
   { tags: [CACHE_TAG.pages], revalidate: REVALIDATE_SECONDS },
@@ -1421,14 +1324,18 @@ const readInternalLinkTargets = unstable_cache(
     const payload = await getPayloadClient()
 
     const query = (collection: InternalLinkCollection) =>
-      payload.find({
-        collection,
-        locale: SITE_LOCALE,
-        depth: 0,
-        limit: 1000,
-        select: internalLinkSelect,
-        where: { _status: { equals: 'published' } },
-      })
+      collectPages((page) =>
+        payload.find({
+          collection,
+          locale: SITE_LOCALE,
+          depth: 0,
+          limit: 500,
+          sort: 'id',
+          page,
+          select: internalLinkSelect,
+          where: { _status: { equals: 'published' } },
+        }),
+      )
 
     const [trips, destinations, posts, pages] = await Promise.all([
       query('trips'),
@@ -1438,10 +1345,10 @@ const readInternalLinkTargets = unstable_cache(
     ])
 
     return [
-      ...trips.docs.map((doc) => toInternalLinkRecord('trips', doc)),
-      ...destinations.docs.map((doc) => toInternalLinkRecord('destinations', doc)),
-      ...posts.docs.map((doc) => toInternalLinkRecord('blog', doc)),
-      ...pages.docs.map((doc) => toInternalLinkRecord('pages', doc)),
+      ...trips.map((doc) => toInternalLinkRecord('trips', doc)),
+      ...destinations.map((doc) => toInternalLinkRecord('destinations', doc)),
+      ...posts.map((doc) => toInternalLinkRecord('blog', doc)),
+      ...pages.map((doc) => toInternalLinkRecord('pages', doc)),
     ].filter((record): record is InternalLinkRecord => record !== null)
   },
   ['internal-link-targets'],
@@ -1525,3 +1432,109 @@ export const getSettings = cache(async (): Promise<Setting> => {
 })
 
 export type Author = Pick<User, 'id' | 'name'> & { avatar?: number | Media | null }
+
+// Nav menus and homepage blocks intentionally request a bounded preview. Public archives
+// instead read one deterministically ordered database page, with filters applied before LIMIT.
+function archiveReader<T>(
+  collection: Archive,
+  tag: string,
+  select: typeof tripCardSelect | typeof destinationCardSelect | typeof postCardSelect,
+) {
+  return unstable_cache(
+    async (page: number, order: string, conditions: Where[]): Promise<CatalogPage<T>> => {
+      const payload = await getPayloadClient()
+      const { docs, totalPages, totalDocs } = await payload.find({
+        collection,
+        page,
+        limit: PAGE_SIZE,
+        depth: 1,
+        locale: SITE_LOCALE,
+        select,
+        sort: [order, 'id'],
+        where: { and: [{ _status: { equals: 'published' } }, ...conditions] },
+      })
+      return { docs: docs as unknown as T[], totalPages, totalDocs }
+    },
+    ['catalog-archive', collection],
+    { tags: [tag], revalidate: REVALIDATE_SECONDS },
+  )
+}
+const readTripsPage = archiveReader<TripCard>('trips', CACHE_TAG.trips, tripCardSelect)
+const readDestinationsPage = archiveReader<DestinationCard>(
+  'destinations',
+  CACHE_TAG.destinations,
+  destinationCardSelect,
+)
+const readPostsPage = archiveReader<PostCard>('blog', CACHE_TAG.posts, postCardSelect)
+function demoPage<T>(docs: T[], page: number): CatalogPage<T> {
+  return {
+    docs: docs.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    totalDocs: docs.length,
+    totalPages: Math.ceil(docs.length / PAGE_SIZE),
+  }
+}
+export const getDestinationsPage = (page: number) =>
+  safeQuery(
+    () => readDestinationsPage(page, '-featured', []),
+    demoPage(defaultFeaturedDestinations, page),
+  )
+export const getPostsPage = (page: number, category: string) =>
+  safeQuery(
+    () =>
+      readPostsPage(
+        page,
+        '-publishedAt',
+        category === 'all' ? [] : [{ categories: { in: [category] } }],
+      ),
+    demoPage(
+      defaultPosts.filter(
+        (post) => category === 'all' || post.categories?.some((c) => c === category),
+      ),
+      page,
+    ),
+  )
+export const getTripsPage = (page: number, filters: TripFilters, destinationId?: number) => {
+  const order = tripSorts[filters.sort]
+  const demo = defaultFeaturedTrips.filter(
+    (t) =>
+      (filters.difficulty === 'all' || t.difficulty === filters.difficulty) &&
+      (filters.season === 'all' || t.bestSeasons?.includes(filters.season)) &&
+      (filters.type === 'all' || t.tripType === filters.type) &&
+      (filters.destination === 'all' ||
+        (typeof t.destination === 'object' && t.destination?.slug === filters.destination)),
+  )
+  const field = order.includes('price')
+    ? 'priceFrom'
+    : order.includes('duration')
+      ? 'durationDays'
+      : 'featured'
+  demo.sort((a, b) => (Number(a[field]) - Number(b[field])) * (order.startsWith('-') ? -1 : 1))
+  return safeQuery(
+    () => readTripsPage(page, order, tripConditions(filters, destinationId)),
+    demoPage(demo, page),
+  )
+}
+export const getDestinationFilterOptions = () =>
+  safeQuery(
+    unstable_cache(
+      async () => {
+        const payload = await getPayloadClient()
+        const rows = await collectPages((page) =>
+          payload.find({
+            collection: 'destinations',
+            depth: 0,
+            locale: SITE_LOCALE,
+            select: { slug: true, name: true },
+            sort: ['name', 'id'],
+            page,
+            limit: 500,
+            where: { _status: { equals: 'published' } },
+          }),
+        )
+        return rows.flatMap(({ id, name, slug }) => (slug ? [{ id, name, slug }] : []))
+      },
+      ['archive-destination-options'],
+      { tags: [CACHE_TAG.destinations], revalidate: REVALIDATE_SECONDS },
+    ),
+    defaultFeaturedDestinations.map(({ id, name, slug }) => ({ id, name, slug })),
+  )

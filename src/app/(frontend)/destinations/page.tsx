@@ -1,3 +1,6 @@
+import { notFound } from 'next/navigation'
+import { ArchivePagination } from '@/components/sections/archive-pagination'
+import { archiveHref, PAGE_SIZE, parsePage, type ArchiveProps } from '@/lib/catalog'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -9,7 +12,7 @@ import { PayloadImageFill } from '@/components/ui/payload-image'
 import { JsonLd } from '@/components/seo/json-ld'
 import { dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
-import { getDestinations, getSettings, type DestinationCard } from '@/lib/data'
+import { getDestinationsPage, getSettings, type DestinationCard } from '@/lib/data'
 import { breadcrumbJsonLd, buildMetadata, webPageJsonLd } from '@/lib/seo'
 
 import './destinations.css'
@@ -25,23 +28,30 @@ export const revalidate = 3600
  */
 const DESTINATIONS_HERO_IMAGE = '/images/destinations/hero.jpg'
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ searchParams }: ArchiveProps): Promise<Metadata> {
   const dict = dictionary
+  const page = parsePage((await searchParams).page) ?? notFound()
   const settings = await getSettings()
 
   return buildMetadata({
-    title: dict.destinations.listingTitle,
+    title:
+      page === 1
+        ? dict.destinations.listingTitle
+        : `${dict.destinations.listingTitle} — Page ${page}`,
     description: dict.destinations.listingSubtitle,
     image: settings.defaultOgImage,
-    path: sitePath('/destinations'),
+    path: archiveHref('destinations', page),
     siteName: settings.siteName,
   })
 }
 
 /** DESTINATIONS LISTING — `/destinations` */
-export default async function DestinationsPage() {
+export default async function DestinationsPage({ searchParams }: ArchiveProps) {
   const dict = dictionary
-  const destinations = await getDestinations()
+  const search = await searchParams
+  const page = parsePage(search.page) ?? notFound()
+  const { docs: destinations, totalPages } = await getDestinationsPage(page)
+  if (page > 1 && page > totalPages) notFound()
 
   return (
     /* `data-destinations-page` scopes this page's fixed description sizes (see
@@ -133,7 +143,7 @@ export default async function DestinationsPage() {
             <div className="mt-10 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:mt-12 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-16 3xl:grid-cols-4">
               {destinations.map((destination, index) => (
                 <Reveal key={destination.id} delay={index * 70}>
-                  <AtlasCard destination={destination} index={index} />
+                  <AtlasCard destination={destination} index={(page - 1) * PAGE_SIZE + index} />
                 </Reveal>
               ))}
             </div>
@@ -164,18 +174,20 @@ export default async function DestinationsPage() {
         </div>
       </section>
 
+      <ArchivePagination archive="destinations" page={page} totalPages={totalPages} />
+
       <JsonLd
         data={[
           breadcrumbJsonLd([
             { name: dict.nav.home, url: sitePath('/') },
-            { name: dict.nav.destinations, url: sitePath('/destinations') },
+            { name: dict.nav.destinations, url: archiveHref('destinations', page) },
           ]),
           // A CollectionPage whose ItemList is exactly the atlas cards above.
           webPageJsonLd({
             type: 'CollectionPage',
             name: dict.destinations.listingTitle,
             description: dict.destinations.listingSubtitle,
-            url: sitePath('/destinations'),
+            url: archiveHref('destinations', page),
             siteName: dict.structuredData.organization,
             items: destinations.map((destination) => ({
               name: destination.name,
