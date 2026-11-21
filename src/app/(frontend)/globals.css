@@ -127,12 +127,20 @@
   --color-quote-edge: #e74848;
 
   /* --- Boxed Content plate -------------------------------------------------
-     Soft alpine-meadow mint surface (#d8f3dc) with a harmonised mint hairline
-     and deep forest accent (ink on #d8f3dc = 11.38:1 AAA, ink-80 = 6.07:1 AA,
-     boxed-accent = 5.41:1 AA). */
-  --color-boxed-surface: #d8f3dc;
-  --color-boxed-border: #b7e4c7;
-  --color-boxed-accent: #2d6a4f;
+     Alluring alpine-twilight editorial surface: deep expedition navy (#11283b
+     → #173a52 → #1e4c66) kissed with a soft glacial glow (#2a607b peak),
+     crisp white headings (>= 6.87:1 everywhere, 13.25:1 AAA on base), luminous
+     mist copy (#eaf2f7, >= 6.06:1 AA everywhere, 11.70:1 AAA on base), and a
+     warm alpine-sunrise coral accent (#f2a698, >= 3.49:1 everywhere). */
+  --color-boxed-surface: #143248;
+  --color-boxed-surface-deep: #11283b;
+  --color-boxed-surface-mid: #173a52;
+  --color-boxed-surface-lit: #1e4c66;
+  --color-boxed-glow: #2a607b;
+  --color-boxed-border: #274f6b;
+  --color-boxed-title: #ffffff;
+  --color-boxed-copy: #eaf2f7;
+  --color-boxed-accent: #f2a698;
 
   /* --- Button palette & radius ---
      Dedicated interactive tokens tuned for clear hierarchy, tactile hover/press
@@ -997,6 +1005,7 @@
     margin-block-start: 1rem;
   }
   .boxed-content__frame {
+    position: relative;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     width: 100%;
@@ -1004,41 +1013,63 @@
     overflow: hidden;
     border: 1px solid var(--color-boxed-border);
     background-color: var(--color-boxed-surface);
+    background-image:
+      radial-gradient(
+        115% 135% at 96% 6%,
+        color-mix(in srgb, var(--color-haze) 26%, transparent) 0%,
+        transparent 54%
+      ),
+      linear-gradient(
+        132deg,
+        var(--color-boxed-surface-deep) 0%,
+        var(--color-boxed-surface-mid) 56%,
+        var(--color-boxed-surface-lit) 100%
+      );
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--color-paper) 12%, transparent),
+      var(--shadow-md);
   }
   .boxed-content__media {
     position: relative;
     width: 100%;
     min-width: 0;
     min-height: 10rem;
-    max-height: 14.5rem;
+    max-height: 15.5rem;
     aspect-ratio: 16 / 10;
-    border-bottom: 1px solid var(--color-boxed-border);
-    background-color: color-mix(in srgb, var(--color-ink) 6%, var(--color-boxed-surface));
+    border-bottom: 1px solid color-mix(in srgb, var(--color-paper) 14%, transparent);
+    background-color: var(--color-boxed-surface-deep);
   }
+  #main .boxed-content__photo,
   .boxed-content__photo {
-    filter: var(--image-grade);
+    filter: none;
   }
   .boxed-content__copy {
+    position: relative;
     display: flex;
     min-width: 0;
     flex-direction: column;
     justify-content: center;
     gap: 0.5rem;
-    padding: clamp(1rem, 4cqi, 1.375rem) clamp(1.125rem, 4.5cqi, 1.5rem);
+    padding: clamp(1.125rem, 4.2cqi, 1.5rem) clamp(1.25rem, 4.8cqi, 1.625rem);
   }
   .boxed-content__accent {
     display: block;
-    width: 2.25rem;
+    width: 2.5rem;
     height: 2px;
-    margin-bottom: 0.125rem;
-    background-color: var(--color-boxed-accent);
+    margin-bottom: 0.1875rem;
+    background: linear-gradient(
+      90deg,
+      var(--color-boxed-accent) 0%,
+      color-mix(in srgb, var(--color-boxed-accent) 45%, transparent) 100%
+    );
   }
+  .single-page-body .prose-hg .boxed-content__title,
   .prose-hg .boxed-content__title,
   .prose-hg .boxed-content__title--subheading,
   .boxed-content__title {
     max-width: none;
     margin: 0;
-    color: var(--color-ink);
+    color: var(--color-boxed-title);
     font-family: var(--font-heading);
     font-size: var(--text-card);
     font-weight: 600;
@@ -1054,7 +1085,7 @@
   .boxed-content__description {
     max-width: 65ch;
     margin: 0;
-    color: var(--color-ink-80);
+    color: var(--color-boxed-copy);
     font-size: var(--text-body);
     line-height: var(--text-body--line-height);
     overflow-wrap: anywhere;
@@ -1068,15 +1099,15 @@
     .boxed-content__frame--with-media .boxed-content__media {
       aspect-ratio: auto;
       height: 100%;
-      min-height: 11.5rem;
+      min-height: 12rem;
       max-height: none;
       align-self: stretch;
-      border-right: 1px solid var(--color-boxed-border);
+      border-right: 1px solid color-mix(in srgb, var(--color-paper) 14%, transparent);
       border-bottom: 0;
     }
     .boxed-content__copy {
       gap: 0.625rem;
-      padding: clamp(1.125rem, 3.2cqi, 1.75rem) clamp(1.25rem, 3.8cqi, 2rem);
+      padding: clamp(1.25rem, 3.4cqi, 1.875rem) clamp(1.375rem, 4cqi, 2.125rem);
     }
   }
 }
@@ -1109,7 +1140,7 @@
     color: var(--color-ink);
   }
   .single-page-body .prose-hg .boxed-content__description {
-    color: var(--color-ink);
+    color: var(--color-boxed-copy);
     font-size: var(--text-body);
     line-height: var(--text-body--line-height);
   }

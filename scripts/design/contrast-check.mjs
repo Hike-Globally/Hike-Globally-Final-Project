@@ -130,9 +130,9 @@ const pairs = [
   ['window day (deep-90)', need('deep-90'), need('haze-20'), TEXT],
   ['available day (ink)', need('ink'), need('sage-20'), TEXT],
   ['sold-out day (ink-60)', need('ink-60'), need('mist'), TEXT],
-  ['ink on boxed content', need('ink'), need('boxed-surface'), TEXT],
-  ['prose on boxed content', need('ink-80'), need('boxed-surface'), TEXT],
-  ['accent on boxed content', need('boxed-accent'), need('boxed-surface'), LARGE],
+  ['title on boxed content', need('boxed-title'), need('boxed-glow'), TEXT],
+  ['copy on boxed content', need('boxed-copy'), need('boxed-glow'), TEXT],
+  ['accent on boxed content', need('boxed-accent'), need('boxed-glow'), LARGE],
 
   // --- dark sections (navy) ----------------------------------------------
   ['copy on navy', need('mist'), INK, TEXT],

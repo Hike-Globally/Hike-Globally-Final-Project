@@ -5,21 +5,33 @@ import type { Media } from '@/payload-types'
 import { localMediaUrl } from '@/lib/media-url'
 import { cn } from '@/lib/utils'
 
-type PayloadImageProps = {
+type PayloadImageBaseProps = {
   media: number | Media | null | undefined
   /** Overrides the CMS alt text (only when the image is purely decorative). */
   alt?: string
-  /**
-   * Required layout hint — with the Next optimizer enabled this is what lets the browser pick
-   * the right `srcset` candidate for the slot (e.g. `(max-width: 768px) 100vw, 33vw`) instead of
-   * defaulting to the full viewport width.
-   */
-  sizes: string
   className?: string
   imageClassName?: string
   priority?: boolean
   loading?: 'lazy' | 'eager'
 }
+
+type PayloadImageProps = PayloadImageBaseProps &
+  (
+    | {
+        /** Serve the stored original upload directly without `/_next/image` re-encoding or resizing. */
+        unoptimized: true
+        sizes?: string
+      }
+    | {
+        unoptimized?: false
+        /**
+         * Required layout hint — with the Next optimizer enabled this is what lets the browser pick
+         * the right `srcset` candidate for the slot (e.g. `(max-width: 768px) 100vw, 33vw`) instead of
+         * defaulting to the full viewport width.
+         */
+        sizes: string
+      }
+  )
 
 /**
  * Payload may return an absolute URL for media served by this site. Use a relative URL so
@@ -68,6 +80,7 @@ export function PayloadImage({
   imageClassName,
   priority = false,
   loading,
+  unoptimized = false,
 }: PayloadImageProps) {
   if (!media || typeof media === 'number') return null
   const src = originalMediaUrl(media)
@@ -99,7 +112,7 @@ export function PayloadImage({
         width={media.width ?? 1200}
         height={media.height ?? 800}
         sizes={sizes}
-        unoptimized={isOptimizerPassthrough(media)}
+        unoptimized={unoptimized || isOptimizerPassthrough(media)}
         priority={priority}
         loading={priority ? undefined : (loading ?? 'lazy')}
         style={{ objectPosition }}
@@ -117,6 +130,7 @@ export function PayloadImageFill({
   className,
   imageClassName,
   priority = false,
+  unoptimized = false,
 }: PayloadImageProps) {
   if (!media || typeof media === 'number') return null
   const src = originalMediaUrl(media)
@@ -147,7 +161,7 @@ export function PayloadImageFill({
       alt={alt ?? media.alt ?? ''}
       fill
       sizes={sizes}
-      unoptimized={isOptimizerPassthrough(media)}
+      unoptimized={unoptimized || isOptimizerPassthrough(media)}
       priority={priority}
       style={{ objectPosition }}
       className={cn('object-cover', imageClassName, className)}
