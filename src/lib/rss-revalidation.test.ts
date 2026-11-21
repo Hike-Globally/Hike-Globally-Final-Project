@@ -24,8 +24,11 @@ after(() => {
     else process.env[key] = value
   }
 })
-const { revalidatePost, revalidatePostDelete, revalidateGlobal } = await import('../hooks/revalidate')
+const { revalidatePost, revalidatePostDelete, revalidateTrip, revalidateGlobal } =
+  await import('../hooks/revalidate')
+const { PLACE_INDEX_PATH, placeCategoryPaths } = await import('./place-categories')
 const doc = { id: 1, slug: 'a-post', _status: 'published' }
+const placePaths = [PLACE_INDEX_PATH, ...placeCategoryPaths()]
 
 test('publishing, editing, renaming and unpublishing a post invalidate RSS and its cached query', async () => {
   for (const [next, before] of [
@@ -39,6 +42,20 @@ test('publishing, editing, renaming and unpublishing a post invalidate RSS and i
     assert.equal(result, next)
     assert.ok(events.includes('/feed.xml'))
     assert.ok(events.includes('tag:posts'))
+  }
+})
+
+test('publishing trips and posts refreshes every Browse Places page', async () => {
+  for (const [hook, document] of [
+    [revalidateTrip, { ...doc, slug: 'a-trip' }],
+    [revalidatePost, doc],
+  ] as const) {
+    events.length = 0
+    const result = await hook({ doc: document, previousDoc: undefined, req: {} } as never)
+    assert.equal(result, document)
+    for (const path of placePaths) {
+      assert.ok(events.includes(path), `${path} should be invalidated with that document`)
+    }
   }
 })
 

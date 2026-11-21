@@ -9,6 +9,7 @@ import { internalLinkKeywordsSection } from '../fields/internal-link-keywords'
 import { keywordsSection } from '../fields/keywords'
 import { linkField } from '../fields/link'
 import { metaField } from '../fields/meta'
+import { placeCategoriesField } from '../fields/place-categories'
 import { slugField } from '../fields/slug'
 import { viewLiveField } from '../fields/view-live'
 import { revalidateTrip, revalidateTripDelete } from '../hooks/revalidate'
@@ -224,6 +225,10 @@ export const Trips: CollectionConfig = {
         },
       ],
     },
+
+    // Browse Places is a frontend taxonomy, shared with posts and the dedicated
+    // /places pages. Optional and multi-select, so legacy trips stay valid.
+    placeCategoriesField(),
 
     /* --------------------------------------------------------------------------
        Pricing — open by default: price and currency are required

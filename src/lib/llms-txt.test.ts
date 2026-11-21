@@ -24,8 +24,13 @@ process.env.NEXT_PUBLIC_SITE_URL = 'https://hikeglobally.com'
 
 const { buildLlmsTxt, EMPTY_LLMS_TXT_SOURCES } = await import('./llms-txt')
 const { buildSitemap } = await import('./sitemap')
+const { placeCategories } = await import('./place-categories')
 
 const ORIGIN = 'https://hikeglobally.com'
+const PLACE_URLS = [
+  `${ORIGIN}/places`,
+  ...placeCategories.map((category) => `${ORIGIN}/places/${category.value}`),
+]
 
 const document = (overrides: Partial<LlmsTxtDocument> = {}): LlmsTxtDocument => ({
   title: 'A document',
@@ -118,6 +123,7 @@ test('lists every published document once, at its canonical URL', () => {
   // One URL, one line: a duplicate would be a crawl list that argues with itself.
   const listed = urls(text)
   assert.equal(new Set(listed).size, listed.length)
+  assert.ok(PLACE_URLS.every((url) => listed.includes(url)))
 })
 
 test('spells links the way the canonical tag and the sitemap do', () => {
@@ -143,6 +149,7 @@ test('spells links the way the canonical tag and the sitemap do', () => {
   for (const url of urls(text).filter((url) => url !== `${ORIGIN}/sitemap.xml`)) {
     assert.ok(sitemapUrls.has(url), `${url} is in llms.txt but not in the sitemap`)
   }
+  assert.ok(PLACE_URLS.every((url) => sitemapUrls.has(url)))
 })
 
 test('says nothing about documents that are noindex', () => {
@@ -171,6 +178,7 @@ test('does not list a CMS page under a URL a dedicated route already owns', () =
         document({ title: 'Home', slug: 'home' }),
         document({ title: 'Trips', slug: 'trips' }),
         document({ title: 'About', slug: 'about' }),
+        document({ title: 'Places', slug: 'places' }),
         document({ title: 'Careers', slug: 'careers' }),
       ],
     }),
@@ -180,6 +188,7 @@ test('does not list a CMS page under a URL a dedicated route already owns', () =
   assert.doesNotMatch(text, /\]\(https:\/\/hikeglobally\.com\/home\)/)
   assert.equal(urls(text).filter((url) => url === `${ORIGIN}/about`).length, 1)
   assert.equal(urls(text).filter((url) => url === `${ORIGIN}/trips`).length, 0)
+  assert.equal(urls(text).filter((url) => url === `${ORIGIN}/places`).length, 1)
   assert.equal(urls(text).filter((url) => url === `${ORIGIN}/careers`).length, 1)
 })
 
@@ -277,6 +286,9 @@ test('still answers with a truthful file when nothing is published', () => {
   assert.match(text, /\[Contact\]\(https:\/\/hikeglobally\.com\/contact\)/)
   assert.match(text, /\[About Hike Globally\]\(https:\/\/hikeglobally\.com\/about\)/)
   assert.match(text, /\[Sitemap\]\(https:\/\/hikeglobally\.com\/sitemap\.xml\)/)
+  assert.match(text, /^## Places$/m)
+  assert.equal(entries(sections(text).Places).length, PLACE_URLS.length)
+  assert.ok(PLACE_URLS.every((url) => text.includes(`](${url})`)))
 
   assert.doesNotMatch(text, /^## (Trips|Destinations|Journal)$/m)
   assert.match(text, /^## Pages$/m)

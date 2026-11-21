@@ -6,6 +6,10 @@ import { PgDialect } from 'drizzle-orm/pg-core'
 import { Media } from '../../collections/Media'
 import { revalidateMedia, revalidateMediaDelete } from '../../hooks/revalidate'
 import { down, up } from '../20261120_190941_sitemap_video_thumbnail'
+import {
+  down as placeCategoriesDown,
+  up as placeCategoriesUp,
+} from '../20261121_134756_place_categories'
 import { migrations } from '../index'
 
 async function sqlFor(migrate: typeof up | typeof down) {
@@ -17,9 +21,13 @@ async function sqlFor(migrate: typeof up | typeof down) {
   return statements.join('\n')
 }
 
-test('thumbnail migration is last and only adds an optional media relationship', async () => {
-  assert.equal(migrations.at(-1)?.up, up)
-  assert.equal(migrations.at(-1)?.down, down)
+test('thumbnail migration immediately precedes Browse Places and only adds an optional media relationship', async () => {
+  const thumbnail = migrations.findIndex((migration) => migration.up === up && migration.down === down)
+  const placeCategories = migrations.findIndex(
+    (migration) => migration.up === placeCategoriesUp && migration.down === placeCategoriesDown,
+  )
+  assert.ok(thumbnail >= 0)
+  assert.equal(placeCategories, thumbnail + 1)
   const sql = await sqlFor(up)
   assert.match(sql, /ADD COLUMN "video_thumbnail_id" integer;/)
   assert.match(sql, /REFERENCES "public"."media"\("id"\) ON DELETE set null/)

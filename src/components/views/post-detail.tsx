@@ -20,6 +20,7 @@ import { CtaCard } from '@/components/blocks/cta'
 import { JsonLd } from '@/components/seo/json-ld'
 import { Breadcrumbs } from '@/components/sections/breadcrumbs'
 import { FaqSection } from '@/components/sections/faq-section'
+import { PlaceCategoryLinks } from '@/components/sections/place-category-links'
 import { LinkPreviewSection } from '@/components/sections/link-preview-section'
 import { MultiUrlPreviewSection } from '@/components/sections/multi-url-preview-section'
 import { PayloadImage, PayloadImageFill } from '@/components/ui/payload-image'
@@ -28,6 +29,7 @@ import { sitePath } from '@/i18n/config'
 import type { PostCard as PostCardData } from '@/lib/data'
 import type { InternalLinker } from '@/lib/internal-links'
 import { getArticleHeadings } from '@/lib/article-headings'
+import { resolvePlaceCategories } from '@/lib/place-categories'
 import { formatDate, readingTimeMinutes } from '@/lib/format'
 import { blogPostingJsonLd, breadcrumbJsonLd, faqJsonLd } from '@/lib/seo'
 import { getTripFaqGroups } from '@/lib/trip-faqs'
@@ -104,6 +106,9 @@ export function PostDetail({
           .join('')}` as keyof typeof dict.blog
       ] ?? category)
     : null
+  const placeCategoryLabels = resolvePlaceCategories(post.placeCategories).map(
+    (place) => place.label,
+  )
 
   const sectionContent: Record<string, PageSectionContent> = {
     hero: (
@@ -357,6 +362,8 @@ export function PostDetail({
         })}
       </article>
 
+      <PlaceCategoryLinks values={post.placeCategories} />
+
       <JsonLd
         data={[
           breadcrumbJsonLd([
@@ -376,7 +383,10 @@ export function PostDetail({
             siteName,
             organizationLogo: settings.logo,
             organizationSocials: settings.socials,
-            categories: (post.categories ?? []).map(blogCategoryLabel),
+            categories: [
+              ...(post.categories ?? []).map(blogCategoryLabel),
+              ...placeCategoryLabels,
+            ],
           }),
           ...(faqs.length && sections.some(({ kind }) => kind === 'faqs')
             ? [faqJsonLd(faqs.map((faq) => ({ question: faq.question, answer: faq.answer ?? '' })))]

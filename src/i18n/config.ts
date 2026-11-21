@@ -114,6 +114,7 @@ export const routes = {
   trips: 'trips',
   destinations: 'destinations',
   blog: 'blog',
+  places: 'places',
   inquiry: 'inquiry',
   contact: 'contact',
   about: 'about',

@@ -9,6 +9,7 @@ import { blogSectionOptions } from '../lib/page-sections'
 import { internalLinkKeywordsSection } from '../fields/internal-link-keywords'
 import { keywordsSection } from '../fields/keywords'
 import { metaField } from '../fields/meta'
+import { placeCategoriesField } from '../fields/place-categories'
 import { slugField } from '../fields/slug'
 import { viewLiveField } from '../fields/view-live'
 import { populatePublishedAt, revalidatePost, revalidatePostDelete } from '../hooks/revalidate'
@@ -109,6 +110,9 @@ export const Blog: CollectionConfig = {
       options: blogCategoryOptions,
       admin: { description: 'Drives the category filter on /blog.' },
     },
+    // Separate from editorial categories: this maps a post into the homepage
+    // Browse Places taxonomy and its dedicated /places page.
+    placeCategoriesField(),
     {
       name: 'relatedPosts',
       type: 'relationship',

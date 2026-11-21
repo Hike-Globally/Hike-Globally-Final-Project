@@ -29,6 +29,7 @@ import * as migration_20261119_190000_hotels_near_destination from './20261119_1
 import * as migration_20261119_200000_multi_url_preview_images from './20261119_200000_multi_url_preview_images'
 import * as migration_20261120_185728_remove_reviews from './20261120_185728_remove_reviews'
 import * as migration_20261120_190941_sitemap_video_thumbnail from './20261120_190941_sitemap_video_thumbnail'
+import * as migration_20261121_134756_place_categories from './20261121_134756_place_categories'
 
 export const migrations = [
   {
@@ -185,5 +186,10 @@ export const migrations = [
     up: migration_20261120_190941_sitemap_video_thumbnail.up,
     down: migration_20261120_190941_sitemap_video_thumbnail.down,
     name: '20261120_190941_sitemap_video_thumbnail',
+  },
+  {
+    up: migration_20261121_134756_place_categories.up,
+    down: migration_20261121_134756_place_categories.down,
+    name: '20261121_134756_place_categories',
   },
 ]

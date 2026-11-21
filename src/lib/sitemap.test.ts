@@ -22,8 +22,14 @@ import type { SitemapDocument, SitemapSources } from './sitemap'
 process.env.NEXT_PUBLIC_SITE_URL = 'https://hikeglobally.com'
 
 const { buildSitemap, EMPTY_SITEMAP_SOURCES } = await import('./sitemap')
+const { placeCategories } = await import('./place-categories')
 
 const ORIGIN = 'https://hikeglobally.com'
+const PLACE_URLS = [
+  `${ORIGIN}/places`,
+  ...placeCategories.map((category) => `${ORIGIN}/places/${category.value}`),
+]
+const STATIC_ROUTE_COUNT = 8 + PLACE_URLS.length
 
 const document = (overrides: Partial<SitemapDocument> = {}): SitemapDocument => ({
   slug: 'a-document',
@@ -73,6 +79,7 @@ test('URLs are the canonical spelling of each page', () => {
   ])
 
   assert.deepEqual(urls(entries).slice(8), [
+    ...PLACE_URLS,
     `${ORIGIN}/trips/everest-base-camp`,
     `${ORIGIN}/destinations/khumbu`,
     `${ORIGIN}/blog/training-for-altitude`,
@@ -107,7 +114,7 @@ test('every published document gets one entry, and no URL appears twice', () => 
     }),
   )
 
-  assert.equal(entries.length, 8 + 7)
+  assert.equal(entries.length, STATIC_ROUTE_COUNT + 7)
   assert.equal(new Set(urls(entries)).size, urls(entries).length)
 })
 
@@ -125,6 +132,7 @@ test('two documents sharing a slug still produce one entry for that URL', () => 
     `${ORIGIN}/about`,
     `${ORIGIN}/privacy`,
     `${ORIGIN}/terms`,
+    ...PLACE_URLS,
     `${ORIGIN}/trips/one`,
   ])
 })
@@ -134,7 +142,7 @@ test('documents without a slug are skipped', () => {
     sources({ trips: [document({ slug: null }), document({ slug: '' })] }),
   )
 
-  assert.equal(entries.length, 8)
+  assert.equal(entries.length, STATIC_ROUTE_COUNT)
 })
 
 test('a noindex document is never advertised', () => {
@@ -146,17 +154,18 @@ test('a noindex document is never advertised', () => {
     }),
   )
 
-  assert.deepEqual(urls(entries).slice(8), [`${ORIGIN}/trips/live-trip`])
+  assert.deepEqual(urls(entries).slice(STATIC_ROUTE_COUNT), [`${ORIGIN}/trips/live-trip`])
 })
 
 test('a page whose slug a dedicated route owns is not listed a second time', () => {
   const entries = buildSitemap(
     sources({
       pages: [
-        // `home` is served at `/`, while `trips` and `blog` are shadowed by their listing routes.
+        // `home` is served at `/`, while `trips`, `blog` and `places` are shadowed by real routes.
         document({ slug: 'home' }),
         document({ slug: 'trips' }),
         document({ slug: 'blog' }),
+        document({ slug: 'places' }),
         document({ slug: 'about' }),
       ],
     }),
@@ -170,7 +179,8 @@ test('a page whose slug a dedicated route owns is not listed a second time', () 
     urls(entries).filter((url) => url === ORIGIN),
     [ORIGIN],
   )
-  assert.deepEqual(urls(entries).slice(8), [])
+  assert.deepEqual(urls(entries).slice(STATIC_ROUTE_COUNT), [])
+  assert.equal(urls(entries).filter((url) => url === `${ORIGIN}/places`).length, 1)
   assert.equal(urls(entries).filter((url) => url === `${ORIGIN}/about`).length, 1)
 })
 
@@ -226,10 +236,11 @@ test('an unparseable date is ignored instead of being written into the XML', () 
   assert.equal(lastModifiedOf(entries, `${ORIGIN}/trips/broken`), undefined)
 })
 
-test('with no content at all the sitemap is still the eight static routes', () => {
+test('with no content at all the sitemap is still the eighteen static routes', () => {
   const entries = buildSitemap()
 
-  assert.equal(entries.length, 8)
+  assert.equal(entries.length, STATIC_ROUTE_COUNT)
+  assert.ok(PLACE_URLS.every((url) => urls(entries).includes(url)))
   assert.equal(entryFor(entries, ORIGIN).priority, 1)
   assert.equal(entryFor(entries, ORIGIN).changeFrequency, 'weekly')
   assert.equal(entryFor(entries, `${ORIGIN}/trips`).priority, 0.8)
