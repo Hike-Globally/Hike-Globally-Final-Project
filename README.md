@@ -129,7 +129,7 @@ yet:
 | Site-wide fallback | `(frontend)/layout.tsx` → `canonical: resolveSiteUrlObject()` | Next resolves a `URL` _instance_ against the request pathname, so a route that exports no metadata at all still canonicalizes to its own URL instead of inheriting the homepage's.         |
 
 `canonicalUrl()` in `src/lib/seo.ts` is the single formatter behind the canonical tag, `og:url`,
-`sitemap.xml` and JSON-LD: it drops query strings and hashes (`/trips?page=2` → `/trips`), collapses
+`sitemap.xml` and JSON-LD: it drops filters, tracking parameters and hashes, preserves archive page numbers, collapses
 duplicate and trailing slashes, percent-encodes segments, and renders the homepage as the bare
 origin. Because the sitemap is written with the same helper, an entry and the canonical of the page
 it points at are always the identical string.
@@ -141,6 +141,15 @@ exist) and is `noindex`.
 `buildMetadata({ …, path: sitePath('/your/path') })`. `npm test` fails if a page under
 `src/app/(frontend)` does not: `src/lib/canonical-coverage.test.ts` audits the route tree, so the
 rule holds for pages written later, not just the ones written today.
+
+### Catalog discovery
+
+`/trips`, `/destinations`, and `/blog` serve 24 published records per page. Server-rendered
+Previous/Next links lead to URLs such as `/trips?page=2`; page one uses the bare archive URL.
+Filtering and ordering happen before pagination. Neither a browser interaction nor the sitemap
+is required to discover the next batch. Detail-route slug guards and build-time params read
+all published slugs in stable ID order, not just the first 1,000. Menu and homepage previews
+remain intentionally bounded.
 
 ### Sitemap and robots
 

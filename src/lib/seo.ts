@@ -1,3 +1,4 @@
+import { parsePage } from './catalog'
 import type { Metadata } from 'next'
 
 import { MAX_KEYWORDS } from '@/fields/keywords'
@@ -52,7 +53,7 @@ const encodeSegment = (segment: string): string => {
  * 'trips'                → '/trips'          (leading slash added)
  * '/trips/'              → '/trips'          (trailing slash dropped)
  * '/trips//everest/'     → '/trips/everest'  (duplicate slashes collapsed)
- * '/trips?page=2&x=1'    → '/trips'          (query dropped — filters are not pages)
+ * '/trips?page=2&x=1'    → '/trips?page=2'   (only archive pagination is canonical)
  * '/trips/everest#day-3' → '/trips/everest'  (hash dropped)
  * '/blog/café'           → '/blog/caf%C3%A9' (encoded)
  * ''  |  '/'             → '/'
@@ -68,7 +69,8 @@ export const canonicalPath = (path?: string | null): string => {
   let pathname = raw
   if (/^https?:\/\//i.test(raw)) {
     try {
-      pathname = new URL(raw).pathname
+      const url = new URL(raw)
+      pathname = url.pathname + url.search
     } catch {
       return '/'
     }
@@ -81,7 +83,14 @@ export const canonicalPath = (path?: string | null): string => {
     .filter(Boolean)
     .map(encodeSegment)
 
-  return segments.length === 0 ? '/' : `/${segments.join('/')}`
+  const pathOnly = `/${segments.join('/')}`
+  if (['/trips', '/destinations', '/blog'].includes(pathOnly)) {
+    const search = pathname.split('#')[0].split('?')[1]
+    const pages = new URLSearchParams(search).getAll('page')
+    const page = pages.length === 1 ? parsePage(pages[0]) : null
+    if (page && page > 1) return `${pathOnly}?page=${page}`
+  }
+  return pathOnly
 }
 
 /**

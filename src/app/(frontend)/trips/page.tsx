@@ -1,3 +1,13 @@
+import { notFound } from 'next/navigation'
+import { ArchivePagination } from '@/components/sections/archive-pagination'
+import {
+  archiveHref,
+  parsePage,
+  type ArchiveProps,
+  tripFilters,
+  filterQuery,
+  searchString,
+} from '@/lib/catalog'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -8,7 +18,7 @@ import { JsonLd } from '@/components/seo/json-ld'
 import { TripsExplorer } from '@/components/views/trips-explorer'
 import { dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
-import { getDestinations, getSettings, getTrips } from '@/lib/data'
+import { getDestinationFilterOptions, getSettings, getTripsPage } from '@/lib/data'
 import { breadcrumbJsonLd, buildMetadata, webPageJsonLd } from '@/lib/seo'
 
 import './trips.css'
@@ -17,15 +27,16 @@ export const revalidate = 3600
 
 const TRIPS_HERO_IMAGE = '/images/trips/hero.jpg'
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ searchParams }: ArchiveProps): Promise<Metadata> {
   const dict = dictionary
+  const page = parsePage((await searchParams).page) ?? notFound()
   const settings = await getSettings()
 
   return buildMetadata({
-    title: dict.trips.listingTitle,
+    title: page === 1 ? dict.trips.listingTitle : `${dict.trips.listingTitle} — Page ${page}`,
     description: dict.trips.listingSubtitle,
     image: settings.defaultOgImage,
-    path: sitePath('/trips'),
+    path: archiveHref('trips', page),
     siteName: settings.siteName,
   })
 }
@@ -35,10 +46,15 @@ export async function generateMetadata(): Promise<Metadata> {
  * TRIPS LISTING — `/trips`
  * ============================================================================
  */
-export default async function TripsPage() {
+export default async function TripsPage({ searchParams }: ArchiveProps) {
   const dict = dictionary
-
-  const [trips, destinations] = await Promise.all([getTrips(), getDestinations()])
+  const search = await searchParams
+  const page = parsePage(search.page) ?? notFound()
+  const destinations = await getDestinationFilterOptions()
+  const filters = tripFilters(searchString(search), destinations)
+  const destinationId = destinations.find((d) => d.slug.toLowerCase() === filters.destination)?.id
+  const { docs: trips, totalDocs, totalPages } = await getTripsPage(page, filters, destinationId)
+  if (page > 1 && page > totalPages) notFound()
 
   return (
     <>
@@ -98,6 +114,8 @@ export default async function TripsPage() {
       >
         <TripsExplorer
           trips={trips}
+          filters={filters}
+          totalDocs={totalDocs}
           cardSummaryClassName="trips-card-summary"
           destinations={destinations.map((destination) => ({
             slug: destination.slug,
@@ -106,11 +124,18 @@ export default async function TripsPage() {
         />
       </section>
 
+      <ArchivePagination
+        archive="trips"
+        page={page}
+        totalPages={totalPages}
+        filters={filterQuery(filters)}
+      />
+
       <JsonLd
         data={[
           breadcrumbJsonLd([
             { name: dict.nav.home, url: sitePath('/') },
-            { name: dict.nav.trips, url: sitePath('/trips') },
+            { name: dict.nav.trips, url: archiveHref('trips', page) },
           ]),
           // A CollectionPage whose ItemList is exactly the cards above: the same titles and the
           // same canonical URLs, so the listing hands Google the site structure behind /trips.
@@ -118,7 +143,7 @@ export default async function TripsPage() {
             type: 'CollectionPage',
             name: dict.trips.listingTitle,
             description: dict.trips.listingSubtitle,
-            url: sitePath('/trips'),
+            url: archiveHref('trips', page),
             siteName: dict.structuredData.organization,
             items: trips.map((trip) => ({
               name: trip.title,

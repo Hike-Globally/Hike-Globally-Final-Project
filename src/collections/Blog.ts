@@ -1,3 +1,4 @@
+import { blogCategoryOptions } from '../lib/blog-categories'
 import type { CollectionConfig } from 'payload'
 
 import { adminOrEditor, publishedOrSignedIn } from '../access'
@@ -105,16 +106,7 @@ export const Blog: CollectionConfig = {
       name: 'categories',
       type: 'select',
       hasMany: true,
-      options: [
-        { label: 'Trekking guides', value: 'trekking-guides' },
-        { label: 'Gear & packing', value: 'gear' },
-        { label: 'Destination guides', value: 'destinations' },
-        { label: 'Culture & people', value: 'culture' },
-        { label: 'Health & safety', value: 'health-safety' },
-        { label: 'Sustainability', value: 'sustainability' },
-        { label: 'Trip reports', value: 'trip-reports' },
-        { label: 'News', value: 'news' },
-      ],
+      options: blogCategoryOptions,
       admin: { description: 'Drives the category filter on /blog.' },
     },
     {

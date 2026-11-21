@@ -81,7 +81,7 @@ const pathCases: Array<[string | null | undefined, string]> = [
   ['/trips//everest/', '/trips/everest'],
   ['  /blog  ', '/blog'],
   // Query strings and hashes are the same page, never a separate canonical.
-  ['/trips?page=2', '/trips'],
+  ['/trips?page=2&utm_source=nav', '/trips?page=2'],
   ['/trips?destination=khumbu&sort=price', '/trips'],
   ['/trips/everest#day-3', '/trips/everest'],
   ['/trips?utm_source=newsletter#top', '/trips'],
@@ -122,8 +122,8 @@ test('canonicalUrl renders the homepage as the bare origin, exactly like Next.js
   assert.equal(canonicalUrl(), 'https://hikeglobally.com')
 })
 
-test('canonicalUrl never carries a query string or a trailing slash', () => {
-  for (const url of ['/trips/?page=2', '/blog/', '/destinations/annapurna#treks']) {
+test('canonicalUrl drops redundant page one, fragments and trailing slashes', () => {
+  for (const url of ['/trips/?page=1', '/blog/', '/destinations/annapurna#treks']) {
     const canonical = canonicalUrl(url)
     assert.ok(!canonical.includes('?'), `${url} → ${canonical}`)
     assert.ok(!canonical.includes('#'), `${url} → ${canonical}`)

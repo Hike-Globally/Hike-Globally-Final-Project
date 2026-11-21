@@ -5,9 +5,8 @@ import type { Trip } from '@/payload-types'
 /**
  * Pure URL query helpers for `/trips` filtering (destination, season, trip style).
  *
- * Mirrors `src/lib/difficulty.ts`: reading and writing `window.location.search` directly
- * keeps `/trips` statically renderable while letting mega-menu items and external links
- * deep-link into any filtered slice of the catalog.
+ * The archive reads these URL parameters before querying the database, so menu items and
+ * external links filter the whole published catalog, not only the current page.
  */
 
 export const DESTINATION_QUERY_PARAM = 'destination'
