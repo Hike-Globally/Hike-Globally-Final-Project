@@ -165,8 +165,8 @@
   box-shadow:
     inset 0 1px 0 color-mix(in srgb, var(--color-mist) 18%, transparent),
     0 1rem 2.5rem color-mix(in srgb, var(--color-ink) 30%, transparent);
-  -webkit-backdrop-filter: blur(18px) saturate(130%);
-  backdrop-filter: blur(18px) saturate(130%);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
+  backdrop-filter: blur(6px) saturate(120%);
   transition:
     border-color 500ms var(--ease-brand),
     box-shadow 500ms var(--ease-brand),
@@ -197,14 +197,14 @@
   transform: scale(1.055);
 }
 
-/* Keep the category photo a quiet, blurred texture behind the glass and text. */
+/* Keep the category photo a quiet, lightly softened texture behind the glass and text. */
 .browse-places__image--glass,
 .browse-places__card:hover .browse-places__image--glass,
 .browse-places__card:focus-visible .browse-places__image--glass {
   z-index: 0;
   object-fit: cover;
   opacity: 0.12;
-  filter: blur(3px);
+  filter: blur(1px);
   transform: scale(1.12);
   pointer-events: none;
 }
