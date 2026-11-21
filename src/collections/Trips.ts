@@ -386,10 +386,13 @@ export const Trips: CollectionConfig = {
         {
           name: 'tripForDescription',
           type: 'richText',
+          editor: contentEditor(),
           label: 'Description',
           localized: true,
           admin: {
             className: 'hg-trip-compact-editor',
+            description:
+              'Insert Boxed Content from the toolbar’s block menu for an image-and-copy feature inside this panel.',
           },
         },
       ],
@@ -411,10 +414,13 @@ export const Trips: CollectionConfig = {
         {
           name: 'tripNotForDescription',
           type: 'richText',
+          editor: contentEditor(),
           label: 'Description',
           localized: true,
           admin: {
             className: 'hg-trip-compact-editor',
+            description:
+              'Insert Boxed Content from the toolbar’s block menu for an image-and-copy feature inside this panel.',
           },
         },
       ],

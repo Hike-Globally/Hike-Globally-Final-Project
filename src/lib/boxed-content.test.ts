@@ -4,7 +4,10 @@ import { createElement } from 'react'
 import { renderToReadableStream } from 'react-dom/server'
 import { JSDOM } from 'jsdom'
 
+import config from '../payload.config'
 import { Blog } from '../collections/Blog'
+import { Destinations } from '../collections/Destinations'
+import { Pages } from '../collections/Pages'
 import { Trips } from '../collections/Trips'
 import { RichText } from '../components/content/rich-text'
 import { inlineBoxedContentBlock } from '../fields/content-editor'
@@ -60,6 +63,122 @@ test('Boxed Content is available in the shared Trip and Blog rich-text editor', 
   const tripOverview = Trips.fields.find((field) => 'name' in field && field.name === 'description')
   assert.ok(blogBody?.type === 'richText' && blogBody.editor)
   assert.ok(tripOverview?.type === 'richText' && tripOverview.editor)
+})
+
+/**
+ * Every rich-text field in the project — in every collection, every global and every block —
+ * must offer Boxed Content.
+ *
+ * This is the regression that matters, and it has two halves.
+ *
+ * 1. A rich-text field may pass the shared editor explicitly. If it does not, Payload falls back
+ *    to the root editor in `payload.config.ts`. The two used to be *different* editors: the root
+ *    one had no `BlocksFeature` at all. A field that forgot `editor: contentEditor()` therefore
+ *    lost the entire block menu with no error anywhere — the ribbon just quietly had no blocks
+ *    dropdown — which is exactly how Boxed Content went missing from some editors while showing
+ *    up in others. The config now points the root editor at the shared editor, so there is one
+ *    definition and no reduced fallback to fall into.
+ * 2. The blocks offered have to be the shared editor's blocks. Blocks are declared on the
+ *    feature's `serverFeatureProps` and, once Payload sanitises the editor, copied onto
+ *    `sanitizedServerFeatureProps`. Reading only the former is how an audit script can report
+ *    "no blocks" for a field whose ribbon plainly has them, so both shapes are accepted here.
+ *
+ * The walk covers collections, globals and page-builder blocks — the destination copy, the
+ * audience panels and the Pages rich-text block were all outside the old Trips/Blog-only walk.
+ */
+test('every rich-text field in the project offers Boxed Content', async () => {
+  // `buildConfig` returns a promise, so the root-editor check below has to await it.
+  const appConfig = await config
+  const blockSlugsFromProps = (props: unknown): string[] => {
+    const blocks = (props as { blocks?: { slug?: unknown }[] } | undefined)?.blocks
+    return Array.isArray(blocks) ? blocks.map((block) => String(block?.slug)) : []
+  }
+
+  const blockSlugs = (editor: unknown): string[] => {
+    if (!editor || typeof editor !== 'object') return []
+    const candidate = editor as {
+      features?: unknown
+      editorConfig?: { resolvedFeatureMap?: Map<string, { sanitizedServerFeatureProps?: unknown }> }
+    }
+
+    // A sanitised editor has already resolved its features into a lazy factory's payload.
+    const resolved = candidate.editorConfig?.resolvedFeatureMap
+    if (resolved) {
+      return blockSlugsFromProps(resolved.get('blocks')?.sanitizedServerFeatureProps)
+    }
+
+    // Two shapes appear here, and both must work. A *field* editor is a lazy `lexicalEditor()`
+    // factory whose `features` is still a function; the *root* editor in `payload.config.ts` has
+    // already been invoked by `buildConfig`, so its `features` is the resolved array. Reading only
+    // one of them reports "no blocks" for a ribbon that plainly has them.
+    const source = candidate.features
+    if (typeof source !== 'function' && !Array.isArray(source)) return []
+    const features = Array.isArray(source)
+      ? source
+      : (source as (args: { defaultFeatures: unknown[]; rootFeatures: unknown[] }) => unknown[])({
+          defaultFeatures: [],
+          rootFeatures: [],
+        })
+    if (!Array.isArray(features)) return []
+    const blocks = features.find((feature) => (feature as { key?: string }).key === 'blocks')
+    return blockSlugsFromProps(
+      (blocks as { serverFeatureProps?: unknown } | undefined)?.serverFeatureProps,
+    )
+  }
+
+  const richTextFields: { path: string; editor: unknown }[] = []
+  const walk = (fields: readonly unknown[] | undefined, path: string) => {
+    for (const field of (fields ?? []) as {
+      type?: string
+      name?: string
+      label?: unknown
+      fields?: unknown[]
+      blocks?: unknown[]
+    }[]) {
+      if (!field || typeof field !== 'object') continue
+      const name =
+        field.name ?? (typeof field.label === 'string' ? field.label : undefined) ?? field.type
+      const next = `${path} › ${name}`
+      if (field.type === 'richText') {
+        richTextFields.push({ path: next, editor: (field as { editor?: unknown }).editor })
+      }
+      if (Array.isArray(field.fields)) walk(field.fields, next)
+      if (field.type === 'blocks' && Array.isArray(field.blocks)) {
+        for (const block of field.blocks as { slug?: string; fields?: unknown[] }[]) {
+          walk(block?.fields, `${next} › [${block?.slug ?? 'block'}]`)
+        }
+      }
+    }
+  }
+
+  const rootEditor = appConfig.editor
+  walk(Blog.fields, 'blog')
+  walk(Trips.fields, 'trips')
+  walk(Destinations.fields, 'destinations')
+  walk(Pages.fields, 'pages')
+  for (const global of appConfig.globals ?? []) walk(global.fields, `global:${global.slug}`)
+  for (const block of appConfig.blocks ?? []) walk(block.fields, `block:[${block.slug}]`)
+
+  // The fallback itself must be the shared editor: a field that omits `editor` gets this one.
+  assert.ok(
+    blockSlugs(rootEditor).includes('boxedContent'),
+    `the root editor in payload.config.ts does not offer Boxed Content (blocks: ${
+      blockSlugs(rootEditor).join(', ') || 'none'
+    })`,
+  )
+
+  assert.ok(richTextFields.length >= 8, 'expected the trip, post, destination and page editors')
+  const rootSlugs = blockSlugs(rootEditor)
+  for (const { path, editor } of richTextFields) {
+    // A field that omits the editor inherits the root one, so that is what it must be judged
+    // against. Checking only the fields that pass an editor would let a field that quietly fell
+    // back to a reduced root editor pass — which is precisely the bug this test exists for.
+    const slugs = editor ? blockSlugs(editor) : rootSlugs
+    assert.ok(
+      slugs.includes('boxedContent'),
+      `${path} does not offer Boxed Content (blocks: ${slugs.join(', ') || 'none'})`,
+    )
+  }
 })
 
 test('Boxed Content renders an accessible image-left / copy-right feature in document order', async () => {
