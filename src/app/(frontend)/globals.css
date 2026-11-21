@@ -118,6 +118,14 @@
   --color-mist-60: #efeeed;
   --color-mist-40: #fbfbfb;
 
+  /* --- Pull-quote card -----------------------------------------------------
+     The dark, red-outlined blockquote treatment from the blockquote design
+     reference (`blockquote.png`): a near-black surface with a 2px ember-red
+     outline and 16px corners. These two are the card's own surface and edge —
+     the quote sits apart from the six brand colours rather than tinting one. */
+  --color-quote-surface: #292a2b;
+  --color-quote-edge: #e74848;
+
   /* --- Button palette & radius ---
      Dedicated interactive tokens tuned for clear hierarchy, tactile hover/press
      states, and >= 4.8:1 WCAG AA contrast across light and dark surfaces. */
@@ -850,11 +858,40 @@
   .prose-hg li::marker {
     color: var(--color-slate-40);
   }
+  /* Pull quotes — the dark, red-outlined card. The quote itself is wrapped in
+     the card; a paragraph after the first is the attribution, which sits below
+     the outline in the meta role (the reference keeps it out of the box, and
+     on the paper page it has to be a dark ink to stay legible). */
   .prose-hg blockquote {
-    @apply border-l-2 border-sage pl-6 text-ink;
-    /* Pull quotes read the lead role (17px → 18px, 1.7). */
-    font-size: var(--text-lead);
-    line-height: var(--text-lead--line-height);
+    margin: 2.75rem 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-ink);
+    font-family: var(--font-heading);
+  }
+  .prose-hg blockquote > p:first-child {
+    /* The reference card is ~620px wide; capping it keeps the quote a card
+       rather than a band when the reading measure runs wider. */
+    max-width: 39rem;
+    margin: 0 auto;
+    border: 2px solid var(--color-quote-edge);
+    border-radius: 1rem;
+    background: var(--color-quote-surface);
+    padding: 1.5rem 1.75rem;
+    color: #fff;
+    /* Display-led pull quote: 24px on a phone, 44px on a desktop canvas. */
+    font-size: clamp(1.5rem, 1rem + 2.4vw, 2.75rem);
+    font-weight: 500;
+    line-height: 1.2;
+  }
+  .prose-hg blockquote > p ~ p {
+    margin: 1rem 0 0;
+    color: var(--color-ink-60);
+    /* Attributions stay at the body role (16px, 1.7), centred under the card. */
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    text-align: center;
   }
   .prose-hg hr {
     @apply my-12 border-slate-20;
@@ -1062,24 +1099,9 @@
     content: '';
   }
 
-  .blog-prose blockquote {
-    position: relative;
-    margin-block: 2.75rem;
-    border: 0;
-    border-left: 2px solid var(--color-sage);
-    background: var(--color-mist);
-    padding: 1.75rem 1.75rem 1.75rem 2rem;
-    font-family: var(--font-display);
-    /* Article pull quotes read the card role (20px → 24px). */
-    font-size: var(--text-card);
-    line-height: 1.45;
-  }
-
-  .blog-prose blockquote p {
-    color: var(--color-ink);
-    font-family: var(--font-display);
-    font-weight: 400;
-  }
+  /* Article pull quotes use the same dark, red-outlined card as every other
+     rich-text quote (see `.prose-hg blockquote` above) — the old mist panel
+     with a sage left border is gone. */
 
   /* Photographs in an article hang on a hairline, not on a shadow. */
   .blog-prose figure > div {
