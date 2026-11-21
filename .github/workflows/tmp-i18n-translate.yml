@@ -94,7 +94,7 @@ jobs:
       - name: Commit generated translations
         shell: bash
         run: |
-          if git diff --quiet -- tools/i18n-translations.generated.json; then
+          if [ -z "$(git status --porcelain -- tools/i18n-translations.generated.json)" ]; then
             echo 'Generated translations are unchanged.'
             exit 0
           fi
