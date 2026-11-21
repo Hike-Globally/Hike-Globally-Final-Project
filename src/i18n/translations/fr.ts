@@ -563,6 +563,7 @@ export const translations: Record<string, string> = {
   "Pheriche to Namche": "Pheriche vers Namche",
   "Phone / WhatsApp": "Téléphone/WhatsApp",
   "Plan a trip with us": "Planifiez un voyage avec nous",
+  "Places": "Lieux",
   "Plan your trip": "Planifiez votre voyage",
   "Plus insured porters, max 25 kg each.": "Plus porteurs assurés, max 25 kg chacun.",
   "Pokhara & Lakeside": "Pokhara et bord du lac",

@@ -55,6 +55,7 @@ export const en = {
     home: 'Home',
     trips: 'Trips',
     destinations: 'Destinations',
+    places: 'Places',
     blog: 'Journal',
     inquiry: 'Plan your trip',
     contact: 'Contact',

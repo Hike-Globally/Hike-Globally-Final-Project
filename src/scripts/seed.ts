@@ -1954,6 +1954,7 @@ const run = async () => {
             { link: { label: 'Mustang', type: 'custom', url: '/destinations/mustang' } },
           ],
         },
+        { link: { label: 'Places', type: 'custom', url: '/places' } },
         { link: { label: 'Journal', type: 'custom', url: '/blog' } },
         { link: { label: 'About', type: 'custom', url: '/about' } },
       ],
@@ -1972,6 +1973,7 @@ const run = async () => {
           heading: 'Trips',
           links: [
             { link: { label: 'All trips', type: 'custom', url: '/trips' } },
+            { link: { label: 'Places', type: 'custom', url: '/places' } },
             {
               link: {
                 label: 'Everest region',
