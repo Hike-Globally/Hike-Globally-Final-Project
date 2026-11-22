@@ -62,7 +62,7 @@ export function DestinationCard({
           (`--scrim-ink`). It is dark enough at the foot of the card that mist copy
           holds 6.7:1 even over a snowfield. Its backdrop blur softens the photo
           behind the card copy. */}
-      <div className="photo-scrim pointer-events-none absolute inset-0 backdrop-blur-sm" aria-hidden="true" />
+      <div className="photo-scrim pointer-events-none absolute inset-0 backdrop-blur-[4.8px]" aria-hidden="true" />
 
       <div className="pointer-events-none relative mt-auto flex w-full flex-col items-start p-4 text-left">
         <p className="text-label font-medium tracking-[0.16em] text-mist/85 uppercase">
