@@ -60,9 +60,10 @@ export function DestinationCard({
       />
       {/* One navy scrim — the site's single treatment for copy over a photograph
           (`--scrim-ink`). It is dark enough at the foot of the card that mist copy
-          holds 6.7:1 even over a snowfield. Its backdrop blur softens the photo
-          behind the card copy. */}
-      <div className="photo-scrim pointer-events-none absolute inset-0 backdrop-blur-[4.8px]" aria-hidden="true" />
+          holds 6.7:1 even over a snowfield. A black overlay at 50% opacity sits
+          over the photo and scrim. */}
+      <div className="photo-scrim pointer-events-none absolute inset-0" aria-hidden="true" />
+      <div className="pointer-events-none absolute inset-0 bg-black/50" aria-hidden="true" />
 
       <div className="pointer-events-none relative mt-auto flex w-full flex-col items-start p-4 text-left">
         <p className="text-label font-medium tracking-[0.16em] text-mist/85 uppercase">
