@@ -201,7 +201,7 @@ test('Blog body, Trip Essential Information and other rendered Trip bodies expos
   const blog = flatten(Blog.fields).find((field) => 'name' in field && field.name === 'content')
   assert.ok(blog?.type === 'richText' && blog.editor)
   const fields = flatten(Trips.fields)
-  for (const name of ['description', 'whyChooseThisTrek', 'routeMapContent', 'departures']) {
+  for (const name of ['description', 'whyChooseThisTrek', 'departures']) {
     const field = fields.find((field) => 'name' in field && field.name === name)
     assert.ok(field?.type === 'richText' && field.editor, name)
   }

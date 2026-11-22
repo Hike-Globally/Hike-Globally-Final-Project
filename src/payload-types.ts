@@ -688,21 +688,6 @@ export interface Trip {
     };
     [k: string]: unknown;
   } | null;
-  routeMapContent?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
   routeMap?: (number | null) | Media;
   /**
    * Pins the live map shown between the Original route map and the Altitude chart. Right-click the trailhead (or the place the route starts from) in Google Maps → “Copy coordinates”, then paste the pair — the first number is latitude. Leave both empty and the section shows only your two images, as before.
@@ -1890,7 +1875,6 @@ export interface TripsSelect<T extends boolean = true> {
         id?: T;
       };
   whyChooseThisTrek?: T;
-  routeMapContent?: T;
   routeMap?: T;
   coordinates?:
     | T

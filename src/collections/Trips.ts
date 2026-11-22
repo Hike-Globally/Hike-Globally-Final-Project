@@ -614,19 +614,9 @@ export const Trips: CollectionConfig = {
     },
     {
       type: 'collapsible',
-      label: 'Route map, live map and altitude chart',
+      label: 'Live map and altitude chart',
       admin: { initCollapsed: true },
       fields: [
-        {
-          name: 'routeMapContent',
-          label: 'Route map and altitude chart content',
-          type: 'richText',
-          editor: contentEditor(),
-          localized: true,
-          admin: {
-            className: 'hg-trip-compact-editor',
-          },
-        },
         coordinatesField({
           label: 'Trailhead / route coordinates',
           description:
