@@ -141,7 +141,7 @@ export function DifficultyLevels() {
                 aria-hidden="true"
               />
               <div
-                className="photo-scrim pointer-events-none absolute inset-0 -z-10 backdrop-blur-md"
+                className="photo-scrim pointer-events-none absolute inset-0 -z-10 backdrop-blur-sm"
                 aria-hidden="true"
               />
 
