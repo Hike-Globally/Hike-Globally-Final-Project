@@ -1,11 +1,14 @@
+import type { Field, NumberField } from 'payload'
+
 /**
  * ============================================================================
  * Map coordinates
  * ============================================================================
- * Editorial coordinates live in Payload (`destinations.coordinates`), reach the destination page as
- * plain numbers, and are then turned into (a) an embedded map URL, (b) a marker position and
- * (c) `GeoCoordinates` structured data. Three call sites, one truth — so the parsing, the guard and
- * the URL building live here instead of being re-implemented per component.
+ * Editorial coordinates live in Payload — `destinations.coordinates` for a destination,
+ * `trips.coordinates` for a trip's route — reach the page as plain numbers, and are then turned into
+ * (a) an embedded map URL, (b) a marker position and (c) `GeoCoordinates` structured data. Three
+ * call sites, one truth — so the parsing, the guard, the shared admin field and the URL building
+ * live here instead of being re-implemented per collection or per component.
  *
  * The guard is the important part. The obvious truthiness check (`latitude && longitude`) is a bug:
  * latitude 0 is the equator (Uganda, Kenya, Indonesia) and longitude 0 is the Greenwich meridian
@@ -133,3 +136,105 @@ export function mapEmbedUrl({
 export function formatCoordinates(coords: Coordinates, decimals = 4): string {
   return `${coords.latitude.toFixed(decimals)}, ${coords.longitude.toFixed(decimals)}`
 }
+
+/**
+ * The `coordinates` pair as an admin field, shared by Destinations and Trips.
+ *
+ * A factory rather than two copies: the ±90 / ±180 bounds, the "both or neither" rule, the `0,0`
+ * rule and the editor hints have to be identical everywhere, or one collection quietly accepts a pin
+ * the other rejects.
+ *
+ * `min`/`max` already keep each half in range. What they cannot catch is an editor filling only one
+ * field — the page would then have no map, with nothing in the admin explaining why. Both fields
+ * carry the pair check (each watches the other), so whichever one the editor filled last raises the
+ * error. Drafts skip field validation in Payload, so autosave still works mid-edit; the check bites
+ * on publish. `0, 0` is the Gulf of Guinea, and it is what a number input cleared back to zero leaves
+ * behind — treated as "no coordinates", matching `parseCoordinates()` above.
+ */
+const coordinatePairValidator =
+  (other: 'latitude' | 'longitude') =>
+  (value: unknown, { siblingData }: { siblingData?: Record<string, unknown> }) => {
+    const isSet = (candidate: unknown): candidate is number =>
+      typeof candidate === 'number' && Number.isFinite(candidate)
+
+    const thisSet = isSet(value)
+    const otherValue = (siblingData ?? {})[other]
+    const otherSet = isSet(otherValue)
+
+    if (thisSet !== otherSet) {
+      return 'Enter both latitude and longitude, or leave both empty — one alone cannot be mapped.'
+    }
+    if (thisSet && value === 0 && otherValue === 0) {
+      return '0, 0 is the Gulf of Guinea (the “empty pair”). Leave both fields empty instead.'
+    }
+    return true
+  }
+
+const coordinateField = ({
+  name,
+  label,
+  description,
+  min,
+  max,
+  other,
+}: {
+  name: 'latitude' | 'longitude'
+  label: string
+  description: string
+  min: number
+  max: number
+  other: 'latitude' | 'longitude'
+}): NumberField => ({
+  name,
+  label,
+  type: 'number',
+  required: false,
+  min,
+  max,
+  admin: {
+    width: '50%',
+    step: 0.000001,
+    placeholder: name === 'latitude' ? '27.7172' : '85.3240',
+    description,
+  },
+  validate: coordinatePairValidator(other),
+})
+
+/**
+ * A `coordinates` group: latitude and longitude as plain numbers.
+ *
+ * Plain numbers are deliberate — they accept a pasted pair on any keyboard, need no JavaScript, and
+ * keep the dashboard fast on a slow connection. A future `type: 'ui'` component (the pattern in
+ * `src/components/admin/redirection-check-field.tsx`) could add a click-to-set map later; that needs
+ * a geocoder and a restricted key, so it is not part of this field.
+ */
+export const coordinatesField = ({
+  label = 'Map coordinates',
+  description,
+}: {
+  label?: string
+  description?: string
+} = {}): Field => ({
+  name: 'coordinates',
+  type: 'group',
+  label,
+  admin: description ? { description } : {},
+  fields: [
+    coordinateField({
+      name: 'latitude',
+      label: 'Latitude',
+      description: '−90 (south) to 90 (north). The first number of a pasted pair.',
+      min: -90,
+      max: 90,
+      other: 'longitude',
+    }),
+    coordinateField({
+      name: 'longitude',
+      label: 'Longitude',
+      description: '−180 (west) to 180 (east). The second number of a pasted pair.',
+      min: -180,
+      max: 180,
+      other: 'latitude',
+    }),
+  ],
+})

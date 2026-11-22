@@ -8,7 +8,7 @@ import { TripCard } from '@/components/cards/trip-card'
 import { Reveal } from '@/components/motion/reveal'
 import { JsonLd } from '@/components/seo/json-ld'
 import { Breadcrumbs } from '@/components/sections/breadcrumbs'
-import { DestinationMap } from '@/components/sections/destination-map'
+import { CoordinatesMap } from '@/components/sections/coordinates-map'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { PayloadImage, PayloadImageFill } from '@/components/ui/payload-image'
@@ -175,7 +175,7 @@ export function DestinationDetail({
             (see the `coordinates` group on the Destinations collection). */}
         {coordinates ? (
           <div className="container-content mt-12 md:mt-16">
-            <DestinationMap
+            <CoordinatesMap
               name={destination.name}
               coords={coordinates}
               zoom={5}

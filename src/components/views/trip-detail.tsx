@@ -36,6 +36,7 @@ import {
 } from '@/components/sections/essential-information-section'
 import { TripBrochureButton } from '@/components/trips/trip-brochure-button'
 import { TripSectionNav } from '@/components/trips/trip-section-nav'
+import { CoordinatesMap } from '@/components/sections/coordinates-map'
 import { FaqSection } from '@/components/sections/faq-section'
 import { DeparturesSection } from '@/components/sections/departures-section'
 import { KeyTakeawaysSection } from '@/components/sections/key-takeaways-section'
@@ -47,6 +48,7 @@ import { KeyPointsPanel } from '@/components/sections/key-points-panel'
 import { PlaceCategoryLinks } from '@/components/sections/place-category-links'
 import { ItinerarySection } from '@/components/sections/itinerary-section'
 import { surface } from '@/components/ui/surface'
+import { parseCoordinates } from '@/lib/coordinates'
 import { PayloadImageFill, PayloadImage } from '@/components/ui/payload-image'
 import { dictionary, type Dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
@@ -165,50 +167,93 @@ function TripBookingCard({
 }
 
 /* ----------------------------------------------------------------------------
-   Route map and altitude chart — the two uploaded figures as a side-by-side pair
+   Route map, live map and altitude chart
    ---------------------------------------------------------------------------- */
 
-/** The figures that actually have an upload behind them, in reading order. */
-function routeMapFigures(trip: Trip): { media: Media; label: string }[] {
+/** One uploaded figure. `label` is the caption above it; `sizes` feeds the image optimizer. */
+type RouteFigure = { media: Media; label: string; sizes: string }
+
+/** Each figure the editor uploaded, in reading order. Missing uploads simply drop out. */
+function routeMapFigures(trip: Trip): RouteFigure[] {
   return [
-    { media: trip.routeMap, label: 'Original route map' },
-    { media: trip.altitudeChart, label: 'Altitude chart' },
-  ].flatMap(({ media, label }) => (media && typeof media !== 'number' ? [{ media, label }] : []))
+    {
+      media: trip.routeMap,
+      label: 'Original route map',
+      sizes: '(min-width: 1024px) 30vw, (min-width: 768px) 45vw, 92vw',
+    },
+    {
+      media: trip.altitudeChart,
+      label: 'Altitude chart',
+      sizes: '(min-width: 1024px) 30vw, (min-width: 768px) 45vw, 92vw',
+    },
+  ].flatMap(({ media, label, sizes }) =>
+    media && typeof media !== 'number' ? [{ media, label, sizes }] : [],
+  )
 }
 
+/**
+ * The uploaded route figures and the interactive map, as one row.
+ *
+ * Reading order is fixed: **Original route map → live map → Altitude chart**. The live map sits
+ * between the two images because it is the interactive counterpart of the scanned route map above
+ * it, and the chart is the altitude profile of the same route below it — three views of one line,
+ * left to right. Any of the three can be missing without leaving a hole: the figures are collected
+ * first, then laid out, and a row only exists when at least one item does.
+ */
 function RouteMapSection({ trip, linker }: { trip: Trip; linker?: InternalLinker | null }) {
   const figures = routeMapFigures(trip)
+  const coordinates = parseCoordinates(trip.coordinates)
+  const total = figures.length + (coordinates ? 1 : 0)
   const intro = hasRichTextContent(trip.routeMapContent) ? trip.routeMapContent : null
-  if (!intro && !figures.length) return null
+  if (!intro && total === 0) return null
+
+  /** The image card. Stretches to the tallest cell, with the picture centred in what is left. */
+  const figureCard = ({ media, label, sizes }: RouteFigure) => (
+    <figure key={label} className={cn(surface, 'flex flex-col overflow-hidden p-4 sm:p-6')}>
+      <figcaption className="mb-4 font-heading text-subhead font-semibold">{label}</figcaption>
+      {/* The cards stretch to the tallest of the row, so the wide, short altitude chart is centred
+          in the space beside it rather than pinned under its caption. */}
+      <div className="flex flex-1 items-center">
+        <PayloadImage
+          media={media}
+          sizes={sizes}
+          className="w-full"
+          imageClassName="h-auto object-contain"
+        />
+      </div>
+    </figure>
+  )
+
+  const mapCard = coordinates ? (
+    <CoordinatesMap
+      key="live-map"
+      name={trip.title}
+      coords={coordinates}
+      // A trailhead, not a region: close enough to read the valleys around the start.
+      zoom={9}
+      height="sm"
+      heading="Live map"
+      caption="Trailhead and route start"
+      className={cn(surface, 'flex flex-col p-4 sm:p-6')}
+    />
+  ) : null
+
+  // Two figures and no map used to share a 50/50 row. Three items need three tracks, so the map
+  // can sit between the images; a partial row spreads its items instead of stranding empty cells.
+  const layout = total >= 3 ? 'md:grid-cols-3' : total === 2 ? 'md:grid-cols-2' : 'md:grid-cols-1'
+
+  const items = [
+    figures[0] ? figureCard(figures[0]) : null,
+    mapCard,
+    ...figures.slice(1).map(figureCard),
+  ].filter(Boolean)
 
   return (
     <section id="route-map" className="scroll-mt-24 pb-16 md:pb-24">
       <SectionTitle title="Original route map and altitude chart" />
       {intro ? <RichText content={intro} className="mb-8" linker={linker} /> : null}
 
-      {/* Stacked on a phone, side by side from tablet up — the same split the
-          included/not-included grid makes further down the page. A lone upload
-          keeps the full column instead of stranding half an empty grid. */}
-      <div className={cn('grid gap-6', figures.length > 1 && 'md:grid-cols-2')}>
-        {figures.map(({ media, label }) => (
-          <figure key={label} className={cn(surface, 'flex flex-col overflow-hidden p-4 sm:p-6')}>
-            <figcaption className="mb-4 font-heading text-subhead font-semibold">
-              {label}
-            </figcaption>
-            {/* The cards stretch to the taller of the two, so the wide, short
-                altitude chart is centred in the space the route map leaves
-                beside it rather than pinned under its caption. */}
-            <div className="flex flex-1 items-center">
-              <PayloadImage
-                media={media}
-                sizes="(min-width: 1024px) 30vw, (min-width: 768px) 45vw, 92vw"
-                className="w-full"
-                imageClassName="h-auto object-contain"
-              />
-            </div>
-          </figure>
-        ))}
-      </div>
+      <div className={cn('grid gap-6', layout)}>{items}</div>
     </section>
   )
 }
@@ -607,7 +652,8 @@ export function TripDetail({
       })}
       <PlaceCategoryLinks values={trip.placeCategories} className="mt-16 md:mt-24" />
       <p className="container-content my-8 text-small">
-        {dict.common.affiliateDescription} We may earn a commission if you book through a partner link.
+        {dict.common.affiliateDescription} We may earn a commission if you book through a partner
+        link.
       </p>
       {/* A layout with no body column still needs visible attribution for its schema. */}
       {!lastBodyGroup ? <div className="container-content">{guideProfile}</div> : null}

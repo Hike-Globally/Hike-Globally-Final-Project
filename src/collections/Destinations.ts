@@ -7,39 +7,8 @@ import { metaField } from '../fields/meta'
 import { slugField } from '../fields/slug'
 import { viewLiveField } from '../fields/view-live'
 import { revalidateDestination, revalidateDestinationDelete } from '../hooks/revalidate'
+import { coordinatesField } from '../lib/coordinates'
 import { siteLivePreviewURL } from '../lib/live-preview-url'
-
-/**
- * Half a pin is not a place, so the pair either exists or it doesn't.
- *
- * `min`/`max` already keep each half inside ±90 / ±180. What they cannot catch is an editor filling
- * only one field — the destination page would then have no map and no `GeoCoordinates`, with nothing
- * in the admin to explain why. Both coordinate fields carry this check (each watches the other), so
- * whichever one the editor filled last is the one that raises the error. Drafts skip field
- * validation in Payload, so autosave still works mid-edit; the check bites on publish.
- *
- * The `0, 0` case is separate: it is the Gulf of Guinea, and it is what a number input that was
- * cleared back to zero leaves behind. It is treated as "no coordinates" rather than a pin, matching
- * `parseCoordinates()` in `src/lib/coordinates.ts`.
- */
-const coordinatePairValidator =
-  (other: 'latitude' | 'longitude') =>
-  (value: unknown, { siblingData }: { siblingData?: Record<string, unknown> }) => {
-    const isSet = (candidate: unknown): candidate is number =>
-      typeof candidate === 'number' && Number.isFinite(candidate)
-
-    const thisSet = isSet(value)
-    const otherValue = (siblingData ?? {})[other]
-    const otherSet = isSet(otherValue)
-
-    if (thisSet !== otherSet) {
-      return 'Enter both latitude and longitude, or leave both empty — one alone cannot be mapped.'
-    }
-    if (thisSet && value === 0 && otherValue === 0) {
-      return '0, 0 is the Gulf of Guinea (the “empty pair”). Leave both fields empty instead.'
-    }
-    return true
-  }
 
 export const Destinations: CollectionConfig = {
   slug: 'destinations',
@@ -135,50 +104,12 @@ export const Destinations: CollectionConfig = {
       ],
       admin: { description: 'Drives the "best time to visit" row on the destination page.' },
     },
-    {
-      name: 'coordinates',
-      type: 'group',
-      label: 'Map coordinates',
-      admin: {
-        description:
-          'Pins the destination page map and fills the geographic structured data. Paste any ' +
-          'point from Google Maps (right-click → “Copy coordinates”) into either field: both are ' +
-          'also editable as text, so “27.7172, 85.3240” can go straight into Latitude. Leave both ' +
-          'empty to publish without a map.',
-      },
-      fields: [
-        {
-          name: 'latitude',
-          label: 'Latitude',
-          type: 'number',
-          required: false,
-          min: -90,
-          max: 90,
-          admin: {
-            width: '50%',
-            step: 0.000001,
-            placeholder: '27.7172',
-            description: '−90 (south) to 90 (north). The first number of a pasted pair.',
-          },
-          validate: coordinatePairValidator('longitude'),
-        },
-        {
-          name: 'longitude',
-          label: 'Longitude',
-          type: 'number',
-          required: false,
-          min: -180,
-          max: 180,
-          admin: {
-            width: '50%',
-            step: 0.000001,
-            placeholder: '85.3240',
-            description: '−180 (west) to 180 (east). The second number of a pasted pair.',
-          },
-          validate: coordinatePairValidator('latitude'),
-        },
-      ],
-    },
+    coordinatesField({
+      description:
+        'Pins the destination page map and fills the geographic structured data. Right-click the ' +
+        'spot in Google Maps → “Copy coordinates”, then paste the pair — the first number is ' +
+        'latitude. Leave both empty to publish without a map.',
+    }),
     {
       name: 'gettingThere',
       type: 'richText',

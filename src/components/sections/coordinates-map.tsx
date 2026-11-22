@@ -4,16 +4,17 @@ import { formatCoordinates, mapEmbedUrl, mapPageUrl, type Coordinates } from '@/
 
 /**
  * ============================================================================
- * Destination map
+ * Coordinates map
  * ============================================================================
- * A server-rendered, keyless OpenStreetMap embed with a single pin.
+ * A server-rendered, keyless OpenStreetMap embed with a single pin. Used for a destination's
+ * location and for a trip's trailhead.
  *
  * Why an `<iframe>` and not Leaflet / MapLibre / Google Maps:
  *
  *  - **Payload.** One pin, no popups, no clustering. An iframe is 0 KB of JavaScript, needs no
- *    `'use client'` boundary (so the destination page stays a server component end to end, and the
- *    coordinates never cross into the RSC payload as anything but a URL string), and ships with
- *    pan/zoom/labels already built.
+ *    `'use client'` boundary (so the pages stay server components end to end, and the coordinates
+ *    never cross into the RSC payload as anything but a URL string), and ships with pan/zoom/labels
+ *    already built.
  *  - **No third-party key or billing.** Mapbox, MapTiler and Google all need an API key, a card and
  *    a domain allowlist; this needs none of them.
  *  - **Consistency.** The rest of the site's geo work is deliberately dependency-free (see the
@@ -28,39 +29,55 @@ import { formatCoordinates, mapEmbedUrl, mapPageUrl, type Coordinates } from '@/
  * the tiles, or a route polyline. Then swap this component for `react-leaflet` behind the same props
  * — no caller changes.
  */
-export function DestinationMap({
+export function CoordinatesMap({
   name,
   coords,
   zoom = 5,
+  heading,
   caption,
+  height = 'md',
   className,
 }: {
-  /** Destination name — the iframe's accessible title and the pin's popup label. */
+  /** The place — the iframe's accessible title and the pin's popup label. */
   name: string
   /** Already validated by `parseCoordinates()`; the caller renders nothing when this is null. */
   coords: Coordinates
-  /** Levels in from the world: 3 continent, 5 region (default), 7 valley, 10 trailhead. */
+  /** Levels in from the world: 3 continent, 5 region (default), 7 valley, 9 trailhead. */
   zoom?: number
-  /** figcaption copy, e.g. "Map of the Khumbu region". */
+  /** Optional label above the frame, matching the captions on the surrounding figures. */
+  heading?: string
+  /** figcaption copy, e.g. "Map of the Khumbu region". Defaults to `name`. */
   caption?: string
+  /**
+   * Frame height. `sm` suits a card that shares a row with two images; `md` a full-width row.
+   * (Tailwind needs the class names written out in full, hence the lookup rather than a template.)
+   */
+  height?: 'sm' | 'md' | 'lg'
   className?: string
 }) {
   const src = mapEmbedUrl({ coords, label: name, zoom })
   const href = mapPageUrl(coords)
   const degrees = formatCoordinates(coords)
+  const frame = {
+    sm: 'h-[240px] md:h-[300px]',
+    md: 'h-[300px] md:h-[340px]',
+    lg: 'h-[320px] md:h-[420px]',
+  }[height]
 
   return (
     <figure className={className}>
+      {heading ? (
+        <figcaption className="mb-4 font-heading text-subhead font-semibold">{heading}</figcaption>
+      ) : null}
       <div className="relative isolate overflow-hidden bg-sage-20">
         <iframe
           // A coordinate change must re-create the frame, not silently keep the old viewport.
           key={src}
           src={src}
           title={`Map of ${name}`}
-          className="block h-[300px] w-full border-0 md:h-[340px]"
+          className={`block w-full border-0 ${frame}`}
           loading="lazy"
-          // The embed is same-origin-ish only in the sense that it posts no messages back to us;
-          // it needs no script, form or popup permission.
+          // The embed posts no messages back to us: it needs no script, form or popup permission.
           referrerPolicy="no-referrer-when-downgrade"
           allow="fullscreen"
         />
@@ -71,7 +88,7 @@ export function DestinationMap({
         </span>
       </div>
 
-      <figcaption className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-small text-slate-80">
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-small text-slate-80">
         <span>{caption ?? name}</span>
         <a
           href={href}
@@ -83,7 +100,7 @@ export function DestinationMap({
           <ExternalLink className="size-3.5" aria-hidden />
           <span className="sr-only">(opens in a new tab)</span>
         </a>
-      </figcaption>
+      </div>
       <p className="mt-1 text-small text-slate-80">
         Map data ©{' '}
         <a
