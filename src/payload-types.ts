@@ -600,6 +600,9 @@ export interface Trip {
         day: number;
         title: string;
         description: string;
+        image1?: (number | null) | Media;
+        image2?: (number | null) | Media;
+        image3?: (number | null) | Media;
         accommodation?: string | null;
         altitude?: number | null;
         food?: ('included' | 'not-included') | null;
@@ -1837,6 +1840,9 @@ export interface TripsSelect<T extends boolean = true> {
         day?: T;
         title?: T;
         description?: T;
+        image1?: T;
+        image2?: T;
+        image3?: T;
         accommodation?: T;
         altitude?: T;
         food?: T;

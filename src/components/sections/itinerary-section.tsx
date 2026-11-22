@@ -10,6 +10,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { surface } from '@/components/ui/surface'
+import { PayloadImage, resolveMediaImage } from '@/components/ui/payload-image'
 import { dictionary } from '@/i18n/dictionaries'
 import { formatNumber } from '@/lib/format'
 import { cn } from '@/lib/utils'
@@ -177,6 +178,9 @@ export function ItinerarySection({ days }: { days: ItineraryDay[] }) {
         {days.map((day, index) => {
           const dayNumber = day.day ?? index + 1
           const food = day.food === 'included' || day.food === 'not-included' ? day.food : null
+          const images = [day.image1, day.image2, day.image3].filter((image) =>
+            resolveMediaImage(image),
+          )
 
           return (
             <AccordionItem
@@ -216,6 +220,31 @@ export function ItinerarySection({ days }: { days: ItineraryDay[] }) {
                       </p>
                     ))}
                   </div>
+
+                  {images.length > 0 ? (
+                    <div
+                      className={cn(
+                        'mt-6 grid overflow-hidden rounded-sm bg-mist',
+                        images.length === 1
+                          ? 'grid-cols-1'
+                          : images.length === 2
+                            ? 'grid-cols-2'
+                            : 'grid-cols-3',
+                      )}
+                    >
+                      {images.map((image, imageIndex) => (
+                        <PayloadImage
+                          key={imageIndex}
+                          media={image}
+                          sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 350px"
+                          className={cn(
+                            'aspect-square sm:aspect-[4/3]',
+                            images.length === 1 && 'aspect-[16/9] sm:aspect-[2/1]',
+                          )}
+                        />
+                      ))}
+                    </div>
+                  ) : null}
 
                   {day.accommodation || typeof day.altitude === 'number' || food ? (
                     <div className="mt-6 grid gap-3 border-t border-slate-20 pt-6 sm:grid-cols-2 2xl:grid-cols-3">
