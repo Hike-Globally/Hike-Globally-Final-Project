@@ -1,0 +1,84 @@
+name: Verify commit author
+
+# Vercel refuses to deploy a private-repo commit whose author email it cannot
+# map to the repo owner's GitHub account. The push succeeds, but the deployment
+# is blocked before the build starts with:
+#
+#   "GitHub couldn't verify an account for the commit."
+#   "The commit author email is not a valid email address."
+#
+# `scripts/check-commit-author.mjs` has encoded that rule for a while, but
+# nothing ever ran it: there is no pre-commit/pre-push hook and no CI. This
+# workflow is the enforcement point, so a bot-authored commit fails here in
+# seconds instead of turning into a red Vercel status nobody reads.
+#
+# It deliberately does NOT need `npm ci` — the guard is dependency-free and
+# imports only node:child_process, so the check finishes in a few seconds and
+# cannot be broken by a failing install.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-commit-author-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  author:
+    name: Commit author is deployable
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out history needed for the commit range
+        uses: actions/checkout@v4
+        with:
+          # The guard inspects `origin/main..HEAD`, so it needs the merge base,
+          # not just the single tip commit.
+          fetch-depth: 0
+
+      # A pull_request run checks out a synthetic merge commit whose author is
+      # GitHub itself ("GitHub <noreply@github.com>"). Vercel builds the PR head
+      # commit, so check that sha directly. On push, HEAD is already the tip.
+      - name: Select the commit Vercel will build
+        id: target
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ -n "$PR_HEAD_SHA" ]; then
+            echo "sha=$PR_HEAD_SHA" >> "$GITHUB_OUTPUT"
+          else
+            echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run the commit-author guard
+        env:
+          TARGET_SHA: ${{ steps.target.outputs.sha }}
+        run: node scripts/check-commit-author.mjs "$TARGET_SHA"
+
+      - name: Name the bad author and how to fix it
+        if: failure()
+        env:
+          TARGET_SHA: ${{ steps.target.outputs.sha }}
+        run: |
+          echo "### Vercel would block this commit" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          git log -1 --pretty='%H%n  author:    %an <%ae>%n  committer: %cn <%ce>' "$TARGET_SHA" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Vercel maps the commit author email to a GitHub account. On a private" >> "$GITHUB_STEP_SUMMARY"
+          echo "repo it must resolve to **the account that owns this repository**." >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo 'Re-stamp the commit with the repo identity and push again:' >> "$GITHUB_STEP_SUMMARY"
+          echo '```bash' >> "$GITHUB_STEP_SUMMARY"
+          echo 'git config user.name  "Hike-Globally"' >> "$GITHUB_STEP_SUMMARY"
+          echo 'git config user.email "337236695+Hike-Globally@users.noreply.github.com"' >> "$GITHUB_STEP_SUMMARY"
+          echo 'git commit --amend --no-edit --reset-author' >> "$GITHUB_STEP_SUMMARY"
+          echo 'git push --force-with-lease origin <branch>' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
