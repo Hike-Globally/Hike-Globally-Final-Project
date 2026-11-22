@@ -627,29 +627,13 @@ export const Trips: CollectionConfig = {
             className: 'hg-trip-compact-editor',
           },
         },
-        {
-          name: 'routeMap',
-          label: 'Original route map',
-          type: 'upload',
-          relationTo: 'media',
-          filterOptions: { mimeType: { contains: 'image/' } },
-        },
-        // Between the two uploads in the admin, and between the two figures on the page: the live
-        // map is the interactive counterpart of the scanned route map it sits under.
         coordinatesField({
           label: 'Trailhead / route coordinates',
           description:
-            'Pins the live map shown between the Original route map and the Altitude chart. ' +
-            'Right-click the trailhead (or the place the route starts from) in Google Maps → ' +
-            '“Copy coordinates”, then paste the pair — the first number is latitude. Leave both ' +
-            'empty and the section shows only your two images, as before.',
+            'Pins the live map for the route. Right-click the trailhead (or the place the route ' +
+            'starts from) in Google Maps → “Copy coordinates”, then paste the pair — the first ' +
+            'number is latitude.',
         }),
-        {
-          name: 'altitudeChart',
-          type: 'upload',
-          relationTo: 'media',
-          filterOptions: { mimeType: { contains: 'image/' } },
-        },
       ],
     },
     {
