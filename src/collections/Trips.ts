@@ -453,6 +453,21 @@ export const Trips: CollectionConfig = {
               required: true,
             },
             {
+              type: 'collapsible',
+              label: 'Day photos',
+              admin: {
+                description:
+                  'Add up to three images for this day. They appear together beneath the description.',
+              },
+              fields: [1, 2, 3].map((number) => ({
+                name: `image${number}`,
+                label: `Image ${number}`,
+                type: 'upload' as const,
+                relationTo: 'media' as const,
+                filterOptions: { mimeType: { contains: 'image/' } },
+              })),
+            },
+            {
               type: 'row',
               fields: [
                 {
