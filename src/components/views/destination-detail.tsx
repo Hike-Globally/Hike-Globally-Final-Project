@@ -8,11 +8,13 @@ import { TripCard } from '@/components/cards/trip-card'
 import { Reveal } from '@/components/motion/reveal'
 import { JsonLd } from '@/components/seo/json-ld'
 import { Breadcrumbs } from '@/components/sections/breadcrumbs'
+import { DestinationMap } from '@/components/sections/destination-map'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { PayloadImage, PayloadImageFill } from '@/components/ui/payload-image'
 import { dictionary, plural, type Dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
+import { mapPageUrl, parseCoordinates } from '@/lib/coordinates'
 import type { DestinationCard as DestinationCardData, TripCard as TripCardData } from '@/lib/data'
 import { breadcrumbJsonLd, touristDestinationJsonLd } from '@/lib/seo'
 import type { Destination } from '@/payload-types'
@@ -43,10 +45,10 @@ export function DestinationDetail({
       ] ?? season,
   )
 
-  const mapUrl =
-    destination.coordinates?.latitude && destination.coordinates?.longitude
-      ? `https://www.openstreetmap.org/?mlat=${destination.coordinates.latitude}&mlon=${destination.coordinates.longitude}#map=9/${destination.coordinates.latitude}/${destination.coordinates.longitude}`
-      : null
+  // One validated pin drives both the hero's "Getting there" button and the map below. The old
+  // truthiness check dropped any place on the equator or the Greenwich meridian (0 is not "empty").
+  const coordinates = parseCoordinates(destination.coordinates)
+  const mapUrl = coordinates ? mapPageUrl(coordinates) : null
 
   return (
     <>
@@ -167,6 +169,20 @@ export function DestinationDetail({
             ) : null}
           </aside>
         </div>
+
+        {/* The map matches the copy column, not the sidebar: it is easier to read under the
+            description than squeezed next to it. Rendered only when the editor set coordinates
+            (see the `coordinates` group on the Destinations collection). */}
+        {coordinates ? (
+          <div className="container-content mt-12 md:mt-16">
+            <DestinationMap
+              name={destination.name}
+              coords={coordinates}
+              zoom={5}
+              caption={`${dict.destinations.gettingThere} — ${destination.name}, ${destination.country}`}
+            />
+          </div>
+        ) : null}
       </section>
 
       {trips.length ? (
