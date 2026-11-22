@@ -332,7 +332,7 @@ export interface Destination {
    */
   bestSeasons?: ('spring' | 'summer' | 'autumn' | 'winter')[] | null;
   /**
-   * Pins the destination page map and fills the geographic structured data. Paste any point from Google Maps (right-click → “Copy coordinates”) into either field: both are also editable as text, so “27.7172, 85.3240” can go straight into Latitude. Leave both empty to publish without a map.
+   * Pins the destination page map and fills the geographic structured data. Right-click the spot in Google Maps → “Copy coordinates”, then paste the pair — the first number is latitude. Leave both empty to publish without a map.
    */
   coordinates?: {
     /**
@@ -697,6 +697,19 @@ export interface Trip {
     [k: string]: unknown;
   } | null;
   routeMap?: (number | null) | Media;
+  /**
+   * Pins the live map shown between the Original route map and the Altitude chart. Right-click the trailhead (or the place the route starts from) in Google Maps → “Copy coordinates”, then paste the pair — the first number is latitude. Leave both empty and the section shows only your two images, as before.
+   */
+  coordinates?: {
+    /**
+     * −90 (south) to 90 (north). The first number of a pasted pair.
+     */
+    latitude?: number | null;
+    /**
+     * −180 (west) to 180 (east). The second number of a pasted pair.
+     */
+    longitude?: number | null;
+  };
   altitudeChart?: (number | null) | Media;
   departureDates?:
     | {
@@ -1871,6 +1884,12 @@ export interface TripsSelect<T extends boolean = true> {
   whyChooseThisTrek?: T;
   routeMapContent?: T;
   routeMap?: T;
+  coordinates?:
+    | T
+    | {
+        latitude?: T;
+        longitude?: T;
+      };
   altitudeChart?: T;
   departureDates?:
     | T

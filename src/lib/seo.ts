@@ -559,6 +559,10 @@ export const touristTripJsonLd = ({
   const tripImage = schemaImageUrl(image)
   const tripGuide = personJsonLd(guide === undefined ? trip.guide : guide)
   const pageUrl = canonicalUrl(url)
+  // The trailhead, when the editor set one. `TouristTrip` is a product, not a location, so there is
+  // no coordinates property on it: the pin belongs on the `about` Place of the page that describes
+  // the trip.
+  const trailhead = parseCoordinates(trip.coordinates)
 
   return {
     '@context': 'https://schema.org',
@@ -584,6 +588,22 @@ export const touristTripJsonLd = ({
       mainEntity: { '@id': `${pageUrl}#trip` },
       datePublished: trip.createdAt,
       dateModified: trip.updatedAt,
+      // The trailhead, when the editor set one: `about` names the place the trip starts from and
+      // carries its coordinates. (A `GeoCoordinates` node cannot hang off `TouristTrip` itself —
+      // the trip is a product, not a location.)
+      ...(trailhead
+        ? {
+            about: {
+              '@type': 'Place',
+              name: trip.title,
+              geo: {
+                '@type': 'GeoCoordinates',
+                latitude: trailhead.latitude,
+                longitude: trailhead.longitude,
+              },
+            },
+          }
+        : {}),
     },
     // The "Keywords" section of the trip, in the order the editor wrote it.
     keywords: normalizeKeywords(trip.keywords).join(', ') || undefined,

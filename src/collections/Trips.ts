@@ -1,7 +1,7 @@
-import { contentEditor } from '../fields/content-editor'
 import type { CollectionConfig } from 'payload'
 
 import { adminOrEditor, publishedOrSignedIn } from '../access'
+import { contentEditor } from '../fields/content-editor'
 import { faqFields } from '../fields/faqs'
 import { pageSectionsField } from '../fields/page-sections'
 import { tripSectionOptions } from '../lib/page-sections'
@@ -13,6 +13,7 @@ import { placeCategoriesField } from '../fields/place-categories'
 import { slugField } from '../fields/slug'
 import { viewLiveField } from '../fields/view-live'
 import { revalidateTrip, revalidateTripDelete } from '../hooks/revalidate'
+import { coordinatesField } from '../lib/coordinates'
 import { departureStatusOptions, toDateKey } from '../lib/departures'
 import { difficultySelectOptions } from '../lib/difficulty'
 import { buildLivePreviewURL, resolveLivePreviewPath } from '../lib/live-preview-url'
@@ -592,7 +593,7 @@ export const Trips: CollectionConfig = {
     },
     {
       type: 'collapsible',
-      label: 'Original route map and altitude chart',
+      label: 'Route map, live map and altitude chart',
       admin: { initCollapsed: true },
       fields: [
         {
@@ -612,6 +613,16 @@ export const Trips: CollectionConfig = {
           relationTo: 'media',
           filterOptions: { mimeType: { contains: 'image/' } },
         },
+        // Between the two uploads in the admin, and between the two figures on the page: the live
+        // map is the interactive counterpart of the scanned route map it sits under.
+        coordinatesField({
+          label: 'Trailhead / route coordinates',
+          description:
+            'Pins the live map shown between the Original route map and the Altitude chart. ' +
+            'Right-click the trailhead (or the place the route starts from) in Google Maps → ' +
+            '“Copy coordinates”, then paste the pair — the first number is latitude. Leave both ' +
+            'empty and the section shows only your two images, as before.',
+        }),
         {
           name: 'altitudeChart',
           type: 'upload',
