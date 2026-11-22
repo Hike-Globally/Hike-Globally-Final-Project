@@ -9,9 +9,7 @@ import { LivePreviewRefresh } from '@/components/providers/live-preview-refresh'
 import { SmoothScroll } from '@/components/providers/smooth-scroll'
 import { JsonLd } from '@/components/seo/json-ld'
 import { dictionary } from '@/i18n/dictionaries'
-import { FRONTEND_LOCALE_COOKIE, frontendLocales, htmlLang, ogLocale } from '@/i18n/config'
-import { FrontendLocaleRuntime } from '@/components/providers/frontend-locale-runtime'
-import { LanguageSwitcher } from '@/components/layout/language-switcher'
+import { htmlLang, ogLocale } from '@/i18n/config'
 import { getSettings } from '@/lib/data'
 import { faviconIcons } from '@/lib/favicon'
 import { RSS_FEED_PATH } from '@/lib/rss'
@@ -176,29 +174,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           name="google-site-verification"
           content="ifr0lQC0vSpJEnOHwV3BpQ6Zk4uYFFdI5tpkK0H7UG0"
         />
-        {/* Set the visitor's cookie language on <html> before hydration. No URL or route changes. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function () {
-  try {
-    var cookieName = ${JSON.stringify(FRONTEND_LOCALE_COOKIE)};
-    var allowed = ${JSON.stringify(frontendLocales)};
-    var value = 'en';
-    var entries = document.cookie ? document.cookie.split(';') : [];
-    for (var index = 0; index < entries.length; index += 1) {
-      var entry = entries[index].trim();
-      if (entry.indexOf(cookieName + '=') === 0) {
-        value = decodeURIComponent(entry.slice(cookieName.length + 1));
-        break;
-      }
-    }
-    if (allowed.indexOf(value) === -1) value = 'en';
-    document.documentElement.lang = value === 'en' ? 'en' : value;
-    document.documentElement.setAttribute('data-frontend-locale', value);
-  } catch {}
-})();`,
-          }}
-        />
         {/* Explicit link survives child routes replacing metadata.alternates with their canonical. */}
         <link
           rel="alternate"
@@ -289,10 +264,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <SmoothScroll />
 
         <Analytics />
-
-        {/* Cookie-driven EN/DE/FR copy and the same-URL language switcher. */}
-        <FrontendLocaleRuntime />
-        <LanguageSwitcher />
       </body>
     </html>
   )

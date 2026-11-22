@@ -8,16 +8,8 @@
  *
  * All *content* (trips, destinations, posts, page blocks, navigation) still comes from Payload.
  *
- * `en` is the English source dictionary. The editable DE/FR UI dictionaries below are built
- * from `ui-translations.ts`; full frontend dictionaries (including CMS fallback strings) are
- * loaded lazily by the cookie-driven translation runtime. Payload stays single-locale and URLs
- * are unchanged. Existing components keep importing `dictionary` — the English source — and
- * their rendered output is translated in the browser for DE/FR visitors.
+ * The public site and Payload admin currently use English copy.
  */
-
-import type { FrontendLocale } from './config'
-import { normalizeTranslationKey } from './translate'
-import { uiTranslations } from './ui-translations'
 
 const affiliateDescription =
   'Hike Globally is a travel affiliate platform. We publish trip guides and connect travelers with independent operators who run the trips.'
@@ -39,7 +31,6 @@ export const en = {
     skipToContent: 'Skip to content',
     menu: 'Menu',
     close: 'Close',
-    language: 'Language',
     share: 'Share',
     copied: 'Link copied',
     shareError: 'Could not copy link',
@@ -326,37 +317,6 @@ export type Dictionary = Widen<typeof en>
 
 /** English source dictionary, kept as the default for existing server/client imports. */
 export const dictionary: Dictionary = en
-
-function localizeValue(value: unknown, translations: Record<string, string>): unknown {
-  if (typeof value === 'string') {
-    return translations[normalizeTranslationKey(value)] ?? value
-  }
-  if (Array.isArray(value)) {
-    return value.map((item) => localizeValue(item, translations))
-  }
-  if (value && typeof value === 'object') {
-    return Object.fromEntries(
-      Object.entries(value as Record<string, unknown>).map(([key, item]) => [
-        key,
-        localizeValue(item, translations),
-      ]),
-    )
-  }
-  return value
-}
-
-/** Typed, editable UI dictionaries for the frontend-only language switcher. */
-export const de: Dictionary = localizeValue(en, uiTranslations.de) as Dictionary
-export const fr: Dictionary = localizeValue(en, uiTranslations.fr) as Dictionary
-
-export const dictionaries: Record<FrontendLocale, Dictionary> = {
-  en: dictionary,
-  de,
-  fr,
-}
-
-export const getDictionary = (locale: FrontendLocale): Dictionary =>
-  dictionaries[locale] ?? dictionary
 
 /** Tiny ICU-style interpolation: t('{count} trips', { count: 12 }) */
 export const t = (template: string, values: Record<string, string | number> = {}): string =>

@@ -81,24 +81,16 @@ Every public collection has:
 
 ### Language rules that matter
 
-Payload remains **English-only**: one CMS locale, no admin language selector, and no database
-migration. The public frontend adds a cookie-driven **EN / DE / FR** language switcher. It keeps
-the same unprefixed URLs, does not generate locale-specific hreflang pages, and uses editable
-frontend dictionaries (`src/i18n/translations/`) for UI/static copy and CMS strings; unknown CMS
-strings fall back to English.
+Payload and the public frontend use **English**. The public site uses unprefixed URLs and does not
+generate locale-specific hreflang pages.
 
-- `src/i18n/config.ts` keeps `locales = ['en']` for Payload and separately declares
-  `frontendLocales = ['en', 'de', 'fr']` for the switcher. Fields keep `localized: true` and
-  their `_locales` storage shape, so the backend schema is untouched.
-- `blocks`, and every array of translatable items (itinerary, FAQs, highlights,
-  stats, nav items), remain localized at the parent, exactly as before.
-- Localized fields are **never `required`**, so a save can never be blocked by a missing
-  translation.
+- `src/i18n/config.ts` configures Payload's single locale and keeps shared route constants.
+- `blocks`, and every array of translatable items (itinerary, FAQs, highlights, stats, nav items),
+  retain their existing localized storage shape.
 
 UI chrome (buttons, empty states, filter labels) lives in `src/i18n/dictionaries.ts` instead of
 the CMS. Trade-off: changing "Read more" needs a deploy, but rendering a page costs zero extra
 queries and a missing key is a _build_ error.
-
 ---
 
 ## 4. Routing

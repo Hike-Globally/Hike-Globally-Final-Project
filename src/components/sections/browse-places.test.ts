@@ -190,14 +190,11 @@ test('the category page hero links nowhere but home and the places index', () =>
   assert.doesNotMatch(hero, /<Link[^>]*href=\{[^}]*category/)
 })
 
-test('the new routes join sitemap, llms, reserved slugs, revalidation and translations', () => {
+test('the new routes join sitemap, llms, reserved slugs and revalidation', () => {
   assert.equal(isReservedPageSlug('places'), true)
   assert.match(read('src/i18n/config.ts'), /places: 'places'/)
   assert.match(read('src/lib/sitemap.ts'), /placeCategoryPaths\(\)|placeCategoryPath\(category\.value\)/)
   assert.match(read('src/lib/llms-txt.ts'), /section\('Places', placeEntries\(\)\)/)
   assert.match(read('src/hooks/revalidate.ts'), /PLACE_INDEX_PATH, \.\.\.placeCategoryPaths\(\)/)
-  assert.match(read('src/lib/frontend-i18n.test.ts'), /Browse Places copy is translated/)
-  assert.match(read('src/i18n/translations/de.ts'), /"Browse places": "Orte entdecken"/)
-  assert.match(read('src/i18n/translations/fr.ts'), /"Browse places": "Découvrir des lieux"/)
   assert.match(read('src/migrations/index.ts'), /20261121_134756_place_categories/)
 })
