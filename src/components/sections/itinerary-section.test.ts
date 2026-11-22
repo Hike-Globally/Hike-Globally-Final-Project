@@ -33,3 +33,11 @@ test('partial and missing images do not leave empty gallery slots', () => {
   assert.doesNotMatch(render({ image1: 123 }), /aspect-square/)
   assert.doesNotMatch(render({}), /aspect-square/)
 })
+
+test('photos have spacing, rounded corners and use the original file', () => {
+  const html = render({ image1: image(1), image2: image(2), image3: image(3) })
+  assert.match(html, /gap-2 sm:gap-3/)
+  assert.equal((html.match(/rounded-\[8px\]/g) ?? []).length, 3)
+  assert.match(html, /src="\/api\/media\/file\/trail-1\.jpg"/)
+  assert.doesNotMatch(html, /_next\/image/)
+})

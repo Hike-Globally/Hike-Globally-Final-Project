@@ -224,7 +224,7 @@ export function ItinerarySection({ days }: { days: ItineraryDay[] }) {
                   {images.length > 0 ? (
                     <div
                       className={cn(
-                        'mt-6 grid overflow-hidden rounded-sm bg-mist',
+                        'mt-6 grid gap-2 sm:gap-3',
                         images.length === 1
                           ? 'grid-cols-1'
                           : images.length === 2
@@ -236,9 +236,9 @@ export function ItinerarySection({ days }: { days: ItineraryDay[] }) {
                         <PayloadImage
                           key={imageIndex}
                           media={image}
-                          sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 350px"
+                          unoptimized
                           className={cn(
-                            'aspect-square sm:aspect-[4/3]',
+                            'aspect-square rounded-[8px] sm:aspect-[4/3]',
                             images.length === 1 && 'aspect-[16/9] sm:aspect-[2/1]',
                           )}
                         />
