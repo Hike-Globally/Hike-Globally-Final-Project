@@ -36,33 +36,16 @@ test('a destination with coordinates renders the map; one without renders nothin
   assert.ok(mapIndex < destinationDetail.indexOf('id="trips"'), 'before the trips rail')
 })
 
-test('the trip page puts the live map between the original route map and the altitude chart', () => {
+test('the trip page keeps the live map and itinerary chart, without the uploaded route images', () => {
   assert.match(tripDetail, /const coordinates = parseCoordinates\(trip\.coordinates\)/)
-
-  // The order is declared once, in `items`: route map, map, then the altitude chart.
+  assert.match(tripDetail, /const profile = altitudeProfile\(trip\.itinerary\)/)
   const items = tripDetail.slice(tripDetail.indexOf('const items = ['))
   const order = items.slice(0, items.indexOf('].filter'))
-  assert.match(order, /routeMap\[0\] \? figureCard\(routeMap\[0\]\) : null,/)
   assert.match(order, /mapCard,/)
   assert.match(order, /chartCard/)
-  assert.ok(order.indexOf('routeMap[0]') < order.indexOf('mapCard'), 'route map comes first')
-  assert.ok(order.indexOf('mapCard') < order.indexOf('chartCard'), 'the chart comes last')
-
-  // The two uploads keep their labels in their own helpers, route map first.
-  const uploads = tripDetail.slice(tripDetail.indexOf('function uploadedRouteMap'))
-  assert.ok(
-    uploads.indexOf("label: 'Original route map'") < uploads.indexOf("label: 'Altitude chart'"),
-  )
-
-  // A trailhead-level zoom, not the region view the destination page uses.
+  assert.doesNotMatch(tripDetail, /uploadedRouteMap|uploadedAltitudeChart|routeMap\[0\]/)
   assert.match(tripDetail, /zoom=\{9\}/)
-
-  // The section still declines to render when it has neither prose nor any of the three items.
-  assert.match(
-    tripDetail,
-    /const total =\s*routeMap\.length \+ \(coordinates \? 1 : 0\) \+ \(profile \|\| altitudeUpload\.length \? 1 : 0\)/,
-  )
-  assert.match(tripDetail, /if \(!intro && total === 0\) return null/)
+  assert.match(tripDetail, /if \(!intro && !coordinates && !profile\) return null/)
 })
 
 test('the map is server-rendered: no client boundary, no map library, no API key', () => {
@@ -89,11 +72,11 @@ test('both collections share one coordinates field, so the rules cannot drift ap
   assert.doesNotMatch(destinations, /name: 'coordinates',\s*\n\s*type: 'group'/)
   assert.doesNotMatch(trips, /name: 'coordinates',\s*\n\s*type: 'group'/)
 
-  // Admin order on the trip: original route map → coordinates → altitude chart.
+  // The admin keeps itinerary-derived chart fields and coordinates, but no image uploads.
   const section = trips.slice(trips.indexOf("label: 'Route map, live map and altitude chart'"))
   const block = section.slice(0, section.indexOf("name: 'departureDates'"))
-  assert.ok(block.indexOf("name: 'routeMap'") < block.indexOf('coordinatesField({'))
-  assert.ok(block.indexOf('coordinatesField({') < block.indexOf("name: 'altitudeChart'"))
+  assert.ok(block.includes('coordinatesField({'))
+  assert.doesNotMatch(block, /name: '(routeMap|altitudeChart)'/)
 })
 
 test('the field rejects half a pin and the 0,0 pair, but keeps a real 0', () => {

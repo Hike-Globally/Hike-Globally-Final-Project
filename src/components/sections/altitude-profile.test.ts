@@ -94,23 +94,17 @@ test('the value labels at the two ends anchor inward, so they stay inside the fr
   assert.deepEqual(new Set(valueLabels.slice(1, -1)), new Set(['middle']))
 })
 
-test('the trip page draws the chart from the itinerary and falls back to the upload', () => {
-  // The profile is derived from the itinerary array, and the generated chart is the default.
+test('the trip page renders the altitude chart from itinerary data, with no image upload fallback', () => {
   assert.match(tripDetail, /const profile = altitudeProfile\(trip\.itinerary\)/)
-  assert.match(tripDetail, /const altitudeUpload = profile \? \[\] : uploadedAltitudeChart\(trip\)/)
   assert.match(tripDetail, /<AltitudeProfile days=\{trip\.itinerary\} \/>/)
+  assert.doesNotMatch(tripDetail, /uploadedAltitudeChart|altitudeUpload/)
+  assert.doesNotMatch(tripDetail, /md:col-span-2/)
 
-  // The upload still exists as the documented fallback, in its own helper.
-  assert.match(tripDetail, /function uploadedAltitudeChart\(trip: Trip\)/)
-
-  // Layout: the chart spans two tracks so an 18-day profile stays readable.
-  assert.match(tripDetail, /md:col-span-2/)
-
-  // Reading order is unchanged: route map, live map, then the altitude chart.
   const items = tripDetail.slice(tripDetail.indexOf('const items = ['))
   const order = items.slice(0, items.indexOf('].filter'))
-  assert.ok(order.indexOf('routeMap[0]') < order.indexOf('mapCard'))
-  assert.ok(order.indexOf('mapCard') < order.indexOf('chartCard'))
+  assert.match(order, /mapCard,/)
+  assert.match(order, /chartCard/)
+  assert.doesNotMatch(order, /routeMap/)
 })
 
 test('the itinerary collects a place label per day, and says what altitude means', () => {
