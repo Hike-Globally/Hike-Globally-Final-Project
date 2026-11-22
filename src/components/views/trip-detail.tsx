@@ -64,7 +64,7 @@ import { resolveLink } from '@/lib/links'
 import { cn } from '@/lib/utils'
 import { hasRichTextContent } from '@/lib/rich-text-content'
 import { breadcrumbJsonLd, faqJsonLd, touristTripJsonLd } from '@/lib/seo'
-import type { Media, Setting, Trip } from '@/payload-types'
+import type { Setting, Trip } from '@/payload-types'
 
 /* ----------------------------------------------------------------------------
    Shared styling
@@ -193,17 +193,15 @@ function RouteMapSection({ trip }: { trip: Trip }) {
   ) : null
 
   const chartCard = profile ? (
-    <figure
+    <div
       key="altitude-profile"
-      className={cn(surface, 'flex flex-col overflow-hidden p-4 sm:p-6')}
+      className={cn(surface, 'flex min-w-0 flex-col overflow-hidden p-4 sm:p-6')}
     >
-      <figcaption className="mb-4 font-heading text-subhead font-semibold">
-        Altitude chart
-      </figcaption>
-      <div className="flex flex-1 items-center">
-        <AltitudeProfile days={trip.itinerary} />
+      <h3 className="mb-4 font-heading text-subhead font-semibold">Altitude chart</h3>
+      <div className="flex min-w-0 flex-1">
+        <AltitudeProfile days={trip.itinerary} className="w-full" title="Altitude chart" />
       </div>
-    </figure>
+    </div>
   ) : null
   const items = [mapCard, chartCard].filter(Boolean)
 
