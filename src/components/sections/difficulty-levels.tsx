@@ -134,13 +134,14 @@ export function DifficultyLevels() {
                 aria-hidden="true"
               />
               {/* Two navy washes, one per edge that carries copy — the level
-                  row at the top, the rung name and description at the foot. */}
+                  row at the top, the rung name and description at the foot.
+                  The scrim carries the backdrop blur over the photo. */}
               <div
                 className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-ink/80 via-ink/22 to-transparent"
                 aria-hidden="true"
               />
               <div
-                className="photo-scrim pointer-events-none absolute inset-0 -z-10"
+                className="photo-scrim pointer-events-none absolute inset-0 -z-10 backdrop-blur-md"
                 aria-hidden="true"
               />
 
