@@ -449,6 +449,19 @@ export const Trips: CollectionConfig = {
               ],
             },
             {
+              name: 'place',
+              label: 'Place (chart label)',
+              type: 'text',
+              localized: true,
+              maxLength: 40,
+              admin: {
+                description:
+                  'The short place name plotted under this day on the altitude chart — "Namche ' +
+                  'Bazaar", not "Phakding to Namche Bazaar (3,440 m)". Left empty, the chart ' +
+                  'prints "Day n" instead.',
+              },
+            },
+            {
               name: 'description',
               type: 'textarea',
               required: true,
@@ -480,9 +493,17 @@ export const Trips: CollectionConfig = {
                 },
                 {
                   name: 'altitude',
+                  label: 'Highest point (m)',
                   type: 'number',
                   min: 0,
-                  admin: { width: '25%' },
+                  max: 8850,
+                  admin: {
+                    width: '25%',
+                    description:
+                      'Metres above sea level at the highest point reached on this day — a pass, ' +
+                      'a viewpoint, a summit — not where you sleep. Two or more days with an ' +
+                      'altitude are drawn as the trip’s altitude chart.',
+                  },
                 },
                 {
                   name: 'food',

@@ -8,6 +8,9 @@ admin:
 | **Destination** page | **Map coordinates** (below _Best time to visit_)                                             | The destination's location, full-width                                       |
 | **Trip** page        | **Trailhead / route coordinates**, inside the _Route map, live map and altitude chart_ panel | The trailhead, sitting **between** _Original route map_ and _Altitude chart_ |
 
+The altitude chart in that same row is generated from the itinerary rather than uploaded — see
+[altitude-chart.md](altitude-chart.md).
+
 The page renders a pinned OpenStreetMap embed and the same numbers fill geographic structured data:
 `GeoCoordinates` on a destination's `TouristDestination`, and `subjectOf.about` → `Place` →
 `GeoCoordinates` on a trip (a `TouristTrip` is a product, not a location, so it has no coordinates

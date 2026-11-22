@@ -605,11 +605,18 @@ export interface Trip {
     | {
         day: number;
         title: string;
+        /**
+         * The short place name plotted under this day on the altitude chart — "Namche Bazaar", not "Phakding to Namche Bazaar (3,440 m)". Left empty, the chart prints "Day n" instead.
+         */
+        place?: string | null;
         description: string;
         image1?: (number | null) | Media;
         image2?: (number | null) | Media;
         image3?: (number | null) | Media;
         accommodation?: string | null;
+        /**
+         * Metres above sea level at the highest point reached on this day — a pass, a viewpoint, a summit — not where you sleep. Two or more days with an altitude are drawn as the trip’s altitude chart.
+         */
         altitude?: number | null;
         food?: ('included' | 'not-included') | null;
         id?: string | null;
@@ -1858,6 +1865,7 @@ export interface TripsSelect<T extends boolean = true> {
     | {
         day?: T;
         title?: T;
+        place?: T;
         description?: T;
         image1?: T;
         image2?: T;

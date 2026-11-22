@@ -39,32 +39,29 @@ test('a destination with coordinates renders the map; one without renders nothin
 test('the trip page puts the live map between the original route map and the altitude chart', () => {
   assert.match(tripDetail, /const coordinates = parseCoordinates\(trip\.coordinates\)/)
 
-  // The order is declared once, in `items`: first figure, map, then the remaining figures.
+  // The order is declared once, in `items`: route map, map, then the altitude chart.
   const items = tripDetail.slice(tripDetail.indexOf('const items = ['))
   const order = items.slice(0, items.indexOf('].filter'))
-  assert.match(order, /figures\[0\] \? figureCard\(figures\[0\]\) : null,/)
+  assert.match(order, /routeMap\[0\] \? figureCard\(routeMap\[0\]\) : null,/)
   assert.match(order, /mapCard,/)
-  assert.match(order, /\.\.\.figures\.slice\(1\)\.map\(figureCard\),/)
-  assert.ok(
-    order.indexOf('figures[0]') < order.indexOf('mapCard'),
-    'route map comes before the map',
-  )
-  assert.ok(
-    order.indexOf('mapCard') < order.indexOf('figures.slice(1)'),
-    'the altitude chart comes after the map',
-  )
+  assert.match(order, /chartCard/)
+  assert.ok(order.indexOf('routeMap[0]') < order.indexOf('mapCard'), 'route map comes first')
+  assert.ok(order.indexOf('mapCard') < order.indexOf('chartCard'), 'the chart comes last')
 
-  // Reading order is documented in `routeMapFigures`: route map first, altitude chart second.
-  const figures = tripDetail.slice(tripDetail.indexOf('function routeMapFigures'))
+  // The two uploads keep their labels in their own helpers, route map first.
+  const uploads = tripDetail.slice(tripDetail.indexOf('function uploadedRouteMap'))
   assert.ok(
-    figures.indexOf("label: 'Original route map'") < figures.indexOf("label: 'Altitude chart'"),
+    uploads.indexOf("label: 'Original route map'") < uploads.indexOf("label: 'Altitude chart'"),
   )
 
   // A trailhead-level zoom, not the region view the destination page uses.
   assert.match(tripDetail, /zoom=\{9\}/)
 
   // The section still declines to render when it has neither prose nor any of the three items.
-  assert.match(tripDetail, /const total = figures\.length \+ \(coordinates \? 1 : 0\)/)
+  assert.match(
+    tripDetail,
+    /const total =\s*routeMap\.length \+ \(coordinates \? 1 : 0\) \+ \(profile \|\| altitudeUpload\.length \? 1 : 0\)/,
+  )
   assert.match(tripDetail, /if \(!intro && total === 0\) return null/)
 })
 
