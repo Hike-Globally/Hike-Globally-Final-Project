@@ -23,7 +23,9 @@
     "seed": "tsx src/scripts/seed.ts",
     "postinstall": "payload generate:importmap && patch-package",
     "generate:globe-dots": "node scripts/generate-globe-dots.mjs",
-    "verify:commit-author": "node scripts/check-commit-author.mjs"
+    "verify:commit-author": "node scripts/check-commit-author.mjs",
+    "setup:git": "node scripts/setup-git-identity.mjs",
+    "prepare": "node scripts/setup-git-identity.mjs"
   },
   "dependencies": {
     "@carrot-kpi/switzer-font": "^0.1.0",

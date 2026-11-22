@@ -1,61 +1,28 @@
 #!/usr/bin/env node
 /**
- * Vercel refuses to deploy a commit whose author email it cannot map to a
- * GitHub account. The deployment fails before the build starts with:
+ * Fail when the commit Vercel would build is authored by an address Vercel
+ * cannot map to the account that owns this repository, and install the git
+ * identity that prevents it in the first place.
  *
- *   "GitHub couldn't verify an account for the commit."
- *   "The commit author email is not a valid email address"
- *
- * That is what happened to the bot-authored commits on this repository: the
- * merge commits deployed, the individual commits arrived blocked, and the
- * preview stayed on the previous build even though the push succeeded.
- *
- * This check reads the commits about to be pushed (or the given range) and
- * fails loudly, with the exact command that fixes it, instead of leaving a
- * silent "Deployment was blocked" in Vercel.
+ * The rule itself lives in ./commit-identity.mjs.
  *
  * Usage:
- *   npm run verify:commit-author                 # checks HEAD (the commit Vercel would build)
- *   npm run verify:commit-author HEAD            # same — a single revision is the tip only
- *   npm run verify:commit-author <sha>           # one specific commit, ancestors ignored
+ *   npm run verify:commit-author                     # HEAD (what Vercel builds)
+ *   npm run verify:commit-author HEAD                # same
+ *   npm run verify:commit-author <sha>               # one commit, ancestry ignored
  *   npm run verify:commit-author origin/main..HEAD   # every commit on the branch
  *   BASE=origin/main npm run verify:commit-author
  *
- * The check mirrors what Vercel does: it builds the commit at the tip of the
- * push, so merges are checked like any other commit and only the tip matters
- * when you push a single branch. Ancestors are not inspected, because Vercel
- * never builds them — a merge commit authored by a verified account deploys
- * even when a commit it merges was authored by a bot.
- *
- * A single revision (HEAD, a sha) is therefore forced to `--max-count=1`.
- * `git log <sha>` on its own walks the whole ancestry, which would flag a bot
- * commit buried in history and fail every later push over a commit Vercel has
- * already deployed — the exact false positive this check exists to avoid.
+ * The check mirrors Vercel: it builds the commit at the tip of the push, so a
+ * single revision is forced to `--max-count=1`. `git log <sha>` on its own
+ * walks the whole ancestry, which would flag a bot commit buried in history
+ * and fail every later push over a commit Vercel has already deployed.
  */
 
 import { execFileSync } from 'node:child_process'
+import { FIX, isDeployableEmail, OWNER } from './commit-identity.mjs'
 
-/** Addresses GitHub/Vercel cannot map to an account. Extend as needed. */
-const UNVERIFIABLE = [
-  /@arena\.ai$/i,
-  /@example\.(com|org|net)$/i,
-  /@localhost$/i,
-  /@local$/i,
-  /\.local$/i,
-  /^[^+@]+@users\.noreply\.github\.com$/i, // old form, no numeric id — usually a bot alias
-  /^(agent|bot|probe|cursor|codex|claude|gemini)@/i,
-]
-
-const FIX = `Fix it (repo-local, affects only new commits):
-  git config user.name  "Hike-Globally"
-  git config user.email "337236695+Hike-Globally@users.noreply.github.com"
-
-For a commit that is already pushed, amend or rebase it:
-  git commit --amend --no-edit --reset-author
-  git push --force-with-lease origin <branch>`
-
-const run = (args) =>
-  execFileSync('git', args, { encoding: 'utf8' }).trim()
+const run = (args) => execFileSync('git', args, { encoding: 'utf8' }).trim()
 
 const requested = process.argv[2] ?? (process.env.BASE ? `${process.env.BASE}..HEAD` : '-1')
 
@@ -73,7 +40,7 @@ const logArgs = isSingleRevision(requested) ? ['-1', requested] : [requested]
 
 let log
 try {
-  log = run(['log', ...logArgs, '--pretty=%h%x09%an <%ae>%x09%s'])
+  log = run(['log', ...logArgs, '--pretty=%h%x09%an <%ae>%x09%cn <%ce>%x09%s'])
 } catch {
   console.error('verify:commit-author — could not read git history for range:', logArgs.join(' '))
   process.exit(1)
@@ -84,17 +51,46 @@ if (!log) {
   process.exit(0)
 }
 
+const emailOf = (field) => field?.match(/<([^>]+)>/)?.[1] ?? ''
+
 const commits = log.split('\n').map((line) => {
-  const [sha, author, subject] = line.split('\t')
-  const email = author?.match(/<([^>]+)>/)?.[1] ?? ''
-  return { sha, author, subject, email }
+  const [sha, author, committer, subject] = line.split('\t')
+  return {
+    sha,
+    author,
+    committer,
+    subject,
+    email: emailOf(author),
+    committerEmail: emailOf(committer),
+  }
 })
 
-const bad = commits.filter((c) => UNVERIFIABLE.some((rule) => rule.test(c.email)))
+/**
+ * Vercel matches the *author*. The committer is checked too, because a
+ * committer address that resolves to nobody has the same effect on the git
+ * provider side, and catching it here costs nothing.
+ */
+const isBad = (c) =>
+  !isDeployableEmail(c.email, { kind: 'author' }) ||
+  !isDeployableEmail(c.committerEmail, { kind: 'committer' })
+
+const bad = commits.filter(isBad)
 
 if (bad.length === 0) {
   console.log(`verify:commit-author — ${commits.length} commit(s) OK:`)
   for (const c of commits) console.log(`  ${c.sha}  ${c.author}`)
+  // Self-heal: if this clone is configured with an address that cannot deploy,
+  // fix it now so the *next* commit is correct even if nobody reads the docs.
+  try {
+    const current = run(['config', 'user.email'])
+    if (!isDeployableEmail(current)) {
+      run(['config', 'user.name', OWNER.name])
+      run(['config', 'user.email', OWNER.email])
+      console.log(`\nAlso fixed this clone's git identity (was "${current}"); future commits use ${OWNER.email}.`)
+    }
+  } catch {
+    // No usable git config, or a read-only checkout — not worth failing the run.
+  }
   process.exit(0)
 }
 

@@ -625,17 +625,42 @@ account for the commit"_ / _"The commit author email is not a valid email addres
 site silently keeps the previous build. Bot addresses such as `agent@arena.ai` or
 `probe@arena.local` do exactly that (`fe87b32` and `2c7e039` on this repo are real examples), so
 every commit — human or automated — must be authored with an address tied to the account that owns
-this repo:
+this repo. Exactly two addresses deploy, both verified on `Hike-Globally`:
+
+| Address | Use |
+| --- | --- |
+| `337236695+Hike-Globally@users.noreply.github.com` | **preferred** — stable even if the account's email privacy setting changes |
+| `hikeglobally@gmail.com` | the account's primary address; also deploys |
 
 ```bash
-git config user.name  "Hike-Globally"
-git config user.email "337236695+Hike-Globally@users.noreply.github.com"
+npm run setup:git     # sets the identity and installs the pre-push hook
 ```
 
-The numeric `ID+USERNAME@users.noreply.github.com` form is preferred because GitHub keeps it stable
-even after the account's email privacy setting changes. Run `git log -1 --pretty='%an <%ae>'` to
-check the identity of the commit you are about to push — rewriting the author of an already-pushed
-commit requires a force-push and a new PR.
+`npm run setup:git` is also wired into `prepare`, so a fresh `npm install` on a clone configures the
+correct identity automatically.
+
+#### Why an allowlist, not a blocklist
+
+`scripts/commit-identity.mjs` is the single source of truth, and it **allows** the addresses above
+rather than blocking known-bad ones. The earlier guard was a blocklist (`@arena.ai`, `@local`, …),
+which is why this kept recurring: any *new* agent or tool address was not on the list, passed the
+check, was pushed, and blocked the deploy. With an allowlist, an unrecognised address fails instead
+of slipping through.
+
+Two details it gets right, both real Vercel behaviour:
+
+- **Plus-addressing is not normalised.** `hikeglobally+ci@gmail.com` is a *different* identity to
+  Vercel and does not deploy, so the allowlist compares exact strings.
+- **`noreply@github.com` is committer-only.** GitHub Web-flow is the committer on merge commits it
+  creates; it is never a valid author.
+
+The earlier failure text was:
+
+> The deployment was blocked because the commit email `agent@arena.ai` could not be matched to a
+> GitHub account. Ensure your git email matches your GitHub account.
+
+`git log -1 --pretty='%an <%ae>'` shows the identity of the commit you are about to push —
+rewriting the author of an already-pushed commit requires a force-push and a new PR.
 
 #### The guard runs automatically in CI
 
@@ -659,16 +684,11 @@ npm run verify:commit-author <sha>               # one specific commit
 It exits non-zero and prints the exact `git config` fix when it finds an author address Vercel
 cannot verify, instead of leaving a blocked deployment behind.
 
-Optionally catch it even before the push by installing the same guard as a local hook (not tracked
-in git, so each clone needs its own copy):
+`npm run setup:git` installs the same guard as a repo-local `pre-push` hook, so a bad commit is
+refused before it reaches GitHub. It never overwrites a custom `pre-push` hook you wrote.
 
-```bash
-printf '#!/bin/sh\nexec node scripts/check-commit-author.mjs HEAD\n' > .git/hooks/pre-push
-chmod +x .git/hooks/pre-push
-```
-
-Pass `HEAD` explicitly — a pre-push hook receives `<remote> <url>` as `$1`/`$2`, so forwarding `$1`
-would hand the guard the remote name and check the wrong commit.
+Pass `HEAD` explicitly in that hook — a `pre-push` hook receives `<remote> <url>` as `$1`/`$2`, so
+forwarding `$1` would hand the guard the remote name and check the wrong commit.
 
 Only the tip of a push is built, so a merge commit authored by the verified account deploys even
 when one of the commits it merges came from a bot — that is why the direct pushes `fe87b32` and
