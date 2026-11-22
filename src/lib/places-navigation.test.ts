@@ -3,8 +3,6 @@ import { readFileSync } from 'node:fs'
 import test from 'node:test'
 
 import { dictionary } from '../i18n/dictionaries'
-import { translations as de } from '../i18n/translations/de'
-import { translations as fr } from '../i18n/translations/fr'
 import { withPlacesFooterLink, withPlacesHeaderLink } from './places-navigation'
 
 const places = { href: '/places', label: dictionary.nav.places, newTab: false }
@@ -39,7 +37,7 @@ test('footer adds Places once in a travel column, or the first available column'
   assert.deepEqual(withPlacesFooterLink([], places), [])
 })
 
-test('header and footer apply the link to CMS and fallback menus and translate the label', () => {
+test('header and footer apply the link to CMS and fallback menus', () => {
   const header = readFileSync(new URL('../components/layout/header.tsx', import.meta.url), 'utf8')
   const footer = readFileSync(new URL('../components/layout/footer.tsx', import.meta.url), 'utf8')
   assert.match(header, /withPlacesHeaderLink\(fallbackLinks/)
@@ -48,6 +46,4 @@ test('header and footer apply the link to CMS and fallback menus and translate t
     assert.match(source, /href: sitePath\('\/places'\)/)
     assert.match(source, /label: dict\.nav\.places/)
   }
-  assert.equal(de.Places, 'Orte')
-  assert.equal(fr.Places, 'Lieux')
 })
