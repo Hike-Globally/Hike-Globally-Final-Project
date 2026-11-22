@@ -48,7 +48,24 @@ export function setFrontendLocale(locale: FrontendLocale): FrontendLocale {
   const next = isFrontendLocale(locale) ? locale : defaultFrontendLocale
   writeFrontendLocaleCookie(next)
   if (typeof window !== 'undefined') {
-    window.dispatchEvent(new Event(FRONTEND_LOCALE_EVENT))
+    window.dispatchEvent(new window.Event(FRONTEND_LOCALE_EVENT))
+
+    // Apply the selected dictionary to the page already on screen immediately,
+    // rather than waiting for React's external-store update/effect cycle. The
+    // runtime still observes later React/Next.js content updates and handles
+    // navigation; this makes an in-place switch reliable on detail pages too.
+    void import('./load-translations')
+      .then(({ loadTranslations }) => loadTranslations(next))
+      .then((translations) => {
+        // Ignore a slow import if the visitor selected another language meanwhile.
+        if (getFrontendLocale() !== next) return
+        return import('./dom-translations').then(({ applyFrontendTranslations }) => {
+          if (getFrontendLocale() === next) applyFrontendTranslations(next, translations)
+        })
+      })
+      .catch((error: unknown) => {
+        console.warn('[frontend-locale] Could not apply selected language:', error)
+      })
   }
   return next
 }

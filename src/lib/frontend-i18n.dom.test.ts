@@ -7,6 +7,7 @@ import test from 'node:test'
 import { JSDOM } from 'jsdom'
 
 import { applyFrontendTranslations, observeFrontendTranslations } from '../i18n/dom-translations'
+import { setFrontendLocale } from '../i18n/frontend-locale'
 import { translations as de } from '../i18n/translations/de'
 import { translations as fr } from '../i18n/translations/fr'
 
@@ -101,6 +102,22 @@ test('English restores the original copy without changing the URL', () => {
   assert.equal(dom.window.document.documentElement.lang, 'en')
   assert.equal(dom.window.document.documentElement.dataset.frontendLocale, 'en')
   assert.equal(dom.window.document.URL, 'https://example.com/')
+})
+
+test('changing the language applies it to the current detail-page DOM immediately', async () => {
+  setFrontendLocale('de')
+  await new Promise((resolve) => setTimeout(resolve, 0))
+
+  assert.equal(text('#exact'), 'Mehr lesen')
+  assert.equal(text('#inserted'), 'Planen Sie Ihre Reise')
+  assert.equal(dom.window.document.documentElement.lang, 'de')
+
+  setFrontendLocale('fr')
+  await new Promise((resolve) => setTimeout(resolve, 0))
+
+  assert.equal(text('#exact'), 'En savoir plus')
+  assert.equal(text('#inserted'), 'Planifiez votre voyage')
+  assert.equal(dom.window.document.documentElement.lang, 'fr')
 })
 
 test('release JSDOM globals', () => {
