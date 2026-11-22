@@ -5,6 +5,7 @@ import { MAX_KEYWORDS } from '@/fields/keywords'
 import { htmlLang, ogLocale } from '@/i18n/config'
 import type { Blog, Destination, Media, Trip } from '@/payload-types'
 import { authorProfile, type PublicAuthor } from './author-profile'
+import { parseCoordinates } from './coordinates'
 import { lexicalToPlainText, truncate } from './format'
 import { httpUrl } from './http-url'
 import { resolveSiteUrl } from './site-url'
@@ -673,27 +674,32 @@ export const touristDestinationJsonLd = ({
   url: string
   /** Media document, media id or an already-absolute URL — resolved by `schemaImageUrl()`. */
   image?: number | Media | string | null
-}): JsonLdInput => ({
-  '@context': 'https://schema.org',
-  '@type': 'TouristDestination',
-  name: destination.meta?.title || destination.name,
-  description: destination.meta?.description || destination.tagline,
-  url: canonicalUrl(url),
-  image: schemaImageUrl(image) ? [schemaImageUrl(image)] : undefined,
-  inLanguage: htmlLang,
-  address: {
-    '@type': 'PostalAddress',
-    addressCountry: destination.country,
-  },
-  geo:
-    destination.coordinates?.latitude && destination.coordinates?.longitude
+}): JsonLdInput => {
+  const coordinates = parseCoordinates(destination.coordinates)
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'TouristDestination',
+    name: destination.meta?.title || destination.name,
+    description: destination.meta?.description || destination.tagline,
+    url: canonicalUrl(url),
+    image: schemaImageUrl(image) ? [schemaImageUrl(image)] : undefined,
+    inLanguage: htmlLang,
+    address: {
+      '@type': 'PostalAddress',
+      addressCountry: destination.country,
+    },
+    // `parseCoordinates()` rather than a truthiness check: a destination on the equator (latitude 0)
+    // or the Greenwich meridian (longitude 0) still deserves its GeoCoordinates.
+    geo: coordinates
       ? {
           '@type': 'GeoCoordinates',
-          latitude: destination.coordinates.latitude,
-          longitude: destination.coordinates.longitude,
+          latitude: coordinates.latitude,
+          longitude: coordinates.longitude,
         }
       : undefined,
-})
+  }
+}
 
 /**
  * FAQPage structured data.

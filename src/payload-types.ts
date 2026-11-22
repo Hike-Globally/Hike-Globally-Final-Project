@@ -332,10 +332,16 @@ export interface Destination {
    */
   bestSeasons?: ('spring' | 'summer' | 'autumn' | 'winter')[] | null;
   /**
-   * Used for the map link and for geographic structured data.
+   * Pins the destination page map and fills the geographic structured data. Paste any point from Google Maps (right-click → “Copy coordinates”) into either field: both are also editable as text, so “27.7172, 85.3240” can go straight into Latitude. Leave both empty to publish without a map.
    */
   coordinates?: {
+    /**
+     * −90 (south) to 90 (north). The first number of a pasted pair.
+     */
     latitude?: number | null;
+    /**
+     * −180 (west) to 180 (east). The second number of a pasted pair.
+     */
     longitude?: number | null;
   };
   /**
