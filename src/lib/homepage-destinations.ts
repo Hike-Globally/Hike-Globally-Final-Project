@@ -50,13 +50,13 @@ export const NEPAL_REGION_CARDS: DestinationCard[] = [
     102,
     'Eastern Nepal',
     'Home of Everest and Kanchenjunga, with sherpa villages and high trails.',
-    '/images/regions/eastern-nepal.webp',
+    '/images/regions/eastern-nepal.jpg',
   ),
   nepalRegion(
     103,
     'Far Western Nepal',
     'Api Nampa conservation area, remote valleys and a culture older than the roads.',
-    '/images/regions/far-western-nepal.png',
+    '/images/regions/far-western-nepal.jpg',
   ),
   nepalRegion(
     104,
