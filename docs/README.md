@@ -20,15 +20,16 @@ documents here go deeper on specific areas.
 
 ## Content features
 
-| Document                                             | Description                                                                                                             |
-| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| [page-sections.md](content/page-sections.md)         | Per-page section ordering, custom HTML sections and link previews on trips and blog posts.                              |
-| [multi-url-preview.md](content/multi-url-preview.md) | Multi-URL Preview page sections and inline content blocks: layouts, animations, accessibility and deployment.           |
-| [internal-linking.md](content/internal-linking.md)   | Automatic internal links from the **Keyword For Internal Linking** panel — how editors use it and how the engine works. |
-| [trip-brochure.md](content/trip-brochure.md)         | The downloadable trip brochure on the trip page.                                                                        |
-| [trip-audience.md](content/trip-audience.md)         | The _Who Is This Trip For / Not For_ cards on the trip page.                                                            |
-| [author-expertise.md](content/author-expertise.md)   | Public author qualifications, trip itinerary experts, and site-wide publisher identity.                                 |
-| [destination-maps.md](content/destination-maps.md)   | Destination map coordinates: what editors enter, the OpenStreetMap embed, and why coordinates get a guard.              |
+| Document                                             | Description                                                                                                                  |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| [page-sections.md](content/page-sections.md)         | Per-page section ordering, custom HTML sections and link previews on trips and blog posts.                                   |
+| [multi-url-preview.md](content/multi-url-preview.md) | Multi-URL Preview page sections and inline content blocks: layouts, animations, accessibility and deployment.                |
+| [internal-linking.md](content/internal-linking.md)   | Automatic internal links from the **Keyword For Internal Linking** panel — how editors use it and how the engine works.      |
+| [trip-brochure.md](content/trip-brochure.md)         | The downloadable trip brochure on the trip page.                                                                             |
+| [trip-audience.md](content/trip-audience.md)         | The _Who Is This Trip For / Not For_ cards on the trip page.                                                                 |
+| [author-expertise.md](content/author-expertise.md)   | Public author qualifications, trip itinerary experts, and site-wide publisher identity.                                      |
+| [destination-maps.md](content/destination-maps.md)   | Destination map coordinates: what editors enter, the OpenStreetMap embed, and why coordinates get a guard.                   |
+| [altitude-chart.md](content/altitude-chart.md)       | The generated altitude chart: the `place`/`altitude` itinerary fields, how the profile is computed, and the upload fallback. |
 
 ## Design
 

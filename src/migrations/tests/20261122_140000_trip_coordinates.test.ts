@@ -27,11 +27,15 @@ const columns = [
   ['_trips_v', 'version_coordinates_longitude'],
 ] as const
 
-test('trip coordinates is the newest migration', () => {
-  assert.equal(migrations.at(-1)?.up, up)
-  assert.equal(migrations.at(-1)?.down, down)
-  assert.equal(migrations.at(-1)?.name, '20261122_140000_trip_coordinates')
-  assert.equal(migrations.at(-2)?.name, '20261122_120000_itinerary_images')
+test('trip coordinates sits after the itinerary images and before the next migration', () => {
+  // Not "the newest" any more — later migrations append below it, which is expected; what must not
+  // change is its position, because the chain is applied in array order.
+  const index = migrations.findIndex(({ name }) => name === '20261122_140000_trip_coordinates')
+  assert.ok(index >= 0)
+  assert.equal(migrations[index]?.up, up)
+  assert.equal(migrations[index]?.down, down)
+  assert.equal(migrations[index - 1]?.name, '20261122_120000_itinerary_images')
+  assert.equal(migrations[index + 1]?.name, '20261122_160000_itinerary_place')
 })
 
 test('up adds the four columns as nullable numerics, on both the live and versioned tables', async () => {

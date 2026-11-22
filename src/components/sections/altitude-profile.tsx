@@ -1,0 +1,173 @@
+import { Mountain } from 'lucide-react'
+
+import {
+  altitudeProfile,
+  altitudeScale,
+  profilePaths,
+  type AltitudeDayInput,
+} from '@/lib/altitude-profile'
+import { formatNumber } from '@/lib/format'
+
+/**
+ * ============================================================================
+ * Altitude profile
+ * ============================================================================
+ * The elevation profile of a trek, drawn from the itinerary instead of uploaded as a picture.
+ *
+ * Hand-written inline SVG, in the same spirit as the homepage globe (`globe-renderer.ts`) and the
+ * map embed (`coordinates-map.tsx`): no chart library, no client boundary, no JavaScript bundle. A
+ * profile is a polyline, a filled area, a handful of axis labels and dots — maybe 3 KB of markup,
+ * which is less than the library's own loader would weigh and infinitely easier to style to the
+ * brand. It also means the chart is in the HTML on first paint and reads correctly with JavaScript
+ * off.
+ *
+ * The viewBox is a fixed 800 × 340 user space, so every text size below is in the same units and
+ * the whole chart scales fluidly with its container (`w-full`, `h-auto`). Nothing is measured at
+ * runtime, which is what lets this stay a pure server component.
+ */
+
+/** The drawing box, in viewBox units. Kept here so the tests can reason about the same numbers. */
+const WIDTH = 800
+const HEIGHT = 340
+// Left/right room for the rotated place names, which lean out past their dots — generous enough
+// that a long first label ("Kathmandu") still fits inside the frame.
+const PADDING = { top: 34, right: 30, bottom: 62, left: 64 }
+
+const INK = '#183144' /* ink */
+const SLATE = '#6b6767' /* slate-80 */
+const OCEAN_LIT = '#3d6f92' /* ink mixed toward deep, the globe's lit ocean */
+const OCEAN_WASH = '#dbe9f3' /* deep-20 */
+
+/** Altitude as whole metres: 3210, not "3,210" — the reference chart's denser, ungrouped form. */
+const metres = (value: number): string => String(Math.round(value))
+
+export function AltitudeProfile({
+  days,
+  className,
+  title = 'Altitude profile',
+}: {
+  /** The trip's `itinerary` array. Days without an altitude are ignored. */
+  days: readonly AltitudeDayInput[] | null | undefined
+  className?: string
+  /** Accessible name of the figure — the section already says "Altitude chart". */
+  title?: string
+}) {
+  const profile = altitudeProfile(days)
+  // The caller decides what to show instead; a one-point profile is not worth drawing.
+  if (!profile) return null
+
+  const scale = altitudeScale(profile)
+  const { line, area, coords } = profilePaths({
+    points: profile.points,
+    scale,
+    width: WIDTH,
+    height: HEIGHT,
+    padding: PADDING,
+  })
+
+  const baseline = HEIGHT - PADDING.bottom
+
+  return (
+    <figure className={className}>
+      <svg
+        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+        className="h-auto w-full"
+        role="img"
+        aria-label={`${title}: ${formatNumber(profile.minAltitude)} to ${formatNumber(
+          profile.maxAltitude,
+        )} metres over ${profile.points.length} days.`}
+        preserveAspectRatio="xMidYMid meet"
+      >
+        {/* No y-axis and no gridlines, by design: every point prints its own metre value, so an
+            axis would only add ink. This is the treatment of the operator's reference chart (and
+            of most trek profiles), and it keeps an 18-day itinerary from looking like a spreadsheet.
+            The scale itself is still computed and padded — `altitudePaths()` uses it — which is
+            what stops the profile from flattening into the top of the frame. */}
+
+        {/* The profile: a filled area under the line, then the line itself. */}
+        <path d={area} fill={OCEAN_WASH} />
+        <path d={line} fill="none" stroke={OCEAN_LIT} strokeWidth={2.5} strokeLinejoin="round" />
+
+        {profile.points.map((point, index) => {
+          const { x, y } = coords[index]!
+          const isTop = point.altitude === profile.maxAltitude
+          // The end labels would otherwise run off the frame and collide with the y-axis ticks,
+          // so they hang inside the plot box instead of being centred on their dot.
+          const anchor =
+            index === 0 ? 'start' : index === profile.points.length - 1 ? 'end' : 'middle'
+          const labelX = anchor === 'start' ? x - 4 : anchor === 'end' ? x + 4 : x
+          // At the two ends the line runs away from the label, so the value is pushed further up
+          // to keep it off the stroke.
+          const labelY =
+            y - (isTop ? 14 : index === 0 || index === profile.points.length - 1 ? 20 : 12)
+
+          return (
+            <g key={`${point.day}-${point.label}`}>
+              <circle cx={x} cy={y} r={isTop ? 5 : 4} fill={OCEAN_LIT} />
+              {/* The metre value above each dot, clear of the line. */}
+              <text
+                x={labelX}
+                y={labelY}
+                textAnchor={anchor}
+                fontSize={13}
+                fontWeight={isTop ? 600 : 400}
+                fill={INK}
+              >
+                {metres(point.altitude)}m
+              </text>
+              {/* The place name under the axis, rotated like the reference chart so the labels
+                  never collide even on a full 18-day itinerary. */}
+              {profile.labelled[index] ? (
+                <text
+                  x={x}
+                  y={baseline + 16}
+                  textAnchor="end"
+                  fontSize={12.5}
+                  fill={SLATE}
+                  transform={`rotate(-35 ${x} ${baseline + 16})`}
+                >
+                  {point.label}
+                </text>
+              ) : null}
+            </g>
+          )
+        })}
+      </svg>
+
+      {/* Screen readers get the numbers as text: the chart above is a picture of this table. */}
+      <figcaption className="sr-only">
+        <table>
+          <caption>{title}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Day</th>
+              <th scope="col">Place</th>
+              <th scope="col">Altitude (m)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {profile.points.map((point) => (
+              <tr key={`row-${point.day}`}>
+                <td>{point.day}</td>
+                <td>{point.label}</td>
+                <td>{formatNumber(point.altitude)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </figcaption>
+
+      {/* Sighted readers get the same thing as a line of text, which also explains what a point
+          plots when a day has a high point and a lower bed. */}
+      <p className="mt-4 flex items-center gap-1.5 text-small text-slate-80">
+        <Mountain className="size-3.5 text-sage-90" aria-hidden />
+        Highest point of each day, {formatNumber(profile.minAltitude)}–
+        {formatNumber(profile.maxAltitude)} m over {profile.points.length} days
+        <span className="sr-only">. Full values in the table above.</span>
+      </p>
+    </figure>
+  )
+}
+
+/** Exported for the layout tests: the drawing box the paths are computed against. */
+export const ALTITUDE_PROFILE_SIZE = { width: WIDTH, height: HEIGHT, padding: PADDING }

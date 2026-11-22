@@ -125,13 +125,11 @@ const richText = (...nodes: LexicalNode[]): RichTextValue => ({
  * Trekking Equipment, Personal Items. Seeded this way so a fresh install demonstrates the grouped
  * view instead of a wall of untagged rows.
  */
-const packingList = (
-  groups: {
-    clothing?: string[]
-    equipment?: string[]
-    personal?: string[]
-  },
-) => [
+const packingList = (groups: {
+  clothing?: string[]
+  equipment?: string[]
+  personal?: string[]
+}) => [
   ...(groups.clothing ?? []).map((item) => ({ item, category: 'clothing-footwear' as const })),
   ...(groups.equipment ?? []).map((item) => ({ item, category: 'trekking-equipment' as const })),
   ...(groups.personal ?? []).map((item) => ({ item, category: 'personal-items' as const })),
@@ -598,6 +596,7 @@ const run = async () => {
         {
           day: 1,
           title: 'Arrive in Kathmandu (1,400 m)',
+          place: 'Kathmandu',
           altitude: 1400,
           description:
             'Airport transfer, gear check and briefing at the hotel. Welcome dinner in Thamel.',
@@ -606,6 +605,7 @@ const run = async () => {
         {
           day: 2,
           title: 'Fly to Lukla, trek to Phakding (2,610 m)',
+          place: 'Phakding',
           altitude: 2610,
           description:
             'The 35-minute flight to Lukla is the best value sightseeing in aviation. Gentle three-hour walk down the Dudh Koshi to Phakding.',
@@ -614,6 +614,7 @@ const run = async () => {
         {
           day: 3,
           title: 'Phakding to Namche Bazaar (3,440 m)',
+          place: 'Namche Bazaar',
           altitude: 3440,
           description:
             'Six suspension bridges, the Hillary Bridge, and the long climb up to Namche. First view of Everest from the top of the ridge.',
@@ -622,6 +623,7 @@ const run = async () => {
         {
           day: 4,
           title: 'Acclimatisation day in Namche',
+          place: 'Khumjung',
           altitude: 3440,
           description:
             'Walk to Khumjung or the Everest View Hotel and back down to sleep. This day is what makes the rest of the trek work.',
@@ -630,6 +632,7 @@ const run = async () => {
         {
           day: 5,
           title: 'Namche to Tengboche (3,860 m)',
+          place: 'Tengboche',
           altitude: 3860,
           description:
             'Rhododendron forest, the Dudh Koshi far below, and the monastery at Tengboche with Ama Dablam directly behind it.',
@@ -638,6 +641,7 @@ const run = async () => {
         {
           day: 6,
           title: 'Tengboche to Dingboche (4,410 m)',
+          place: 'Dingboche',
           altitude: 4410,
           description:
             'Above the tree line now. Yak pastures, stone walls, and the first real taste of thin air.',
@@ -646,6 +650,7 @@ const run = async () => {
         {
           day: 7,
           title: 'Acclimatisation day in Dingboche',
+          place: 'Nangkartshang',
           altitude: 4410,
           description:
             'Climb to Nangkartshang (5,083 m) for the Makalu view, then back down. Sleep low, climb high.',
@@ -654,6 +659,7 @@ const run = async () => {
         {
           day: 8,
           title: 'Dingboche to Lobuche (4,940 m)',
+          place: 'Lobuche',
           altitude: 4940,
           description:
             'Past the memorials to climbers lost on Everest, up the terminal moraine of the Khumbu glacier.',
@@ -662,6 +668,7 @@ const run = async () => {
         {
           day: 9,
           title: 'Lobuche to Gorak Shep, Base Camp (5,364 m)',
+          place: 'Gorak Shep',
           altitude: 5364,
           description:
             'The longest day: Gorak Shep, then on to Everest Base Camp on the ice of the Khumbu glacier.',
@@ -670,6 +677,7 @@ const run = async () => {
         {
           day: 10,
           title: 'Kala Patthar sunrise, down to Pheriche',
+          place: 'Kala Patthar',
           altitude: 5545,
           description:
             'Up at 4:30 am for the best view of your life: Everest, Nuptse, Lhotse and Pumori from 5,545 m. Then descend to Pheriche.',
@@ -678,6 +686,7 @@ const run = async () => {
         {
           day: 11,
           title: 'Pheriche to Namche',
+          place: 'Pheriche',
           altitude: 3440,
           description:
             'Long descent through Tengboche and the forests below. Legs tired, spirits high.',
@@ -686,6 +695,7 @@ const run = async () => {
         {
           day: 12,
           title: 'Namche to Lukla',
+          place: 'Lukla',
           altitude: 2860,
           description: 'Final walk out, farewell dinner with the crew.',
           accommodation: 'Teahouse',
@@ -693,6 +703,7 @@ const run = async () => {
         {
           day: 13,
           title: 'Fly to Kathmandu',
+          place: 'Kathmandu',
           altitude: 1400,
           description:
             'Morning flight (with buffer day if needed), afternoon at leisure, celebration dinner.',
@@ -701,6 +712,7 @@ const run = async () => {
         {
           day: 14,
           title: 'Departure',
+          place: 'Kathmandu',
           altitude: 1400,
           description: 'Transfer to the airport. Or stay on — most people do.',
           accommodation: '—',
@@ -763,6 +775,7 @@ const run = async () => {
         {
           day: 1,
           title: 'Arrive in Pokhara',
+          place: 'Pokhara',
           altitude: 822,
           description: 'Transfer from Kathmandu by flight or road. Gear check and briefing.',
           accommodation: 'Hotel in Pokhara',
@@ -770,6 +783,7 @@ const run = async () => {
         {
           day: 2,
           title: 'Drive to Nayapul, trek to Tikhedhunga',
+          place: 'Tikhedhunga',
           altitude: 1540,
           description: 'Short drive, then a gentle walk up the Bhurungdi Khola.',
           accommodation: 'Teahouse',
@@ -777,6 +791,7 @@ const run = async () => {
         {
           day: 3,
           title: 'Tikhedhunga to Ghorepani (2,860 m)',
+          place: 'Ghorepani',
           altitude: 2860,
           description: 'The Ulleri staircase: 3,000 steps, one memorable afternoon.',
           accommodation: 'Teahouse',
@@ -784,6 +799,7 @@ const run = async () => {
         {
           day: 4,
           title: 'Poon Hill sunrise, trek to Tadapani',
+          place: 'Poon Hill',
           altitude: 2630,
           description:
             'Pre-dawn climb to Poon Hill (3,210 m) for the Dhaulagiri sunrise, then through rhododendron forest to Tadapani.',
@@ -792,6 +808,7 @@ const run = async () => {
         {
           day: 5,
           title: 'Tadapani to Chomrong (2,170 m)',
+          place: 'Chomrong',
           altitude: 2170,
           description:
             'Gurung village with the best views of Annapurna South and Hiunchuli from the teahouse veranda.',
@@ -800,6 +817,7 @@ const run = async () => {
         {
           day: 6,
           title: 'Chomrong to Dovan (2,600 m)',
+          place: 'Dovan',
           altitude: 2600,
           description: 'Down to the Chomrong Khola and back up through bamboo forest.',
           accommodation: 'Teahouse',
@@ -807,6 +825,7 @@ const run = async () => {
         {
           day: 7,
           title: 'Dovan to Deurali (3,230 m)',
+          place: 'Deurali',
           altitude: 3230,
           description: 'Into the gorge, under Hinko Cave, with the Sanctuary walls closing in.',
           accommodation: 'Teahouse',
@@ -814,6 +833,7 @@ const run = async () => {
         {
           day: 8,
           title: 'Deurali to Annapurna Base Camp (4,130 m)',
+          place: 'Annapurna BC',
           altitude: 4130,
           description:
             'The amphitheatre opens. Machhapuchhre’s fishtail, Annapurna I, Gangapurna — all at once.',
@@ -822,6 +842,7 @@ const run = async () => {
         {
           day: 9,
           title: 'Sunrise at Base Camp, descend to Bamboo',
+          place: 'Bamboo',
           altitude: 2310,
           description: 'One last freezing sunrise, then a long descent.',
           accommodation: 'Teahouse',
@@ -829,6 +850,7 @@ const run = async () => {
         {
           day: 10,
           title: 'Bamboo to Jhinu Danda',
+          place: 'Jhinu Danda',
           altitude: 1780,
           description: 'Hot springs in the afternoon. Well earned.',
           accommodation: 'Teahouse',
@@ -836,6 +858,7 @@ const run = async () => {
         {
           day: 11,
           title: 'Drive to Pokhara',
+          place: 'Pokhara',
           altitude: 822,
           description: 'Walk out to Nayapul, transfer to Pokhara, celebration dinner.',
           accommodation: 'Hotel in Pokhara',
@@ -898,6 +921,7 @@ const run = async () => {
         {
           day: 1,
           title: 'Drive Kathmandu to Syabrubesi (1,550 m)',
+          place: 'Syabrubesi',
           altitude: 1550,
           description: 'Seven hours through the Trishuli valley. Last cold beer for a while.',
           accommodation: 'Teahouse',
@@ -905,6 +929,7 @@ const run = async () => {
         {
           day: 2,
           title: 'Syabrubesi to Lama Hotel (2,380 m)',
+          place: 'Lama Hotel',
           altitude: 2380,
           description: 'Riverside walking through bamboo and oak forest.',
           accommodation: 'Teahouse',
@@ -912,6 +937,7 @@ const run = async () => {
         {
           day: 3,
           title: 'Lama Hotel to Langtang village (3,430 m)',
+          place: 'Langtang Village',
           altitude: 3430,
           description:
             'The valley opens. This is the village that was buried in 2015, rebuilt by the families who stayed.',
@@ -920,6 +946,7 @@ const run = async () => {
         {
           day: 4,
           title: 'Langtang to Kyanjin Gompa (3,870 m)',
+          place: 'Kyanjin Gompa',
           altitude: 3870,
           description:
             'Yak pastures, mani walls, and the monastery directly under Langtang Lirung.',
@@ -928,6 +955,7 @@ const run = async () => {
         {
           day: 5,
           title: 'Kyanjin Ri and Tsergo Ri',
+          place: 'Tsergo Ri',
           altitude: 4984,
           description:
             'Kyanjin Ri (4,773 m) at sunrise, Tsergo Ri (4,984 m) if the group is strong. Both are optional and both are worth it.',
@@ -936,6 +964,7 @@ const run = async () => {
         {
           day: 6,
           title: 'Kyanjin to Lama Hotel',
+          place: 'Lama Hotel',
           altitude: 2380,
           description: 'Retrace the valley downhill.',
           accommodation: 'Teahouse',
@@ -943,6 +972,7 @@ const run = async () => {
         {
           day: 7,
           title: 'Lama Hotel to Syabrubesi',
+          place: 'Syabrubesi',
           altitude: 1550,
           description: 'Final forest walk out.',
           accommodation: 'Teahouse',
@@ -950,6 +980,7 @@ const run = async () => {
         {
           day: 8,
           title: 'Drive to Kathmandu',
+          place: 'Kathmandu',
           altitude: 1400,
           description: 'Long road day, hot shower, celebration dinner.',
           accommodation: 'Hotel in Kathmandu',
@@ -957,6 +988,7 @@ const run = async () => {
         {
           day: 9,
           title: 'Departure',
+          place: 'Kathmandu',
           altitude: 1400,
           description: 'Airport transfer.',
           accommodation: '—',
@@ -1018,6 +1050,7 @@ const run = async () => {
         {
           day: 1,
           title: 'Arrive in Kathmandu',
+          place: 'Kathmandu',
           altitude: 1400,
           description: 'Briefing and gear check.',
           accommodation: 'Hotel',
@@ -1025,6 +1058,7 @@ const run = async () => {
         {
           day: 2,
           title: 'Fly to Lukla, trek to Phakding',
+          place: 'Phakding',
           altitude: 2610,
           description: 'The approach begins.',
           accommodation: 'Teahouse',
@@ -1032,6 +1066,7 @@ const run = async () => {
         {
           day: 3,
           title: 'Phakding to Namche Bazaar',
+          place: 'Namche Bazaar',
           altitude: 3440,
           description: 'Hillary Bridge and the Namche hill.',
           accommodation: 'Teahouse',
@@ -1039,6 +1074,7 @@ const run = async () => {
         {
           day: 4,
           title: 'Acclimatisation in Namche',
+          place: 'Khumjung',
           altitude: 3440,
           description: 'Everest View Hotel and the Sherpa museum.',
           accommodation: 'Teahouse',
@@ -1046,6 +1082,7 @@ const run = async () => {
         {
           day: 5,
           title: 'Namche to Tengboche',
+          place: 'Tengboche',
           altitude: 3860,
           description: 'Monastery afternoon.',
           accommodation: 'Teahouse',
@@ -1053,6 +1090,7 @@ const run = async () => {
         {
           day: 6,
           title: 'Tengboche to Dingboche',
+          place: 'Dingboche',
           altitude: 4410,
           description: 'Above the treeline.',
           accommodation: 'Teahouse',
@@ -1060,6 +1098,7 @@ const run = async () => {
         {
           day: 7,
           title: 'Acclimatisation in Dingboche',
+          place: 'Nangkartshang',
           altitude: 4410,
           description: 'Nangkartshang peak.',
           accommodation: 'Teahouse',
@@ -1067,6 +1106,7 @@ const run = async () => {
         {
           day: 8,
           title: 'Dingboche to Lobuche',
+          place: 'Lobuche',
           altitude: 4940,
           description: 'Climbers’ memorials above Thukla.',
           accommodation: 'Teahouse',
@@ -1074,6 +1114,7 @@ const run = async () => {
         {
           day: 9,
           title: 'Lobuche to Everest Base Camp',
+          place: 'Everest Base Camp',
           altitude: 5364,
           description: 'Gorak Shep, then the icefall.',
           accommodation: 'Teahouse',
@@ -1081,6 +1122,7 @@ const run = async () => {
         {
           day: 10,
           title: 'Kala Patthar and Kongma La',
+          place: 'Kala Patthar',
           altitude: 5535,
           description: 'Sunrise at 5,545 m, then the first pass to Chhukung.',
           accommodation: 'Teahouse',
@@ -1088,6 +1130,7 @@ const run = async () => {
         {
           day: 11,
           title: 'Chhukung rest day',
+          place: 'Chhukung',
           altitude: 4730,
           description: 'Optional Island Peak base camp walk.',
           accommodation: 'Teahouse',
@@ -1095,6 +1138,7 @@ const run = async () => {
         {
           day: 12,
           title: 'Cho La crossing to Dzongla',
+          place: 'Cho La',
           altitude: 5420,
           description: 'The technical pass — crampons and early start.',
           accommodation: 'Teahouse',
@@ -1102,6 +1146,7 @@ const run = async () => {
         {
           day: 13,
           title: 'Dzongla to Gokyo',
+          place: 'Gokyo',
           altitude: 4790,
           description: 'Ngozumpa glacier and the turquoise lakes.',
           accommodation: 'Teahouse',
@@ -1109,6 +1154,7 @@ const run = async () => {
         {
           day: 14,
           title: 'Gokyo Ri sunrise',
+          place: 'Gokyo Ri',
           altitude: 5357,
           description: 'Four 8,000-metre peaks before breakfast.',
           accommodation: 'Teahouse',
@@ -1116,6 +1162,7 @@ const run = async () => {
         {
           day: 15,
           title: 'Renjo La to Thame',
+          place: 'Renjo La',
           altitude: 5360,
           description: 'The third pass, then down into the Bhote Koshi valley.',
           accommodation: 'Teahouse',
@@ -1123,6 +1170,7 @@ const run = async () => {
         {
           day: 16,
           title: 'Thame to Namche',
+          place: 'Namche Bazaar',
           altitude: 3440,
           description: 'Monastery visit and a last bakery stop.',
           accommodation: 'Teahouse',
@@ -1130,6 +1178,7 @@ const run = async () => {
         {
           day: 17,
           title: 'Namche to Lukla',
+          place: 'Lukla',
           altitude: 2860,
           description: 'Final descent and farewell dinner.',
           accommodation: 'Teahouse',
@@ -1137,6 +1186,7 @@ const run = async () => {
         {
           day: 18,
           title: 'Fly to Kathmandu',
+          place: 'Kathmandu',
           altitude: 1400,
           description: 'Buffer day available if weather delays the flight.',
           accommodation: 'Hotel',
@@ -1198,6 +1248,7 @@ const run = async () => {
         {
           day: 1,
           title: 'Arrive in Pokhara',
+          place: 'Pokhara',
           altitude: 822,
           description: 'Permit formalities and briefing.',
           accommodation: 'Hotel',
@@ -1205,6 +1256,7 @@ const run = async () => {
         {
           day: 2,
           title: 'Fly to Jomsom, trek to Kagbeni',
+          place: 'Kagbeni',
           altitude: 2810,
           description:
             'Morning flight over the gorge, then an easy walk to the gateway of Mustang.',
@@ -1213,6 +1265,7 @@ const run = async () => {
         {
           day: 3,
           title: 'Kagbeni to Chele',
+          place: 'Chele',
           altitude: 3050,
           description: 'Permit check, then into the red cliffs.',
           accommodation: 'Lodge',
@@ -1220,6 +1273,7 @@ const run = async () => {
         {
           day: 4,
           title: 'Chele to Ghiling',
+          place: 'Ghiling',
           altitude: 3520,
           description: 'Two passes, one very long canyon.',
           accommodation: 'Lodge',
@@ -1227,6 +1281,7 @@ const run = async () => {
         {
           day: 5,
           title: 'Ghiling to Charang',
+          place: 'Charang',
           altitude: 3560,
           description: 'The royal palace and the red monastery of Charang.',
           accommodation: 'Lodge',
@@ -1234,6 +1289,7 @@ const run = async () => {
         {
           day: 6,
           title: 'Charang to Lo Manthang',
+          place: 'Lo Manthang',
           altitude: 3810,
           description: 'Cross the final pass into the walled city.',
           accommodation: 'Lodge',
@@ -1241,6 +1297,7 @@ const run = async () => {
         {
           day: 7,
           title: 'Lo Manthang and the Chhoser caves',
+          place: 'Chhoser',
           altitude: 3810,
           description: 'Sky caves, murals, and a monastery with 1,500 painted Buddhas.',
           accommodation: 'Lodge',
@@ -1248,6 +1305,7 @@ const run = async () => {
         {
           day: 8,
           title: 'Lo Manthang rest day',
+          place: 'Lo Manthang',
           altitude: 3810,
           description:
             'Festival visits if the calendar cooperates; otherwise horse riding in the valley.',
@@ -1256,6 +1314,7 @@ const run = async () => {
         {
           day: 9,
           title: 'Lo Manthang to Drakmar',
+          place: 'Drakmar',
           altitude: 3820,
           description: 'Retrace south through the painted red cliffs.',
           accommodation: 'Lodge',
@@ -1263,6 +1322,7 @@ const run = async () => {
         {
           day: 10,
           title: 'Drakmar to Ghiling',
+          place: 'Ghiling',
           altitude: 3520,
           description: 'Canyon walking.',
           accommodation: 'Lodge',
@@ -1270,6 +1330,7 @@ const run = async () => {
         {
           day: 11,
           title: 'Ghiling to Kagbeni',
+          place: 'Kagbeni',
           altitude: 2810,
           description: 'Long final day down the Kali Gandaki.',
           accommodation: 'Lodge',
@@ -1277,6 +1338,7 @@ const run = async () => {
         {
           day: 12,
           title: 'Kagbeni to Jomsom, fly to Pokhara',
+          place: 'Jomsom',
           altitude: 2720,
           description: 'Morning walk, afternoon flight, celebration dinner.',
           accommodation: 'Hotel in Pokhara',
@@ -1284,6 +1346,7 @@ const run = async () => {
         {
           day: 13,
           title: 'Departure',
+          place: 'Pokhara',
           altitude: 822,
           description: 'Transfer to Kathmandu or the airport.',
           accommodation: '—',
@@ -1339,6 +1402,7 @@ const run = async () => {
         {
           day: 1,
           title: 'Arrive in Pokhara',
+          place: 'Pokhara',
           altitude: 822,
           description: 'Briefing in Lakeside.',
           accommodation: 'Hotel',
@@ -1346,6 +1410,7 @@ const run = async () => {
         {
           day: 2,
           title: 'Drive to Kande, trek to Deurali',
+          place: 'Deurali',
           altitude: 2100,
           description: 'Short drive, ridge walking from the start.',
           accommodation: 'Lodge',
@@ -1353,6 +1418,7 @@ const run = async () => {
         {
           day: 3,
           title: 'Deurali to Forest Camp',
+          place: 'Forest Camp',
           altitude: 2600,
           description: 'Rhododendron and oak forest.',
           accommodation: 'Lodge',
@@ -1360,6 +1426,7 @@ const run = async () => {
         {
           day: 4,
           title: 'Forest Camp to Low Camp',
+          place: 'Low Camp',
           altitude: 3050,
           description: 'Above the treeline, first big views.',
           accommodation: 'Lodge',
@@ -1367,6 +1434,7 @@ const run = async () => {
         {
           day: 5,
           title: 'Low Camp to High Camp',
+          place: 'High Camp',
           altitude: 3580,
           description: 'The fishtail fills the sky.',
           accommodation: 'Lodge',
@@ -1374,6 +1442,7 @@ const run = async () => {
         {
           day: 6,
           title: 'Mardi Himal base camp and back',
+          place: 'Mardi Himal BC',
           altitude: 4500,
           description: 'Sunrise push to 4,500 m, then descend to Low Camp.',
           accommodation: 'Lodge',
@@ -1381,6 +1450,7 @@ const run = async () => {
         {
           day: 7,
           title: 'Low Camp to Siding',
+          place: 'Siding',
           altitude: 1750,
           description: 'Down through Gurung villages.',
           accommodation: 'Lodge',
@@ -1388,6 +1458,7 @@ const run = async () => {
         {
           day: 8,
           title: 'Drive to Pokhara',
+          place: 'Pokhara',
           altitude: 822,
           description: 'Short walk out, transfer, celebration dinner.',
           accommodation: 'Hotel',

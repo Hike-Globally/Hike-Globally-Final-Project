@@ -36,6 +36,7 @@ import {
 } from '@/components/sections/essential-information-section'
 import { TripBrochureButton } from '@/components/trips/trip-brochure-button'
 import { TripSectionNav } from '@/components/trips/trip-section-nav'
+import { AltitudeProfile } from '@/components/sections/altitude-profile'
 import { CoordinatesMap } from '@/components/sections/coordinates-map'
 import { FaqSection } from '@/components/sections/faq-section'
 import { DeparturesSection } from '@/components/sections/departures-section'
@@ -48,6 +49,7 @@ import { KeyPointsPanel } from '@/components/sections/key-points-panel'
 import { PlaceCategoryLinks } from '@/components/sections/place-category-links'
 import { ItinerarySection } from '@/components/sections/itinerary-section'
 import { surface } from '@/components/ui/surface'
+import { altitudeProfile } from '@/lib/altitude-profile'
 import { parseCoordinates } from '@/lib/coordinates'
 import { PayloadImageFill, PayloadImage } from '@/components/ui/payload-image'
 import { dictionary, type Dictionary } from '@/i18n/dictionaries'
@@ -173,22 +175,27 @@ function TripBookingCard({
 /** One uploaded figure. `label` is the caption above it; `sizes` feeds the image optimizer. */
 type RouteFigure = { media: Media; label: string; sizes: string }
 
-/** Each figure the editor uploaded, in reading order. Missing uploads simply drop out. */
-function routeMapFigures(trip: Trip): RouteFigure[] {
-  return [
-    {
-      media: trip.routeMap,
-      label: 'Original route map',
-      sizes: '(min-width: 1024px) 30vw, (min-width: 768px) 45vw, 92vw',
-    },
-    {
-      media: trip.altitudeChart,
-      label: 'Altitude chart',
-      sizes: '(min-width: 1024px) 30vw, (min-width: 768px) 45vw, 92vw',
-    },
-  ].flatMap(({ media, label, sizes }) =>
-    media && typeof media !== 'number' ? [{ media, label, sizes }] : [],
-  )
+const figureSizes = '(min-width: 1024px) 30vw, (min-width: 768px) 45vw, 92vw'
+
+/** The uploaded route map, if there is one. */
+function uploadedRouteMap(trip: Trip): RouteFigure[] {
+  return trip.routeMap && typeof trip.routeMap !== 'number'
+    ? [{ media: trip.routeMap, label: 'Original route map', sizes: figureSizes }]
+    : []
+}
+
+/**
+ * The uploaded altitude chart — the fallback.
+ *
+ * A trip's itinerary can now draw its own profile (`AltitudeProfile`), which is the default. The
+ * upload is still honoured, and still wins, when the itinerary cannot produce one: fewer than two
+ * days carry an altitude, or the operator has a bespoke graphic they want shown instead. Nothing
+ * that already exists loses its image.
+ */
+function uploadedAltitudeChart(trip: Trip): RouteFigure[] {
+  return trip.altitudeChart && typeof trip.altitudeChart !== 'number'
+    ? [{ media: trip.altitudeChart, label: 'Altitude chart', sizes: figureSizes }]
+    : []
 }
 
 /**
@@ -201,9 +208,15 @@ function routeMapFigures(trip: Trip): RouteFigure[] {
  * first, then laid out, and a row only exists when at least one item does.
  */
 function RouteMapSection({ trip, linker }: { trip: Trip; linker?: InternalLinker | null }) {
-  const figures = routeMapFigures(trip)
+  const routeMap = uploadedRouteMap(trip)
   const coordinates = parseCoordinates(trip.coordinates)
-  const total = figures.length + (coordinates ? 1 : 0)
+
+  // The chart is generated from the itinerary whenever there is a profile to draw; the uploaded
+  // image is the fallback, so no existing trip loses the graphic it shipped with.
+  const profile = altitudeProfile(trip.itinerary)
+  const altitudeUpload = profile ? [] : uploadedAltitudeChart(trip)
+
+  const total = routeMap.length + (coordinates ? 1 : 0) + (profile || altitudeUpload.length ? 1 : 0)
   const intro = hasRichTextContent(trip.routeMapContent) ? trip.routeMapContent : null
   if (!intro && total === 0) return null
 
@@ -240,12 +253,34 @@ function RouteMapSection({ trip, linker }: { trip: Trip; linker?: InternalLinker
 
   // Two figures and no map used to share a 50/50 row. Three items need three tracks, so the map
   // can sit between the images; a partial row spreads its items instead of stranding empty cells.
-  const layout = total >= 3 ? 'md:grid-cols-3' : total === 2 ? 'md:grid-cols-2' : 'md:grid-cols-1'
+  //
+  // The generated chart is the exception: a profile needs horizontal room to stay readable (an
+  // 18-day itinerary has 18 labels), so it spans two tracks and the live map takes the third.
+  const tracks = total >= 3 ? 3 : total === 2 ? 2 : 1
+  const layout =
+    tracks === 1 ? 'md:grid-cols-1' : tracks === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'
 
+  const chartCard = profile ? (
+    <figure
+      key="altitude-profile"
+      className={cn(surface, 'flex flex-col overflow-hidden p-4 sm:p-6 md:col-span-2')}
+    >
+      <figcaption className="mb-4 font-heading text-subhead font-semibold">
+        Altitude chart
+      </figcaption>
+      <div className="flex flex-1 items-center">
+        <AltitudeProfile days={trip.itinerary} />
+      </div>
+    </figure>
+  ) : (
+    altitudeUpload.map(figureCard)
+  )
+
+  // `chartCard` is either one element (generated) or an array (the upload fallback).
   const items = [
-    figures[0] ? figureCard(figures[0]) : null,
+    routeMap[0] ? figureCard(routeMap[0]) : null,
     mapCard,
-    ...figures.slice(1).map(figureCard),
+    ...(Array.isArray(chartCard) ? chartCard : [chartCard]),
   ].filter(Boolean)
 
   return (
