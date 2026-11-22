@@ -1,10 +1,9 @@
 import type { Metadata } from 'next'
 
 import { CtaCard } from '@/components/blocks/cta'
-import { PlaceAtlasCard } from '@/components/cards/place-atlas-card'
 import { JsonLd } from '@/components/seo/json-ld'
 import { PageHeader } from '@/components/sections/page-header'
-import { SectionHeading } from '@/components/sections/section-heading'
+import { PlaceBento } from '@/components/sections/place-bento'
 import { dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
 import { getSettings } from '@/lib/data'
@@ -73,23 +72,10 @@ export default async function PlacesPage() {
 
       <section aria-labelledby="places-index-heading" className="py-16 md:py-24">
         <div className="container-content">
-          <SectionHeading
-            eyebrow="NINE CURATED CATEGORIES"
-            title="Start with a landscape"
-            titleId="places-index-heading"
-            description="Lakes, passes, summits and sacred places: choose the feature you want to travel toward, and we will show the journeys and stories gathered around it."
-          />
-
-          <div className="places-grid">
-            {placeCategories.map((category, index) => (
-              <PlaceAtlasCard
-                key={category.value}
-                category={category}
-                index={index}
-                priority={index < 3}
-              />
-            ))}
-          </div>
+          {/* The grid's own key plate carries the section heading — see
+              `place-bento.tsx`. Nothing sits above the composition: the bento
+              is the section, not a gallery dropped under a heading. */}
+          <PlaceBento titleId="places-index-heading" />
         </div>
       </section>
 

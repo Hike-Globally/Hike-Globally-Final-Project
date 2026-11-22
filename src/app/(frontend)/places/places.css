@@ -1,5 +1,7 @@
-/* Layout for the Browse Places pages: the atlas gallery on `/places`, and
-   the related-landscape strip on the nine `/places/<category>` pages. */
+/* Layout for the Browse Places pages: the index hero line on `/places`, and the
+   related-landscape strip on the nine `/places/<category>` pages. The index's
+   bento grid carries its own stylesheet with its component
+   (`src/components/sections/place-bento.css`). */
 
 /* --- Index hero — the shared count line under the standfirst ------------- */
 
@@ -24,105 +26,12 @@
   background: var(--color-sage-light);
 }
 
-/* --- The atlas gallery — nine framed plates, museum captions below -------- */
-
-.places-grid {
-  display: grid;
-  grid-template-columns: repeat(1, minmax(0, 1fr));
-  /* Columns sit closer than the captions below them: a photograph and its
-     label read as one object, then the eye moves to the next one. */
-  column-gap: clamp(1.25rem, 1rem + 1vw, 2rem);
-  row-gap: clamp(2.5rem, 2rem + 1.6vw, 3.75rem);
-}
-
-.atlas-card {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  color: inherit;
-  text-decoration: none;
-}
-
-.atlas-card__photo {
-  display: block;
-  width: 100%;
-  aspect-ratio: 4 / 5;
-}
-
-.atlas-card__image {
-  filter: var(--image-grade);
-  transform: scale(1.001);
-  transition: transform 1400ms var(--ease-brand);
-}
-
-.atlas-card:hover .atlas-card__image,
-.atlas-card:focus-visible .atlas-card__image {
-  transform: scale(1.05);
-}
-
-.atlas-card__caption {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding-top: clamp(1rem, 0.85rem + 0.5vw, 1.35rem);
-}
-
-.atlas-card__meta {
-  display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
-}
-
-/* Ember numeral — AA on paper (sage-90, 5.01:1), the site's one warm accent
-   doing the numbering the carousel cards do in white over their scrims. */
-.atlas-card__num {
-  font-family: var(--font-display);
-  font-size: clamp(1.25rem, 1.15rem + 0.35vw, 1.5rem);
-  line-height: 1.15;
-  color: var(--color-sage-90);
-}
-
-.atlas-card__title {
-  flex: 1 1 auto;
-  min-width: 0;
-  font-family: var(--font-heading);
-  font-size: var(--text-card);
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  line-height: var(--text-card--line-height);
-  color: var(--color-ink);
-  transition: color 300ms var(--ease-brand);
-}
-
-.atlas-card:hover .atlas-card__title {
-  color: var(--color-deep-90);
-}
-
-.atlas-card__arrow {
-  flex: 0 0 auto;
-  align-self: center;
-  color: var(--color-slate-80);
-  transition:
-    color 300ms var(--ease-brand),
-    transform 300ms var(--ease-brand);
-}
-
-.atlas-card:hover .atlas-card__arrow {
-  color: var(--color-sage-90);
-  transform: translate(2px, -2px);
-}
-
-.atlas-card:focus-visible {
-  outline: 2px solid var(--color-deep);
-  outline-offset: 4px;
-}
-
-.atlas-card__desc {
-  max-width: 46ch;
-  font-size: var(--text-body);
-  line-height: var(--text-body--line-height);
-  color: var(--color-ink-60);
-}
+/* --- The bento index ------------------------------------------------------
+   `/places` is a bento grid (`src/components/sections/place-bento.tsx`, with
+   its packing in `src/lib/place-bento-layout.ts`). Its stylesheet ships with
+   the component, so nothing about the gallery is left in this page file — only
+   the hero meta line above and the category-page furniture below.
+   ------------------------------------------------------------------------- */
 
 /* --- Related landscapes (category pages) --------------------------------- */
 
@@ -540,16 +449,14 @@
 }
 
 @media (width >= 40rem) {
-  .places-grid,
   .places-related-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-/* Nine cards land as a deliberate 3 × 3 at every desktop width — the gallery
-   never grows a fourth column and orphans the last plate in a row of one. */
+/* The related strip on a category page lands as a deliberate 3 × 3 at every
+   desktop width — it never grows a fourth column and orphans a plate. */
 @media (width >= 64rem) {
-  .places-grid,
   .places-related-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }

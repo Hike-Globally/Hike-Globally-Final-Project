@@ -1,0 +1,507 @@
+/* ==========================================================================
+   The `/places` bento
+   ==========================================================================
+   Ten plates — an editorial key and the nine landscapes — packed into one
+   rectangle with a single gutter everywhere. The packing itself is data
+   (`src/lib/place-bento-layout.ts`, proved hole-free by its test); this file
+   only styles the cells it is handed.
+
+   Rules this stylesheet keeps:
+
+   1. ONE GUTTER. `--bento-gap` is the only distance between plates, on both
+      axes, at every breakpoint. No plate carries a margin of its own.
+   2. NO RAGGED EDGE. The packing tiles exactly, and every plate is a surface —
+      the page's white shows only in the gutters, which is what makes the
+      composition read as one object.
+   3. TYPE FOLLOWS THE PLATE. A plate's label is sized from its own inline size
+      (`cqi`, container queries) so the wide feature and the small square both
+      set their title on the same optical proportion.
+   4. PHOTOGRAPHS KEEP THE SITE'S ONE TREATMENT. `--image-grade`, a paper plate
+      while loading, the single navy scrim under copy, mist/white type only.
+   ========================================================================== */
+
+.places-bento {
+  /* One gutter, both axes. The unit is deliberately small on phones, where the
+     screen itself is the margin, and settles just under a rem on desktop. */
+  --bento-gap: clamp(0.6rem, 0.4rem + 0.8vw, 0.95rem);
+  --bento-radius: 0.85rem;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--bento-gap);
+  align-items: stretch;
+}
+
+/* --------------------------------------------------------------------------
+   Plates — the surface every cell shares
+   -------------------------------------------------------------------------- */
+
+.pb-plate,
+.pb-key {
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+  border-radius: var(--bento-radius);
+  overflow: hidden;
+  /* The photograph's plate while it loads, so a slow image is paper, never a
+     flash of black or of another tile's colour. */
+  background: var(--image-plate);
+}
+
+.pb-plate {
+  display: block;
+  color: var(--color-paper);
+  text-decoration: none;
+}
+
+/* --------------------------------------------------------------------------
+   Photograph and scrim
+   -------------------------------------------------------------------------- */
+
+.pb-plate__image {
+  z-index: -2;
+  object-fit: cover;
+  filter: var(--image-grade);
+  transform: scale(1.001);
+  transition: transform 1400ms var(--ease-brand);
+}
+
+.pb-plate:hover .pb-plate__image,
+.pb-plate:focus-visible .pb-plate__image {
+  transform: scale(1.045);
+}
+
+/* The one navy scrim, tuned so a plate's label always clears AA against the
+   photograph underneath it (mist on ink ≥ 12:1 at the foot, ≥ 7:1 mid-plate).
+   Top and bottom only — the middle of every photograph stays untouched. */
+.pb-plate__wash {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    /* The foot: where the label sits. 86% ink at the very bottom holds mist
+       type at 11:1 even over a blown-out sky. */
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--color-ink) 86%, transparent) 0%,
+      color-mix(in srgb, var(--color-ink) 52%, transparent) 24%,
+      color-mix(in srgb, var(--color-ink) 4%, transparent) 52%,
+      transparent 74%
+    ),
+    /* The head: a touch deeper, because the numerals and the corner marks sit
+       over skies that are often the brightest part of a photograph. */
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-ink) 42%, transparent) 0%,
+      color-mix(in srgb, var(--color-ink) 12%, transparent) 18%,
+      transparent 34%
+    );
+}
+
+/* --------------------------------------------------------------------------
+   Plate contents — a 3-row grid, so the numeral, the label and the cue stay on
+   the plate's own lines however tall the plate is.
+   -------------------------------------------------------------------------- */
+
+.pb-plate__inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 0.5rem;
+  height: 100%;
+  padding: clamp(0.85rem, 0.65rem + 0.7vw, 1.35rem);
+  /* Type is measured against the plate, not the viewport. */
+  container-type: inline-size;
+}
+
+.pb-plate__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* The index numeral — display face, mist at 78% (≥ 5.6:1 over the scrim). */
+.pb-plate__num {
+  font-family: var(--font-display);
+  font-size: clamp(0.85rem, 0.75rem + 0.45vw, 1.1rem);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--color-mist) 78%, transparent);
+}
+
+/* The plate's corner mark. Borderless at rest (the composition is the
+   ornament), it fills ember on hover as the plate's single warm accent. */
+.pb-plate__cue {
+  display: grid;
+  flex: 0 0 auto;
+  width: clamp(1.6rem, 1.4rem + 0.55vw, 1.95rem);
+  height: clamp(1.6rem, 1.4rem + 0.55vw, 1.95rem);
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--color-mist) 34%, transparent);
+  border-radius: 999px;
+  color: var(--color-paper);
+  transition:
+    background-color 350ms var(--ease-brand),
+    border-color 350ms var(--ease-brand),
+    transform 350ms var(--ease-brand);
+}
+
+.pb-plate__cue svg {
+  width: 45%;
+  height: 45%;
+  stroke-width: 2;
+}
+
+.pb-plate:hover .pb-plate__cue,
+.pb-plate:focus-visible .pb-plate__cue {
+  border-color: var(--color-sage);
+  background: var(--color-sage);
+  transform: translate(1px, -1px);
+}
+
+.pb-plate__body {
+  align-self: end;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.pb-plate__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  /* A fixed share of the plate: a 280px square sets a 20px label and a 490px
+     feature a 32px one, so the small squares and the big plates read as
+     siblings rather than two different systems. */
+  font-size: clamp(1.2rem, 6.4cqi, 2.05rem);
+  line-height: 1.02;
+  letter-spacing: -0.005em;
+  color: var(--color-paper);
+  text-wrap: balance;
+}
+
+/* Supporting line — one sentence, on the plates that can carry it. */
+.pb-plate__desc {
+  display: none;
+  max-width: 34ch;
+  font-family: var(--font-heading);
+  font-size: clamp(0.76rem, 2.3cqi, 0.875rem);
+  font-weight: 400;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--color-mist) 88%, transparent);
+  text-wrap: pretty;
+}
+
+/* The nine landscapes are peers, so their plates are treated alike: every
+   plate that has room for the supporting line shows it, on every breakpoint,
+   and the smallest square simply sets it in fewer lines. The rule is a
+   container query on the plate itself — never a viewport guess, and never a
+   per-category allowlist that one breakpoint can silently re-enable. */
+@container (width >= 16rem) {
+  .pb-plate__desc {
+    display: block;
+  }
+}
+
+.pb-plate:focus-visible {
+  outline: 2px solid var(--color-sage-light);
+  outline-offset: 3px;
+}
+
+/* --------------------------------------------------------------------------
+   The key plate — the editorial tile
+   -------------------------------------------------------------------------- */
+
+.pb-key {
+  position: relative;
+  /* The key's own type is measured against its plate, like the landscape
+     plates — so a 390px-wide key at 1024px and a 490px one at 1440px both set
+     their headline and standfirst on the same optical proportion. */
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(1.15rem, 0.9rem + 1.8vw, 2.25rem);
+  padding: clamp(1.2rem, 0.85rem + 1.7vw, 2.15rem);
+  border: 1px solid color-mix(in srgb, var(--color-mist) 12%, transparent);
+  background:
+    radial-gradient(
+      circle at 92% 4%,
+      color-mix(in srgb, var(--color-deep) 34%, transparent),
+      transparent 46%
+    ),
+    radial-gradient(
+      circle at 4% 96%,
+      color-mix(in srgb, var(--color-sage) 16%, transparent),
+      transparent 52%
+    ),
+    var(--color-ink);
+  color: var(--color-mist);
+}
+
+/* The survey contours that dress the rest of the site's dark panels (the CTA
+   card, the themed hero watermarks) — here they run off the key's right edge,
+   so the tile reads as drawn rather than painted. The SVG is clipped by the
+   plate's own `overflow: hidden`, so no contour line ever terminates inside the
+   tile as a visible seam. */
+.pb-key__topo {
+  position: absolute;
+  top: 0;
+  right: -18%;
+  z-index: 0;
+  width: min(96%, 32rem);
+  height: 100%;
+  color: var(--color-mist);
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.pb-key__head {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: clamp(0.6rem, 0.45rem + 0.6vw, 1rem);
+}
+
+.pb-key__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  /* The label keeps the site's 12px eyebrow role but steps with the plate on a
+     wide canvas, exactly as the landscape plates' numerals do. */
+  font-size: clamp(var(--text-label), 2.4cqi, 0.85rem);
+  color: color-mix(in srgb, var(--color-mist) 82%, transparent);
+}
+
+.pb-key__dot {
+  flex: 0 0 auto;
+  width: 0.42rem;
+  height: 0.42rem;
+  background: var(--color-sage-light);
+}
+
+/* The key's headline is the section's H2, so it keeps the display face's
+   editorial scale but is sized from the plate (not the viewport) — at 1024px
+   the key is only ~390px wide and a viewport-sized title would leave no room
+   for the standfirst under it. */
+.pb-key__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.45rem, 7.4cqi, 2.55rem);
+  line-height: 1.04;
+  letter-spacing: -0.01em;
+  color: var(--color-paper);
+  text-wrap: balance;
+}
+
+/* The italic accent line, exactly as the site's hero titles carry it. */
+.pb-key__title i {
+  font-style: italic;
+  color: var(--color-mist);
+}
+
+.pb-key__text {
+  max-width: 40ch;
+  margin: 0;
+  font-size: clamp(0.8rem, 2.6cqi, 0.94rem);
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--color-mist) 80%, transparent);
+  text-wrap: pretty;
+}
+
+.pb-key__foot {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem 1.25rem;
+  padding-top: clamp(0.85rem, 0.65rem + 0.5vw, 1.1rem);
+  border-top: 1px solid color-mix(in srgb, var(--color-mist) 16%, transparent);
+}
+
+/* The nine-category route key: the same nine glyphs the category pages each
+   carry, set as one centred row of marks over a hairline. It gives the key
+   plate a reason to be the tallest tile — the map, not just a title block. */
+.pb-key__route {
+  position: relative;
+  z-index: 1;
+  display: none;
+  align-items: center;
+  gap: clamp(0.45rem, 0.25rem + 0.9vw, 0.95rem);
+  color: color-mix(in srgb, var(--color-mist) 66%, transparent);
+}
+
+/* Hairlines on both sides, so the nine marks read as a measured rule rather
+   than as a cluster of icons floating in the middle of the plate. */
+.pb-key__route::before,
+.pb-key__route::after {
+  flex: 1 1 auto;
+  height: 1px;
+  content: '';
+  background: color-mix(in srgb, var(--color-mist) 18%, transparent);
+}
+
+.pb-key__route svg {
+  flex: 0 0 auto;
+  width: clamp(0.9rem, 0.7rem + 0.55vw, 1.2rem);
+  height: clamp(0.9rem, 0.7rem + 0.55vw, 1.2rem);
+}
+
+.pb-key__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-family: var(--font-heading);
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: var(--text-label--line-height);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--color-mist) 86%, transparent);
+}
+
+.pb-key__count::before {
+  width: 1.5rem;
+  height: 1px;
+  content: '';
+  background: var(--color-sage-light);
+}
+
+/* The corner signature the phone and tablet plates keep: three glyphs, no
+   labels. The full route key takes over on desktop. */
+.pb-key__glyphs {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: color-mix(in srgb, var(--color-mist) 54%, transparent);
+}
+
+.pb-key__glyphs svg {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+/* ==========================================================================
+   Phones — one column, editorial stack
+   --------------------------------------------------------------------------
+   Each plate owns its crop. The key opens the stack; the plates then alternate
+   4 : 3 and 5 : 4 so the column has a rhythm rather than a filmstrip of equal
+   postcards.
+   ========================================================================== */
+
+.pb-plate[data-tile='lakes'],
+.pb-plate[data-tile='waterfalls'],
+.pb-plate[data-tile='caves'],
+.pb-plate[data-tile='temples'] {
+  aspect-ratio: 4 / 3;
+}
+
+.pb-plate[data-tile='mountain-passes'],
+.pb-plate[data-tile='canyons'],
+.pb-plate[data-tile='base-camps'],
+.pb-plate[data-tile='bike-tours'],
+.pb-plate[data-tile='mountain-peaks'] {
+  aspect-ratio: 5 / 4;
+}
+
+/* ==========================================================================
+   Tablet — six columns (see `md` in the layout map)
+   --------------------------------------------------------------------------
+   The phone crops are cleared here FIRST: from this breakpoint on, the layout
+   map decides every plate's height. Leaving a `4 / 3` behind would force its
+   row taller than the track and shear the composition.
+   ========================================================================== */
+
+@media (width >= 48rem) {
+  .places-bento {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    /* 22 rows at 0.36 × a column — BENTO_ASPECT_MD. */
+    grid-template-rows: repeat(22, minmax(0, 1fr));
+    aspect-ratio: 6 / 16.6;
+  }
+
+  .pb-plate,
+  .pb-plate[data-tile='lakes'],
+  .pb-plate[data-tile='waterfalls'],
+  .pb-plate[data-tile='mountain-passes'],
+  .pb-plate[data-tile='canyons'],
+  .pb-plate[data-tile='base-camps'],
+  .pb-plate[data-tile='caves'],
+  .pb-plate[data-tile='bike-tours'],
+  .pb-plate[data-tile='mountain-peaks'],
+  .pb-plate[data-tile='temples'] {
+    aspect-ratio: auto;
+    grid-area: var(--bento-area-md);
+  }
+
+  .pb-key {
+    grid-area: var(--bento-area-md);
+  }
+
+}
+
+/* ==========================================================================
+   Desktop — twelve columns (see `lg` in the layout map)
+   --------------------------------------------------------------------------
+   Twelve columns of 1 and twelve rows of 0.826 (BENTO_ASPECT_LG). Rows size
+   themselves from the column width, so a 5 × 5 feature plate stays a 1.5 : 1
+   landscape at 1024px and at 3840px without a single height query.
+   ========================================================================== */
+
+@media (width >= 64rem) {
+  .places-bento {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: repeat(12, minmax(0, 1fr));
+    aspect-ratio: 1280 / 1080;
+  }
+
+  .pb-plate,
+  .pb-plate[data-tile='lakes'],
+  .pb-plate[data-tile='waterfalls'],
+  .pb-plate[data-tile='mountain-passes'],
+  .pb-plate[data-tile='canyons'],
+  .pb-plate[data-tile='base-camps'],
+  .pb-plate[data-tile='caves'],
+  .pb-plate[data-tile='bike-tours'],
+  .pb-plate[data-tile='mountain-peaks'],
+  .pb-plate[data-tile='temples'] {
+    grid-area: var(--bento-area-lg);
+  }
+
+  .pb-key {
+    grid-area: var(--bento-area-lg);
+  }
+
+  /* The feature plate sets its label a notch larger than its neighbours. */
+  .pb-plate[data-tile='base-camps'] .pb-plate__title {
+    font-size: clamp(1.5rem, 6.2cqi, 2.3rem);
+  }
+
+  /* The route key needs a real plate to exist on — it replaces the three-glyph
+     signature the phone and tablet key plates carry. */
+  .pb-key__route {
+    display: flex;
+  }
+
+  .pb-key__glyphs {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Reduced motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .pb-plate,
+  .pb-plate__image,
+  .pb-plate__cue {
+    transition: none;
+  }
+}
