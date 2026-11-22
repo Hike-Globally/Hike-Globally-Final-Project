@@ -73,10 +73,11 @@ test('both collections share one coordinates field, so the rules cannot drift ap
   assert.doesNotMatch(trips, /name: 'coordinates',\s*\n\s*type: 'group'/)
 
   // The admin keeps itinerary-derived chart fields and coordinates, but no image uploads.
-  const section = trips.slice(trips.indexOf("label: 'Route map, live map and altitude chart'"))
+  const section = trips.slice(trips.indexOf("label: 'Live map and altitude chart'"))
   const block = section.slice(0, section.indexOf("name: 'departureDates'"))
   assert.ok(block.includes('coordinatesField({'))
-  assert.doesNotMatch(block, /name: '(routeMap|altitudeChart)'/)
+  assert.doesNotMatch(block, /name: '(routeMap|altitudeChart|routeMapContent)'/)
+  assert.doesNotMatch(tripDetail, /routeMapContent|hasRichTextContent\(trip\.routeMapContent\)/)
 })
 
 test('the field rejects half a pin and the 0,0 pair, but keeps a real 0', () => {

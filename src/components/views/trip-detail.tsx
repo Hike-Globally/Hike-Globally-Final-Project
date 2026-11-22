@@ -173,11 +173,10 @@ function TripBookingCard({
    ---------------------------------------------------------------------------- */
 
 /** The interactive route map and itinerary-generated altitude chart. */
-function RouteMapSection({ trip, linker }: { trip: Trip; linker?: InternalLinker | null }) {
+function RouteMapSection({ trip }: { trip: Trip }) {
   const coordinates = parseCoordinates(trip.coordinates)
   const profile = altitudeProfile(trip.itinerary)
-  const intro = hasRichTextContent(trip.routeMapContent) ? trip.routeMapContent : null
-  if (!intro && !coordinates && !profile) return null
+  if (!coordinates && !profile) return null
 
   const mapCard = coordinates ? (
     <CoordinatesMap
@@ -211,7 +210,6 @@ function RouteMapSection({ trip, linker }: { trip: Trip; linker?: InternalLinker
   return (
     <section id="route-map" className="scroll-mt-24 pb-16 md:pb-24">
       <SectionTitle title="Route map and altitude chart" />
-      {intro ? <RichText content={intro} className="mb-8" linker={linker} /> : null}
 
       <div className="grid gap-6 md:grid-cols-2">{items}</div>
     </section>
@@ -402,7 +400,7 @@ export function TripDetail({
         <RichText content={trip.whyChooseThisTrek} linker={linker} />
       </section>
     ) : null,
-    routeMap: <RouteMapSection trip={trip} linker={linker} />,
+    routeMap: <RouteMapSection trip={trip} />,
     departures: (
       <DeparturesSection
         trip={trip}
