@@ -127,20 +127,14 @@
   --color-quote-edge: #e74848;
 
   /* --- Boxed Content plate -------------------------------------------------
-     Alluring alpine-twilight editorial surface: deep expedition navy (#11283b
-     → #173a52 → #1e4c66) kissed with a soft glacial glow (#2a607b peak),
-     crisp white headings (>= 6.87:1 everywhere, 13.25:1 AAA on base), luminous
-     mist copy (#eaf2f7, >= 6.06:1 AA everywhere, 11.70:1 AAA on base), and a
-     warm alpine-sunrise coral accent (#f2a698, >= 3.49:1 everywhere). */
-  --color-boxed-surface: #143248;
-  --color-boxed-surface-deep: #11283b;
-  --color-boxed-surface-mid: #173a52;
-  --color-boxed-surface-lit: #1e4c66;
-  --color-boxed-glow: #2a607b;
-  --color-boxed-border: #274f6b;
-  --color-boxed-title: #ffffff;
-  --color-boxed-copy: #eaf2f7;
-  --color-boxed-accent: #f2a698;
+     Glacial sky-cyan surface (#caf0f8) paired with its sister ice-blue hairline
+     (#90e0ef), deep navy headings (#183144, 11.10:1 AAA), oceanic slate-ink
+     copy (#244357, 8.60:1 AAA), and expedition-blue accent (#1f6699, 5.07:1 AA). */
+  --color-boxed-surface: #caf0f8;
+  --color-boxed-border: #90e0ef;
+  --color-boxed-title: #183144;
+  --color-boxed-copy: #244357;
+  --color-boxed-accent: #1f6699;
 
   /* --- Button palette & radius ---
      Dedicated interactive tokens tuned for clear hierarchy, tactile hover/press
@@ -1013,21 +1007,6 @@
     overflow: hidden;
     border: 1px solid var(--color-boxed-border);
     background-color: var(--color-boxed-surface);
-    background-image:
-      radial-gradient(
-        115% 135% at 96% 6%,
-        color-mix(in srgb, var(--color-haze) 26%, transparent) 0%,
-        transparent 54%
-      ),
-      linear-gradient(
-        132deg,
-        var(--color-boxed-surface-deep) 0%,
-        var(--color-boxed-surface-mid) 56%,
-        var(--color-boxed-surface-lit) 100%
-      );
-    box-shadow:
-      inset 0 1px 0 color-mix(in srgb, var(--color-paper) 12%, transparent),
-      var(--shadow-md);
   }
   .boxed-content__media {
     position: relative;
@@ -1036,8 +1015,8 @@
     min-height: 10rem;
     max-height: 15.5rem;
     aspect-ratio: 16 / 10;
-    border-bottom: 1px solid color-mix(in srgb, var(--color-paper) 14%, transparent);
-    background-color: var(--color-boxed-surface-deep);
+    border-bottom: 1px solid var(--color-boxed-border);
+    background-color: color-mix(in srgb, var(--color-ink) 6%, var(--color-boxed-surface));
   }
   #main .boxed-content__photo,
   .boxed-content__photo {
@@ -1057,11 +1036,7 @@
     width: 2.5rem;
     height: 2px;
     margin-bottom: 0.1875rem;
-    background: linear-gradient(
-      90deg,
-      var(--color-boxed-accent) 0%,
-      color-mix(in srgb, var(--color-boxed-accent) 45%, transparent) 100%
-    );
+    background-color: var(--color-boxed-accent);
   }
   .single-page-body .prose-hg .boxed-content__title,
   .prose-hg .boxed-content__title,
@@ -1102,7 +1077,7 @@
       min-height: 12rem;
       max-height: none;
       align-self: stretch;
-      border-right: 1px solid color-mix(in srgb, var(--color-paper) 14%, transparent);
+      border-right: 1px solid var(--color-boxed-border);
       border-bottom: 0;
     }
     .boxed-content__copy {
