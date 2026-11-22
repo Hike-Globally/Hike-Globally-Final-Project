@@ -637,15 +637,38 @@ even after the account's email privacy setting changes. Run `git log -1 --pretty
 check the identity of the commit you are about to push — rewriting the author of an already-pushed
 commit requires a force-push and a new PR.
 
-Before pushing, run the guard that encodes this rule:
+#### The guard runs automatically in CI
+
+`scripts/check-commit-author.mjs` encodes the rule, and
+[`verify-commit-author`](.github/workflows/verify-commit-author.yml) runs it on every pull request
+and every push to `main`. It is a required check: a red X on that job means Vercel will refuse to
+deploy the commit, and the job summary names the offending author and prints the fix.
+
+The workflow checks the **PR head sha**, not the synthetic merge commit, because Vercel builds the
+head — so the check fails exactly where Vercel would, and nowhere else. It needs no `npm ci`: the
+guard is dependency-free, so the job finishes in seconds and cannot be broken by a failing install.
+
+Run it locally before pushing if you want the answer sooner:
 
 ```bash
 npm run verify:commit-author                     # the commit Vercel would build (HEAD)
 npm run verify:commit-author origin/main..HEAD   # every commit on the branch
+npm run verify:commit-author <sha>               # one specific commit
 ```
 
 It exits non-zero and prints the exact `git config` fix when it finds an author address Vercel
 cannot verify, instead of leaving a blocked deployment behind.
+
+Optionally catch it even before the push by installing the same guard as a local hook (not tracked
+in git, so each clone needs its own copy):
+
+```bash
+printf '#!/bin/sh\nexec node scripts/check-commit-author.mjs HEAD\n' > .git/hooks/pre-push
+chmod +x .git/hooks/pre-push
+```
+
+Pass `HEAD` explicitly — a pre-push hook receives `<remote> <url>` as `$1`/`$2`, so forwarding `$1`
+would hand the guard the remote name and check the wrong commit.
 
 Only the tip of a push is built, so a merge commit authored by the verified account deploys even
 when one of the commits it merges came from a bot — that is why the direct pushes `fe87b32` and

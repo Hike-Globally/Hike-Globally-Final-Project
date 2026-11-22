@@ -16,7 +16,9 @@
  *
  * Usage:
  *   npm run verify:commit-author                 # checks HEAD (the commit Vercel would build)
- *   npm run verify:commit-author origin/main..HEAD
+ *   npm run verify:commit-author HEAD            # same — a single revision is the tip only
+ *   npm run verify:commit-author <sha>           # one specific commit, ancestors ignored
+ *   npm run verify:commit-author origin/main..HEAD   # every commit on the branch
  *   BASE=origin/main npm run verify:commit-author
  *
  * The check mirrors what Vercel does: it builds the commit at the tip of the
@@ -24,6 +26,11 @@
  * when you push a single branch. Ancestors are not inspected, because Vercel
  * never builds them — a merge commit authored by a verified account deploys
  * even when a commit it merges was authored by a bot.
+ *
+ * A single revision (HEAD, a sha) is therefore forced to `--max-count=1`.
+ * `git log <sha>` on its own walks the whole ancestry, which would flag a bot
+ * commit buried in history and fail every later push over a commit Vercel has
+ * already deployed — the exact false positive this check exists to avoid.
  */
 
 import { execFileSync } from 'node:child_process'
@@ -50,13 +57,25 @@ For a commit that is already pushed, amend or rebase it:
 const run = (args) =>
   execFileSync('git', args, { encoding: 'utf8' }).trim()
 
-const range = process.argv[2] ?? (process.env.BASE ? `${process.env.BASE}..HEAD` : '-1')
+const requested = process.argv[2] ?? (process.env.BASE ? `${process.env.BASE}..HEAD` : '-1')
+
+/**
+ * `git log <rev>` lists every ancestor of <rev>. Only a range (`base..tip`) or
+ * an explicit `-1` should limit the walk; a bare revision must mean "just that
+ * commit", because that is the only commit Vercel builds.
+ */
+const isSingleRevision = (spec) =>
+  !spec.includes('..') && !spec.endsWith('^@') && !spec.startsWith('-')
+
+// Keep these as separate argv entries: git parses "-1 <rev>" as one token only
+// if you pass it as one, and rejects it as a malformed count.
+const logArgs = isSingleRevision(requested) ? ['-1', requested] : [requested]
 
 let log
 try {
-  log = run(['log', range, '--pretty=%h%x09%an <%ae>%x09%s'])
+  log = run(['log', ...logArgs, '--pretty=%h%x09%an <%ae>%x09%s'])
 } catch {
-  console.error('verify:commit-author — could not read git history for range:', range)
+  console.error('verify:commit-author — could not read git history for range:', logArgs.join(' '))
   process.exit(1)
 }
 
