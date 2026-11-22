@@ -1,5 +1,6 @@
 import { Mountain } from 'lucide-react'
 
+import { cn } from '@/lib/utils'
 import {
   altitudeProfile,
   altitudeScale,
@@ -21,17 +22,19 @@ import { formatNumber } from '@/lib/format'
  * brand. It also means the chart is in the HTML on first paint and reads correctly with JavaScript
  * off.
  *
- * The viewBox is a fixed 800 × 340 user space, so every text size below is in the same units and
- * the whole chart scales fluidly with its container (`w-full`, `h-auto`). Nothing is measured at
- * runtime, which is what lets this stay a pure server component.
+ * The viewBox is a fixed 800 × 448 user space, so every text size below is in the same units and
+ * the whole chart scales fluidly with its container (`w-full`, `h-auto`). Its taller frame uses the
+ * same vertical space as the paired route-map card without distorting the plotted line or labels.
+ * Nothing is measured at runtime, which is what lets this stay a pure server component.
  */
 
 /** The drawing box, in viewBox units. Kept here so the tests can reason about the same numbers. */
 const WIDTH = 800
-const HEIGHT = 340
+const HEIGHT = 448
 // Left/right room for the rotated place names, which lean out past their dots — generous enough
-// that a long first label ("Kathmandu") still fits inside the frame.
-const PADDING = { top: 34, right: 30, bottom: 62, left: 64 }
+// that long labels still fit inside the frame. The larger bottom inset keeps them clear of the edge
+// now that the chart uses more of the card's height.
+const PADDING = { top: 34, right: 30, bottom: 100, left: 64 }
 
 const INK = '#183144' /* ink */
 const SLATE = '#6b6767' /* slate-80 */
@@ -68,10 +71,10 @@ export function AltitudeProfile({
   const baseline = HEIGHT - PADDING.bottom
 
   return (
-    <figure className={className}>
+    <figure className={cn('w-full min-w-0', className)}>
       <svg
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-        className="h-auto w-full"
+        className="block h-auto w-full"
         role="img"
         aria-label={`${title}: ${formatNumber(profile.minAltitude)} to ${formatNumber(
           profile.maxAltitude,

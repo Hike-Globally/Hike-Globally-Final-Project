@@ -34,6 +34,13 @@ test('the chart is inline SVG: no chart library, no client boundary, no canvas',
   assert.doesNotMatch(chart, /<canvas|useEffect|useState|ResizeObserver/)
 })
 
+test('the profile scales across the width of its containing trip card', () => {
+  const html = render(poonHill)
+
+  assert.match(html, /^<figure class="w-full min-w-0">/)
+  assert.match(html, /<svg viewBox="0 0 800 448" class="block h-auto w-full"/)
+})
+
 test('a profile renders one dot and one metre label per day, plus every place name', () => {
   const html = render(poonHill)
 
@@ -96,7 +103,10 @@ test('the value labels at the two ends anchor inward, so they stay inside the fr
 
 test('the trip page renders the altitude chart from itinerary data, with no image upload fallback', () => {
   assert.match(tripDetail, /const profile = altitudeProfile\(trip\.itinerary\)/)
-  assert.match(tripDetail, /<AltitudeProfile days=\{trip\.itinerary\} \/>/)
+  assert.match(
+    tripDetail,
+    /<AltitudeProfile days=\{trip\.itinerary\} className="w-full" title="Altitude chart" \/>/,
+  )
   assert.doesNotMatch(tripDetail, /uploadedAltitudeChart|altitudeUpload/)
   assert.doesNotMatch(tripDetail, /md:col-span-2/)
 
