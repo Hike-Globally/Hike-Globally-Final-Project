@@ -1,15 +1,19 @@
 /* ============================================================================
-   The chart — /sitemap
+   The route map — /sitemap
    ============================================================================
-   A navigation chart, not a brochure: a dark survey-style hero with hand-drawn
-   contour geometry, then four numbered layers of hairline-ruled rows. Everything
-   is cut from the same tokens the site already uses — no gradients, no blur, no
-   shadow except the nav panel — and the motion is a hover tick that draws in,
-   nothing more.
+   The whole site drawn as a waymarked climb. The hero carries a full-width SVG
+   elevation profile — 1,420 m at Home, 5,360 m at the summit register, every
+   dot a live link — and the body pairs a dark "GPS unit" rail (altimeter, camp
+   index, filter) with four camp sections, each rendered in its own idiom:
 
-   The page is a content page, not a hero-and-card page: copy is bottom-anchored
-   in the dark band, and the index is typeset like a ledger — serif titles,
-   uppercase coordinate paths, and a printed number for every row.
+     Camp 01 · The circuit   — trailhead cards (the front doors)
+     Camp 02 · Nine benches  — full-bleed photographs of the nine landscapes
+     Camp 03 · The ledger    — a surveyor's dashed-line CMS ledger
+     Camp 04 · Summit reg.   — dark register plates with copy-link buttons
+
+   Type, colour and elevation come from the site's tokens; nothing here invents
+   a hue. Motion is a hover lift and a scroll-mapped altimeter — both honour
+   prefers-reduced-motion.
    ========================================================================== */
 
 .sitemap-page {
@@ -18,13 +22,12 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* Hero                                                                       */
+/* Hero — the dark survey band with the elevation profile                       */
 /* -------------------------------------------------------------------------- */
 
 .sitemap-hero {
   position: relative;
   isolation: isolate;
-  min-height: min(47.5rem, 96svh);
   display: flex;
   flex-direction: column;
   background: var(--color-ink);
@@ -36,28 +39,26 @@
   position: absolute;
   top: 0;
   right: 0;
-  height: 100%;
-  /* An explicit box keeps the crop deterministic: the SVG slices into a right-anchored
-     panel about sixty percent of the hero, so the trig peak sits in clear air at the right
-     while the copy stays left. The viewBox repeats at any hero width. */
+  height: 72%;
   width: min(61rem, 62vw);
-  opacity: 0.6;
+  opacity: 0.55;
   user-select: none;
+  z-index: 0;
 }
 
 .sitemap-hero__inner {
   position: relative;
   z-index: 1;
-  flex: 1;
+  flex: none;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-top: 8.75rem;
-  padding-bottom: 3.5rem;
+  padding-top: clamp(7.5rem, 15vh, 10rem);
+  padding-bottom: 1.25rem;
 }
 
 .sitemap-hero__inner > nav {
-  margin-bottom: 1.75rem;
+  margin-bottom: 1.5rem;
 }
 
 .sitemap-hero__eyebrow {
@@ -75,6 +76,7 @@
   color: rgba(255, 255, 255, 0.72);
   letter-spacing: 0.14em;
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
 @media (max-width: 47.99rem) {
@@ -87,24 +89,23 @@
 .sitemap-hero__title {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(3.4rem, 7.2vw, 6.75rem);
-  line-height: 0.95;
+  font-size: clamp(3rem, 6.6vw, 6.25rem);
+  line-height: 0.96;
   letter-spacing: -0.02em;
-  margin-top: 1.4rem;
+  margin-top: 1.25rem;
   color: #ffffff;
-  max-width: 12em;
+  max-width: 13em;
 }
 
 .sitemap-hero__title em {
-  font-family: var(--font-display);
   font-style: italic;
   letter-spacing: 0;
 }
 
 .sitemap-hero__lead {
-  margin-top: 1.75rem;
-  max-width: 33.75rem;
-  font-size: clamp(1.05rem, 0.98rem + 0.4vw, 1.2rem);
+  margin-top: 1.4rem;
+  max-width: 36rem;
+  font-size: clamp(1rem, 0.94rem + 0.35vw, 1.15rem);
   line-height: 1.65;
   color: rgba(255, 255, 255, 0.88);
 }
@@ -112,7 +113,7 @@
 .sitemap-hero__stats {
   display: flex;
   flex-wrap: wrap;
-  margin-top: 3rem;
+  margin-top: 1.75rem;
   border-top: 1px solid rgba(255, 255, 255, 0.28);
 }
 
@@ -120,8 +121,8 @@
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
-  padding-top: 1.5rem;
-  margin-right: clamp(1.5rem, 3vw, 2.5rem);
+  padding-top: 1.1rem;
+  margin-right: clamp(1.5rem, 3.5vw, 3rem);
 }
 
 .sitemap-hero__stat:last-child {
@@ -131,13 +132,14 @@
 .sitemap-hero__stat-value {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(2.5rem, 3.4vw, 3.4rem);
+  font-size: clamp(2.1rem, 2.9vw, 3.1rem);
   line-height: 1;
   color: #ffffff;
+  font-variant-numeric: tabular-nums;
 }
 
 .sitemap-hero__stat-label {
-  font-size: 0.625rem;
+  font-size: 0.6rem;
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -146,8 +148,169 @@
 
 @media (max-width: 47.99rem) {
   .sitemap-hero__stat {
-    margin-right: 0;
+    margin-right: 1.4rem;
   }
+}
+
+/* The profile plate — a surveyor's cross-section under the copy */
+.sitemap-hero__profile-block {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid rgba(135, 170, 189, 0.3);
+  padding-top: 0.9rem;
+  padding-bottom: 0.75rem;
+}
+
+.sitemap-hero__profile-caption {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.5rem;
+  margin-bottom: 0.15rem;
+}
+
+.sitemap-hero__profile-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--color-haze);
+}
+
+.sitemap-hero__profile-note {
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.sitemap-hero__profile-scroll {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(135, 170, 189, 0.5) transparent;
+}
+
+/* -------------------------------------------------------------------------- */
+/* The elevation profile SVG                                                  */
+/* -------------------------------------------------------------------------- */
+
+.profile {
+  display: block;
+  width: 100%;
+  min-width: 58rem;
+  height: auto;
+  overflow: visible;
+}
+
+.profile__gridline {
+  stroke: rgba(135, 170, 189, 0.18);
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-dasharray: 1 6;
+}
+
+.profile__grid-label {
+  fill: rgba(135, 170, 189, 0.85);
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+
+.profile__camp-line {
+  stroke: rgba(135, 170, 189, 0.4);
+  stroke-width: 1;
+  stroke-dasharray: 3 5;
+}
+
+.profile__camp-label {
+  fill: var(--color-haze);
+  font-family: var(--font-sans);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+}
+
+.profile__area {
+  fill: rgba(135, 170, 189, 0.1);
+}
+
+.profile__line {
+  stroke: var(--color-sage);
+  stroke-width: 2.25;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.profile__baseline {
+  stroke: rgba(255, 255, 255, 0.24);
+  stroke-width: 1;
+}
+
+.profile__summit-plumb {
+  stroke: rgba(255, 255, 255, 0.32);
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+}
+
+.profile__trig {
+  fill: var(--color-sage);
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 1.25;
+  stroke-linejoin: round;
+}
+
+.profile__axis-cap {
+  fill: rgba(255, 255, 255, 0.65);
+  font-family: var(--font-sans);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  font-variant-numeric: tabular-nums;
+}
+
+.profile__axis-cap--end {
+  text-anchor: end;
+}
+
+.profile-dot {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.profile-dot__hit {
+  fill: transparent;
+}
+
+.profile-dot__mark {
+  fill: var(--color-sage);
+  stroke: var(--color-ink);
+  stroke-width: 1.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.2s var(--ease-brand), fill 0.2s ease-out;
+}
+
+.profile-dot:hover .profile-dot__mark,
+.profile-dot:focus-visible .profile-dot__mark {
+  transform: scale(1.55);
+  fill: var(--color-sage-light);
+}
+
+.profile-dot:focus-visible {
+  outline: none;
+}
+
+.profile-dot:focus-visible .profile-dot__hit {
+  fill: rgba(222, 137, 130, 0.18);
+  stroke: var(--color-sage-light);
+  stroke-width: 1.5;
 }
 
 .sitemap-hero__bottom {
@@ -155,8 +318,8 @@
   justify-content: space-between;
   gap: 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.28);
-  padding-top: 1.1rem;
-  padding-bottom: 1.4rem;
+  padding-top: 0.85rem;
+  padding-bottom: 1.1rem;
   font-size: 0.625rem;
   font-weight: 600;
   letter-spacing: 0.2em;
@@ -164,6 +327,7 @@
   color: rgba(255, 255, 255, 0.85);
   position: relative;
   z-index: 1;
+  font-variant-numeric: tabular-nums;
 }
 
 @media (max-width: 47.99rem) {
@@ -173,410 +337,1039 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* Body: sidebar + main                                                        */
+/* Body — the rail + the camps                                                 */
 /* -------------------------------------------------------------------------- */
 
-.sitemap-body {
+.route {
   display: grid;
-  grid-template-columns: 16.5rem minmax(0, 1fr);
-  gap: clamp(2.25rem, 3.5vw, 3.5rem);
-  padding-top: 3.75rem;
+  grid-template-columns: 17rem minmax(0, 1fr);
+  gap: clamp(2rem, 3vw, 3.25rem);
+  align-items: start;
+  padding-top: 3.5rem;
   padding-bottom: 4.5rem;
 }
 
-.sitemap-sidebar {
+/* ------- The rail: a dark GPS unit ---------------------------------------- */
+
+.route-rail {
   position: sticky;
   top: 6rem;
   align-self: start;
+  z-index: 1;
+}
+
+.route-rail__panel {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  border: 1px solid var(--color-slate-20);
-  background: var(--color-mist);
-  padding: 1.5rem;
+  gap: 1.15rem;
+  background: var(--color-ink);
+  color: var(--color-mist);
+  padding: 1.35rem 1.35rem 1.15rem;
+  box-shadow: inset 0 0 0 1px rgba(135, 170, 189, 0.28);
 }
 
-.sitemap-sidebar__label {
-  font-size: 0.625rem;
+.route-rail__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--color-haze);
+  border-bottom: 1px solid rgba(135, 170, 189, 0.25);
+  padding-bottom: 0.9rem;
+}
+
+.route-rail__brand-coord {
+  margin-left: auto;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.14em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Altimeter */
+.altimeter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  border: 1px dashed rgba(135, 170, 189, 0.35);
+  padding: 0.85rem 0.95rem 0.95rem;
+}
+
+.altimeter__label {
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--color-haze);
+}
+
+.altimeter__value {
+  font-size: clamp(2.1rem, 2.6vw, 2.6rem);
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+}
+
+.altimeter__unit {
+  font-size: 0.35em;
   font-weight: 600;
   letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--color-slate-80);
+  color: var(--color-sage-light);
+  margin-left: 0.35rem;
 }
 
-.sitemap-filter {
+.altimeter__track {
+  display: block;
+  height: 3px;
+  background: rgba(135, 170, 189, 0.28);
+  overflow: hidden;
+  margin-top: 0.3rem;
+}
+
+.altimeter__fill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--color-sage);
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform 0.18s linear;
+}
+
+.altimeter__sub {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 0.15rem;
+}
+
+.altimeter__wpt {
+  color: var(--color-sage-light);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* The camp index */
+.camps ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.camps li + li {
+  border-top: 1px solid rgba(135, 170, 189, 0.16);
+}
+
+.camp {
+  display: grid;
+  grid-template-columns: 1.55rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.62rem 0.35rem;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.82);
+  transition: color 0.2s ease-out, background-color 0.2s ease-out;
+}
+
+.camp:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.camp:focus-visible {
+  outline: 2px solid var(--color-sage-light);
+  outline-offset: -2px;
+}
+
+.camp__dot {
+  display: grid;
+  place-items: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(135, 170, 189, 0.5);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-haze);
+  font-variant-numeric: tabular-nums;
+  transition: background-color 0.2s ease-out, border-color 0.2s ease-out, color 0.2s ease-out;
+}
+
+.camp[aria-current='true'] .camp__dot {
+  background: var(--color-sage);
+  border-color: var(--color-sage);
+  color: var(--color-ink);
+}
+
+.camp__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.camp__kicker {
+  font-size: 0.52rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  color: rgba(135, 170, 189, 0.85);
+}
+
+.camp__title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.camp[aria-current='true'] .camp__title {
+  color: #ffffff;
+}
+
+.camp__alt {
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.4);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.camp[aria-current='true'] .camp__alt {
+  color: var(--color-haze);
+}
+
+/* Filter */
+.route-rail__label {
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--color-haze);
+  border-top: 1px solid rgba(135, 170, 189, 0.25);
+  padding-top: 1.05rem;
+}
+
+.route-filter {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.sitemap-filter__icon {
+.route-filter__icon {
   position: absolute;
-  left: 0.75rem;
-  color: var(--color-slate-80);
+  left: 0.7rem;
+  color: var(--color-haze);
   pointer-events: none;
 }
 
-.sitemap-filter__input {
+.route-filter__input {
   width: 100%;
-  border: 1px solid var(--color-slate);
+  border: 1px solid rgba(135, 170, 189, 0.4);
   border-radius: 0;
-  background: var(--color-paper);
-  color: var(--color-ink);
-  padding: 0.7rem 2.4rem 0.7rem 2.4rem;
-  font-size: 0.9375rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  padding: 0.62rem 2.2rem 0.62rem 2.2rem;
+  font-size: 0.875rem;
   line-height: 1.4;
-  transition: border-color 0.2s ease-out;
+  transition: border-color 0.2s ease-out, background-color 0.2s ease-out;
 }
 
-.sitemap-filter__input::placeholder {
-  color: var(--color-slate-40);
+.route-filter__input::placeholder {
+  color: rgba(255, 255, 255, 0.38);
 }
 
-.sitemap-filter__input:focus-visible {
-  outline: 2px solid var(--color-deep);
+.route-filter__input:focus-visible {
+  outline: 2px solid var(--color-sage-light);
   outline-offset: 1px;
-  border-color: var(--color-deep);
+  border-color: var(--color-sage-light);
+  background: rgba(255, 255, 255, 0.09);
 }
 
-/* Tidy the native search field */
-.sitemap-filter__input::-webkit-search-cancel-button,
-.sitemap-filter__input::-webkit-search-decoration {
+.route-filter__input::-webkit-search-cancel-button,
+.route-filter__input::-webkit-search-decoration {
   -webkit-appearance: none;
   appearance: none;
 }
 
-.sitemap-filter__clear {
+.route-filter__clear {
   position: absolute;
-  right: 0.4rem;
+  right: 0.35rem;
   display: grid;
   place-items: center;
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 1.6rem;
+  height: 1.6rem;
   border: 0;
   background: transparent;
-  color: var(--color-slate-80);
+  color: var(--color-haze);
   cursor: pointer;
   transition: color 0.2s ease-out;
 }
 
-.sitemap-filter__clear:hover {
-  color: var(--color-ink);
+.route-filter__clear:hover {
+  color: #ffffff;
 }
 
-.sitemap-filter__clear:focus-visible {
-  outline: 2px solid var(--color-deep);
+.route-filter__clear:focus-visible {
+  outline: 2px solid var(--color-sage-light);
   outline-offset: 1px;
 }
 
-.sitemap-filter__count {
-  font-size: 0.625rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--color-slate-80);
-}
-
-.sitemap-sidebar__layers ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  border-top: 1px solid var(--color-slate-20);
-}
-
-.sitemap-layer-link {
-  display: flex;
-  align-items: baseline;
-  gap: 0.85rem;
-  padding: 0.7rem 0.1rem;
-  border-bottom: 1px solid var(--color-slate-20);
-  color: var(--color-ink);
-  text-decoration: none;
-  transition: color 0.2s ease-out;
-}
-
-.sitemap-layer-link:hover {
-  color: var(--color-deep);
-}
-
-.sitemap-layer-link:focus-visible {
-  outline: 2px solid var(--color-deep);
-  outline-offset: 2px;
-}
-
-.sitemap-layer-link[aria-current='true'] {
-  background: var(--color-ink);
-  color: var(--color-mist);
-  padding-inline: 0.85rem;
-  margin-inline: -0.85rem;
-  border-bottom-color: var(--color-ink);
-}
-
-.sitemap-layer-link__index {
-  font-size: 0.625rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  color: var(--color-slate-80);
-  min-width: 2.2rem;
-}
-
-.sitemap-layer-link[aria-current='true'] .sitemap-layer-link__index {
-  color: var(--color-haze);
-}
-
-.sitemap-layer-link__title {
-  flex: 1;
-  font-size: 0.9375rem;
-  font-weight: 500;
-}
-
-.sitemap-layer-link__count {
-  font-size: 0.75rem;
-  color: var(--color-slate-80);
-}
-
-.sitemap-layer-link[aria-current='true'] .sitemap-layer-link__count {
-  color: var(--color-haze);
-}
-
-.sitemap-sidebar__note {
-  font-size: 0.75rem;
-  line-height: 1.55;
-  color: var(--color-slate-80);
-  border-top: 1px solid var(--color-slate-20);
-  padding-top: 1rem;
-}
-
-.sitemap-sidebar__notelink {
-  color: var(--color-deep-80);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: var(--color-slate-40);
-  transition: color 0.2s ease-out, text-decoration-color 0.2s ease-out;
-}
-
-.sitemap-sidebar__notelink:hover {
-  color: var(--color-deep);
-  text-decoration-color: var(--color-deep);
-}
-
-/* -------------------------------------------------------------------------- */
-/* Layer sections                                                             */
-/* -------------------------------------------------------------------------- */
-
-.sitemap-main {
-  display: flex;
-  flex-direction: column;
-  gap: 4.5rem;
-  min-width: 0;
-}
-
-.sitemap-layer {
-  scroll-margin-top: 6.5rem;
-}
-
-.sitemap-layer__head {
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--color-ink);
-}
-
-.sitemap-layer__kicker {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  font-size: 0.6875rem;
+.route-filter__count {
+  font-size: 0.58rem;
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--color-slate-80);
+  color: var(--color-haze);
+  font-variant-numeric: tabular-nums;
 }
 
-.sitemap-layer__kicker::before {
-  content: '';
-  width: 0.55rem;
-  height: 0.55rem;
-  background: var(--color-sage);
+.route-rail__note {
+  font-size: 0.72rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.route-rail__notelink {
+  color: var(--color-haze);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(135, 170, 189, 0.45);
+  transition: color 0.2s ease-out, text-decoration-color 0.2s ease-out;
+}
+
+.route-rail__notelink:hover {
+  color: #ffffff;
+  text-decoration-color: #ffffff;
+}
+
+/* ------- The camps (main column) ------------------------------------------ */
+
+.route-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+  min-width: 0;
+}
+
+.camp-section {
+  scroll-margin-top: 6.5rem;
+}
+
+.camp-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding-bottom: 1.15rem;
+  border-bottom: 2px solid var(--color-ink);
+  margin-bottom: 1.1rem;
+}
+
+.camp-head__seal {
+  display: grid;
+  place-items: center;
   flex: none;
+  width: 3rem;
+  height: 3rem;
+  background: var(--color-ink);
+  color: var(--color-sage-light);
+  margin-top: 0.15rem;
 }
 
-.sitemap-layer__title {
-  font-size: clamp(1.9rem, 1.55rem + 1.3vw, 2.6rem);
+.camp-head__copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.camp-head__kicker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-slate-80);
+  font-variant-numeric: tabular-nums;
+}
+
+.camp-head__kicker-sep {
+  color: var(--color-slate-40);
+}
+
+.camp-head__title {
+  font-size: clamp(1.8rem, 1.45rem + 1.25vw, 2.5rem);
   line-height: 1.08;
-  margin-top: 1rem;
+  margin-top: 0.55rem;
   color: var(--color-ink);
   letter-spacing: -0.02em;
 }
 
-.sitemap-layer__note {
-  margin-top: 0.85rem;
-  max-width: 36rem;
-  font-size: 0.9375rem;
+.camp-head__note {
+  margin-top: 0.5rem;
+  max-width: 44rem;
+  font-size: 0.9rem;
   line-height: 1.6;
   color: var(--color-ink-60);
 }
 
+.camp-section__empty {
+  margin: 0;
+  padding: 1.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-style: italic;
+  font-family: var(--font-display);
+  color: var(--color-slate-80);
+  border: 1px dashed var(--color-slate-40);
+  background: var(--color-mist-40);
+}
+
 /* -------------------------------------------------------------------------- */
-/* Rows                                                                       */
+/* Camp 01 — trailhead cards                                                  */
 /* -------------------------------------------------------------------------- */
 
-.sitemap-rows {
+.waypoints {
   list-style: none;
   margin: 0;
   padding: 0;
-}
-
-.sitemap-row {
-  position: relative;
   display: grid;
-  grid-template-columns: 2.9rem minmax(0, 1fr) 1.4rem;
-  gap: 1.4rem;
-  align-items: start;
-  padding: 1.35rem 0.75rem 1.35rem 0.75rem;
-  border-bottom: 1px solid var(--color-slate-20);
-  text-decoration: none;
-  color: var(--color-ink);
-  transition: background-color 0.22s ease-out;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
 }
 
-.sitemap-row:first-child {
-  border-top: 1px solid var(--color-slate-20);
+.waypoints__item--wide {
+  grid-column: 1 / -1;
 }
 
-.sitemap-row:hover {
-  background: var(--color-mist);
-}
-
-.sitemap-row:focus-visible {
-  outline: 2px solid var(--color-deep);
-  outline-offset: -2px;
-}
-
-.sitemap-row__tick {
-  position: absolute;
-  left: 0;
-  top: 16%;
-  height: 68%;
-  width: 3px;
-  background: var(--color-sage);
-  transform: scaleY(0);
-  transform-origin: center;
-  transition: transform 0.28s var(--ease-brand);
-}
-
-.sitemap-row:hover .sitemap-row__tick,
-.sitemap-row:focus-visible .sitemap-row__tick {
-  transform: scaleY(1);
-}
-
-.sitemap-row__index {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  color: var(--color-slate-80);
-  padding-top: 0.55rem;
-  font-variant-numeric: tabular-nums;
-}
-
-.sitemap-row__body {
+.waypoint {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  min-width: 0;
+  gap: 0.4rem;
+  height: 100%;
+  padding: 0.95rem 1.05rem 0.9rem;
+  background: var(--color-paper);
+  border: 1px solid var(--color-slate-20);
+  border-left: 3px solid var(--color-slate-20);
+  text-decoration: none;
+  color: var(--color-ink);
+  overflow: hidden;
+  transition: transform 0.24s var(--ease-brand), border-color 0.24s ease-out, box-shadow 0.24s ease-out;
 }
 
-.sitemap-row__title {
+.waypoint:hover {
+  transform: translateY(-3px);
+  border-color: var(--color-slate-40);
+  border-left-color: var(--color-sage);
+  box-shadow: 0 14px 30px -22px color-mix(in srgb, var(--color-ink) 40%, transparent);
+}
+
+.waypoint:focus-visible {
+  outline: 2px solid var(--color-deep);
+  outline-offset: 2px;
+}
+
+.waypoint__ghost {
+  position: absolute;
+  top: -0.35rem;
+  right: 0.35rem;
   font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(1.35rem, 1.2rem + 0.6vw, 1.7rem);
-  line-height: 1.15;
+  font-size: 4.6rem;
+  line-height: 1;
+  color: var(--color-mist-60);
+  user-select: none;
+  pointer-events: none;
+}
+
+.waypoint__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-slate-80);
+  font-variant-numeric: tabular-nums;
+  padding-right: 4.2rem;
+}
+
+.waypoint__code {
+  color: var(--color-sage-90);
+}
+
+.waypoint__alt {
+  color: var(--color-slate-80);
+}
+
+.waypoint__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.45rem, 1.3rem + 0.6vw, 1.8rem);
+  line-height: 1.12;
   letter-spacing: -0.01em;
   color: var(--color-ink);
-  transition: color 0.22s ease-out;
+  transition: color 0.2s ease-out;
 }
 
-.sitemap-row:hover .sitemap-row__title {
+.waypoint:hover .waypoint__title {
   color: var(--color-deep);
 }
 
-.sitemap-row__desc {
-  font-size: 0.9375rem;
-  line-height: 1.6;
+.waypoint__desc {
+  font-size: 0.85rem;
+  line-height: 1.55;
   color: var(--color-ink-60);
-  max-width: 46rem;
+  max-width: 36rem;
 }
 
-.sitemap-row__meta {
+.waypoint__foot {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 0.45rem;
+  gap: 0.6rem;
+  margin-top: auto;
+  padding-top: 0.6rem;
+  padding-right: 2.2rem;
 }
 
-.sitemap-row__path {
-  font-size: 0.6875rem;
+.waypoint__path {
+  font-size: 0.62rem;
   font-weight: 600;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--color-slate-80);
+  color: var(--color-deep-80);
+  border-bottom: 1px solid var(--color-deep-20);
+  padding-bottom: 0.1rem;
 }
 
-.sitemap-row__chip {
+.tag {
   display: inline-flex;
   align-items: center;
-  padding: 0.28rem 0.65rem;
+  padding: 0.2rem 0.55rem;
   border: 1px solid var(--color-slate-20);
   background: var(--color-mist-40);
-  font-size: 0.625rem;
+  font-size: 0.55rem;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--color-slate-80);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
-.sitemap-row__arrow {
+.waypoint__arrow {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
   color: var(--color-slate-40);
-  margin-top: 0.35rem;
-  transition: color 0.22s ease-out, transform 0.28s var(--ease-brand);
+  transition: color 0.2s ease-out, transform 0.24s var(--ease-brand);
 }
 
-.sitemap-row:hover .sitemap-row__arrow,
-.sitemap-row:focus-visible .sitemap-row__arrow {
-  color: var(--color-deep);
-  transform: translate(0.25rem, -0.25rem);
+.waypoint:hover .waypoint__arrow,
+.waypoint:focus-visible .waypoint__arrow {
+  color: var(--color-sage-90);
+  transform: translate(0.2rem, -0.2rem);
 }
 
-.sitemap-layer__empty {
+/* -------------------------------------------------------------------------- */
+/* Camp 02 — the benches: full-bleed photographs of the nine landscapes        */
+/* -------------------------------------------------------------------------- */
+
+.benches {
+  list-style: none;
   margin: 0;
-  padding: 1.6rem 0.75rem;
-  font-size: 0.9375rem;
-  font-style: italic;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-auto-rows: 11.5rem;
+  grid-auto-flow: dense;
+  gap: 0.65rem;
+}
+
+.benches__item:nth-child(1) {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.benches__item:nth-child(2),
+.benches__item:nth-child(3),
+.benches__item:nth-child(4),
+.benches__item:nth-child(5),
+.benches__item:nth-child(6),
+.benches__item:nth-child(7),
+.benches__item:nth-child(8) {
+  grid-column: span 2;
+}
+
+.benches__item:nth-child(9) {
+  grid-column: span 6;
+}
+
+.bench {
+  position: relative;
+  display: block;
+  height: 100%;
+  text-decoration: none;
+  color: #ffffff;
+  overflow: hidden;
+  background: var(--color-ink);
+  isolation: isolate;
+}
+
+.bench__image {
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+  filter: var(--image-grade);
+  transition: transform 0.7s var(--ease-brand);
+}
+
+.bench:hover .bench__image,
+.bench:focus-visible .bench__image {
+  transform: scale(1.045);
+}
+
+.bench__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--scrim-ink);
+  opacity: 0.92;
+  transition: opacity 0.35s ease-out;
+}
+
+.bench:hover .bench__scrim,
+.bench:focus-visible .bench__scrim {
+  opacity: 1;
+}
+
+.bench__top {
+  position: absolute;
+  z-index: 2;
+  top: 0.75rem;
+  left: 0.8rem;
+  right: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+  font-variant-numeric: tabular-nums;
+}
+
+.bench__code {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.bench__alt {
+  color: var(--color-haze);
+}
+
+.bench__bottom {
+  position: absolute;
+  z-index: 2;
+  left: 0.8rem;
+  right: 0.8rem;
+  bottom: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+}
+
+.bench__title {
   font-family: var(--font-display);
-  color: var(--color-slate-80);
-  border-bottom: 1px solid var(--color-slate-20);
+  font-size: clamp(1.5rem, 1.2rem + 1.3vw, 2.15rem);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+}
+
+.bench__desc {
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 30rem;
+}
+
+.bench__meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.2rem;
+}
+
+.bench__path {
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.bench__chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.18rem 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  font-size: 0.52rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.9);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.bench__arrow {
+  position: absolute;
+  z-index: 2;
+  right: 0.7rem;
+  top: 2.1rem;
+  color: rgba(255, 255, 255, 0.75);
+  transition: color 0.2s ease-out, transform 0.3s var(--ease-brand);
+}
+
+.bench:hover .bench__arrow,
+.bench:focus-visible .bench__arrow {
+  color: #ffffff;
+  transform: translate(0.2rem, -0.2rem);
+}
+
+.bench:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* A panorama close: the last bench runs the full width */
+.benches__item:nth-child(9) .bench__desc {
+  max-width: 42rem;
 }
 
 /* -------------------------------------------------------------------------- */
-/* Empty state                                                                */
+/* Camp 03 — the ledger: a surveyor's dashed-line page of CMS entries          */
 /* -------------------------------------------------------------------------- */
 
-.sitemap-empty {
+.ledger {
+  border: 1px solid var(--color-slate-20);
+  border-top: 3px double var(--color-ink);
+  background: var(--color-paper);
+}
+
+.ledger__columns {
+  display: grid;
+  grid-template-columns: 3.25rem minmax(0, 1fr) auto 4.5rem 1.2rem;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.55rem 1rem;
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-slate-80);
+  border-bottom: 1px solid var(--color-ink);
+  background: var(--color-mist-40);
+}
+
+.ledger__col-path {
+  justify-self: end;
+}
+
+.ledger__col-class {
+  justify-self: center;
+}
+
+.ledger__rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ledger-row {
+  display: grid;
+  grid-template-columns: 3.25rem minmax(0, 1fr) auto 4.5rem 1.2rem;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px dashed var(--color-slate-40);
+  text-decoration: none;
+  color: var(--color-ink);
+  transition: background-color 0.2s ease-out;
+}
+
+.ledger__rows li:last-child .ledger-row {
+  border-bottom: 0;
+}
+
+.ledger-row:hover {
+  background: var(--color-mist);
+}
+
+.ledger-row:focus-visible {
+  outline: 2px solid var(--color-deep);
+  outline-offset: -2px;
+}
+
+.ledger-row__idx {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  color: var(--color-slate-40);
+  font-variant-numeric: tabular-nums;
+}
+
+.ledger-row__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.ledger-row__title {
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.ledger-row__desc {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--color-ink-60);
+}
+
+/* The path + stamp sit inside a `display: contents` wrapper on desktop so the
+   columns align with the header strip; on small screens it becomes a wrapped
+   inline row instead (see the responsive block). */
+.ledger-row__meta {
+  display: contents;
+}
+
+.ledger-row__path {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--color-slate-80);
+  text-transform: uppercase;
+  white-space: nowrap;
+  justify-self: end;
+}
+
+.ledger-row__stamp {
+  display: inline-block;
+  padding: 0.22rem 0.45rem;
+  border: 3px double var(--color-sage-90);
+  color: var(--color-sage-90);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  transform: rotate(-2.5deg);
+  user-select: none;
+  justify-self: center;
+  white-space: nowrap;
+}
+
+.ledger-row__arrow {
+  color: var(--color-slate-40);
+  justify-self: end;
+  transition: color 0.2s ease-out, transform 0.24s var(--ease-brand);
+}
+
+.ledger-row:hover .ledger-row__arrow,
+.ledger-row:focus-visible .ledger-row__arrow {
+  color: var(--color-deep);
+  transform: translate(0.15rem, -0.15rem);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Camp 04 — the summit register: dark plates with copy-link buttons          */
+/* -------------------------------------------------------------------------- */
+
+.register {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.plate {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--color-ink);
+  box-shadow: inset 0 0 0 1px rgba(135, 170, 189, 0.35),
+    inset 0 0 0 3px var(--color-ink),
+    inset 0 0 0 4px rgba(135, 170, 189, 0.18);
+  color: var(--color-mist);
+  transition: transform 0.24s var(--ease-brand), box-shadow 0.24s ease-out;
+}
+
+.plate:hover {
+  transform: translateY(-2px);
+}
+
+.plate__link {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.9rem 1rem 0.65rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.plate__link:focus-visible {
+  outline: 2px solid var(--color-sage-light);
+  outline-offset: -2px;
+}
+
+.plate__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding-right: 1.4rem;
+}
+
+.plate__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.22rem 0.55rem;
+  border: 1px solid var(--color-sage-light);
+  color: var(--color-sage-light);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.plate__alt {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: rgba(135, 170, 189, 0.9);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.plate__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 1.25rem + 0.6vw, 1.75rem);
+  line-height: 1.1;
+  color: #ffffff;
+  margin-top: 0.1rem;
+}
+
+.plate__desc {
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.plate__arrow {
+  position: absolute;
+  top: 0.95rem;
+  right: 0.8rem;
+  color: rgba(135, 170, 189, 0.75);
+  transition: color 0.2s ease-out, transform 0.24s var(--ease-brand);
+}
+
+.plate__link:hover .plate__arrow,
+.plate__link:focus-visible .plate__arrow {
+  color: var(--color-sage-light);
+  transform: translate(0.15rem, -0.15rem);
+}
+
+.plate__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding: 0.55rem 1rem;
+  border-top: 1px solid rgba(135, 170, 189, 0.22);
+}
+
+.plate__path {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--color-haze);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plate__copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: none;
+  padding: 0.32rem 0.6rem;
+  border: 1px solid rgba(135, 170, 189, 0.4);
+  background: transparent;
+  color: var(--color-haze);
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s ease-out, border-color 0.2s ease-out, background-color 0.2s ease-out;
+}
+
+.plate__copy:hover {
+  color: #ffffff;
+  border-color: var(--color-sage-light);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.plate__copy:focus-visible {
+  outline: 2px solid var(--color-sage-light);
+  outline-offset: 2px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Empty state (search)                                                       */
+/* -------------------------------------------------------------------------- */
+
+.route-empty {
   padding: 3.5rem 2rem;
   text-align: center;
   border: 1px solid var(--color-slate-20);
   background: var(--color-mist-40);
 }
 
-.sitemap-empty__kicker {
+.route-empty__kicker {
   font-size: 0.6875rem;
   font-weight: 600;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--color-slate-80);
 }
 
-.sitemap-empty__title {
+.route-empty__title {
   font-family: var(--font-display);
   font-weight: 400;
   font-size: clamp(2rem, 1.6rem + 1.6vw, 2.75rem);
@@ -586,7 +1379,7 @@
   color: var(--color-ink);
 }
 
-.sitemap-empty__text {
+.route-empty__text {
   margin: 1rem auto 0;
   max-width: 26rem;
   font-size: 0.9375rem;
@@ -594,7 +1387,7 @@
   color: var(--color-ink-60);
 }
 
-.sitemap-empty__reset {
+.route-empty__reset {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -612,18 +1405,18 @@
   transition: background-color 0.2s ease-out, border-color 0.2s ease-out;
 }
 
-.sitemap-empty__reset:hover {
+.route-empty__reset:hover {
   background: var(--color-btn-primary-hover);
   border-color: var(--color-btn-primary-hover);
 }
 
-.sitemap-empty__reset:focus-visible {
+.route-empty__reset:focus-visible {
   outline: 2px solid var(--color-deep);
   outline-offset: 2px;
 }
 
 /* -------------------------------------------------------------------------- */
-/* CTA band                                                                    */
+/* CTA                                                                         */
 /* -------------------------------------------------------------------------- */
 
 .sitemap-cta {
@@ -647,7 +1440,7 @@
 .sitemap-cta__eyebrow {
   font-size: 0.6875rem;
   font-weight: 600;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--color-sage-90);
 }
@@ -706,62 +1499,116 @@
 /* -------------------------------------------------------------------------- */
 
 @media (max-width: 63.99rem) {
-  .sitemap-body {
+  .route {
     grid-template-columns: 1fr;
-    gap: 2rem;
-    padding-top: 2.75rem;
+    gap: 1.75rem;
+    padding-top: 2.5rem;
   }
 
-  .sitemap-sidebar {
+  .route-rail {
     position: static;
-    gap: 0.9rem;
   }
 
-  .sitemap-sidebar__layers ul {
-    display: flex;
-    gap: 0.5rem;
+  .route-rail__panel {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 1rem 1.25rem;
+    padding: 1.1rem 1.15rem;
+  }
+
+  .route-rail__brand {
+    flex: 1 1 100%;
+    padding-bottom: 0.6rem;
+  }
+
+  .altimeter {
+    flex: 1 1 11rem;
+    min-width: 10rem;
+  }
+
+  .camps {
+    flex: 1 1 auto;
+    min-width: 0;
+    align-self: center;
+  }
+
+  .camps ul {
+    flex-direction: row;
+    flex-wrap: nowrap;
     overflow-x: auto;
-    border-top: 0;
-    padding-top: 0.25rem;
+    gap: 0.45rem;
     scrollbar-width: none;
   }
 
-  .sitemap-sidebar__layers ul::-webkit-scrollbar {
+  .camps ul::-webkit-scrollbar {
     display: none;
   }
 
-  .sitemap-layer-link {
-    flex: none;
-    align-items: center;
+  .camps li + li {
+    border-top: 0;
+  }
+
+  .camp {
+    grid-template-columns: auto minmax(0, auto);
     gap: 0.5rem;
-    padding: 0.45rem 0.8rem;
-    border: 1px solid var(--color-slate-20);
-    border-bottom: 1px solid var(--color-slate-20);
-    background: var(--color-paper);
+    padding: 0.45rem 0.75rem;
+    border: 1px solid rgba(135, 170, 189, 0.35);
+    background: rgba(255, 255, 255, 0.05);
     white-space: nowrap;
   }
 
-  .sitemap-layer-link[aria-current='true'] {
-    background: var(--color-ink);
-    border-color: var(--color-ink);
-    padding-inline: 0.8rem;
-    margin-inline: 0;
+  .camp[aria-current='true'] {
+    border-color: var(--color-sage);
+    background: rgba(208, 86, 77, 0.16);
   }
 
-  .sitemap-layer-link__index {
+  .camp__dot {
+    width: 1.3rem;
+    height: 1.3rem;
+    font-size: 0.62rem;
+    border-radius: 999px;
+  }
+
+  .camp__body {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.45rem;
+  }
+
+  .camp__kicker,
+  .camp__alt {
     display: none;
   }
 
-  .sitemap-layer-link__title {
-    font-size: 0.8125rem;
+  .camp__title {
+    font-size: 0.8rem;
   }
 
-  .sitemap-sidebar__note {
-    display: none;
+  .route-rail__label {
+    flex: 1 1 100%;
+    border-top: 1px solid rgba(135, 170, 189, 0.25);
+    padding-top: 0.9rem;
   }
 
-  .sitemap-main {
-    gap: 3.25rem;
+  .route-filter {
+    flex: 1 1 16rem;
+  }
+
+  .route-filter__count {
+    align-self: center;
+  }
+
+  .route-rail__note {
+    flex: 1 1 100%;
+  }
+
+  .register {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .benches {
+    grid-auto-rows: 10.5rem;
   }
 }
 
@@ -771,52 +1618,236 @@
   }
 
   .sitemap-hero__inner {
-    padding-top: 7.25rem;
-    padding-bottom: 2rem;
+    padding-top: 7rem;
+    padding-bottom: 0.75rem;
   }
 
-  .sitemap-hero__stats {
-    margin-top: 2rem;
+  .sitemap-hero__lead {
+    margin-top: 1.1rem;
   }
 
-  .sitemap-row {
-    grid-template-columns: 2.35rem minmax(0, 1fr) 1.2rem;
-    gap: 0.9rem;
-    padding: 1.1rem 0.5rem;
+  .sitemap-hero__profile-note {
+    display: none;
   }
 
-  .sitemap-row__index {
-    font-size: 0.6875rem;
-    letter-spacing: 0.1em;
+  .route-rail__panel {
+    padding: 0.95rem 1rem;
   }
 
-  .sitemap-row__title {
-    font-size: 1.3rem;
+  .altimeter {
+    display: none;
   }
 
-  /* The chart’s rules should stand down on small screens — the rows separate
-     by their own border already. */
+  .route-rail__brand-coord {
+    display: none;
+  }
+
+  .waypoints {
+    grid-template-columns: 1fr;
+  }
+
+  .waypoints__item--wide {
+    grid-column: auto;
+  }
+
+  .waypoint__ghost {
+    font-size: 3.4rem;
+  }
+
+  .benches {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 10rem;
+  }
+
+  .benches__item:nth-child(1) {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+
+  .benches__item:nth-child(2),
+  .benches__item:nth-child(3),
+  .benches__item:nth-child(4),
+  .benches__item:nth-child(5),
+  .benches__item:nth-child(6),
+  .benches__item:nth-child(7),
+  .benches__item:nth-child(8) {
+    grid-column: span 1;
+  }
+
+  .benches__item:nth-child(9) {
+    grid-column: span 2;
+  }
+
+  .bench__desc {
+    display: none;
+  }
+
+  .bench__title {
+    font-size: 1.35rem;
+  }
+
+  .bench__arrow {
+    display: none;
+  }
+
+  .ledger__columns {
+    display: none;
+  }
+
+  .ledger-row {
+    grid-template-columns: 2.3rem minmax(0, 1fr) auto;
+    grid-template-areas:
+      "idx body arrow"
+      "idx meta meta";
+    row-gap: 0.25rem;
+  }
+
+  .ledger-row__idx {
+    grid-area: idx;
+    font-size: 1.15rem;
+  }
+
+  .ledger-row__body {
+    grid-area: body;
+  }
+
+  .ledger-row__meta {
+    grid-area: meta;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-top: 0.3rem;
+  }
+
+  .ledger-row__path {
+    justify-self: auto;
+    font-size: 0.58rem;
+  }
+
+  .ledger-row__arrow {
+    grid-area: arrow;
+  }
+
+  .ledger-row__stamp {
+    justify-self: auto;
+    transform: none;
+  }
+
+  .register {
+    grid-template-columns: 1fr;
+  }
+
+  .camp-head {
+    gap: 0.75rem;
+  }
+
+  .camp-head__seal {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .route-main {
+    gap: 3.25rem;
+  }
+
   .sitemap-cta__inner {
     flex-direction: column;
     align-items: flex-start;
   }
+
+  .route-filter__input {
+    font-size: 1rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sitemap-row,
-  .sitemap-row__tick,
-  .sitemap-row__arrow,
-  .sitemap-filter__input,
-  .sitemap-filter__clear,
+  .waypoint,
+  .waypoint__arrow,
+  .waypoint__title,
+  .bench__image,
+  .bench__scrim,
+  .bench__arrow,
+  .plate,
+  .plate__arrow,
+  .plate__copy,
+  .camp,
+  .camp__dot,
+  .ledger-row__arrow,
+  .route-filter__input,
   .sitemap-cta__button,
-  .sitemap-empty__reset,
-  .sitemap-row__title,
-  .sitemap-layer-link {
+  .route-empty__reset,
+  .route-filter__clear,
+  .profile-dot__mark,
+  .altimeter__fill {
     transition: none;
   }
 
-  .sitemap-row__tick {
-    opacity: 0;
+  .waypoint:hover,
+  .plate:hover {
     transform: none;
+  }
+
+  .bench:hover .bench__image,
+  .bench:focus-visible .bench__image {
+    transform: none;
+  }
+}
+
+/* Print: the whole route on paper, chrome stripped away */
+@media print {
+  .sitemap-hero__topography,
+  .sitemap-hero__profile-block,
+  .route-rail,
+  .sitemap-cta,
+  .plate__copy,
+  .bench__arrow,
+  .waypoint__arrow {
+    display: none !important;
+  }
+
+  .sitemap-hero {
+    background: #ffffff;
+    color: #000000;
+    min-height: auto;
+  }
+
+  .sitemap-hero__title,
+  .sitemap-hero__stat-value {
+    color: #000000;
+  }
+
+  .sitemap-hero__lead,
+  .sitemap-hero__stat-label {
+    color: #222222;
+  }
+
+  .route {
+    display: block;
+    padding: 1rem 0;
+  }
+
+  .waypoints,
+  .benches,
+  .register {
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: auto;
+  }
+
+  .bench {
+    background: #ffffff;
+    border: 1px solid #cccccc;
+  }
+
+  .bench__scrim,
+  .bench__image {
+    display: none;
+  }
+
+  .bench__title,
+  .bench__desc,
+  .bench__path,
+  .bench__top {
+    position: static;
+    color: #000000;
   }
 }
