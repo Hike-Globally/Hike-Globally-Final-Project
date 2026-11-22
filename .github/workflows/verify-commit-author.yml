@@ -56,10 +56,30 @@ jobs:
             echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           fi
 
+      # The allowlist rules themselves are pure functions; test them first so a
+      # wrong change to the allowlist cannot quietly weaken the gate.
+      - name: Test the allowlist rules
+        run: node --test scripts/commit-identity.test.mjs
+
       - name: Run the commit-author guard
         env:
           TARGET_SHA: ${{ steps.target.outputs.sha }}
         run: node scripts/check-commit-author.mjs "$TARGET_SHA"
+
+      # A branch rule can be bypassed with a force-push; main cannot. This step
+      # is what makes "it cannot happen again" true even for a direct push to
+      # main by an admin, covering every commit in the push rather than the tip.
+      - name: Check every commit pushed to main
+        if: github.event_name == 'push'
+        env:
+          EVENT_BEFORE: ${{ github.event.before }}
+          EVENT_AFTER: ${{ github.event.after }}
+        run: |
+          if [ -z "$EVENT_BEFORE" ] || [ "$EVENT_BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            echo "New branch — nothing to compare against."
+            exit 0
+          fi
+          node scripts/check-commit-author.mjs "${EVENT_BEFORE}..${EVENT_AFTER}"
 
       - name: Name the bad author and how to fix it
         if: failure()
