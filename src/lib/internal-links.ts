@@ -514,6 +514,8 @@ export class InternalLinker {
 
   /** Text nodes seen by `collect()` that have not been through selection yet. */
   private readonly pending: ObservedNode[] = []
+  /** Roots already walked by `collect()` so nested rich-text blocks are never double-counted. */
+  private readonly collectedRoots = new WeakSet<object>()
   /** The decided plan, keyed by node identity (the same object the renderer holds). */
   private readonly plans = new Map<LexicalNode, NodeLinkPlan>()
 
@@ -569,7 +571,9 @@ export class InternalLinker {
   collect(content: unknown): void {
     if (this.isEmpty) return
     const root = (content as { root?: LexicalNode } | null | undefined)?.root
-    if (root) this.walk(root, true)
+    if (!root || typeof root !== 'object' || this.collectedRoots.has(root)) return
+    this.collectedRoots.add(root)
+    this.walk(root, true)
   }
 
   /**
@@ -599,6 +603,21 @@ export class InternalLinker {
         if (typeof slug === 'string' && typeof relationTo === 'string') {
           this.reserve(docHref(relationTo, slug))
         }
+      }
+    } else if (
+      node.type === 'block' &&
+      node.fields?.blockType === 'boxedContent' &&
+      node.fields.description &&
+      typeof node.fields.description === 'object'
+    ) {
+      const descriptionRoot = (node.fields.description as { root?: LexicalNode }).root
+      if (
+        descriptionRoot &&
+        typeof descriptionRoot === 'object' &&
+        !this.collectedRoots.has(descriptionRoot)
+      ) {
+        this.collectedRoots.add(descriptionRoot)
+        this.walk(descriptionRoot, linkable && !neverLink)
       }
     }
 

@@ -30,7 +30,9 @@ export function hasRichTextContent(value: unknown): boolean {
     const description = node.fields.description
     return (
       (typeof heading === 'string' && Boolean(heading.trim())) ||
-      (typeof description === 'string' && Boolean(description.trim()))
+      (typeof description === 'string'
+        ? Boolean(description.trim())
+        : hasRichTextContent(description))
     )
   }
   if (node.type === 'upload' || node.type === 'horizontalrule') return true

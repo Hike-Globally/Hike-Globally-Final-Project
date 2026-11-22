@@ -12,10 +12,15 @@ import { Pages } from '../collections/Pages'
 import { Trips } from '../collections/Trips'
 import { RichText } from '../components/content/rich-text'
 import { EssentialInformationSection } from '../components/sections/essential-information-section'
-import { inlineBoxedContentBlock } from '../fields/content-editor'
+import {
+  boxedContentEditor,
+  coerceBoxedContentDescriptionToLexical,
+  inlineBoxedContentBlock,
+} from '../fields/content-editor'
 import type { Trip } from '../payload-types'
 import { getArticleHeadings } from './article-headings'
 import { lexicalToPlainText, readingTimeMinutes } from './format'
+import { buildLinkTargets, compileLinkIndex, InternalLinker } from './internal-links'
 import { hasRichTextContent } from './rich-text-content'
 
 const paragraph = (text: string) => ({ type: 'paragraph', children: [{ type: 'text', text }] })
@@ -45,7 +50,7 @@ async function render(content: unknown, headingIds?: readonly string[]) {
   return new JSDOM(await new Response(stream).text()).window.document
 }
 
-test('Boxed Content is available in the shared Trip and Blog rich-text editor', () => {
+test('Boxed Content is available in the shared Trip and Blog rich-text editor', async () => {
   assert.equal(inlineBoxedContentBlock.slug, 'boxedContent')
   assert.equal(inlineBoxedContentBlock.labels?.singular, 'Boxed Content')
 
@@ -61,10 +66,51 @@ test('Boxed Content is available in the shared Trip and Blog rich-text editor', 
   const description = fields.find((field) => 'name' in field && field.name === 'description')
   const upload = fields.find((field) => 'name' in field && field.name === 'image')
   assert.ok(heading?.type === 'text' && heading.required)
-  assert.ok(description?.type === 'textarea' && description.required)
+  assert.ok(description?.type === 'richText' && description.required && description.editor)
   assert.ok(upload?.type === 'upload' && upload.required)
   assert.equal(upload.relationTo, 'media')
   assert.deepEqual(upload.filterOptions, { mimeType: { contains: 'image/' } })
+
+  // Verify the Boxed Content description editor resolves the full editorial toolbar shown in the
+  // dashboard (+ menu, inline blocks, text/heading styles, align, indent, bold/italic/underline/
+  // strikethrough/sub/sup/inline-code, links, lists, blockquote, upload, hr, tables).
+  const appConfig = await config
+  const adapter = await boxedContentEditor()({
+    config: appConfig,
+    isRoot: false,
+    parentIsLocalized: false,
+  })
+  const resolvedFeatureMap = adapter.editorConfig.resolvedFeatureMap
+  for (const key of [
+    'toolbarFixed',
+    'blocks',
+    'heading',
+    'align',
+    'indent',
+    'bold',
+    'italic',
+    'underline',
+    'strikethrough',
+    'subscript',
+    'superscript',
+    'inlineCode',
+    'link',
+    'unorderedList',
+    'orderedList',
+    'checklist',
+    'blockquote',
+    'relationship',
+    'upload',
+    'horizontalRule',
+    'experimental_table',
+  ]) {
+    assert.ok(resolvedFeatureMap.has(key), `expected Boxed Content editor feature ${key}`)
+  }
+  const blocksProps = resolvedFeatureMap.get('blocks')?.sanitizedServerFeatureProps as
+    | { blocks?: { slug?: string }[] }
+    | undefined
+  const nestedSlugs = (blocksProps?.blocks ?? []).map((b) => b.slug)
+  assert.deepEqual(nestedSlugs, ['linkPreview', 'multiUrlPreview'])
 
   const blogBody = Blog.fields.find((field) => 'name' in field && field.name === 'content')
   const tripOverview = Trips.fields.find((field) => 'name' in field && field.name === 'description')
@@ -306,6 +352,149 @@ test('Boxed Content distinguishes media vs copy-only frames and renders cleanly 
   // Inside Essential Information accordions, Boxed Content headings step down to H3 subheadings.
   const subheadings = Array.from(features).map((item) => item.querySelector('h3')?.textContent)
   assert.deepEqual(subheadings, ['Rest day in Namche', 'Hydration on the trail'])
+})
+
+test('Boxed Content supports rich-text descriptions with full editorial formatting and legacy string coercion', async () => {
+  const richDescription = doc(
+    { type: 'heading', tag: 'h3', children: [{ type: 'text', text: 'Trail notes' }] },
+    {
+      type: 'paragraph',
+      format: 'center',
+      indent: 1,
+      children: [
+        { type: 'text', text: 'Pack ', format: 0 },
+        { type: 'text', text: 'warm layers', format: 1 },
+        { type: 'text', text: ' and ', format: 0 },
+        { type: 'text', text: 'water', format: 2 | 8 },
+        { type: 'text', text: ' H', format: 0 },
+        { type: 'text', text: '2', format: 32 },
+        { type: 'text', text: 'O 10', format: 0 },
+        { type: 'text', text: 'x', format: 64 },
+        { type: 'text', text: ' ', format: 0 },
+        { type: 'text', text: 'code()', format: 16 },
+        { type: 'text', text: ' ', format: 0 },
+        {
+          type: 'link',
+          linkType: 'custom',
+          url: 'https://example.com/gear',
+          newTab: true,
+          children: [{ type: 'text', text: 'gear guide' }],
+        },
+      ],
+    },
+    {
+      type: 'list',
+      listType: 'bullet',
+      children: [
+        { type: 'listitem', children: [{ type: 'text', text: 'Start before dawn' }] },
+        { type: 'listitem', children: [{ type: 'text', text: 'Check weather above 4,000 m' }] },
+      ],
+    },
+  )
+
+  const content = doc(
+    boxedContent({
+      heading: 'High camp briefing',
+      description: richDescription,
+      image,
+    }),
+  )
+
+  assert.equal(hasRichTextContent(doc(boxedContent({ description: richDescription }))), true)
+  assert.equal(
+    hasRichTextContent(doc(boxedContent({ description: doc(paragraph('   ')) }))),
+    false,
+  )
+  assert.match(
+    lexicalToPlainText(content),
+    /High camp briefing Trail notes Pack warm layers and water H 2 O 10 x code\(\) gear guide Start before dawn Check weather above 4,000 m/,
+  )
+
+  const document = await render(content)
+  const feature = document.querySelector<HTMLElement>('[data-boxed-content]')
+  assert.ok(feature)
+  const copy = feature.querySelector('.boxed-content__description.boxed-content__richtext')
+  assert.ok(copy)
+  assert.equal(copy.querySelector('h3')?.textContent, 'Trail notes')
+  assert.equal(copy.querySelector('strong')?.textContent, 'warm layers')
+  assert.equal(copy.querySelector('em')?.textContent, 'water')
+  assert.equal(copy.querySelector('u')?.textContent, 'water')
+  assert.equal(copy.querySelector('sub')?.textContent, '2')
+  assert.equal(copy.querySelector('sup')?.textContent, 'x')
+  assert.equal(copy.querySelector('code')?.textContent, 'code()')
+  const anchor = copy.querySelector('a')
+  assert.equal(anchor?.getAttribute('href'), 'https://example.com/gear')
+  assert.equal(anchor?.getAttribute('target'), '_blank')
+  const alignedParagraph = copy.querySelector('p')
+  assert.equal(alignedParagraph?.style.textAlign, 'center')
+  assert.equal(alignedParagraph?.style.paddingInlineStart, '40px')
+  assert.equal(copy.querySelectorAll('ul > li').length, 2)
+
+  // Inside Essential Information accordions (h2 -> Boxed Content h3), inner headings step down to h4.
+  const sections = [
+    {
+      id: 'gear',
+      heading: 'Gear checklist',
+      content,
+    },
+  ] as unknown as NonNullable<Trip['contentSections']>
+  const accordionStream = await renderToReadableStream(
+    createElement(EssentialInformationSection, { title: 'Essential Information', sections }),
+  )
+  const accordionDoc = new JSDOM(await new Response(accordionStream).text()).window.document
+  assert.equal(
+    accordionDoc.querySelector('[data-boxed-content] .boxed-content__title')?.tagName,
+    'H3',
+  )
+  assert.equal(
+    accordionDoc.querySelector('[data-boxed-content] .boxed-content__richtext h4')?.textContent,
+    'Trail notes',
+  )
+
+  // Legacy plain-string descriptions coerce cleanly to Lexical JSON and preserve line breaks.
+  const coerced = coerceBoxedContentDescriptionToLexical('First line\nSecond line\n\nNext paragraph') as {
+    root: { children: { type: string; children: { type: string; text?: string }[] }[] }
+  }
+  assert.equal(coerced.root.children.length, 2)
+  assert.equal(coerced.root.children[0]?.children[1]?.type, 'linebreak')
+  assert.equal(lexicalToPlainText(coerced), 'First line Second line Next paragraph')
+  assert.equal(coerceBoxedContentDescriptionToLexical(richDescription), richDescription)
+
+  // Empty legacy strings coerce to an empty Lexical paragraph rather than crashing Lexical.
+  const emptyCoerced = coerceBoxedContentDescriptionToLexical('   ') as {
+    root: { children: unknown[] }
+  }
+  assert.equal(hasRichTextContent(emptyCoerced), false)
+
+  // Auto-linking also works inside Boxed Content rich-text descriptions without double-counting.
+  const index = compileLinkIndex(
+    buildLinkTargets([
+      {
+        collection: 'trips',
+        id: 10,
+        slug: 'everest-base-camp-trek',
+        href: '/trips/everest-base-camp-trek',
+        internalLinkKeywords: ['Everest Base Camp Trek'],
+      },
+    ]),
+  )
+  const linker = new InternalLinker(index)
+  const linkedDoc = doc(
+    boxedContent({
+      heading: 'Route highlight',
+      description: doc(paragraph('Consider the Everest Base Camp Trek in autumn.')),
+      image,
+    }),
+    paragraph('Another mention of Everest Base Camp Trek later on.'),
+  )
+  const linkedStream = await renderToReadableStream(
+    createElement(RichText, { content: linkedDoc, linker }),
+  )
+  const linkedDom = new JSDOM(await new Response(linkedStream).text()).window.document
+  const autoLinks = linkedDom.querySelectorAll('a[data-auto-link="true"]')
+  assert.equal(autoLinks.length, 1)
+  assert.equal(autoLinks[0]?.getAttribute('href'), '/trips/everest-base-camp-trek')
+  assert.ok(autoLinks[0]?.closest('[data-boxed-content]'))
 })
 
 test('Boxed Content CSS uses #caf0f8 surface with WCAG AA/AAA contrast, ungraded original photos, container-query responsiveness, and zero-gap geometry', () => {

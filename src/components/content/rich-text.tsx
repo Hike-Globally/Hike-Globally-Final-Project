@@ -430,6 +430,7 @@ const renderNode = (node: RichTextNode, index: number, context: RenderContext): 
             source={node.fields}
             headingId={headingId}
             headingTag={boxedContentHeadingTag}
+            linker={context.linker}
           />
         )
       }

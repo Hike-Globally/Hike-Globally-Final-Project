@@ -102,7 +102,12 @@ export const lexicalToPlainText = (content: unknown): string => {
       const fields = record.fields as Record<string, unknown>
       if (fields.blockType === 'boxedContent') {
         if (typeof fields.heading === 'string') parts.push(fields.heading)
-        if (typeof fields.description === 'string') parts.push(fields.description)
+        if (typeof fields.description === 'string') {
+          parts.push(fields.description)
+        } else if (fields.description && typeof fields.description === 'object') {
+          const nested = lexicalToPlainText(fields.description)
+          if (nested) parts.push(nested)
+        }
       }
     }
     if (Array.isArray(record.children)) record.children.forEach(walk)

@@ -10,6 +10,84 @@ import { MULTI_URL_PREVIEW_NAME } from '../lib/multi-url-preview'
 import { linkPreviewSectionFields } from './link-preview'
 import { multiUrlPreviewFields } from './multi-url-preview'
 
+/**
+ * Coerce a legacy plain-text Boxed Content description into a Lexical editor state.
+ *
+ * Boxed Content descriptions used to be stored as plain `textarea` strings. Converting strings on
+ * read and before validation keeps previously saved Trip and Blog documents editable in the
+ * Lexical editor without throwing a "value passed to the Lexical editor is not an object" error.
+ */
+export function coerceBoxedContentDescriptionToLexical(value: unknown): unknown {
+  if (typeof value !== 'string') return value
+
+  const normalized = value.replace(/\r\n?/g, '\n').trim()
+  if (!normalized) {
+    return {
+      root: {
+        type: 'root',
+        format: '',
+        indent: 0,
+        version: 1,
+        direction: null,
+        children: [
+          {
+            type: 'paragraph',
+            format: '',
+            indent: 0,
+            version: 1,
+            direction: null,
+            textFormat: 0,
+            textStyle: '',
+            children: [],
+          },
+        ],
+      },
+    }
+  }
+
+  const paragraphs = normalized.split(/\n{2,}/).map((block) => {
+    const lines = block.split('\n')
+    const children: Record<string, unknown>[] = []
+    lines.forEach((line, index) => {
+      if (index > 0) {
+        children.push({ type: 'linebreak', version: 1 })
+      }
+      if (line.length > 0) {
+        children.push({
+          type: 'text',
+          detail: 0,
+          format: 0,
+          mode: 'normal',
+          style: '',
+          text: line,
+          version: 1,
+        })
+      }
+    })
+    return {
+      type: 'paragraph',
+      format: '',
+      indent: 0,
+      version: 1,
+      direction: 'ltr',
+      textFormat: 0,
+      textStyle: '',
+      children,
+    }
+  })
+
+  return {
+    root: {
+      type: 'root',
+      format: '',
+      indent: 0,
+      version: 1,
+      direction: 'ltr',
+      children: paragraphs,
+    },
+  }
+}
+
 /** The same card as a Page sections link preview, placed between paragraphs in Lexical. */
 export const inlineLinkPreviewBlock: Block = {
   slug: 'linkPreview',
@@ -22,6 +100,27 @@ export const inlineMultiUrlPreviewBlock: Block = {
   slug: 'multiUrlPreview',
   labels: { singular: MULTI_URL_PREVIEW_NAME, plural: MULTI_URL_PREVIEW_NAME },
   fields: multiUrlPreviewFields({ conditional: false }),
+}
+
+/**
+ * Rich-text editor for Boxed Content descriptions.
+ *
+ * Exposes the full editorial toolbar (add menu, inline blocks, text/heading styles, alignment,
+ * indentation, inline formatting, links, and tables) without including Boxed Content itself so the
+ * block schema never recurses infinitely.
+ */
+export function boxedContentEditor() {
+  return lexicalEditor({
+    features: ({ defaultFeatures }) => [
+      ...defaultFeatures,
+      FixedToolbarFeature(),
+      EXPERIMENTAL_TableFeature(),
+      BlocksFeature({
+        blocks: [inlineLinkPreviewBlock, inlineMultiUrlPreviewBlock],
+      }),
+    ],
+    admin: { placeholder: 'Write a concise description…' },
+  })
 }
 
 /** An editorial image-and-copy feature, inserted inline in Trip and Blog rich text. */
@@ -43,13 +142,17 @@ export const inlineBoxedContentBlock: Block = {
     {
       name: 'description',
       label: 'Description',
-      type: 'textarea',
+      type: 'richText',
+      editor: boxedContentEditor(),
       required: true,
-      maxLength: 900,
+      hooks: {
+        afterRead: [({ value }) => coerceBoxedContentDescriptionToLexical(value)],
+        beforeValidate: [({ value }) => coerceBoxedContentDescriptionToLexical(value)],
+      },
       admin: {
-        rows: 5,
-        placeholder: 'Write a concise description…',
-        description: 'Keep this focused; the copy sits beside the image on larger screens.',
+        className: 'hg-trip-compact-editor',
+        description:
+          'Format copy with headings, alignment, lists, links, tables, and inline blocks. Keep this focused; the copy sits beside the image on larger screens.',
       },
     },
     {
