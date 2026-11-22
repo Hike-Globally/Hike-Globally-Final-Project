@@ -18,6 +18,7 @@ import { departureStatusOptions, toDateKey } from '../lib/departures'
 import { difficultySelectOptions } from '../lib/difficulty'
 import { buildLivePreviewURL, resolveLivePreviewPath } from '../lib/live-preview-url'
 import { tripAudienceDefaults } from '../lib/trip-audience'
+import { withoutAdminHelp } from '../lib/without-admin-help'
 
 /**
  * Trips — the longest form in the CMS.
@@ -73,7 +74,7 @@ export const Trips: CollectionConfig = {
     afterChange: [revalidateTrip],
     afterDelete: [revalidateTripDelete],
   },
-  fields: [
+  fields: withoutAdminHelp([
     /* --------------------------------------------------------------------------
        Above the fold — identity and the main body copy
        -------------------------------------------------------------------------- */
@@ -860,5 +861,5 @@ export const Trips: CollectionConfig = {
     internalLinkKeywordsSection(),
     metaField(),
     viewLiveField(),
-  ],
+  ]),
 }

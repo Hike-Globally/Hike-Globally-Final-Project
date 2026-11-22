@@ -14,6 +14,7 @@ import { slugField } from '../fields/slug'
 import { viewLiveField } from '../fields/view-live'
 import { populatePublishedAt, revalidatePost, revalidatePostDelete } from '../hooks/revalidate'
 import { siteLivePreviewURL } from '../lib/live-preview-url'
+import { withoutAdminHelp } from '../lib/without-admin-help'
 
 export const Blog: CollectionConfig = {
   slug: 'blog',
@@ -44,7 +45,7 @@ export const Blog: CollectionConfig = {
     afterChange: [revalidatePost],
     afterDelete: [revalidatePostDelete],
   },
-  fields: [
+  fields: withoutAdminHelp([
     { name: 'title', type: 'text', localized: true, required: true },
     slugField('title'),
     pageSectionsField(blogSectionOptions),
@@ -137,5 +138,5 @@ export const Blog: CollectionConfig = {
     internalLinkKeywordsSection(),
     metaField(),
     viewLiveField(),
-  ],
+  ]),
 }
