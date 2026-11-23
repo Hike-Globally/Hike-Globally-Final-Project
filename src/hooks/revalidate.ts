@@ -186,29 +186,57 @@ export const revalidatePostDelete = postHooks.afterDelete
 export const revalidatePage = pageHooks.afterChange
 export const revalidatePageDelete = pageHooks.afterDelete
 
-/** Profiles are populated inside cached posts/trips; a User save must refresh those reads too. */
-const revalidateAuthorPages = () => {
+/**
+ * Profiles are populated inside cached posts/trips; a User save must refresh those reads too.
+ *
+ * The author's own page is a separate matter: a bio edit changes `/authors/<slug>` and the
+ * `/authors` index, while a *slug* edit moves the page entirely — so the old address has to be
+ * purged as well, or it keeps serving the profile under a URL that no longer exists.
+ */
+const revalidateAuthorPages = (
+  doc?: { slug?: string | null } | null,
+  previousDoc?: { slug?: string | null } | null,
+) => {
   if (revalidationDisabled()) return
+
+  const slugs = [doc, previousDoc].flatMap((record) =>
+    typeof record?.slug === 'string' && record.slug ? [record.slug] : [],
+  )
+
   try {
-    for (const tag of [CACHE_TAG.posts, CACHE_TAG.trips, CACHE_TAG.pages]) {
+    for (const tag of [
+      CACHE_TAG.posts,
+      CACHE_TAG.trips,
+      CACHE_TAG.pages,
+      CACHE_TAG.authors,
+      ...slugs.map((slug) => CACHE_TAG.author(slug)),
+    ]) {
       revalidateTag(tag, { expire: 0 })
     }
+
     revalidatePath('/', 'layout')
+    for (const path of new Set(['/authors', ...slugs.map((slug) => `/authors/${slug}`)])) {
+      revalidatePath(path)
+    }
+    // `/sitemap.xml` lists the profile page, so a new account has to appear there at once.
+    revalidatePath('/sitemap.xml')
   } catch (error) {
     console.warn(`[revalidate] skipped — ${(error as Error).message}`)
   }
 }
 
 export const revalidateAuthor: CollectionAfterChangeHook<User> = ({ doc, previousDoc }) => {
-  // Login/session/password changes must not invalidate the public site.
+  // Login/session/password changes must not invalidate the public site. `slug` is part of the
+  // compared profile, so renaming a profile URL is caught here rather than silently serving the
+  // page at its old address.
   if (JSON.stringify(authorProfile(doc)) !== JSON.stringify(authorProfile(previousDoc))) {
-    revalidateAuthorPages()
+    revalidateAuthorPages(doc, previousDoc)
   }
   return doc
 }
 
 export const revalidateAuthorDelete: CollectionAfterDeleteHook<User> = ({ doc }) => {
-  revalidateAuthorPages()
+  revalidateAuthorPages(doc)
   return doc
 }
 

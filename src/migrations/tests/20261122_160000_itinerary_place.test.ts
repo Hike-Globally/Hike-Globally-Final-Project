@@ -21,11 +21,17 @@ async function sqlFor(migrate: typeof up | typeof down) {
 
 const tables = ['trips_itinerary', '_trips_v_version_itinerary'] as const
 
-test('itinerary place is the newest migration', () => {
-  assert.equal(migrations.at(-1)?.up, up)
-  assert.equal(migrations.at(-1)?.down, down)
-  assert.equal(migrations.at(-1)?.name, '20261122_160000_itinerary_place')
-  assert.equal(migrations.at(-2)?.name, '20261122_140000_trip_coordinates')
+test('itinerary place sits between the coordinates and profile-slug migrations', () => {
+  // Position is looked up by name rather than `at(-1)`, so adding a later migration does not
+  // turn this into a false failure — it only needs to stay in chronological order.
+  const index = migrations.findIndex(
+    (migration) => migration.name === '20261122_160000_itinerary_place',
+  )
+  assert.ok(index >= 0, 'the migration is registered')
+  assert.equal(migrations[index]?.up, up)
+  assert.equal(migrations[index]?.down, down)
+  assert.equal(migrations[index - 1]?.name, '20261122_140000_trip_coordinates')
+  assert.equal(migrations[index + 1]?.name, '20261123_120000_user_profile_slug')
 })
 
 test('up adds one nullable varchar to the live and versioned itinerary tables', async () => {

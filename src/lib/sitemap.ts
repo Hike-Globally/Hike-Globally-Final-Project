@@ -55,6 +55,12 @@ export type SitemapSources = {
   destinations: SitemapDocument[]
   posts: SitemapDocument[]
   pages: SitemapDocument[]
+  /**
+   * Author profile pages. `noIndex` is set on a bare account (no bio, no published work), which
+   * `published()` then filters out — the same rule the profile page applies to its own
+   * `<meta name="robots">`, so the sitemap can never advertise a page that hides itself.
+   */
+  authors: SitemapDocument[]
 }
 
 /** What the sitemap is on a database-less build: the static routes and nothing else. */
@@ -63,6 +69,7 @@ export const EMPTY_SITEMAP_SOURCES: SitemapSources = {
   destinations: [],
   posts: [],
   pages: [],
+  authors: [],
 }
 
 type ChangeFrequency = 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never'
@@ -105,6 +112,14 @@ const STATIC_ROUTES: {
     priority: 0.5,
     changeFrequency: 'monthly',
     feeds: ['trips', 'destinations', 'posts', 'pages'],
+  },
+  // The authors index: one hub page linking to every profile, so a crawler can reach an author
+  // without first finding one of their posts.
+  {
+    path: sitePath(routes.authors),
+    priority: 0.5,
+    changeFrequency: 'weekly',
+    feeds: ['authors'],
   },
   // Browse Places has one index and nine dedicated category pages. Their lastmod follows the
   // trips and posts an editor maps into them through `placeCategories`.
@@ -153,6 +168,12 @@ const DOCUMENT_ROUTES: {
     // of its own — listing it would print a URL the sitemap already contains.
     linkable: (doc) => !isReservedPageSlug(doc.slug ?? ''),
   },
+  {
+    key: 'authors',
+    path: (slug) => sitePath(`/authors/${slug}`),
+    priority: 0.6,
+    changeFrequency: 'weekly',
+  },
 ]
 
 /** Documents that have a URL of their own and are not asking to be kept out of the index. */
@@ -185,6 +206,7 @@ export const buildSitemap = (
     destinations: published(sources.destinations),
     posts: published(sources.posts),
     pages: published(sources.pages),
+    authors: published(sources.authors),
   }
 
   const entries: MetadataRoute.Sitemap = []

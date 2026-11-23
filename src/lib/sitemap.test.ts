@@ -29,7 +29,7 @@ const PLACE_URLS = [
   `${ORIGIN}/places`,
   ...placeCategories.map((category) => `${ORIGIN}/places/${category.value}`),
 ]
-const STATIC_ROUTE_COUNT = 9 + PLACE_URLS.length
+const STATIC_ROUTE_COUNT = 10 + PLACE_URLS.length
 
 const document = (overrides: Partial<SitemapDocument> = {}): SitemapDocument => ({
   slug: 'a-document',
@@ -80,6 +80,7 @@ test('URLs are the canonical spelling of each page', () => {
 
   assert.deepEqual(urls(entries).slice(8), [
     `${ORIGIN}/sitemap`,
+    `${ORIGIN}/authors`,
     ...PLACE_URLS,
     `${ORIGIN}/trips/everest-base-camp`,
     `${ORIGIN}/destinations/khumbu`,
@@ -134,6 +135,7 @@ test('two documents sharing a slug still produce one entry for that URL', () => 
     `${ORIGIN}/privacy`,
     `${ORIGIN}/terms`,
     `${ORIGIN}/sitemap`,
+    `${ORIGIN}/authors`,
     ...PLACE_URLS,
     `${ORIGIN}/trips/one`,
   ])
@@ -157,6 +159,22 @@ test('a noindex document is never advertised', () => {
   )
 
   assert.deepEqual(urls(entries).slice(STATIC_ROUTE_COUNT), [`${ORIGIN}/trips/live-trip`])
+})
+
+test('author profile pages are listed once, and only when the author has something to say', () => {
+  const entries = buildSitemap(
+    sources({
+      authors: [
+        document({ slug: 'sarita-gurung' }),
+        // A bare account — no bio, no published work. Its page is `noindex`, so the sitemap must
+        // not advertise a URL the page itself hides.
+        document({ slug: 'bare-account', noIndex: true }),
+      ],
+    }),
+  )
+
+  assert.equal(urls(entries).filter((url) => url === `${ORIGIN}/authors`).length, 1)
+  assert.deepEqual(urls(entries).slice(STATIC_ROUTE_COUNT), [`${ORIGIN}/authors/sarita-gurung`])
 })
 
 test('a page whose slug a dedicated route owns is not listed a second time', () => {
@@ -238,7 +256,7 @@ test('an unparseable date is ignored instead of being written into the XML', () 
   assert.equal(lastModifiedOf(entries, `${ORIGIN}/trips/broken`), undefined)
 })
 
-test('with no content at all the sitemap is still the nine static routes', () => {
+test('with no content at all the sitemap is still the ten static routes', () => {
   const entries = buildSitemap()
 
   assert.equal(entries.length, STATIC_ROUTE_COUNT)

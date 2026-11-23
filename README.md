@@ -141,6 +141,32 @@ exist) and is `noindex`.
 `src/app/(frontend)` does not: `src/lib/canonical-coverage.test.ts` audits the route tree, so the
 rule holds for pages written later, not just the ones written today.
 
+### Author profile pages
+
+Every account in **Team → Users** has a public landing page at `/authors/<slug>`, and `/authors`
+is the index that links to all of them. This is the piece that turns a byline into an entity a
+search engine can follow: a `Person` structured-data node used to point at the author's own
+homepage (or a social profile), which left every article attributed to a name rather than to a
+page on this site.
+
+| Rule | Why |
+| --- | --- |
+| **`slug` lives on the user, is required and unique** | The profile URL is an address, not a display field. `ensureUniqueUserSlug` (`src/hooks/user-slug.ts`) appends `-2`, `-3`, … when two editors share a name, so the second save cannot fail a constraint the admin never sees. |
+| **Every account gets a page, including ones created later** | `generateStaticParams()` prerenders the profiles that exist at build time and `dynamicParams` stays on, so an editor added after the last deploy gets a live URL on first request — the same contract a trip published after the build has. |
+| **A bare account is `noindex`** | No bio and no published work means nothing to say. The page still renders (a byline must always be able to link to it), but it stays out of the index and out of the sitemap. `isIndexableAuthor()` is the single rule, so the page's robots meta and the sitemap cannot disagree. |
+| **`Person.url` is the profile page, not the author's website** | `personJsonLd()` points the node at `/authors/<slug>`, which is the page *about* the person. The personal site and socials move to `sameAs`, where they belong — pointers to the same person elsewhere. |
+| **`ProfilePage` markup, with the same `Person` as `mainEntity`** | A crawler reading a post, its author card and the author page resolves all three to one entity instead of three names that happen to match. |
+| **Only public fields are ever read** | `authorSelect` in `src/lib/data.ts` selects name, slug, bio, avatar, job title, education, credentials, website and socials — nothing else. A `users` document also holds `email`, `hash`, `salt` and `sessions`, and the Local API defaults `overrideAccess` to true, so this allow-list is what keeps a password hash out of the render *and* out of the Data Cache. |
+| **A user save revalidates their page** | `revalidateAuthor` purges `/authors/<slug>`, the `/authors` index, the author tags and `/sitemap.xml`. A slug rename purges the old address too, so a moved profile never keeps serving a URL that no longer exists. |
+
+Migration `20261123_120000_user_profile_slug` adds the column, backfills a readable slug from each
+existing `name` (de-duplicating in `id` order, so the first account keeps the clean URL), and only
+then creates the unique index. Run `npm run migrate` before starting the updated app — the standard
+build already does this when a database is configured.
+
+The byline card on a post and on a trip (`src/components/content/author-profile.tsx`) links the
+author's name to this page, so every article hands its author a crawlable internal link.
+
 ### Catalog discovery
 
 `/trips`, `/destinations`, and `/blog` serve 24 published records per page. Server-rendered
@@ -154,7 +180,8 @@ remain intentionally bounded.
 
 `/sitemap.xml` is served by `src/app/sitemap.ts`, which reads the published content and hands it to
 `buildSitemap()` in `src/lib/sitemap.ts`. The list covers the homepage, the three listing pages,
-`/inquiry` and every published trip, destination, post and CMS page — each URL **exactly once**:
+`/inquiry`, `/authors` and every published trip, destination, post, CMS page and author profile —
+each URL **exactly once**:
 
 | Rule                                             | Why                                                                                                                                                                                                                              |
 | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

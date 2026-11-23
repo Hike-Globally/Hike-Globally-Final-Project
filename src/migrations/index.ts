@@ -1,6 +1,7 @@
 import * as migration_20261122_120000_itinerary_images from './20261122_120000_itinerary_images'
 import * as migration_20261122_140000_trip_coordinates from './20261122_140000_trip_coordinates'
 import * as migration_20261122_160000_itinerary_place from './20261122_160000_itinerary_place'
+import * as migration_20261123_120000_user_profile_slug from './20261123_120000_user_profile_slug'
 import * as migration_20261003_075051_initial from './20261003_075051_initial'
 import * as migration_20261003_081622_localize_arrays from './20261003_081622_localize_arrays'
 import * as migration_20261003_084733_localize_blocks from './20261003_084733_localize_blocks'
@@ -209,5 +210,10 @@ export const migrations = [
     up: migration_20261122_160000_itinerary_place.up,
     down: migration_20261122_160000_itinerary_place.down,
     name: '20261122_160000_itinerary_place',
+  },
+  {
+    up: migration_20261123_120000_user_profile_slug.up,
+    down: migration_20261123_120000_user_profile_slug.down,
+    name: '20261123_120000_user_profile_slug',
   },
 ]

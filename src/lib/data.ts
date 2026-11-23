@@ -2,6 +2,7 @@ import { cache } from 'react'
 import { unstable_cache } from 'next/cache'
 import type { TypedLocale, Where } from 'payload'
 
+import { isIndexableAuthor } from '@/lib/author-profile'
 import { CACHE_TAG, REVALIDATE_SECONDS } from '@/lib/cache-tags'
 import { defaultLocale, sitePath } from '@/i18n/config'
 import {
@@ -1020,6 +1021,230 @@ export const getRelatedPosts = (post: Blog, limit = 3): Promise<PostCard[]> =>
 
 export const getAllPostSlugs = publishedSlugsFor('blog', CACHE_TAG.posts)
 
+/* -------------------------------------------------------------------------- */
+/* Authors — public profile pages at /authors/<slug>                            */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The only user fields that may ever leave the server.
+ *
+ * A `users` document also carries `email`, `hash`, `salt`, `sessions` and `resetPasswordToken`.
+ * Payload's Local API defaults `overrideAccess` to true, so a careless `find({ collection: 'users' })`
+ * would read all of them — and `unstable_cache` would then persist the password hash in the Data
+ * Cache. Every author read below selects exactly this shape, which makes that impossible rather
+ * than merely unlikely.
+ */
+const authorSelect = {
+  name: true,
+  slug: true,
+  bio: true,
+  avatar: true,
+  jobTitle: true,
+  education: true,
+  credentials: { credential: true },
+  website: true,
+  socials: { platform: true, url: true },
+  // The honest `<lastmod>` for the profile page — the account's own last edit.
+  updatedAt: true,
+} as const
+
+/** A user's public profile, as the `/authors/<slug>` page renders it. */
+export type AuthorProfileRecord = {
+  id: number
+  name: string
+  slug: string
+  bio?: string | null
+  avatar?: number | Media | null
+  jobTitle?: string | null
+  education?: string | null
+  credentials?: { credential: string }[] | null
+  website?: string | null
+  socials?:
+    | {
+        platform: 'instagram' | 'facebook' | 'youtube' | 'tiktok' | 'linkedin' | 'x'
+        url: string
+      }[]
+    | null
+  updatedAt?: string | null
+}
+
+/** Every profile page address, so `generateStaticParams` can prerender them all. */
+export const getAllAuthorSlugs = (): Promise<string[]> =>
+  safeQuery(
+    unstable_cache(
+      async () => {
+        const payload = await getPayloadClient()
+        const rows = await collectPages((page) =>
+          payload.find({
+            collection: 'users',
+            page,
+            limit: 500,
+            sort: 'id',
+            depth: 0,
+            select: { slug: true },
+          }),
+        )
+        return rows.flatMap((row) => (row.slug ? [row.slug] : []))
+      },
+      ['author-slugs'],
+      { tags: [CACHE_TAG.authors], revalidate: REVALIDATE_SECONDS },
+    ),
+    [],
+  )
+
+/** One author, by profile slug. Returns null when the account does not exist. */
+export const getAuthorBySlug = cache(
+  async (slug: string): Promise<AuthorProfileRecord | null> =>
+    safeQuery(
+      unstable_cache(
+        async () => {
+          const payload = await getPayloadClient()
+          const result = await payload.find({
+            collection: 'users',
+            locale: SITE_LOCALE,
+            depth: 1,
+            limit: 1,
+            where: { slug: { equals: slug } },
+            select: authorSelect,
+          })
+          return (result.docs[0] as unknown as AuthorProfileRecord | undefined) ?? null
+        },
+        ['author', slug],
+        { tags: [CACHE_TAG.authors, CACHE_TAG.author(slug)], revalidate: REVALIDATE_SECONDS },
+      ),
+      null,
+    ),
+)
+
+/**
+ * Every author, with the published-work counts the index and the sitemap both need.
+ *
+ * Paginated rather than a single `limit`, because an index that silently stops at the first 100
+ * accounts would make every later author's page unreachable from the hub — an orphan nobody
+ * notices until someone asks why their profile has no internal links.
+ *
+ * `hasWork` is computed here rather than per page because the sitemap needs it for every author in
+ * one pass; the profile page recomputes the same rule from the lists it already renders.
+ */
+export type AuthorIndexEntry = AuthorProfileRecord & { postCount: number; tripCount: number }
+
+/** An author's published field notes, newest first. */
+export const getAuthorPosts = (authorId: number, limit = 12): Promise<PostCard[]> =>
+  safeQuery(
+    unstable_cache(
+      async () => {
+        const payload = await getPayloadClient()
+        const result = await payload.find({
+          collection: 'blog',
+          locale: SITE_LOCALE,
+          depth: 1,
+          limit,
+          sort: '-publishedAt',
+          where: { and: [{ _status: { equals: 'published' } }, { author: { equals: authorId } }] },
+          select: postCardSelect,
+        })
+        return result.docs as unknown as PostCard[]
+      },
+      ['author-posts', String(authorId), String(limit)],
+      { tags: [CACHE_TAG.posts, CACHE_TAG.authors], revalidate: REVALIDATE_SECONDS },
+    ),
+    [],
+  )
+
+/** An author's published trips — the ones they are credited as itinerary expert on. */
+export const getAuthorTrips = (authorId: number, limit = 12): Promise<TripCard[]> =>
+  safeQuery(
+    unstable_cache(
+      async () => {
+        const payload = await getPayloadClient()
+        const result = await payload.find({
+          collection: 'trips',
+          locale: SITE_LOCALE,
+          depth: 1,
+          limit,
+          sort: '-updatedAt',
+          where: { and: [{ _status: { equals: 'published' } }, { guide: { equals: authorId } }] },
+          select: tripCardSelect,
+        })
+        return result.docs as unknown as TripCard[]
+      },
+      ['author-trips', String(authorId), String(limit)],
+      { tags: [CACHE_TAG.trips, CACHE_TAG.authors], revalidate: REVALIDATE_SECONDS },
+    ),
+    [],
+  )
+
+export const getAuthorIndex = (): Promise<AuthorIndexEntry[]> =>
+  safeQuery(
+    unstable_cache(
+      async () => {
+        const payload = await getPayloadClient()
+        const [authors, posts, trips] = await Promise.all([
+          collectPages((page) =>
+            payload.find({
+              collection: 'users',
+              page,
+              limit: 500,
+              locale: SITE_LOCALE,
+              depth: 1,
+              sort: 'name',
+              select: authorSelect,
+            }),
+          ),
+          // `author` and `guide` are relationships, so counting per author is one grouped query
+          // each — not one query per author.
+          payload.find({
+            collection: 'blog',
+            limit: 1000,
+            depth: 0,
+            sort: '-publishedAt',
+            where: { _status: { equals: 'published' } },
+            select: { author: true },
+          }),
+          payload.find({
+            collection: 'trips',
+            limit: 1000,
+            depth: 0,
+            sort: '-updatedAt',
+            where: { _status: { equals: 'published' } },
+            select: { guide: true },
+          }),
+        ])
+
+        const countByAuthor = (rows: Record<string, unknown>[], field: 'author' | 'guide') => {
+          const counts = new Map<number, number>()
+          for (const row of rows) {
+            const value = row[field]
+            const id = typeof value === 'number' ? value : (value as { id?: number } | null)?.id
+            if (typeof id === 'number') counts.set(id, (counts.get(id) ?? 0) + 1)
+          }
+          return counts
+        }
+
+        const postCounts = countByAuthor(
+          posts.docs as unknown as Record<string, unknown>[],
+          'author',
+        )
+        const tripCounts = countByAuthor(
+          trips.docs as unknown as Record<string, unknown>[],
+          'guide',
+        )
+
+        return (authors as unknown as AuthorProfileRecord[]).map((author) => ({
+          ...author,
+          postCount: postCounts.get(author.id) ?? 0,
+          tripCount: tripCounts.get(author.id) ?? 0,
+        }))
+      },
+      ['author-index'],
+      {
+        tags: [CACHE_TAG.authors, CACHE_TAG.posts, CACHE_TAG.trips],
+        revalidate: REVALIDATE_SECONDS,
+      },
+    ),
+    [],
+  )
+
 export type PlaceCategoryContent = {
   trips: TripCard[]
   posts: PostCard[]
@@ -1119,16 +1344,41 @@ export const getAllPageSlugs = async () =>
 const readSitemapSources = unstable_cache(
   async (): Promise<SitemapSources> => {
     const payload = await getPayloadClient()
-    const [trips, destinations, posts, pages] = await Promise.all([
+    const [trips, destinations, posts, pages, authors] = await Promise.all([
       readSitemapDocuments(payload, 'trips'),
       readSitemapDocuments(payload, 'destinations'),
       readSitemapDocuments(payload, 'blog'),
       readSitemapDocuments(payload, 'pages'),
+      getAuthorIndex(),
     ])
-    return { trips, destinations, posts, pages }
+    return {
+      trips,
+      destinations,
+      posts,
+      pages,
+      // A bare account has no landing page worth crawling; `published()` drops it below. The
+      // profile page reaches the same verdict for its own robots meta, so the two never disagree.
+      authors: authors.map((author) => ({
+        slug: author.slug,
+        updatedAt: author.updatedAt,
+        noIndex: !isIndexableAuthor(author, {
+          posts: author.postCount,
+          trips: author.tripCount,
+        }),
+      })),
+    }
   },
-  ['sitemap-with-media-v1'],
-  { tags: [CACHE_TAG.trips, CACHE_TAG.destinations, CACHE_TAG.posts, CACHE_TAG.pages], revalidate: REVALIDATE_SECONDS },
+  ['sitemap-with-media-v2'],
+  {
+    tags: [
+      CACHE_TAG.trips,
+      CACHE_TAG.destinations,
+      CACHE_TAG.posts,
+      CACHE_TAG.pages,
+      CACHE_TAG.authors,
+    ],
+    revalidate: REVALIDATE_SECONDS,
+  },
 )
 
 export const getSitemapSources = (): Promise<SitemapSources> =>

@@ -20,6 +20,9 @@ export const CACHE_TAG = {
   post: (slug: string) => `post:${slug}`,
   pages: 'pages',
   page: (slug: string) => `page:${slug}`,
+  /** Public author profile pages (`/authors`, `/authors/<slug>`). */
+  authors: 'authors',
+  author: (slug: string) => `author:${slug}`,
   header: 'global:header',
   footer: 'global:footer',
   settings: 'global:settings',
