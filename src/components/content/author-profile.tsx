@@ -1,9 +1,12 @@
+import Link from 'next/link'
+
 import { PayloadImage } from '@/components/ui/payload-image'
 import { dictionary } from '@/i18n/dictionaries'
-import { authorProfile, type PublicAuthor } from '@/lib/author-profile'
+import { authorPath, authorProfile, type PublicAuthor } from '@/lib/author-profile'
 import { cn } from '@/lib/utils'
 
-const platformLabels = {
+/** Platform display names, shared with the author detail page's profile links. */
+export const platformLabels = {
   instagram: 'Instagram',
   facebook: 'Facebook',
   youtube: 'YouTube',
@@ -24,7 +27,11 @@ export function AuthorProfile({
 }) {
   const profile = authorProfile(author)
   if (!profile) return null
-  const profileUrl = profile.website ?? profile.socials[0]?.url
+  // The byline leads to the author's page on this site when there is one — that is the internal
+  // link E-E-A-T actually needs — and only falls back to an external profile for a user with no
+  // slug (an account created before the profile pages existed, or one never edited since).
+  const internalUrl = authorPath(author)
+  const externalUrl = profile.website ?? profile.socials[0]?.url
   const dict = dictionary.author
 
   return (
@@ -51,8 +58,12 @@ export function AuthorProfile({
       <div className="min-w-0 pt-1">
         <p className="eyebrow text-slate-80">{label}</p>
         <h2 className="mt-1 font-heading text-subhead font-semibold text-ink">
-          {profileUrl ? (
-            <a href={profileUrl} rel="author" className="underline-offset-4 hover:underline">
+          {internalUrl ? (
+            <Link href={internalUrl} rel="author" className="underline-offset-4 hover:underline">
+              {profile.name}
+            </Link>
+          ) : externalUrl ? (
+            <a href={externalUrl} rel="author" className="underline-offset-4 hover:underline">
               {profile.name}
             </a>
           ) : (

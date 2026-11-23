@@ -240,6 +240,7 @@ const run = async () => {
       collection: 'users',
       data: {
         name: 'Hike Globally Admin',
+        slug: 'hike-globally-admin',
         email: 'admin@hikeglobally.com',
         password: 'hike-globally-2026',
         roles: ['admin'],
@@ -251,6 +252,7 @@ const run = async () => {
       collection: 'users',
       data: {
         name: 'Sarita Gurung',
+        slug: 'sarita-gurung',
         email: 'sarita@hikeglobally.com',
         password: 'hike-globally-2026',
         roles: ['editor'],

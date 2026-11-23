@@ -269,6 +269,9 @@ export async function Footer() {
       heading: dict.footer.company,
       links: [
         { href: sitePath('/about'), label: dict.footer.aboutUs, newTab: false },
+        // The authors index is the hub for every profile page; without a chrome link it is only
+        // reachable from a profile's own breadcrumb.
+        { href: sitePath('/authors'), label: dict.authors.allAuthors, newTab: false },
         { href: sitePath('/contact'), label: dict.nav.contact, newTab: false },
         { href: sitePath('/sitemap'), label: dict.footer.sitemap, newTab: false },
       ],

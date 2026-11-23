@@ -52,4 +52,5 @@ export const routes = {
   privacy: 'privacy',
   terms: 'terms',
   sitemap: 'sitemap',
+  authors: 'authors',
 } as const

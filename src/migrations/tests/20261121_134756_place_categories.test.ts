@@ -40,10 +40,13 @@ async function sqlFor(migrate: typeof up | typeof down) {
   return statements.join('\n')
 }
 
-test('Browse Places is the newest migration and creates only the four has-many tables', async () => {
-  assert.equal(migrations.at(-1)?.up, up)
-  assert.equal(migrations.at(-1)?.down, down)
-  assert.equal(migrations.at(-1)?.name, '20261121_134756_place_categories')
+test('Browse Places is registered and creates only the four has-many tables', async () => {
+  const index = migrations.findIndex(
+    (migration) => migration.name === '20261121_134756_place_categories',
+  )
+  assert.ok(index >= 0, 'the migration is registered')
+  assert.equal(migrations[index]?.up, up)
+  assert.equal(migrations[index]?.down, down)
 
   const sql = await sqlFor(up)
   for (const table of TABLES) {

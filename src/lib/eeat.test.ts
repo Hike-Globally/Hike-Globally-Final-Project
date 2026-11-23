@@ -6,7 +6,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { JSDOM } from 'jsdom'
 
 import type { Blog, Media, Setting, Trip, User } from '@/payload-types'
-import { authorProfile } from './author-profile'
+import { authorPath, authorProfile, isIndexableAuthor } from './author-profile'
 import { httpUrl } from './http-url'
 
 // Both detail views import section CSS, which is irrelevant to server-markup assertions.
@@ -23,8 +23,14 @@ register(
 )
 
 process.env.NEXT_PUBLIC_SITE_URL = 'https://hikeglobally.com'
-const { blogPostingJsonLd, organizationId, organizationJsonLd, personJsonLd, touristTripJsonLd } =
-  await import('./seo')
+const {
+  blogPostingJsonLd,
+  organizationId,
+  organizationJsonLd,
+  personJsonLd,
+  profilePageJsonLd,
+  touristTripJsonLd,
+} = await import('./seo')
 const { AuthorProfile } = await import('@/components/content/author-profile')
 const { PostDetail } = await import('@/components/views/post-detail')
 const { TripDetail } = await import('@/components/views/trip-detail')
@@ -42,6 +48,7 @@ const avatar: Media = {
 const author: User = {
   id: 1,
   name: 'Test Author',
+  slug: 'test-author',
   bio: 'Firsthand notes from many seasons on the trail.',
   jobTitle: 'Itinerary writer',
   education: 'Example tourism course, Example College',
@@ -173,12 +180,14 @@ test('Person structured data contains the supplied public expertise, not account
   assert.equal(person.name, author.name)
   assert.equal(person.description, author.bio)
   assert.equal(person.jobTitle, author.jobTitle)
-  assert.equal(person.url, author.website)
+  // `url` is the author's page on this site, not their own homepage — see personJsonLd().
+  assert.equal(person.url, 'https://hikeglobally.com/authors/test-author')
   assert.equal(person.image, 'https://hikeglobally.com/api/media/file/author.jpg')
-  assert.deepEqual(
-    person.sameAs,
-    author.socials?.map(({ url }) => url),
-  )
+  // The personal site and socials are `sameAs`: pointers to the same person elsewhere.
+  assert.deepEqual(person.sameAs, [
+    author.website,
+    ...(author.socials?.map(({ url }) => url) ?? []),
+  ])
   assert.deepEqual(person.hasCredential, [
     {
       '@type': 'EducationalOccupationalCredential',
@@ -209,9 +218,22 @@ test('name-only profiles do not invent expertise and unresolved author IDs are o
   assert.equal(person.hasCredential, undefined)
 })
 
-test('Person URL can use a supplied social profile when no personal website exists', () => {
-  const person = personJsonLd({ ...author, website: null })!
-  assert.equal(person.url, author.socials?.[0].url)
+test('Person URL only falls back to an external profile when there is no profile slug', () => {
+  // With a slug, the Person node is anchored to the page on this site.
+  assert.equal(
+    personJsonLd({ ...author, website: null })!.url,
+    'https://hikeglobally.com/authors/test-author',
+  )
+  // Without one — an unresolved or legacy record — it falls back to the first external profile.
+  assert.equal(
+    personJsonLd({ ...author, slug: null, website: null })!.url,
+    author.socials?.[0].url,
+  )
+  // And with nothing to point at, no `url` is emitted rather than a wrong one.
+  assert.equal(
+    personJsonLd({ ...author, slug: null, website: null, socials: null })!.url,
+    undefined,
+  )
 })
 
 test('BlogPosting uses the populated author and preserves name-only / unresolved fallbacks', () => {
@@ -360,7 +382,7 @@ test('blog detail renders the same public expertise in its card and structured d
   ]) {
     assert.ok(card.textContent?.includes(fact), `${fact} must be visible`)
   }
-  assert.equal(card.querySelector('a[rel="author"]')?.getAttribute('href'), author.website)
+  assert.equal(card.querySelector('a[rel="author"]')?.getAttribute('href'), '/authors/test-author')
   const article = schemaNodes(document).find((node) => node['@type'] === 'BlogPosting')!
   assert.deepEqual(article.author, serialized(personJsonLd(author)))
   assert.equal(
@@ -435,6 +457,9 @@ test('trip detail renders its expert exactly once, including full-width-only lay
 test('profile text cannot break out of JSON-LD or produce executable profile links', () => {
   const malicious = {
     ...author,
+    // No slug, so the card has no internal profile link to render — the test asserts that
+    // nothing *executable* is emitted, not that the byline is unlinked.
+    slug: null,
     bio: '</script><script>alert(1)</script>',
     website: 'javascript:alert(1)',
     socials: null,
@@ -449,4 +474,41 @@ test('profile text cannot break out of JSON-LD or produce executable profile lin
   const card = documentOf(cardHtml)
   assert.equal(card.querySelector('script'), null)
   assert.equal(card.querySelector('a'), null)
+})
+
+test('authorPath resolves the internal profile address and nothing for an unresolved author', () => {
+  assert.equal(authorPath(author), '/authors/test-author')
+  // Whitespace is trimmed, so a slug pasted with a stray space still forms a valid URL.
+  assert.equal(authorPath({ slug: '  pemba-sherpa  ' }), '/authors/pemba-sherpa')
+  for (const value of [null, undefined, 42, { slug: null }, { slug: '   ' }]) {
+    assert.equal(authorPath(value), null, String(value))
+  }
+})
+
+test('ProfilePage anchors the same Person node the byline and BlogPosting emit', () => {
+  const page = profilePageJsonLd({
+    author,
+    url: '/authors/test-author',
+    siteName: settings.siteName,
+  })
+
+  assert.equal(page['@context'], 'https://schema.org')
+  assert.equal(page['@type'], 'ProfilePage')
+  // `canonicalUrl()` normalizes the trailing slash away, exactly like the page's own canonical.
+  assert.equal(page.url, 'https://hikeglobally.com/authors/test-author')
+  assert.equal(page.name, `Test Author — ${settings.siteName}`)
+  assert.deepEqual(page.mainEntity, personJsonLd(author))
+  assert.equal((page.publisher as Record<string, unknown>)['@id'], organizationId)
+  // The identity must never leak account fields, even on the page dedicated to the author.
+  assert.doesNotMatch(JSON.stringify(page), /private-|\"email\"|\"hash\"|\"salt\"|\"roles\"|\"sessions\"/)
+})
+
+test('only an author with a bio or published work earns an indexed page', () => {
+  assert.equal(isIndexableAuthor(author), true, 'a bio is enough')
+  assert.equal(isIndexableAuthor({ ...author, bio: null }), false, 'a bare account is not')
+  assert.equal(isIndexableAuthor({ ...author, bio: null }, { posts: 1 }), true)
+  assert.equal(isIndexableAuthor({ ...author, bio: null }, { trips: 1 }), true)
+  assert.equal(isIndexableAuthor({ ...author, bio: null }, { posts: 0, trips: 0 }), false)
+  assert.equal(isIndexableAuthor(null), false)
+  assert.equal(isIndexableAuthor(42), false)
 })

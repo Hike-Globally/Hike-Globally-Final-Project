@@ -147,6 +147,10 @@ export interface User {
   id: number;
   name: string;
   /**
+   * Auto-generated from the name. This is the public author page address: /authors/<slug>. Edit carefully — changing it changes the live URL.
+   */
+  slug: string;
+  /**
    * Admins manage the whole site and users. Editors write and publish content only.
    */
   roles: ('admin' | 'editor')[];
@@ -1618,6 +1622,7 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  slug?: T;
   roles?: T;
   bio?: T;
   avatar?: T;

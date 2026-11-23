@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 import { MAX_KEYWORDS } from '@/fields/keywords'
 import { htmlLang, ogLocale } from '@/i18n/config'
 import type { Blog, Destination, Media, Trip } from '@/payload-types'
-import { authorProfile, type PublicAuthor } from './author-profile'
+import { authorPath, authorProfile, type PublicAuthor } from './author-profile'
 import { parseCoordinates } from './coordinates'
 import { lexicalToPlainText, truncate } from './format'
 import { httpUrl } from './http-url'
@@ -436,15 +436,55 @@ export const personJsonLd = (
     })),
   ]
 
+  // `Person.url` is the page *about* the person, which is the profile on this site — not the
+  // author's own homepage. Google reads it as "this is the entity these articles are attributed
+  // to", and an external URL makes that connection someone else's to make. The personal site
+  // still appears, as `sameAs`, where it belongs: a pointer to the same person elsewhere.
+  const profileUrl = authorPath(author)
+  const sameAs = [profile.website, ...profile.socials.map((social) => social.url)].filter(
+    (url): url is string => Boolean(url),
+  )
+
   return {
     '@type': 'Person',
     name: profile.name,
-    url: profile.website ?? profile.socials[0]?.url,
+    url: profileUrl ? canonicalUrl(profileUrl) : profile.website ?? profile.socials[0]?.url,
     image: schemaImageUrl(profile.avatar),
     description: profile.bio,
     jobTitle: profile.jobTitle,
-    sameAs: profile.socials.length ? profile.socials.map((social) => social.url) : undefined,
+    sameAs: sameAs.length ? sameAs : undefined,
     hasCredential: credentials.length ? credentials : undefined,
+  }
+}
+
+/**
+ * `ProfilePage` structured data for `/authors/<slug>` — the page that *is* about the author.
+ *
+ * `mainEntity` is the same `Person` node the byline and every `BlogPosting` emit, so a crawler
+ * reading a post, its author card and the author page resolves all three to one entity instead of
+ * three names that happen to match. That shared identity is the whole E-E-A-T point of giving an
+ * author a page at all.
+ */
+export const profilePageJsonLd = ({
+  author,
+  url,
+  siteName = 'Hike Globally',
+}: {
+  author: PublicAuthor | number | null | undefined
+  url: string
+  siteName?: string
+}): JsonLdInput => {
+  const person = personJsonLd(author)
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    name: person?.name ? `${person.name} — ${siteName}` : siteName,
+    url: canonicalUrl(url),
+    inLanguage: htmlLang,
+    isPartOf: { '@type': 'WebSite', name: siteName, url: siteUrl },
+    publisher: { '@type': 'Organization', '@id': organizationId, name: siteName, url: siteUrl },
+    mainEntity: person,
   }
 }
 

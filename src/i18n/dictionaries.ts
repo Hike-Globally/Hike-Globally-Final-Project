@@ -110,6 +110,33 @@ export const en = {
     website: 'Website',
     profiles: 'Author profiles',
   },
+  authors: {
+    /** The `/authors` index — the hub that links to every profile page. */
+    indexEyebrow: 'Authors & guides',
+    indexTitle: 'The people behind the trails',
+    indexSubtitle:
+      'The guides, writers and itinerary experts behind every route and field note on Hike Globally.',
+    /** The single profile page at `/authors/<slug>`. */
+    profileEyebrow: 'Author & guide',
+    /** Heading for the identity column — "About Sarita Gurung". */
+    about: 'About {name}',
+    posts: 'Field notes',
+    postsEmpty: 'No published field notes yet.',
+    trips: 'Trips led',
+    tripsEmpty: 'No published trips yet.',
+    backToAuthors: 'All authors & guides',
+    allAuthors: 'Authors & guides',
+    /** Accessible label for a profile portrait, with the author's name. */
+    portrait: 'Portrait of {name}',
+    /** Count line under a profile card on the index, e.g. "4 field notes · 2 trips". */
+    counts: '{posts} field notes · {trips} trips',
+    countsPosts: '{posts} field notes',
+    countsTrips: '{trips} trips',
+    /** Shown on the profile page while the author has published nothing yet. */
+    noWork: 'New here — the first field notes are on their way.',
+    /** Shown on the `/authors` index when no account exists yet. */
+    indexEmpty: 'Author profiles appear here as the team is added.',
+  },
   trip: {
     aboutGuide: 'About the itinerary expert',
     overview: 'Trip overview',

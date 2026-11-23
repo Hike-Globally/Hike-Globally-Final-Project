@@ -1,15 +1,17 @@
 import type { CollectionConfig } from 'payload'
 
 import { adminFieldLevel, adminOnly, adminOrSelf } from '../access'
+import { formatSlugHook } from '../fields/slug'
 import { socialsField } from '../fields/socials'
 import { revalidateAuthor, revalidateAuthorDelete } from '../hooks/revalidate'
+import { ensureUniqueUserSlug } from '../hooks/user-slug'
 import { httpUrl } from '../lib/http-url'
 
 export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'email', 'roles'],
+    defaultColumns: ['name', 'slug', 'email', 'roles'],
     group: 'Team',
   },
   auth: {
@@ -30,6 +32,8 @@ export const Users: CollectionConfig = {
     delete: adminOnly,
   },
   hooks: {
+    // Runs before the row is written, so a name collision can never reach the `slug` unique index.
+    beforeChange: [ensureUniqueUserSlug],
     afterChange: [revalidateAuthor],
     afterDelete: [revalidateAuthorDelete],
   },
@@ -38,6 +42,25 @@ export const Users: CollectionConfig = {
       name: 'name',
       type: 'text',
       required: true,
+    },
+    {
+      // The public profile page's URL segment: `/authors/<slug>`. Required and unique, so every
+      // account — including ones created after the last deploy — has exactly one address.
+      name: 'slug',
+      type: 'text',
+      label: 'Profile URL',
+      required: true,
+      unique: true,
+      index: true,
+      admin: {
+        position: 'sidebar',
+        description:
+          'Auto-generated from the name. This is the public author page address: /authors/<slug>. Edit carefully — changing it changes the live URL.',
+      },
+      hooks: {
+        // Fills it from the name on create, and keeps it in sync until an editor edits it by hand.
+        beforeValidate: [formatSlugHook('name')],
+      },
     },
     {
       name: 'roles',

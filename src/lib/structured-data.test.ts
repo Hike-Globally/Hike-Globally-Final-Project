@@ -81,6 +81,10 @@ const expectedStructuredData: Record<string, string[]> = {
   ],
   'src/app/(frontend)/inquiry/page.tsx': [], // permanent redirect
   'src/app/(frontend)/about/page.tsx': ['breadcrumbJsonLd', 'webPageJsonLd'],
+  // The authors index is a `CollectionPage` of the profiles it lists; each profile is a
+  // `ProfilePage` whose `mainEntity` is the same `Person` node the byline emits.
+  'src/app/(frontend)/authors/page.tsx': ['breadcrumbJsonLd', 'webPageJsonLd'],
+  'src/app/(frontend)/authors/[slug]/page.tsx': ['breadcrumbJsonLd', 'profilePageJsonLd'],
   'src/app/(frontend)/contact/page.tsx': ['breadcrumbJsonLd', 'webPageJsonLd'],
   'src/app/(frontend)/privacy/page.tsx': ['breadcrumbJsonLd', 'webPageJsonLd'],
   'src/app/(frontend)/terms/page.tsx': ['breadcrumbJsonLd', 'webPageJsonLd'],
