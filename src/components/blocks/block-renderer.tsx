@@ -57,11 +57,11 @@ function renderBlock(
     case 'richText':
       return <RichTextSection key={key} block={block} singlePage={singlePage} linker={linker} />
     case 'featuredTrips':
-      return <FeaturedTrips key={key} block={block} />
+      return <FeaturedTrips key={key} block={block} opening={opening} />
     case 'featuredDestinations':
-      return <FeaturedDestinations key={key} block={block} />
+      return <FeaturedDestinations key={key} block={block} opening={opening} />
     case 'latestPosts':
-      return <LatestPosts key={key} block={block} />
+      return <LatestPosts key={key} block={block} opening={opening} />
     case 'stats':
       return <Stats key={key} block={block} />
     case 'gallery':

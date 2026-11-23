@@ -33,6 +33,7 @@ export function DestinationCarousel({
   className,
   titleClassName,
   descriptionClassName,
+  priorityFirst = false,
 }: {
   destinations: DestinationCardData[]
   title: string
@@ -41,6 +42,12 @@ export function DestinationCarousel({
   className?: string
   titleClassName?: string
   descriptionClassName?: string
+  /**
+   * Preload the first card's cover. Only a carousel that *opens* the page should ask for it:
+   * the two homepage sliders and any slider placed below a hero sit below the fold, so their
+   * covers must not compete with the hero for the LCP budget.
+   */
+  priorityFirst?: boolean
 }) {
   const trackRef = useRef<HTMLDivElement | null>(null)
   const [atStart, setAtStart] = useState(true)
@@ -127,7 +134,11 @@ export function DestinationCarousel({
             key={destination.id}
             className="w-full shrink-0 snap-start sm:w-[calc((100%_-_1.25rem)/2)] lg:w-[calc((100%_-_2.5rem)/3)] 3xl:w-[calc((100%_-_3.75rem)/4)]"
           >
-            <DestinationCard destination={destination} priority={index === 0} className="h-full" />
+            <DestinationCard
+              destination={destination}
+              priority={priorityFirst && index === 0}
+              className="h-full"
+            />
           </div>
         ))}
       </div>

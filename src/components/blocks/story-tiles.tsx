@@ -34,7 +34,17 @@ const categoryLabel = (category: string | undefined): string | null => {
   return dict.blog[key] ?? category
 }
 
-export function StoryTiles({ posts }: { posts: PostCard[] }) {
+export function StoryTiles({
+  posts,
+  priorityFirst = false,
+}: {
+  posts: PostCard[]
+  /**
+   * Preload the first tile's cover — only when this grid opens the page, where that cover
+   * is the LCP element. Anywhere else it sits below the fold, so it lazy-loads.
+   */
+  priorityFirst?: boolean
+}) {
   const dict = dictionary
 
   return (
@@ -59,7 +69,7 @@ export function StoryTiles({ posts }: { posts: PostCard[] }) {
                 <PayloadImageFill
                   media={post.featuredImage}
                   sizes="(min-width: 1200px) 380px, (min-width: 810px) 30vw, 88vw"
-                  priority={index === 0}
+                  priority={priorityFirst && index === 0}
                   className="st-image"
                 />
                 <span className="st-number" aria-hidden="true">

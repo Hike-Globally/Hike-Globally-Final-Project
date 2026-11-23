@@ -9,7 +9,13 @@ import { resolveLink } from '@/lib/links'
 import { isRenderableTripPick, resolveTripSection } from '@/lib/trip-selection'
 import type { FeaturedTripsBlock, Trip } from '@/payload-types'
 
-export async function FeaturedTrips({ block }: { block: FeaturedTripsBlock }) {
+export async function FeaturedTrips({
+  block,
+  opening = false,
+}: {
+  block: FeaturedTripsBlock
+  opening?: boolean
+}) {
   // Keep the editor's picks, but never render more than six cards. If the block has no valid
   // manual picks, load up to six featured trips (or the newest published trips as a fallback).
   const manualPicks =
@@ -35,5 +41,11 @@ export async function FeaturedTrips({ block }: { block: FeaturedTripsBlock }) {
     newTab: false,
   }
 
-  return <CuratedTripsSection trips={trips} action={{ href: viewAll.href, label: viewAll.label }} />
+  return (
+    <CuratedTripsSection
+      trips={trips}
+      action={{ href: viewAll.href, label: viewAll.label }}
+      priorityFirst={opening}
+    />
+  )
 }

@@ -8,7 +8,14 @@ import type { DestinationCard as DestinationCardData } from '@/lib/data'
 import type { Destination, FeaturedDestinationsBlock } from '@/payload-types'
 import { resolveLink } from '@/lib/links'
 
-export async function FeaturedDestinations({ block }: { block: FeaturedDestinationsBlock }) {
+export async function FeaturedDestinations({
+  block,
+  opening = false,
+}: {
+  block: FeaturedDestinationsBlock
+  /** `true` only when this block is the page's first, so its lead cover can be the LCP element. */
+  opening?: boolean
+}) {
   let destinations: DestinationCardData[] = []
 
   if (
@@ -54,6 +61,7 @@ export async function FeaturedDestinations({ block }: { block: FeaturedDestinati
         action={{ href: viewAll.href, label: viewAll.label }}
         titleClassName="home-section-title"
         descriptionClassName="home-section-intro"
+        priorityFirst={opening}
       />
     )
   }
@@ -72,7 +80,7 @@ export async function FeaturedDestinations({ block }: { block: FeaturedDestinati
         {editorial ? (
           <div className="grid gap-6 lg:grid-cols-2">
             <Reveal>
-              <DestinationCard destination={destinations[0]!} size="large" priority />
+              <DestinationCard destination={destinations[0]!} size="large" priority={opening} />
             </Reveal>
             <div className="grid gap-6">
               {destinations.slice(1, 3).map((destination, index) => (
@@ -86,7 +94,7 @@ export async function FeaturedDestinations({ block }: { block: FeaturedDestinati
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
             {destinations.map((destination, index) => (
               <Reveal key={destination.id} delay={index * 80}>
-                <DestinationCard destination={destination} priority={index === 0} />
+                <DestinationCard destination={destination} priority={opening && index === 0} />
               </Reveal>
             ))}
           </div>
