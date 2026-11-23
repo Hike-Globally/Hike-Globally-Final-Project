@@ -187,6 +187,7 @@
 }
 
 .browse-places__image {
+  object-fit: cover;
   filter: var(--image-grade);
   transform: scale(1.001);
   transition: transform 1400ms var(--ease-brand);
