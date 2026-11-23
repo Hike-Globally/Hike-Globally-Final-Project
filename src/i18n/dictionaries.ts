@@ -211,11 +211,16 @@ export const en = {
      * parallel "where to go" taxonomy, and a bare "Destinations" title let the two hubs compete
      * for the same queries. Every search-facing string here says *region* — the one thing this
      * page is about that `/places` is not (see `src/lib/taxonomy.ts`).
+     *
+     * The atlas includes both Nepal regions and destinations across continents, so the
+     * title and subtitle reflect its broader scope without hardcoding a changing count.
      */
-    listingTitle: 'Trekking regions of Nepal',
+    listingTitle: 'Trekking regions of Nepal and beyond',
     homeSectionTitle: 'Destinations in Nepal',
+    homeSectionDescription:
+      'Five trekking regions, one country that rearranges your sense of scale. Choose a region and see every trip that runs there.',
     listingSubtitle:
-      'Eight trekking regions, one country that rearranges your sense of scale. Choose a region — Khumbu, Annapurna, Mustang — and see every trip that runs there.',
+      'Explore Nepal’s regions and destinations across continents. Choose a region to discover journeys and travel stories from around the world.',
     tripsCount_one: '{count} trip',
     tripsCount_other: '{count} trips',
     bestTime: 'Best time to visit',

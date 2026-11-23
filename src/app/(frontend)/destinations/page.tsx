@@ -91,13 +91,11 @@ export default async function DestinationsPage({ searchParams }: ArchiveProps) {
             ]}
           />
 
-          <p className="eyebrow mt-10 text-mist">Trekking regions · Nepal</p>
+          <p className="eyebrow mt-10 text-mist">Trekking regions · Nepal & beyond</p>
           <h1 className="heading-display hero-title mt-5 max-w-3xl text-white">
-            The Himalaya, <span className="text-mist">region by region.</span>
+            Nepal and the world, <span className="text-mist">region by region.</span>
           </h1>
-          <p className="lead hero-description mt-6 max-w-2xl text-mist">
-            {dict.destinations.listingSubtitle}
-          </p>
+          <p className="lead hero-description mt-6 max-w-2xl text-mist">{dict.destinations.listingSubtitle}</p>
 
           <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4">
             <Link
@@ -135,7 +133,7 @@ export default async function DestinationsPage({ searchParams }: ArchiveProps) {
           <div className="grid gap-6 border-b border-slate-20 pb-8 md:grid-cols-[1fr_0.72fr] md:items-end md:gap-12 md:pb-10">
             <div>
               <p className="eyebrow">A closer look</p>
-              <h2 className="heading-xl mt-3 max-w-2xl">Find the Nepal that feels like yours.</h2>
+              <h2 className="heading-xl mt-3 max-w-2xl">Find the region that feels like yours.</h2>
             </div>
           </div>
 

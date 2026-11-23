@@ -21,6 +21,7 @@ import test from 'node:test'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 
+import { dictionary } from '@/i18n/dictionaries'
 import type { Destination } from '@/payload-types'
 import type { TripCard } from '@/lib/data'
 
@@ -190,6 +191,21 @@ test('each hub names its own taxonomy in its title, and never the other one', ()
   // The same split in the visible headlines, so a crawler is told twice.
   assert.match(read('src/app/(frontend)/destinations/page.tsx'), /region by region\./)
   assert.match(placesPage, /title="Places worth the journey, by landscape"/)
+})
+
+test('destination atlas copy covers Nepal and destinations across continents', () => {
+  const page = read('src/app/(frontend)/destinations/page.tsx')
+  const homepage = read('src/components/blocks/homepage-destinations.tsx')
+
+  assert.match(page, /Nepal & beyond/)
+  assert.match(page, /Nepal and the world/)
+  assert.match(dictionary.destinations.listingTitle, /Nepal and beyond/)
+  assert.match(dictionary.destinations.listingSubtitle, /Nepal.s regions and destinations across continents/)
+  assert.doesNotMatch(dictionary.destinations.listingSubtitle, /eight|one country/i)
+  assert.match(page, /\{dict\.destinations\.listingSubtitle\}/)
+  assert.equal((page.match(/description: dict\.destinations\.listingSubtitle/g) ?? []).length, 2)
+  assert.match(homepage, /description=\{dictionary\.destinations\.homeSectionDescription\}/)
+  assert.match(dictionary.destinations.homeSectionDescription, /Five trekking regions, one country/)
 })
 
 test('each hub links to the other, so the split is in the crawl graph', () => {
