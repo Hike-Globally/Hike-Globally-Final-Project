@@ -117,7 +117,7 @@ function circuitRows(chart: Awaited<ReturnType<typeof getChartSources>>): Sitema
 
 /** The landscapes: the nine Browse Places collections, in their fixed order. */
 function landscapeRows(chart: Awaited<ReturnType<typeof getChartSources>>): SitemapRow[] {
-  return placeCategories.map((category) => {
+  return placeCategories.filter((category) => (chart.placeCounts[category.value] ?? 0) > 0).map((category) => {
     const tagged = chart.placeCounts[category.value] ?? 0
     return {
       title: category.label,

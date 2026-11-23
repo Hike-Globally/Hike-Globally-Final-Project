@@ -73,7 +73,7 @@ const postCategory = (post: PostCard): string | null => {
 const postDate = (post: PostCard): string => (post.publishedAt ?? post.createdAt) as string
 
 const readTime = (post: PostCard): string =>
-  dictionary.blog.readTime.replace('{minutes}', String(readingTimeMinutes(post.excerpt ?? '')))
+  dictionary.blog.readTime.replace('{minutes}', String(readingTimeMinutes(post.content)))
 
 export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
   const dict = dictionary
@@ -239,8 +239,8 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
               {leadAuthor ? <span>{`${dict.blog.by} ${leadAuthor}`}</span> : null}
               {leadAuthor ? <span aria-hidden="true">·</span> : null}
               <time dateTime={postDate(lead)}>{formatDate(postDate(lead))}</time>
-              <span aria-hidden="true">·</span>
-              <span>{readTime(lead)}</span>
+              {lead.content ? <span aria-hidden="true">·</span> : null}
+              {lead.content ? <span>{readTime(lead)}</span> : null}
             </p>
 
             <div className="mt-7 border-t border-mist/20 pt-5">
@@ -302,10 +302,10 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
                       <div className="lb-row-body min-w-0">
                         <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-heading text-label font-medium tracking-[0.14em] uppercase">
                           <span className="text-deep-90">{postCategory(post) ?? dict.nav.blog}</span>
-                          <span className="text-slate-40" aria-hidden="true">
+                          {post.content ? <span className="text-slate-40" aria-hidden="true">
                             /
-                          </span>
-                          <span className="text-slate-80">{readTime(post)}</span>
+                          </span> : null}
+                          {post.content ? <span className="text-slate-80">{readTime(post)}</span> : null}
                         </p>
 
                         <h3

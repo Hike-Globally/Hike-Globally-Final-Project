@@ -399,3 +399,11 @@ test('webPageJsonLd omits the ItemList when a page has nothing to list', () => {
   assert.equal(jsonLd.mainEntity, undefined)
   assert.equal(jsonLd.image, undefined)
 })
+
+
+test('already branded metadata titles bypass the parent title template', () => {
+  assert.deepEqual(buildMetadata({ title: 'Trails · Hike Globally', path: '/trips' }).title, { absolute: 'Trails · Hike Globally' })
+  assert.deepEqual(buildMetadata({ title: 'Trails | HIKE GLOBALLY', path: '/trips' }).title, { absolute: 'Trails | HIKE GLOBALLY' })
+  assert.equal(buildMetadata({ title: 'Trails', path: '/trips' }).title, 'Trails')
+  assert.deepEqual(buildMetadata({ title: 'Trails · Custom Brand', siteName: 'Custom Brand', path: '/trips' }).title, { absolute: 'Trails · Custom Brand' })
+})

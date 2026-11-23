@@ -58,9 +58,9 @@ function ArchiveCard({
               {blog.by} {author}
             </li>
           )}
-          <li>
-            {blog.readTime.replace('{minutes}', String(readingTimeMinutes(post.excerpt ?? '')))}
-          </li>
+          {post.content ? <li>
+            {blog.readTime.replace('{minutes}', String(readingTimeMinutes(post.content)))}
+          </li> : null}
         </ul>
       </div>
     </article>

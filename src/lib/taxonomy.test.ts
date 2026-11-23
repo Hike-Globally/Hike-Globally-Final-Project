@@ -22,6 +22,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 
 import { dictionary } from '@/i18n/dictionaries'
+import { destinationLocationLabel, isWorldDestination } from '@/lib/destination-groups'
 import type { Destination } from '@/payload-types'
 import type { TripCard } from '@/lib/data'
 
@@ -212,8 +213,20 @@ test('atlas card labels use the destination country without a hard-coded Himalay
   const page = read('src/app/(frontend)/destinations/page.tsx')
   const card = page.slice(page.indexOf('function AtlasCard('), page.indexOf('function regionName('))
 
-  assert.match(card, /<span>\{destination\.country\}<\/span>/)
+  assert.match(card, /<span>\{destinationLocationLabel\(destination\)\}<\/span>/)
   assert.doesNotMatch(card, /Himalaya/i)
+})
+
+
+test('destination groups classify continents even if their stored country is Nepal', () => {
+  for (const slug of ['australia', 'africa', 'asia', 'europe', 'south-america', 'north-america']) {
+    const destination = { slug, country: 'Nepal' }
+    assert.equal(isWorldDestination(destination), true)
+    assert.equal(destinationLocationLabel(destination), 'Continent')
+  }
+  assert.equal(isWorldDestination({ slug: 'western-nepal', country: 'Nepal' }), false)
+  assert.equal(isWorldDestination({ slug: 'alps', country: 'France' }), true)
+  assert.equal(destinationLocationLabel({ slug: 'alps', country: 'France' }), 'France')
 })
 
 test('each hub links to the other, so the split is in the crawl graph', () => {

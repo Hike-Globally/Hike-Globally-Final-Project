@@ -91,12 +91,12 @@ export function StoryTiles({
 
                 <div className="st-tags">
                   {label ? <span className="st-tag">{label}</span> : null}
-                  <span className="st-tag">
+                  {post.content ? <span className="st-tag">
                     {dict.blog.readTime.replace(
                       '{minutes}',
-                      String(readingTimeMinutes(post.excerpt ?? '')),
+                      String(readingTimeMinutes(post.content)),
                     )}
-                  </span>
+                  </span> : null}
                 </div>
 
                 <div className="st-footer">

@@ -261,7 +261,10 @@ export const buildMetadata = ({
   const cleanKeywords = normalizeKeywords(keywords)
 
   return {
-    title,
+    // Bypass the parent title template if the editor already included the brand.
+    title: title.trim().toLocaleLowerCase().endsWith(siteName.trim().toLocaleLowerCase())
+      ? { absolute: title }
+      : title,
     description: cleanDescription,
     // `undefined` (not `[]`) when there is no list: an empty `<meta name="keywords">` is worse than
     // no tag at all.
