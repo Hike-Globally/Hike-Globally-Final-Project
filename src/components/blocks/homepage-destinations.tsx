@@ -20,7 +20,7 @@ export function HomepageDestinations() {
       <DestinationCarousel
         destinations={NEPAL_REGION_CARDS}
         title={dictionary.destinations.homeSectionTitle}
-        description={dictionary.destinations.listingSubtitle}
+        description={dictionary.destinations.homeSectionDescription}
         action={{ href: sitePath('/destinations'), label: dictionary.common.viewAll }}
         titleClassName="home-section-title"
         descriptionClassName="home-section-intro"
