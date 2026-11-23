@@ -219,6 +219,12 @@ type BuildMetadataArgs = {
   path: string
   type?: 'website' | 'article'
   noIndex?: boolean
+  /**
+   * With `noIndex`, whether crawlers may still follow the page's links. Faceted archive URLs need
+   * exactly that: the filtered view is not worth an index entry, but the trip cards it renders are
+   * the way a crawler reaches them. Ignored when the page is indexable.
+   */
+  follow?: boolean
   publishedTime?: string | null
   modifiedTime?: string | null
   authorName?: string | null
@@ -242,6 +248,7 @@ export const buildMetadata = ({
   path,
   type = 'website',
   noIndex = false,
+  follow = false,
   publishedTime,
   modifiedTime,
   authorName,
@@ -265,7 +272,7 @@ export const buildMetadata = ({
       canonical: url,
     },
     robots: noIndex
-      ? { index: false, follow: false }
+      ? { index: false, follow }
       : {
           index: true,
           follow: true,

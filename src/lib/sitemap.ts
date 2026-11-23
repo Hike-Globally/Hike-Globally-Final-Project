@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 
 import { routes, sitePath } from '@/i18n/config'
+import { PAGE_SIZE } from './catalog'
 import { canonicalUrl } from './seo'
 import { isReservedPageSlug } from './site-routes'
 import { sitemapAssetUrl, sitemapMediaXml, type SitemapMedia } from './sitemap-media'
@@ -20,8 +21,10 @@ import { PLACE_INDEX_PATH, placeCategories, placeCategoryPath } from './place-ca
  * Four rules make the file worth submitting in Search Console:
  *
  *  1. EVERY PUBLIC URL APPEARS EXACTLY ONCE — the homepage, the listing pages, the inquiry page,
- *     and each published trip, destination, post and CMS page. No query strings, no trailing
- *     slashes, no duplicates this sitemap puts there itself.
+ *     each published trip, destination, post and CMS page, and every page of a paginated archive
+ *     (`/trips?page=2`, …). No query strings except that pagination, no trailing slashes, no
+ *     duplicates this sitemap puts there itself. Filtered archive URLs (`/trips?difficulty=easy`)
+ *     are not here on purpose: they are `noindex,follow`, and rule 4 applies to them too.
  *
  *  2. URLS COME FROM `canonicalUrl()` — the same helper that renders each page's
  *     `<link rel="canonical">`, so a sitemap entry and the canonical of the page it points at are
@@ -86,6 +89,12 @@ const STATIC_ROUTES: {
   priority: number
   changeFrequency: ChangeFrequency
   feeds: (keyof SitemapSources)[]
+  /**
+   * A listing whose cards are paginated. Every page from the second on is a URL of its own with a
+   * different set of cards, and `rel=prev/next` was retired in 2019 — so unless the sitemap hands a
+   * crawler those URLs, page 3 is reachable only by following two pagination links in a row.
+   */
+  archive?: keyof SitemapSources
 }[] = [
   {
     path: '/',
@@ -93,14 +102,27 @@ const STATIC_ROUTES: {
     changeFrequency: 'weekly',
     feeds: ['trips', 'destinations', 'posts', 'pages'],
   },
-  { path: sitePath(routes.trips), priority: 0.8, changeFrequency: 'daily', feeds: ['trips'] },
+  {
+    path: sitePath(routes.trips),
+    priority: 0.8,
+    changeFrequency: 'daily',
+    feeds: ['trips'],
+    archive: 'trips',
+  },
   {
     path: sitePath(routes.destinations),
     priority: 0.8,
     changeFrequency: 'daily',
     feeds: ['destinations'],
+    archive: 'destinations',
   },
-  { path: sitePath(routes.blog), priority: 0.8, changeFrequency: 'daily', feeds: ['posts'] },
+  {
+    path: sitePath(routes.blog),
+    priority: 0.8,
+    changeFrequency: 'daily',
+    feeds: ['posts'],
+    archive: 'posts',
+  },
   // Nothing but the copy an editor writes on the inquiry page itself, so no `<lastmod>` is claimed.
   { path: sitePath(routes.contact), priority: 0.8, changeFrequency: 'daily', feeds: [] },
   { path: sitePath(routes.about), priority: 0.6, changeFrequency: 'monthly', feeds: [] },
@@ -224,6 +246,23 @@ export const buildSitemap = (
       changeFrequency,
       priority,
     })
+  }
+
+  // Pages 2..N of each archive — kept in a block of their own so the static routes above stay a
+  // contiguous run. One URL per page, spelled exactly as the pagination links render it. Filtered
+  // URLs are deliberately absent: the archive routes mark them `noindex,follow`, and a sitemap
+  // must never advertise a URL the page itself tells crawlers to skip.
+  for (const { path, priority, changeFrequency, feeds, archive } of STATIC_ROUTES) {
+    if (!archive) continue
+    const pages = Math.ceil(sources[archive].length / PAGE_SIZE)
+    for (let page = 2; page <= pages; page++) {
+      entries.push({
+        url: canonicalUrl(`${path}?page=${page}`),
+        lastModified: newestUpdate(feeds.flatMap((feed) => collections[feed])),
+        changeFrequency,
+        priority,
+      })
+    }
   }
 
   for (const { key, path, priority, changeFrequency, linkable } of DOCUMENT_ROUTES) {

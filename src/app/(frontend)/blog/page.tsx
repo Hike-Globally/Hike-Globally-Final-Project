@@ -1,7 +1,14 @@
 import { blogCategoryOptions } from '@/lib/blog-categories'
 import { notFound } from 'next/navigation'
 import { ArchivePagination } from '@/components/sections/archive-pagination'
-import { archiveHref, parsePage, type ArchiveProps, filterQuery } from '@/lib/catalog'
+import {
+  archiveHref,
+  hasArchiveFilters,
+  parsePage,
+  type ArchiveProps,
+  filterQuery,
+  searchString,
+} from '@/lib/catalog'
 import type { Metadata } from 'next'
 import { JsonLd } from '@/components/seo/json-ld'
 import { BlogExplorer } from '@/components/views/blog-explorer'
@@ -16,7 +23,8 @@ export const revalidate = 3600
 
 export async function generateMetadata({ searchParams }: ArchiveProps): Promise<Metadata> {
   const dict = dictionary
-  const page = parsePage((await searchParams).page) ?? notFound()
+  const search = await searchParams
+  const page = parsePage(search.page) ?? notFound()
   const settings = await getSettings()
 
   return buildMetadata({
@@ -25,6 +33,10 @@ export async function generateMetadata({ searchParams }: ArchiveProps): Promise<
     image: settings.defaultOgImage,
     path: archiveHref('blog', page),
     siteName: settings.siteName,
+    // A topic filter is a narrower view of the same journal, not a page of its own: crawl it for
+    // the posts it links to, but never index it.
+    noIndex: hasArchiveFilters('blog', searchString(search)),
+    follow: true,
   })
 }
 
