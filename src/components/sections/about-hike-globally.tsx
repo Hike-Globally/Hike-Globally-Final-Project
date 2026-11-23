@@ -36,7 +36,7 @@ const TICKER_DESTINATIONS = [
  *
  * A dark, immersive section (same register as the dark Stats CMS block) so it
  * reads as a deliberate pause between the two light trip/destination grids around it. The
- * panel is flat navy — no cursor-tracked spotlight, no blurred corner glows — and the
+ * panel is flat ink — no cursor-tracked spotlight, no blurred corner glows — and the
  * interaction budget goes to two things instead of many small flourishes:
  *  1. A real 3D globe — a canvas sphere of land dots, destination pins and great-circle
  *     routes that visitors can drag to spin (and fling, and steer with the keyboard). It

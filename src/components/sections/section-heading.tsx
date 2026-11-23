@@ -90,7 +90,7 @@ export function SectionHeading({
                 'group inline-flex shrink-0 items-center gap-2 text-ui font-medium transition-colors',
                 variant === 'light'
                   ? 'text-white hover:text-sage-light'
-                  : 'text-deep hover:text-deep-80',
+                  : 'text-deep-90 hover:text-deep-80',
               )}
             >
               {action.label}

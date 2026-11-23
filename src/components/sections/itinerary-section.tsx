@@ -53,7 +53,7 @@ function DayChip({
       <span
         className={cn(
           'grid size-9 shrink-0 place-items-center',
-          tone === 'positive' ? 'bg-sage-90 text-white' : 'bg-white text-deep',
+          tone === 'positive' ? 'bg-sage-90 text-white' : 'bg-white text-deep-90',
         )}
       >
         <Icon className="size-4" aria-hidden />
@@ -121,8 +121,8 @@ function ExpandAllSwitch({
       <span
         className={cn(
           'font-heading text-small font-semibold tracking-[0.06em] transition-colors duration-300 ease-brand',
-          checked ? 'text-deep' : 'text-ink-60',
-          'group-hover:text-deep',
+          checked ? 'text-deep-90' : 'text-ink-60',
+          'group-hover:text-deep-90',
         )}
       >
         {dictionary.trip.expandAll}

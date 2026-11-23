@@ -31,7 +31,7 @@ export function Logo({
         // `dangerouslyAllowSVG` is on — serve it straight from `public/` instead.
         unoptimized
         // The mark ships as brand ink; `brightness-0 invert` flattens it to
-        // paper white where it sits on navy.
+        // paper white where it sits on ink.
         className={cn(
           'h-10 w-auto shrink-0 object-contain',
           variant === 'light' && 'brightness-0 invert',

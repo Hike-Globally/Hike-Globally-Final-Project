@@ -99,7 +99,7 @@ export function AuthorProfile({
                 <a
                   href={profile.website}
                   rel="author"
-                  className="text-deep underline underline-offset-4"
+                  className="text-deep-90 underline underline-offset-4"
                 >
                   {dict.website}
                 </a>
@@ -107,7 +107,7 @@ export function AuthorProfile({
             ) : null}
             {profile.socials.map((social) => (
               <li key={social.url}>
-                <a href={social.url} rel="me" className="text-deep underline underline-offset-4">
+                <a href={social.url} rel="me" className="text-deep-90 underline underline-offset-4">
                   {platformLabels[social.platform] ?? social.platform}
                 </a>
               </li>

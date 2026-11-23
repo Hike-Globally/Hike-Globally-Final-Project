@@ -179,7 +179,7 @@ test('the canvas stays transparent outside the sphere — no background wash rea
     `the atmosphere must fade to fully transparent, got "${lastStop[1]}"`,
   )
   assert.ok(
-    atmosphere.stops.every(([, colour]) => colour.startsWith('rgba(135, 170, 189')),
+    atmosphere.stops.every(([, colour]) => colour.startsWith('rgba(94, 121, 147')),
     'the atmosphere is haze-only — no second wash tinting the square behind the globe',
   )
 

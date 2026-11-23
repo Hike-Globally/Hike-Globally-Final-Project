@@ -18,7 +18,7 @@
   color: var(--color-mist);
 }
 
-/* The ember hairline the homepage marquee's count opens with. */
+/* The coral hairline the homepage marquee's count opens with. */
 .places-index__hero-meta::before {
   width: 1.75rem;
   height: 1px;
@@ -73,7 +73,7 @@
 
      --place-accent        graphic/large role on light surfaces
      --place-accent-ink    small-text role on light surfaces (≥ 4.5:1)
-     --place-accent-lt     graphic role on navy / photo scrims (≥ 3:1)
+     --place-accent-lt     graphic role on ink / photo scrims (≥ 3:1)
      --place-accent-wash   panel tint behind ink copy
 
    Nothing outside `.place-themed` can see them, and every usage below follows
@@ -91,7 +91,7 @@
 /* --- Hero ---------------------------------------------------------------- */
 
 /* A thematic glow in the hero foot — the category's accent breathing under
-   the shared navy wash, never strong enough to touch copy contrast. */
+   the shared ink wash, never strong enough to touch copy contrast. */
 .place-hero::after {
   position: absolute;
   inset: 0;
@@ -154,7 +154,7 @@
   gap: 0.85rem;
 }
 
-/* The ember hairline that opens the meta line, in the theme's on-dark step. */
+/* The coral hairline that opens the meta line, in the theme's on-dark step. */
 .place-hero__meta-item::before {
   width: 1.75rem;
   height: 1px;

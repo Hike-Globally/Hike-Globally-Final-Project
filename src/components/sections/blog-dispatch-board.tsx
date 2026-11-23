@@ -194,11 +194,11 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
                 className="transition-transform duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.035] group-focus-within:scale-[1.035]"
               />
             </div>
-            {/* The site's one navy scrim, so the copy stays legible over any photo. */}
+            {/* The site's one ink scrim, so the copy stays legible over any photo. */}
             <div className="photo-scrim absolute inset-0" aria-hidden="true" />
           </div>
 
-          {/* Ember rule drawn across the foot of the plate on hover / focus. */}
+          {/* coral rule drawn across the foot of the plate on hover / focus. */}
           <span
             className="lb-lead-rule absolute inset-x-0 bottom-0 h-0.5 bg-sage"
             aria-hidden="true"
@@ -352,7 +352,7 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
               </span>
               <Link
                 href={sitePath('/blog')}
-                className="group/foot inline-flex items-center gap-2 text-ui font-medium text-deep transition-colors hover:text-deep-80 focus-visible:text-deep-80 focus-visible:outline-offset-4"
+                className="group/foot inline-flex items-center gap-2 text-ui font-medium text-deep-90 transition-colors hover:text-deep-80 focus-visible:text-deep-80 focus-visible:outline-offset-4"
               >
                 {dict.blog.browseJournal}
                 <ArrowRight

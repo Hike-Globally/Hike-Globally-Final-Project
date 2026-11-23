@@ -1,4 +1,4 @@
-/* Editorial pages share the site's ink, mist and ember palette. */
+/* Editorial pages share the site's ink, mist and coral palette. */
 .info-page {
   color: var(--color-ink);
 }
@@ -22,11 +22,11 @@
   background:
     linear-gradient(
       90deg,
-      rgba(13, 31, 44, 0.83) 0%,
-      rgba(15, 35, 48, 0.48) 62%,
-      rgba(15, 35, 48, 0.3)
+      color-mix(in srgb, var(--color-ink) 83%, transparent) 0%,
+      color-mix(in srgb, var(--color-ink) 48%, transparent) 62%,
+      color-mix(in srgb, var(--color-ink) 30%, transparent)
     ),
-    linear-gradient(0deg, rgba(13, 31, 44, 0.65), transparent 45%);
+    linear-gradient(0deg, color-mix(in srgb, var(--color-ink) 65%, transparent), transparent 45%);
 }
 .info-hero__content {
   width: 100%;

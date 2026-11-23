@@ -27,7 +27,7 @@ cross for **Who Is This Trip Not For**.
 the Highlights card:
 
 - white sheet, a hairline border and a short accent rule on the top-left corner. The rule is
-  deep blue on the "for" card and ember on the "not for" card, which also has a faint mist tint;
+  brand blue on the "for" card and coral on the "not for" card, which also has a faint mist tint;
 - an icon chip, a small uppercase eyebrow ("The right fit" / "Not the right fit", in
   `src/i18n/dictionaries.ts`) and the heading;
 - bullet lists become hairline-separated rows, each led by a square check or cross chip.

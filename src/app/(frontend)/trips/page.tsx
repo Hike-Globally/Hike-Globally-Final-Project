@@ -81,7 +81,7 @@ export default async function TripsPage({ searchParams }: ArchiveProps) {
           aria-hidden="true"
           className="-z-20 object-cover"
         />
-        {/* One flat navy wash plus the shared photo scrim — the same recipe every
+        {/* One flat ink wash plus the shared photo scrim — the same recipe every
             other photographic header on the site uses. */}
         <div className="absolute inset-0 -z-10 bg-ink/72" aria-hidden="true" />
         <div className="photo-scrim absolute inset-0 -z-10" aria-hidden="true" />

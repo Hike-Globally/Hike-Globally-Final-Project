@@ -2,28 +2,28 @@ import { PLACE_CATEGORY_VALUES, type PlaceCategoryValue } from './place-categori
 
 /**
  * ============================================================================
- * Place themes — the editorial and visual identity of each category page
+ * Place themes — editorial accents drawn from the eight-colour brand palette
  * ============================================================================
  *
  * `place-categories.ts` stays the single source of truth for URLs, labels and
  * the CMS multi-select. This file is its design-side sibling: for each of the
  * nine `/places/<category>` pages it carries the themed accent set. One object
- * per category, keyed by the stable slug, so the page, the contrast test and
- * the translation dictionaries all agree.
+ * per category, keyed by the stable slug, so the page, contrast audit and
+ * translation dictionaries all agree.
  *
- * ACCENT COLOURS — every value is a stated mix of the six locked palette
- * colours (see the palette note in `src/app/(frontend)/globals.css`), and each
- * step is audited by `src/lib/place-themes.test.ts`:
+ * Every colour below is one of the supplied palette colours or a documented
+ * mix of one (see `src/app/(frontend)/globals.css`). The category mappings and
+ * roles are inferred, not user-confirmed. The four roles are audited in
+ * `src/lib/place-themes.test.ts`:
  *
  *   --place-accent      graphic/large role — rules, chapter numerals, glyph
- *                       strokes, hairlines. ≥ 3:1 on paper, mist, the tinted
- *                       band and the wash panel (WCAG 1.4.11 / 1.4.3-large).
+ *                       strokes and hairlines. ≥ 3:1 on paper, mist, the tinted
+ *                       band and the wash panel.
  *   --place-accent-ink  small-text role — themed eyebrows and hover text.
  *                       ≥ 4.5:1 on every light background it sits on.
- *   --place-accent-lt   on-dark role — hero marks. ≥ 3:1 against
- *                       navy (`ink`) and against the hero-foot composite
- *                       (ink wash + photo scrim, `#20384a`). Small copy on a
- *                       photograph always stays `mist`/white, never accent.
+ *   --place-accent-lt   on-dark role — hero marks. ≥ 3:1 against ink and the
+ *                       dark hero-foot composite (`#2E1726`). Small copy on a
+ *                       photograph always stays paper/white, never an accent.
  *   --place-accent-wash the light panel tint behind ink text (≥ 11:1).
  *
  * The CSS custom properties are published by `placeThemeStyle()` and consumed
@@ -36,7 +36,7 @@ export type PlaceTheme = {
   accent: string
   /** Small-text role — ≥ 4.5:1 on every light surface it touches. */
   accentInk: string
-  /** On-dark role — ≥ 3:1 against navy and the hero-foot composite. */
+  /** On-dark role — ≥ 3:1 against ink and the hero-foot composite. */
   accentLt: string
   /** Panel tint behind ink copy. */
   accentWash: string
@@ -44,67 +44,67 @@ export type PlaceTheme = {
 
 export const placeThemes: Record<PlaceCategoryValue, PlaceTheme> = {
   lakes: {
-    // deep 65% + haze 35% — glacial steel blue
-    accent: '#4589b8',
-    accentInk: '#3a749d',
-    accentLt: '#4589b8',
-    accentWash: '#eef4f9',
+    // Blue-grey on the light plates; the vivid blue marks the ink-washed hero.
+    accent: '#5e7993',
+    accentInk: '#0e618d',
+    accentLt: '#0393cd',
+    accentWash: '#d8e5e7',
   },
   waterfalls: {
-    // haze + 25% ink — spray grey-blue
-    accent: '#6b8c9f',
-    accentInk: '#557487',
-    accentLt: '#6b8c9f',
-    accentWash: '#f2f5f6',
+    // Blue-grey graphic role, earth-toned copy, and a lighter on-dark tint.
+    accent: '#5e7993',
+    accentInk: '#78510f',
+    accentLt: '#6d859c',
+    accentWash: '#e2e9e8',
   },
   'mountain-passes': {
-    // slate + 15% ink — wind-scoured stone
-    accent: '#6a6767',
-    accentInk: '#6a6767',
-    accentLt: '#838080',
-    accentWash: '#f2f1f1',
+    // Earth on light surfaces, with the exact gold as the hero mark.
+    accent: '#78510f',
+    accentInk: '#78510f',
+    accentLt: '#cbaf35',
+    accentWash: '#f0e8d4',
   },
   canyons: {
-    // sage 58% + slate 42% — dusty brick
-    accent: '#ab615a',
-    accentInk: '#9e5d58',
-    accentLt: '#b36f69',
-    accentWash: '#f7f1f0',
+    // Coral graphic role, dark coral for small copy, and the same vivid hero mark.
+    accent: '#f53f1d',
+    accentInk: '#ab2b1b',
+    accentLt: '#f53f1d',
+    accentWash: '#f5e7e0',
   },
   'base-camps': {
-    // sage at full strength — the ember of the expedition world
-    accent: '#d0564d',
-    accentInk: '#b3504c',
-    accentLt: '#d25c53',
-    accentWash: '#fbf0ef',
+    // Dark coral on light panels and a paper-lifted coral for the ink hero.
+    accent: '#c0301b',
+    accentInk: '#ab2b1b',
+    accentLt: '#f5745a',
+    accentWash: '#f5e4dc',
   },
   caves: {
-    // ink + 22% deep — subterranean blue-black
-    accent: '#1a405d',
-    accentInk: '#1a405d',
-    accentLt: '#6b8497',
-    accentWash: '#eaeef0',
+    // Ink-on-paper, with the palette's stone as the mark on the dark hero.
+    accent: '#210516',
+    accentInk: '#210516',
+    accentLt: '#bcb0b1',
+    accentWash: '#ece6e1',
   },
   'bike-tours': {
-    // deep at full strength — the site's expedition blue, on the road page
-    accent: '#2177b5',
-    accentInk: '#2173af',
-    accentLt: '#3b87be',
-    accentWash: '#ebf3f8',
+    // A blue-grey road mark and AA deep-blue copy; gold warms the hero.
+    accent: '#5e7993',
+    accentInk: '#0e618d',
+    accentLt: '#cbaf35',
+    accentWash: '#d8e5e7',
   },
   'mountain-peaks': {
-    // ink 62% + slate 38% — cool granite
-    accent: '#3d4954',
-    accentInk: '#3d4954',
-    accentLt: '#7a828a',
-    accentWash: '#eeeff0',
+    // Blue-grey graphics, earth-toned copy and stone on the ink hero.
+    accent: '#5e7993',
+    accentInk: '#78510f',
+    accentLt: '#bcb0b1',
+    accentWash: '#ece6e1',
   },
   temples: {
-    // btn-accent 65% + sage 35% — saffron rust
-    accent: '#c74f3f',
-    accentInk: '#b74c3f',
-    accentLt: '#cc6051',
-    accentWash: '#faefee',
+    // Earth on light surfaces; gold carries the cultural accent on dark.
+    accent: '#78510f',
+    accentInk: '#78510f',
+    accentLt: '#cbaf35',
+    accentWash: '#f0e8d4',
   },
 }
 
