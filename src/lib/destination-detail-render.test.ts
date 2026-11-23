@@ -16,8 +16,24 @@ import { DestinationDetail } from '@/components/views/destination-detail'
 import type { DestinationCard, TripCard } from './data'
 import type { Destination } from '@/payload-types'
 
-const richText = (text: string): unknown => ({
-  root: { children: [{ type: 'paragraph', children: [{ type: 'text', text }] }] },
+/** A minimal, CMS-shaped Lexical document — typed like the field it stands in for. */
+const richText = (text: string): NonNullable<Destination['description']> => ({
+  root: {
+    type: 'root',
+    format: '',
+    indent: 0,
+    direction: null,
+    version: 1,
+    children: [
+      {
+        type: 'paragraph',
+        format: '',
+        indent: 0,
+        version: 1,
+        children: [{ type: 'text', text, format: 0, style: '', version: 1 }],
+      },
+    ],
+  },
 })
 
 const EASTERN_NEPAL =
