@@ -1,503 +1,591 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import {
   ArrowUpRight,
   Check,
-  Compass,
   Copy,
-  Mountain,
-  NotebookPen,
+  GitBranch,
+  LayoutGrid,
+  List,
   Search,
-  Tent,
   X,
-  Flag,
 } from 'lucide-react'
 
-import Image from '@/components/ui/next-image'
-
 /**
- * The interactive half of the route map. The server hands over the four camps
- * (already ordered, already numbered, each waypoint carrying its altitude); this
- * component runs the live filter, the scroll-spy "you are here" and the little GPS
- * altimeter in the rail. Each camp renders in its own idiom — trailhead cards,
- * photographic benches, a surveyor's ledger, dark register plates — so the page
- * reads as a journey, not a list.
+ * Interactive Visual Sitemap & Information Flow explorer.
+ *
+ * Inspired by Octopus.do enterprise-grade visual IA maps (Growlith Academy blueprint):
+ *  - Subsystem filter bar: All (N) + 6 architectural subsystems with live counts
+ *  - Three view modes: Diagram (root-to-branch wireframe tree), Cards (spec cards), Index (table)
+ *  - Search / route filter across titles, paths, descriptions, and metadata
+ *  - Architectural Taxonomy ("Six Core Subsystems at a Glance") with "Filter this subsystem" triggers
  */
 
-export type SitemapRow = {
+export type SitemapNodeKind = 'root' | 'hub' | 'endpoint' | 'protocol'
+
+export type SitemapNode = {
   title: string
   href: string
   path: string
   description: string
-  /** Short right-hand label: a count ("12 published"), a format ("XML") or nothing. */
+  /** HTTP status code or protocol badge, e.g. '200' */
+  status: string
+  kind: SitemapNodeKind
+  /** Optional supplementary tag (e.g. '14d · challenging', '9 landscapes', 'XML') */
   meta?: string
-  /** Waypoint altitude in metres — drives the hero profile and the rail altimeter. */
-  elevation: number
-  /** Bench tiles (the nine landscapes) render their photograph. */
-  image?: { src: string; alt: string }
 }
 
-export type SitemapLayerKind = 'trailheads' | 'benches' | 'ledger' | 'register'
-
-export type SitemapLayer = {
+export type SitemapSubsystem = {
   id: string
+  /** Numerical badge, e.g. '01' */
+  code: string
+  /** Taxonomy subtitle, e.g. 'Root & Direction' */
   kicker: string
+  /** Display name, e.g. 'Core & Brand' */
   title: string
-  note: string
-  /** Shown under the header when this layer has no rows (e.g. a CMS layer with no published pages). */
-  emptyNote?: string
-  kind: SitemapLayerKind
-  rows: SitemapRow[]
+  /** Concise subsystem summary */
+  description: string
+  /** Accent variant mapped strictly to Hike Globally tokens */
+  accent: 'ink' | 'deep' | 'sage' | 'haze' | 'slate'
+  nodes: SitemapNode[]
 }
 
-const pad = (value: number) => String(value).padStart(2, '0')
-const formatElevation = (value: number) => value.toLocaleString('en-US')
+export type SitemapViewMode = 'diagram' | 'cards' | 'index'
 
-const CAMP_ICONS: Record<SitemapLayerKind, typeof Tent> = {
-  trailheads: Tent,
-  benches: Mountain,
-  ledger: NotebookPen,
-  register: Flag,
+function WireframeBars({ kind }: { kind: SitemapNodeKind }) {
+  return (
+    <span className="ia-wireframe" data-kind={kind} aria-hidden="true">
+      <span className="ia-wireframe__bar ia-wireframe__bar--hero" />
+      <span className="ia-wireframe__row">
+        <span className="ia-wireframe__cell" />
+        <span className="ia-wireframe__cell" />
+        {kind === 'root' || kind === 'hub' ? <span className="ia-wireframe__cell" /> : null}
+      </span>
+      <span className="ia-wireframe__bar ia-wireframe__bar--foot" />
+    </span>
+  )
 }
 
-/* -------------------------------------------------------------------------- */
-/* The register's copy button — absolute URL, because the register is what an  */
-/* agent or reader will actually paste somewhere.                              */
-/* -------------------------------------------------------------------------- */
-
-function CopyLinkButton({ path }: { path: string }) {
+function CopyEndpointButton({ path }: { path: string }) {
   const [copied, setCopied] = useState(false)
 
-  const copy = async () => {
-    const absolute =
-      typeof window !== 'undefined' ? new URL(path, window.location.origin).href : path
+  const handleCopy = async () => {
+    const url = typeof window !== 'undefined' ? new URL(path, window.location.origin).href : path
     try {
-      await navigator.clipboard.writeText(absolute)
+      await navigator.clipboard.writeText(url)
       setCopied(true)
       window.setTimeout(() => setCopied(false), 1600)
     } catch {
-      /* Clipboard blocked (permissions/iframe) — the path is printed beside the button. */
+      /* Clipboard unavailable */
     }
   }
 
   return (
-    <button type="button" className="plate__copy" onClick={copy} aria-live="polite">
-      {copied ? <Check size={13} aria-hidden /> : <Copy size={13} aria-hidden />}
-      <span>{copied ? 'Copied' : 'Copy link'}</span>
+    <button
+      type="button"
+      className="ia-copy-btn"
+      onClick={handleCopy}
+      aria-label={`Copy full URL for ${path}`}
+      title="Copy full URL"
+    >
+      {copied ? <Check size={12} aria-hidden /> : <Copy size={12} aria-hidden />}
+      <span>{copied ? 'Copied' : 'Copy'}</span>
     </button>
   )
 }
 
-export function SitemapGuide({ layers }: { layers: SitemapLayer[] }) {
+export function SitemapGuide({
+  subsystems,
+  rootNode,
+}: {
+  subsystems: SitemapSubsystem[]
+  rootNode: SitemapNode
+}) {
+  const [activeSubsystem, setActiveSubsystem] = useState<string>('all')
+  const [viewMode, setViewMode] = useState<SitemapViewMode>('diagram')
   const [query, setQuery] = useState('')
-  const [activeLayer, setActiveLayer] = useState(layers[0]?.id ?? '')
-  const [progress, setProgress] = useState(0)
-  const layerRefs = useRef<Map<string, HTMLElement>>(new Map())
-  const bodyRef = useRef<HTMLDivElement | null>(null)
+  const explorerRef = useRef<HTMLDivElement | null>(null)
 
   const trimmed = query.trim().toLowerCase()
-  const isFiltering = trimmed.length > 0
+  const isSearching = trimmed.length > 0
 
-  const visible = useMemo(() => {
-    if (!isFiltering) return layers
-    return layers
-      .map((layer) => ({
-        ...layer,
-        rows: layer.rows.filter((row) =>
-          `${row.title} ${row.description} ${row.path} ${row.meta ?? ''}`
+  const totalCount = useMemo(
+    () => subsystems.reduce((sum, sub) => sum + sub.nodes.length, 0),
+    [subsystems],
+  )
+
+  const filteredSubsystems = useMemo(() => {
+    return subsystems
+      .filter((sub) => activeSubsystem === 'all' || sub.id === activeSubsystem)
+      .map((sub) => {
+        if (!isSearching) return sub
+        const matchedNodes = sub.nodes.filter((node) =>
+          `${node.title} ${node.path} ${node.description} ${node.meta ?? ''} ${sub.title}`
             .toLowerCase()
             .includes(trimmed),
-        ),
+        )
+        return { ...sub, nodes: matchedNodes }
+      })
+      .filter((sub) => sub.nodes.length > 0)
+  }, [subsystems, activeSubsystem, isSearching, trimmed])
+
+  const visibleCount = useMemo(
+    () => filteredSubsystems.reduce((sum, sub) => sum + sub.nodes.length, 0),
+    [filteredSubsystems],
+  )
+
+  const focusSubsystem = (id: string) => {
+    setActiveSubsystem(id)
+    setQuery('')
+    if (explorerRef.current) {
+      explorerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
+  const resetFilters = () => {
+    setActiveSubsystem('all')
+    setQuery('')
+  }
+
+  /* For Diagram view: separate the root '/' node from Core & Brand's remaining nodes so '/' sits at the apex */
+  const diagramBranches = useMemo(() => {
+    return filteredSubsystems
+      .map((sub) => ({
+        ...sub,
+        branchNodes:
+          activeSubsystem === 'all' && !isSearching && sub.id === 'core'
+            ? sub.nodes.filter((node) => node.path !== rootNode.path)
+            : sub.nodes,
       }))
-      .filter((layer) => layer.rows.length > 0)
-  }, [layers, trimmed, isFiltering])
+      .filter((sub) => sub.branchNodes.length > 0)
+  }, [filteredSubsystems, activeSubsystem, isSearching, rootNode.path])
 
-  const allRows = useMemo(() => layers.flatMap((layer) => layer.rows), [layers])
-  const totalRows = allRows.length
-  const visibleRows = visible.reduce((sum, layer) => sum + layer.rows.length, 0)
-  const minElevation = allRows.length ? Math.min(...allRows.map((row) => row.elevation)) : 0
-  const maxElevation = allRows.length ? Math.max(...allRows.map((row) => row.elevation)) : 0
-
-  /* Row numbers are stable across the filter — they are positions on the route, not a ranking. */
-  const numberFor = useMemo(() => {
-    const numbers = new Map<string, number>()
-    let next = 1
-    for (const layer of layers) {
-      for (const row of layer.rows) {
-        numbers.set(`${layer.id}:${row.href}:${row.path}`, next)
-        next += 1
-      }
-    }
-    return numbers
-  }, [layers])
-
-  /* Scroll-spy over the camp sections: whatever is in the middle band is "you are here". */
-  useEffect(() => {
-    if (typeof IntersectionObserver === 'undefined') return
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setActiveLayer(entry.target.id)
-        }
-      },
-      { rootMargin: '-38% 0px -55% 0px', threshold: 0 },
-    )
-    layerRefs.current.forEach((node) => observer.observe(node))
-    return () => observer.disconnect()
-  }, [layers])
-
-  /* The altimeter: map the scroll position through the route body onto altitude. */
-  useEffect(() => {
-    const body = bodyRef.current
-    if (!body) return
-
-    let frame = 0
-    const measure = () => {
-      frame = 0
-      const rect = body.getBoundingClientRect()
-      const viewport = window.innerHeight || 1
-      const span = rect.height + viewport
-      const walked = viewport * 0.6 - rect.top
-      setProgress(Math.min(1, Math.max(0, walked / span)))
-    }
-    const onScroll = () => {
-      if (frame === 0) frame = window.requestAnimationFrame(measure)
-    }
-
-    measure()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll)
-    return () => {
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
-      if (frame !== 0) window.cancelAnimationFrame(frame)
-    }
-  }, [])
-
-  const setLayerRef = (id: string) => (node: HTMLElement | null) => {
-    if (node) layerRefs.current.set(id, node)
-    else layerRefs.current.delete(id)
-  }
-
-  const altimeter = Math.round(minElevation + progress * (maxElevation - minElevation))
-  const activeWaypoint = Math.min(totalRows, Math.max(1, Math.round(progress * (totalRows - 1)) + 1))
-  const activeLayerTitle = layers.find((layer) => layer.id === activeLayer)?.title ?? ''
-
-  const elevationRange = (layer: SitemapLayer) => {
-    if (layer.rows.length === 0) return null
-    const values = layer.rows.map((row) => row.elevation)
-    return `${formatElevation(Math.min(...values))}–${formatElevation(Math.max(...values))} m`
-  }
-
-  const renderWaypointCard = (layer: SitemapLayer, row: SitemapRow, index: number, count: number) => {
-    const number = numberFor.get(`${layer.id}:${row.href}:${row.path}`) ?? 0
-    const wide = count % 2 === 1 && index === count - 1
-    return (
-      <li key={row.href + row.path} className={wide ? 'waypoints__item waypoints__item--wide' : 'waypoints__item'}>
-        <Link href={row.href} className="waypoint">
-          <span className="waypoint__ghost" aria-hidden="true">
-            {pad(number)}
-          </span>
-          <span className="waypoint__top">
-            <span className="waypoint__code">WP&nbsp;{pad(number)}</span>
-            <span className="waypoint__alt">{formatElevation(row.elevation)} m</span>
-          </span>
-          <span className="waypoint__title">{row.title}</span>
-          <span className="waypoint__desc">{row.description}</span>
-          <span className="waypoint__foot">
-            <span className="waypoint__path">{row.path}</span>
-            {row.meta ? <span className="tag">{row.meta}</span> : null}
-          </span>
-          <ArrowUpRight size={18} aria-hidden className="waypoint__arrow" />
-        </Link>
-      </li>
-    )
-  }
-
-  const renderBench = (layer: SitemapLayer, row: SitemapRow, index: number) => {
-    const number = index + 1
-    return (
-      <li key={row.href + row.path} className="benches__item">
-        <Link href={row.href} className="bench">
-          {row.image ? (
-            <Image
-              src={row.image.src}
-              alt=""
-              fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="bench__image"
-              draggable={false}
-            />
-          ) : null}
-          <span className="bench__scrim" aria-hidden="true" />
-          <span className="bench__top">
-            <span className="bench__code">BENCH&nbsp;{pad(number)}</span>
-            <span className="bench__alt">{formatElevation(row.elevation)} m</span>
-          </span>
-          <span className="bench__bottom">
-            <span className="bench__title">{row.title}</span>
-            <span className="bench__desc">{row.description}</span>
-            <span className="bench__meta">
-              <span className="bench__path">{row.path}</span>
-              {row.meta ? <span className="bench__chip">{row.meta}</span> : null}
-            </span>
-          </span>
-          <ArrowUpRight size={20} aria-hidden className="bench__arrow" />
-        </Link>
-      </li>
-    )
-  }
-
-  const renderLedgerRow = (layer: SitemapLayer, row: SitemapRow, index: number) => (
-    <li key={row.href + row.path}>
-      <Link href={row.href} className="ledger-row">
-        <span className="ledger-row__idx" aria-hidden="true">
-          L{pad(index + 1)}
-        </span>
-        <span className="ledger-row__body">
-          <span className="ledger-row__title">{row.title}</span>
-          <span className="ledger-row__desc">{row.description}</span>
-        </span>
-        <span className="ledger-row__meta">
-          <span className="ledger-row__path">{row.path}</span>
-          <span className="ledger-row__stamp">CMS</span>
-        </span>
-        <ArrowUpRight size={17} aria-hidden className="ledger-row__arrow" />
-      </Link>
-    </li>
-  )
-
-  const renderPlate = (layer: SitemapLayer, row: SitemapRow) => (
-    <li key={row.href + row.path}>
-      <div className="plate">
-        <Link href={row.href} className="plate__link">
-          <span className="plate__top">
-            <span className="plate__badge">{row.meta ?? 'FILE'}</span>
-            <span className="plate__alt">{formatElevation(row.elevation)} m</span>
-          </span>
-          <span className="plate__title">{row.title}</span>
-          <span className="plate__desc">{row.description}</span>
-          <ArrowUpRight size={17} aria-hidden className="plate__arrow" />
-        </Link>
-        <span className="plate__foot">
-          <code className="plate__path">{row.path}</code>
-          <CopyLinkButton path={row.path} />
-        </span>
-      </div>
-    </li>
-  )
-
-  const renderRows = (layer: SitemapLayer) => {
-    switch (layer.kind) {
-      case 'trailheads':
-        return (
-          <ol className="waypoints" aria-label="The circuit, waypoint by waypoint">
-            {layer.rows.map((row, index) =>
-              renderWaypointCard(layer, row, index, layer.rows.length),
-            )}
-          </ol>
-        )
-      case 'benches':
-        return (
-          <ol className="benches" aria-label="The nine landscapes">
-            {layer.rows.map((row, index) => renderBench(layer, row, index))}
-          </ol>
-        )
-      case 'ledger':
-        return (
-          <div className="ledger">
-            <p className="ledger__columns" aria-hidden="true">
-              <span>№</span>
-              <span>Entry</span>
-              <span className="ledger__col-path">Path</span>
-              <span className="ledger__col-class">Class</span>
-              <span />
-            </p>
-            <ol className="ledger__rows" aria-label="CMS landing pages">
-              {layer.rows.map((row, index) => renderLedgerRow(layer, row, index))}
-            </ol>
-          </div>
-        )
-      case 'register':
-        return (
-          <ol className="register" aria-label="Machine-readable files and fine print">
-            {layer.rows.map((row) => renderPlate(layer, row))}
-          </ol>
-        )
-    }
-  }
+  const showApexRoot = activeSubsystem === 'all' && !isSearching
 
   return (
-    <div className="route container-content" ref={bodyRef}>
-      {/* ------------------------------------------------------------ The rail */}
-      <aside className="route-rail" aria-label="Route profile">
-        <div className="route-rail__panel">
-          <p className="route-rail__brand">
-            <Compass size={15} aria-hidden />
-            <span>Route profile</span>
-            <span className="route-rail__brand-coord" aria-hidden="true">
-              27.9881° N
-            </span>
-          </p>
-
-          {/* The altimeter — decorative readout of where in the walk you are */}
-          <div className="altimeter" aria-hidden="true">
-            <p className="altimeter__label">Altimeter</p>
-            <p className="altimeter__value">
-              {formatElevation(altimeter)}
-              <span className="altimeter__unit">m</span>
-            </p>
-            <p className="altimeter__track">
-              <span className="altimeter__fill" style={{ transform: `scaleX(${progress})` }} />
-            </p>
-            <p className="altimeter__sub">
-              <span>{activeLayerTitle}</span>
-              <span className="altimeter__wpt">
-                WPT {pad(activeWaypoint)}/{pad(totalRows)}
-              </span>
-            </p>
-          </div>
-
-          {/* The camps, in walking order */}
-          <nav aria-label="Route camps" className="camps">
-            <ul>
-              {layers.map((layer, index) => {
-                const active = activeLayer === layer.id
-                const range = elevationRange(layer)
-                return (
-                  <li key={layer.id}>
-                    <a
-                      href={`#${layer.id}`}
-                      className="camp"
-                      aria-current={active ? 'true' : undefined}
-                      onClick={() => setActiveLayer(layer.id)}
-                    >
-                      <span className="camp__dot" aria-hidden="true">
-                        {index + 1}
-                      </span>
-                      <span className="camp__body">
-                        <span className="camp__kicker">{layer.kicker}</span>
-                        <span className="camp__title">{layer.title}</span>
-                      </span>
-                      <span className="camp__alt" aria-hidden="true">
-                        {range ?? `${layer.rows.length}×`}
-                      </span>
-                    </a>
-                  </li>
-                )
-              })}
-            </ul>
-          </nav>
-
-          {/* The filter */}
-          <label className="route-rail__label" htmlFor="sitemap-filter">
-            Find a waypoint
-          </label>
-          <div className="route-filter">
-            <Search size={15} aria-hidden className="route-filter__icon" />
-            <input
-              id="sitemap-filter"
-              type="search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Try “Khumbu” or “RSS”"
-              className="route-filter__input"
-              autoComplete="off"
-              spellCheck={false}
-              enterKeyHint="search"
-            />
-            {isFiltering ? (
+    <>
+      {/* ====================================================================
+          INTERACTIVE ARCHITECTURE WORKSPACE
+          ==================================================================== */}
+      <section
+        ref={explorerRef}
+        id="architecture-map"
+        className="ia-workspace"
+        aria-label="Interactive visual sitemap and route explorer"
+      >
+        <div className="container-content">
+          {/* Toolbar: Subsystem Filter Pills + Search + View Switcher */}
+          <div className="ia-toolbar">
+            <div className="ia-toolbar__filters" role="group" aria-label="Filter by subsystem">
               <button
                 type="button"
-                className="route-filter__clear"
-                onClick={() => setQuery('')}
-                aria-label="Clear search"
+                className="ia-filter-pill"
+                aria-pressed={activeSubsystem === 'all'}
+                onClick={() => setActiveSubsystem('all')}
               >
-                <X size={13} aria-hidden />
+                <span>All</span>
+                <span className="ia-filter-pill__count">({totalCount})</span>
               </button>
-            ) : null}
+              {subsystems.map((sub) => (
+                <button
+                  key={sub.id}
+                  type="button"
+                  className="ia-filter-pill"
+                  aria-pressed={activeSubsystem === sub.id}
+                  onClick={() => setActiveSubsystem(sub.id)}
+                >
+                  <span>{sub.title}</span>
+                  <span className="ia-filter-pill__count">({sub.nodes.length})</span>
+                </button>
+              ))}
+            </div>
+
+            <div className="ia-toolbar__controls">
+              <div className="ia-search">
+                <Search size={14} aria-hidden className="ia-search__icon" />
+                <label htmlFor="ia-route-search" className="sr-only">
+                  Filter routes or titles
+                </label>
+                <input
+                  id="ia-route-search"
+                  type="search"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Filter path or node…"
+                  className="ia-search__input"
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+                {isSearching ? (
+                  <button
+                    type="button"
+                    className="ia-search__clear"
+                    onClick={() => setQuery('')}
+                    aria-label="Clear route search"
+                  >
+                    <X size={13} aria-hidden />
+                  </button>
+                ) : null}
+              </div>
+
+              <div className="ia-view-tabs" role="group" aria-label="View mode">
+                <button
+                  type="button"
+                  className="ia-view-tab"
+                  aria-pressed={viewMode === 'diagram'}
+                  onClick={() => setViewMode('diagram')}
+                >
+                  <GitBranch size={14} aria-hidden />
+                  <span>Diagram</span>
+                </button>
+                <button
+                  type="button"
+                  className="ia-view-tab"
+                  aria-pressed={viewMode === 'cards'}
+                  onClick={() => setViewMode('cards')}
+                >
+                  <LayoutGrid size={14} aria-hidden />
+                  <span>Cards</span>
+                </button>
+                <button
+                  type="button"
+                  className="ia-view-tab"
+                  aria-pressed={viewMode === 'index'}
+                  onClick={() => setViewMode('index')}
+                >
+                  <List size={14} aria-hidden />
+                  <span>Index</span>
+                </button>
+              </div>
+            </div>
           </div>
-          <p className="route-filter__count" role="status" aria-live="polite">
-            {isFiltering ? `${visibleRows} of ${totalRows} waypoints` : `${totalRows} waypoints charted`}
-          </p>
 
-          <p className="route-rail__note">
-            The whole walk is machine-readable too — see{' '}
-            <a href="/sitemap.xml" className="route-rail__notelink">
-              /sitemap.xml
-            </a>
-            .
-          </p>
-        </div>
-      </aside>
+          {/* Telemetry status bar */}
+          <div className="ia-status-strip" role="status" aria-live="polite">
+            <span className="ia-status-strip__summary">
+              Showing <strong>{visibleCount}</strong> of <strong>{totalCount}</strong> indexed nodes
+              {activeSubsystem !== 'all' ? (
+                <>
+                  {' '}
+                  in{' '}
+                  <strong>
+                    {subsystems.find((sub) => sub.id === activeSubsystem)?.title}
+                  </strong>
+                </>
+              ) : null}
+            </span>
+            {activeSubsystem !== 'all' || isSearching ? (
+              <button type="button" className="ia-status-strip__reset" onClick={resetFilters}>
+                Reset filter
+              </button>
+            ) : (
+              <span className="ia-status-strip__legend" aria-hidden="true">
+                <span className="ia-legend-dot ia-legend-dot--hub" /> Hub Root
+                <span className="ia-legend-dot ia-legend-dot--endpoint" /> Canonical Endpoint
+              </span>
+            )}
+          </div>
 
-      {/* -------------------------------------------------------------- Main */}
-      <div className="route-main">
-        {visible.map((layer) => {
-          const range = elevationRange(layer)
-          const Icon = CAMP_ICONS[layer.kind]
-          return (
-            <section
-              key={layer.id}
-              id={layer.id}
-              ref={setLayerRef(layer.id)}
-              className="camp-section"
-              data-kind={layer.kind}
-              aria-labelledby={`${layer.id}-heading`}
-            >
-              <header className="camp-head">
-                <span className="camp-head__seal" aria-hidden="true">
-                  <Icon size={20} strokeWidth={1.75} />
-                </span>
-                <div className="camp-head__copy">
-                  <span className="camp-head__kicker">
-                    <span>{layer.kicker}</span>
-                    {range ? (
-                      <>
-                        <span className="camp-head__kicker-sep" aria-hidden="true">
-                          ·
-                        </span>
-                        <span>{range}</span>
-                      </>
-                    ) : null}
-                    <span className="camp-head__kicker-sep" aria-hidden="true">
-                      ·
+          {/* Empty state */}
+          {filteredSubsystems.length === 0 ? (
+            <div className="ia-empty" role="status">
+              <p className="ia-empty__eyebrow">0 MATCHING NODES</p>
+              <h2 className="ia-empty__title">No route matches your filter</h2>
+              <p className="ia-empty__copy">
+                Try searching by URL segment (for example <code>/trips</code>, <code>/places</code>,
+                or <code>/blog</code>) or clear the active subsystem filter.
+              </p>
+              <button type="button" className="ia-empty__btn" onClick={resetFilters}>
+                Show all {totalCount} nodes
+              </button>
+            </div>
+          ) : null}
+
+          {/* ================================================================
+              VIEW 1: DIAGRAM (Octopus.do Visual IA Tree Canvas)
+              ================================================================ */}
+          {filteredSubsystems.length > 0 && viewMode === 'diagram' ? (
+            <div className="ia-canvas">
+              {showApexRoot ? (
+                <div className="ia-apex">
+                  <Link href={rootNode.href} className="ia-node ia-node--root">
+                    <span className="ia-node__bar" aria-hidden="true" />
+                    <span className="ia-node__head">
+                      <code className="ia-node__path">{rootNode.path}</code>
+                      <span className="ia-node__status">{rootNode.status}</span>
                     </span>
-                    <span>
-                      {layer.rows.length} waypoint{layer.rows.length === 1 ? '' : 's'}
-                    </span>
-                  </span>
-                  <h2 id={`${layer.id}-heading`} className="camp-head__title heading-xl">
-                    {layer.title}
-                  </h2>
-                  <span className="camp-head__note">{layer.note}</span>
+                    <WireframeBars kind="root" />
+                    <span className="ia-node__title">{rootNode.title}</span>
+                    <span className="ia-node__meta">{rootNode.description}</span>
+                  </Link>
+                  <div className="ia-apex__stem" aria-hidden="true" />
                 </div>
-              </header>
+              ) : null}
 
-              {layer.rows.length > 0 ? (
-                renderRows(layer)
-              ) : (
-                <p className="camp-section__empty">{layer.emptyNote ?? layer.note}</p>
-              )}
-            </section>
-          )
-        })}
+              <div
+                className="ia-tree-grid"
+                data-columns={Math.min(6, diagramBranches.length)}
+                data-connected={showApexRoot ? 'true' : 'false'}
+              >
+                {diagramBranches.map((sub) => {
+                  const [firstNode, ...childNodes] = sub.branchNodes
+                  const hasHubLead = firstNode && firstNode.kind === 'hub'
 
-        {visible.length === 0 ? (
-          <div className="route-empty" role="status">
-            <p className="route-empty__kicker">Off the route</p>
-            <h2 className="route-empty__title">No waypoint matches.</h2>
-            <p className="route-empty__text">
-              Try a shorter word — or start from the camps above. The whole route is a click away.
+                  return (
+                    <section
+                      key={sub.id}
+                      className="ia-column"
+                      data-accent={sub.accent}
+                      aria-labelledby={`diagram-col-${sub.id}`}
+                    >
+                      <div className="ia-column__connector" aria-hidden="true" />
+
+                      <header className="ia-column__header">
+                        <span className="ia-column__code">{sub.code}</span>
+                        <h2 id={`diagram-col-${sub.id}`} className="ia-column__title">
+                          {sub.title}
+                        </h2>
+                        <span className="ia-column__count">{sub.branchNodes.length}</span>
+                      </header>
+
+                      {hasHubLead ? (
+                        <div className="ia-column__hub-wrap">
+                          <Link href={firstNode.href} className="ia-node ia-node--hub">
+                            <span className="ia-node__bar" aria-hidden="true" />
+                            <span className="ia-node__head">
+                              <code className="ia-node__path">{firstNode.path}</code>
+                              <span className="ia-node__status">{firstNode.status}</span>
+                            </span>
+                            <WireframeBars kind="hub" />
+                            <span className="ia-node__title">{firstNode.title}</span>
+                            {firstNode.meta ? (
+                              <span className="ia-node__badge">{firstNode.meta}</span>
+                            ) : null}
+                          </Link>
+                        </div>
+                      ) : null}
+
+                      {(hasHubLead ? childNodes : sub.branchNodes).length > 0 ? (
+                        <ul className="ia-branch-list">
+                          {(hasHubLead ? childNodes : sub.branchNodes).map((node) => (
+                            <li key={`${sub.id}:${node.path}`} className="ia-branch-list__item">
+                              <Link
+                                href={node.href}
+                                className={`ia-node ia-node--${node.kind}`}
+                              >
+                                <span className="ia-node__bar" aria-hidden="true" />
+                                <span className="ia-node__head">
+                                  <code className="ia-node__path">{node.path}</code>
+                                  <span className="ia-node__status">{node.status}</span>
+                                </span>
+                                <span className="ia-node__title">{node.title}</span>
+                                {node.meta ? (
+                                  <span className="ia-node__badge">{node.meta}</span>
+                                ) : null}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+                    </section>
+                  )
+                })}
+              </div>
+            </div>
+          ) : null}
+
+          {/* ================================================================
+              VIEW 2: CARDS (Route Specification Cards by Subsystem)
+              ================================================================ */}
+          {filteredSubsystems.length > 0 && viewMode === 'cards' ? (
+            <div className="ia-cards-view">
+              {filteredSubsystems.map((sub) => (
+                <section
+                  key={sub.id}
+                  className="ia-cards-group"
+                  data-accent={sub.accent}
+                  aria-labelledby={`cards-group-${sub.id}`}
+                >
+                  <header className="ia-cards-group__head">
+                    <div className="ia-cards-group__title-row">
+                      <span className="ia-cards-group__code">
+                        {sub.code} / {sub.kicker}
+                      </span>
+                      <h2 id={`cards-group-${sub.id}`} className="ia-cards-group__title">
+                        {sub.title}
+                      </h2>
+                    </div>
+                    <span className="ia-cards-group__count">
+                      {sub.nodes.length} {sub.nodes.length === 1 ? 'node' : 'nodes'}
+                    </span>
+                  </header>
+
+                  <ul className="ia-spec-grid">
+                    {sub.nodes.map((node) => (
+                      <li key={`${sub.id}:${node.path}`} className="ia-spec-grid__item">
+                        <article className="ia-spec-card" data-kind={node.kind}>
+                          <Link href={node.href} className="ia-spec-card__link">
+                            <span className="ia-spec-card__top">
+                              <code className="ia-spec-card__path">{node.path}</code>
+                              <span className="ia-spec-card__status">{node.status}</span>
+                            </span>
+                            <WireframeBars kind={node.kind} />
+                            <h3 className="ia-spec-card__title">{node.title}</h3>
+                            <p className="ia-spec-card__desc">{node.description}</p>
+                            <span className="ia-spec-card__foot">
+                              <span className="ia-spec-card__kind">{node.kind}</span>
+                              {node.meta ? (
+                                <span className="ia-spec-card__meta">{node.meta}</span>
+                              ) : null}
+                              <ArrowUpRight
+                                size={15}
+                                aria-hidden
+                                className="ia-spec-card__arrow"
+                              />
+                            </span>
+                          </Link>
+                        </article>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ))}
+            </div>
+          ) : null}
+
+          {/* ================================================================
+              VIEW 3: INDEX (Compact Route Specification Ledger)
+              ================================================================ */}
+          {filteredSubsystems.length > 0 && viewMode === 'index' ? (
+            <div className="ia-index-view">
+              <div className="ia-index-head" aria-hidden="true">
+                <span>Route Path</span>
+                <span>Surface Title &amp; Specification</span>
+                <span>Subsystem</span>
+                <span>Status</span>
+                <span>Action</span>
+              </div>
+              {filteredSubsystems.map((sub) => (
+                <div key={sub.id} className="ia-index-section">
+                  {sub.nodes.map((node) => (
+                    <div key={`${sub.id}:${node.path}`} className="ia-index-row">
+                      <div className="ia-index-row__route">
+                        <Link href={node.href} className="ia-index-row__path-link">
+                          <code>{node.path}</code>
+                        </Link>
+                      </div>
+                      <div className="ia-index-row__main">
+                        <Link href={node.href} className="ia-index-row__title">
+                          {node.title}
+                        </Link>
+                        <p className="ia-index-row__desc">{node.description}</p>
+                      </div>
+                      <div className="ia-index-row__sub">
+                        <span className="ia-index-row__sub-badge">{sub.title}</span>
+                      </div>
+                      <div className="ia-index-row__status">
+                        <span className="ia-node__status">{node.status}</span>
+                      </div>
+                      <div className="ia-index-row__actions">
+                        <CopyEndpointButton path={node.path} />
+                        <Link
+                          href={node.href}
+                          className="ia-index-row__open"
+                          aria-label={`Open ${node.title}`}
+                        >
+                          <ArrowUpRight size={14} aria-hidden />
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      </section>
+
+      {/* ====================================================================
+          01 ARCHITECTURAL TAXONOMY — SIX CORE SUBSYSTEMS AT A GLANCE
+          ==================================================================== */}
+      <section className="ia-taxonomy" aria-labelledby="ia-taxonomy-heading">
+        <div className="container-content">
+          <header className="ia-taxonomy__header">
+            <p className="ia-taxonomy__eyebrow">
+              <span className="ia-taxonomy__num">01</span>
+              <span>ARCHITECTURAL TAXONOMY</span>
             </p>
-            <button type="button" className="route-empty__reset" onClick={() => setQuery('')}>
-              Back to the trailhead
-            </button>
+            <h2 id="ia-taxonomy-heading" className="ia-taxonomy__title">
+              Six Core Subsystems at a Glance
+            </h2>
+            <p className="ia-taxonomy__lead">
+              Each module operates autonomously yet routes expedition discovery, landscape taxonomy,
+              and field notes into one cohesive platform architecture.
+            </p>
+          </header>
+
+          <div className="ia-taxonomy__grid">
+            {subsystems.map((sub) => {
+              const previewNodes = sub.nodes.slice(0, 4)
+              const overflowCount = Math.max(0, sub.nodes.length - previewNodes.length)
+              const isSelected = activeSubsystem === sub.id
+
+              return (
+                <article
+                  key={sub.id}
+                  className="ia-tax-card"
+                  data-accent={sub.accent}
+                  data-active={isSelected ? 'true' : undefined}
+                >
+                  <div className="ia-tax-card__meta">
+                    <span className="ia-tax-card__kicker">
+                      {sub.code} / {sub.kicker}
+                    </span>
+                    <span className="ia-tax-card__count">
+                      {sub.nodes.length} {sub.nodes.length === 1 ? 'node' : 'nodes'}
+                    </span>
+                  </div>
+
+                  <h3 className="ia-tax-card__title">{sub.title}</h3>
+                  <p className="ia-tax-card__desc">{sub.description}</p>
+
+                  <ul className="ia-tax-card__routes">
+                    {previewNodes.map((node) => (
+                      <li key={node.path} className="ia-tax-card__route-item">
+                        <Link href={node.href} className="ia-tax-card__route-link">
+                          <span className="ia-tax-card__route-name">{node.title}</span>
+                          <code className="ia-tax-card__route-path">{node.path}</code>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {overflowCount > 0 ? (
+                    <p className="ia-tax-card__more">
+                      {`+ ${overflowCount} more ${overflowCount === 1 ? 'endpoint' : 'endpoints'}`}
+                    </p>
+                  ) : null}
+
+                  <div className="ia-tax-card__footer">
+                    <button
+                      type="button"
+                      className="ia-tax-card__filter-btn"
+                      onClick={() => focusSubsystem(sub.id)}
+                    >
+                      <span>
+                        {isSelected ? 'Filtered in map above' : 'Filter this subsystem'}
+                      </span>
+                      <ArrowUpRight size={14} aria-hidden />
+                    </button>
+                  </div>
+                </article>
+              )
+            })}
           </div>
-        ) : null}
-      </div>
-    </div>
+        </div>
+      </section>
+    </>
   )
 }

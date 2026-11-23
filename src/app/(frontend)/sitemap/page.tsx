@@ -1,14 +1,17 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowRight, Footprints } from 'lucide-react'
+import { ArrowUpRight, FileCode2, FileText, Rss } from 'lucide-react'
 
 import { Breadcrumbs } from '@/components/sections/breadcrumbs'
-import { JsonLd } from '@/components/seo/json-ld'
-import { SitemapGuide, type SitemapLayer, type SitemapLayerKind, type SitemapRow } from '@/components/sections/sitemap-guide'
-import { SitemapProfile, type ProfilePoint } from '@/components/sections/sitemap-profile'
+import {
+  SitemapGuide,
+  type SitemapNode,
+  type SitemapSubsystem,
+} from '@/components/sections/sitemap-guide'
 import { Topography } from '@/components/sections/topography'
+import { JsonLd } from '@/components/seo/json-ld'
 import { sitePath } from '@/i18n/config'
-import { getChartSources, getSettings } from '@/lib/data'
+import { getChartSources, getSettings, type ChartSources } from '@/lib/data'
 import { PLACE_INDEX_PATH, placeCategories, placeCategoryPath } from '@/lib/place-categories'
 import { breadcrumbJsonLd, buildMetadata, webPageJsonLd } from '@/lib/seo'
 
@@ -17,13 +20,13 @@ import './sitemap.css'
 export const revalidate = 3600
 
 const DESCRIPTION =
-  'Every page on Hike Globally — the circuit, the nine landscapes, the landing pages and the summit register — paced out waypoint by waypoint, with the altitude at each stop.'
+  'Full-funnel structural blueprint of Hike Globally. Interactive node architecture, wireframe topology, route specifications, and machine feeds for every production surface.'
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings()
 
   return buildMetadata({
-    title: 'Sitemap',
+    title: 'Visual Sitemap & Information Flow',
     description: DESCRIPTION,
     path: sitePath('/sitemap'),
     image: settings.defaultOgImage,
@@ -31,327 +34,370 @@ export async function generateMetadata(): Promise<Metadata> {
   })
 }
 
-/* -------------------------------------------------------------------------- */
-/* The route — the whole site paced out as one waymarked climb: every row      */
-/* carries its altitude, the four layers are the camps along the ridge.        */
-/* -------------------------------------------------------------------------- */
+function buildSubsystems(chart: ChartSources, siteName: string): {
+  rootNode: SitemapNode
+  subsystems: SitemapSubsystem[]
+} {
+  const rootNode: SitemapNode = {
+    title: `${siteName} Home`,
+    href: sitePath('/'),
+    path: '/',
+    description: 'Primary platform root — featured expeditions, nine landscapes, regional guides, and field notes.',
+    status: '200',
+    kind: 'root',
+  }
 
-const pad = (value: number) => String(value).padStart(2, '0')
-const formatElevation = (value: number) => value.toLocaleString('en-US')
-
-/** Altitude (metres) assigned to the ten fixed circuit stops, bottom to top. */
-const CIRCUIT_ELEVATIONS = [1420, 1665, 1890, 2125, 2245, 2315, 2410] as const
-
-/** Altitude per landscape, in the fixed Browse Places order. */
-const LANDSCAPE_ELEVATIONS: Record<string, number> = {
-  lakes: 2620,
-  waterfalls: 2740,
-  'mountain-passes': 2955,
-  canyons: 3080,
-  'base-camps': 3325,
-  caves: 3490,
-  'bike-tours': 3620,
-  'mountain-peaks': 3875,
-  temples: 3995,
-}
-
-const LEDGER_BASE_ELEVATION = 4150
-const LEDGER_STEP = 60
-const REGISTER_FLOOR = 4480
-
-/** The circuit: the front doors of the site, in the order a visitor would walk them. */
-function circuitRows(chart: Awaited<ReturnType<typeof getChartSources>>): SitemapRow[] {
-  const rows = [
+  /* 01 — Core & Brand */
+  const coreNodes: SitemapNode[] = [
+    rootNode,
     {
-      title: 'Home',
-      href: '/',
-      path: '/',
-      description: 'The front door — the trip carousel, the nine landscapes, the journal and the ask.',
+      title: 'Contact & Trip Enquiry',
+      href: sitePath('/contact'),
+      path: '/contact',
+      description: 'Direct expedition desk for custom dates, route planning, and group enquiries.',
+      status: '200',
+      kind: 'hub',
     },
     {
-      title: 'Trips',
-      href: '/trips',
+      title: 'About — Expedition Credo',
+      href: sitePath('/about'),
+      path: '/about',
+      description: 'Who stands behind Hike Globally and how Himalayan and global treks are curated.',
+      status: '200',
+      kind: 'endpoint',
+    },
+    ...chart.pages.map(
+      (page): SitemapNode => ({
+        title: page.title,
+        href: sitePath(`/${page.slug}`),
+        path: sitePath(`/${page.slug}`),
+        description: page.summary ?? 'Published CMS landing surface.',
+        status: '200',
+        kind: 'endpoint',
+        meta: page.meta ?? undefined,
+      }),
+    ),
+  ]
+
+  /* 02 — Trips & Expeditions */
+  const tripNodes: SitemapNode[] = [
+    {
+      title: 'Trips & Expeditions Hub',
+      href: sitePath('/trips'),
       path: '/trips',
-      description: 'Every itinerary, from the Khumbu to Dolpo.',
+      description: 'Complete expedition catalog with multi-axis filters for difficulty, region, and duration.',
+      status: '200',
+      kind: 'hub',
       meta: chart.trips ? `${chart.trips} published` : undefined,
     },
+    ...chart.tripNodes.map(
+      (trip): SitemapNode => ({
+        title: trip.title,
+        href: sitePath(`/trips/${trip.slug}`),
+        path: sitePath(`/trips/${trip.slug}`),
+        description: trip.summary ?? 'Full itinerary, altitude profile, departures, and packing list.',
+        status: '200',
+        kind: 'endpoint',
+        meta: trip.meta ?? undefined,
+      }),
+    ),
+  ]
+
+  /* 03 — Browse Places (Landscapes) */
+  const placeNodes: SitemapNode[] = [
     {
-      title: 'Destinations',
-      href: '/destinations',
-      path: '/destinations',
-      description: 'Guides to the mountain regions those trips cross.',
-      meta: chart.destinations ? `${chart.destinations} regions` : undefined,
-    },
-    {
-      title: 'Browse places',
+      title: 'Browse Places Parent Hub',
       href: PLACE_INDEX_PATH,
       path: PLACE_INDEX_PATH,
-      description: 'Nine landscapes, nine ways to choose a journey.',
+      description: 'Cross-cutting terrain taxonomy indexing nine distinct natural and cultural features.',
+      status: '200',
+      kind: 'hub',
       meta: '9 landscapes',
     },
+    ...placeCategories.map((category): SitemapNode => {
+      const count = chart.placeCounts[category.value] ?? 0
+      return {
+        title: category.label,
+        href: placeCategoryPath(category.value),
+        path: placeCategoryPath(category.value),
+        description: category.description,
+        status: '200',
+        kind: 'endpoint',
+        meta: count > 0 ? `${count} tagged` : undefined,
+      }
+    }),
+  ]
+
+  /* 04 — Destinations & Regions */
+  const destinationNodes: SitemapNode[] = [
     {
-      title: 'Journal',
-      href: '/blog',
+      title: 'Destinations Parent Hub',
+      href: sitePath('/destinations'),
+      path: '/destinations',
+      description: 'Regional geography guides covering Himalayan valleys and international trekking zones.',
+      status: '200',
+      kind: 'hub',
+      meta: chart.destinations ? `${chart.destinations} regions` : undefined,
+    },
+    ...chart.destinationNodes.map(
+      (dest): SitemapNode => ({
+        title: dest.title,
+        href: sitePath(`/destinations/${dest.slug}`),
+        path: sitePath(`/destinations/${dest.slug}`),
+        description: dest.summary ?? 'Regional overview, climate windows, and linked itineraries.',
+        status: '200',
+        kind: 'endpoint',
+        meta: dest.meta ?? undefined,
+      }),
+    ),
+  ]
+
+  /* 05 — Journal & Field Guides */
+  const journalNodes: SitemapNode[] = [
+    {
+      title: 'Journal — Field Notes Hub',
+      href: sitePath('/blog'),
       path: '/blog',
-      description:
-        'Field notes, packing lists and hard-won advice from guides who spend 200 days a year on the trail.',
+      description: 'Technical trekking guides, altitude protocols, packing checklists, and trail dispatches.',
+      status: '200',
+      kind: 'hub',
       meta: chart.posts ? `${chart.posts} articles` : undefined,
     },
     {
-      title: 'Plan your trip',
-      href: '/contact',
-      path: '/contact',
-      description:
-        'The enquiry desk — dates, budgets and custom routes, answered in a working day.',
+      title: 'Authors & Mountain Guides Hub',
+      href: sitePath('/authors'),
+      path: '/authors',
+      description: 'Verified profile directory of expedition writers, trail specialists, and mountain guides.',
+      status: '200',
+      kind: 'hub',
+      meta: chart.authorNodes.length ? `${chart.authorNodes.length} profiles` : undefined,
     },
-    {
-      title: 'About',
-      href: '/about',
-      path: '/about',
-      description: 'Who is behind the trips and how they are run.',
-    },
+    ...chart.postNodes.map(
+      (post): SitemapNode => ({
+        title: post.title,
+        href: sitePath(`/blog/${post.slug}`),
+        path: sitePath(`/blog/${post.slug}`),
+        description: post.summary ?? 'Editorial field report and trail guidance.',
+        status: '200',
+        kind: 'endpoint',
+        meta: post.meta ?? undefined,
+      }),
+    ),
+    ...chart.authorNodes.map(
+      (author): SitemapNode => ({
+        title: author.title,
+        href: sitePath(`/authors/${author.slug}`),
+        path: sitePath(`/authors/${author.slug}`),
+        description: author.summary ?? 'Author credentials and published trail dispatches.',
+        status: '200',
+        kind: 'endpoint',
+        meta: author.meta ?? undefined,
+      }),
+    ),
   ]
 
-  return rows.map((row, index) => ({ ...row, elevation: CIRCUIT_ELEVATIONS[index] }))
-}
-
-/** The landscapes: the nine Browse Places collections, in their fixed order. */
-function landscapeRows(chart: Awaited<ReturnType<typeof getChartSources>>): SitemapRow[] {
-  return placeCategories.map((category) => {
-    const tagged = chart.placeCounts[category.value] ?? 0
-    return {
-      title: category.label,
-      href: placeCategoryPath(category.value),
-      path: placeCategoryPath(category.value),
-      description: category.description,
-      meta: tagged ? `${tagged} journey${tagged === 1 ? '' : 's'}` : undefined,
-      elevation: LANDSCAPE_ELEVATIONS[category.value] ?? 3200,
-      image: { src: category.image, alt: category.alt },
-    }
-  })
-}
-
-/** The ledger: CMS landing pages beyond the main circuit, straight from the CMS. */
-function ledgerRows(chart: Awaited<ReturnType<typeof getChartSources>>): SitemapRow[] {
-  return chart.pages.map((page, index) => ({
-    title: page.title,
-    href: sitePath(`/${page.slug}`),
-    path: sitePath(`/${page.slug}`),
-    description: page.summary ?? 'A landing page in the CMS.',
-    elevation: LEDGER_BASE_ELEVATION + index * LEDGER_STEP,
-  }))
-}
-
-/** The register: the machine-readable edges and the two fine-print pages. */
-function recordRows(ledgerCount: number): SitemapRow[] {
-  const base = Math.max(REGISTER_FLOOR, LEDGER_BASE_ELEVATION + ledgerCount * LEDGER_STEP + 30)
-  return [
+  /* 06 — Governance & Protocols */
+  const governanceNodes: SitemapNode[] = [
     {
-      title: 'Sitemap',
-      href: '/sitemap.xml',
-      path: '/sitemap.xml',
-      description: 'Every public URL on the site, with the last modification date and media.',
-      meta: 'XML',
-      elevation: base,
-    },
-    {
-      title: 'Robots',
-      href: '/robots.txt',
-      path: '/robots.txt',
-      description: 'The crawl rules — what engines may follow, and what stays off the chart.',
-      meta: 'TXT',
-      elevation: base + 95,
-    },
-    {
-      title: 'RSS feed',
-      href: '/feed.xml',
-      path: '/feed.xml',
-      description: 'Field notes in a drop — the journal, as it is published.',
-      meta: 'RSS',
-      elevation: base + 105,
-    },
-    {
-      title: 'llms.txt',
-      href: '/llms.txt',
-      path: '/llms.txt',
-      description: 'The site described to a language model — trips, regions, journal and pages.',
-      meta: 'MD',
-      elevation: base + 130,
-    },
-    {
-      title: 'Privacy',
-      href: '/privacy',
+      title: 'Privacy Policy',
+      href: sitePath('/privacy'),
       path: '/privacy',
-      description: 'What this site collects, and why.',
+      description: 'Data stewardship, enquiry handling, analytics disclosures, and traveller privacy rights.',
+      status: '200',
+      kind: 'endpoint',
       meta: 'HTML',
-      elevation: base + 410,
     },
     {
-      title: 'Terms',
-      href: '/terms',
+      title: 'Terms & Conditions',
+      href: sitePath('/terms'),
       path: '/terms',
-      description: 'The terms that apply to bookings and use of the site.',
+      description: 'Platform terms of use, affiliate booking disclosures, and expedition guidance.',
+      status: '200',
+      kind: 'endpoint',
       meta: 'HTML',
-      elevation: base + 880,
+    },
+    {
+      title: 'Visual Sitemap & Information Flow',
+      href: sitePath('/sitemap'),
+      path: '/sitemap',
+      description: 'Interactive structural blueprint, wireframe topology, and route index.',
+      status: '200',
+      kind: 'hub',
+      meta: 'IA MAP',
     },
   ]
-}
 
-/** The camps, in walking order — the profile, the rail and the sections all read from this one shape. */
-type Camp = {
-  id: string
-  kicker: string
-  title: string
-  note: string
-  kind: SitemapLayerKind
-  campLabel: string
-  emptyNote?: string
-  rows: SitemapRow[]
+  const subsystems: SitemapSubsystem[] = [
+    {
+      id: 'core',
+      code: '01',
+      kicker: 'Root & Direction',
+      title: 'Core & Brand',
+      description:
+        'The flagship entry points: the primary platform root, expedition credo, direct enquiry routing, and CMS landing surfaces.',
+      accent: 'ink',
+      nodes: coreNodes,
+    },
+    {
+      id: 'trips',
+      code: '02',
+      kicker: 'Expedition Catalog',
+      title: 'Trips & Expeditions',
+      description:
+        'Structured multi-day trekking itineraries wired with altitude profiles, departure calendars, and route specifications.',
+      accent: 'sage',
+      nodes: tripNodes,
+    },
+    {
+      id: 'places',
+      code: '03',
+      kicker: 'Terrain Specializations',
+      title: 'Browse Places',
+      description:
+        'Nine cross-cutting geographical archetypes—from glacial lakes to high passes—connecting trips and field dispatches.',
+      accent: 'deep',
+      nodes: placeNodes,
+    },
+    {
+      id: 'destinations',
+      code: '04',
+      kicker: 'Mountain Locales',
+      title: 'Regional Operations',
+      description:
+        'Himalayan valleys and international mountain corridors with dedicated regional overviews and linked routes.',
+      accent: 'haze',
+      nodes: destinationNodes,
+    },
+    {
+      id: 'journal',
+      code: '05',
+      kicker: 'Publications & Guides',
+      title: 'Journal & Authors',
+      description:
+        'Field notes, acclimatization checklists, gear essays, and verified guide profiles filed from the trail.',
+      accent: 'slate',
+      nodes: journalNodes,
+    },
+    {
+      id: 'governance',
+      code: '06',
+      kicker: 'Legal Frameworks',
+      title: 'Governance & Trust',
+      description:
+        'Transparent traveller privacy standards, platform terms of engagement, and this interactive architecture map.',
+      accent: 'ink',
+      nodes: governanceNodes,
+    },
+  ]
+
+  return { rootNode, subsystems }
 }
 
 export default async function SitemapPage() {
   const [chart, settings] = await Promise.all([getChartSources(), getSettings()])
-
-  const circuit = circuitRows(chart)
-  const landscapes = landscapeRows(chart)
-  const ledger = ledgerRows(chart)
-  const records = recordRows(ledger.length)
-
-  const camps: Camp[] = [
-    {
-      id: 'circuit',
-      kicker: 'CAMP 01',
-      title: 'The circuit',
-      note: 'The front doors of the site, in the order a visitor would walk them — the trailhead every route starts from.',
-      kind: 'trailheads',
-      campLabel: 'THE CIRCUIT',
-      rows: circuit,
-    },
-    {
-      id: 'landscapes',
-      kicker: 'CAMP 02',
-      title: 'Nine benches',
-      note: 'The nine Browse Places collections — the features every trip and article can carry, one contour bench at a time.',
-      kind: 'benches',
-      campLabel: 'THE LANDSCAPES',
-      rows: landscapes,
-    },
-    {
-      id: 'ledger',
-      kicker: 'CAMP 03',
-      title: 'The ledger',
-      note: 'The landing pages the CMS keeps beyond the main circuit — surveyed straight from the CMS at build time.',
-      kind: 'ledger',
-      campLabel: 'THE LEDGER',
-      emptyNote: 'This leaf of the ledger is still blank — it fills in as the CMS publishes landing pages.',
-      rows: ledger,
-    },
-    {
-      id: 'records',
-      kicker: 'CAMP 04',
-      title: 'The summit register',
-      note: 'The machine-readable edges of the site and the two fine-print pages — sign your name on the way down.',
-      kind: 'register',
-      campLabel: 'THE REGISTER',
-      rows: records,
-    },
-  ]
-
-  const layers: SitemapLayer[] = camps.map(({ campLabel: _campLabel, ...layer }) => layer)
-
-  /* The hero profile plots every waypoint in walking order, camp by camp. */
-  const profilePoints: ProfilePoint[] = camps.flatMap((camp) =>
-    camp.rows.map((row, index) => ({
-      title: row.title,
-      href: row.href,
-      path: row.path,
-      elevation: row.elevation,
-      camp: index === 0 ? camp.campLabel : undefined,
-    })),
-  )
-
-  const totalRows = layers.reduce((sum, layer) => sum + layer.rows.length, 0)
-  const summit = profilePoints.length ? profilePoints[profilePoints.length - 1].elevation : 0
   const siteName = settings.siteName ?? 'Hike Globally'
+  const { rootNode, subsystems } = buildSubsystems(chart, siteName)
+
+  const allNodes = subsystems.flatMap((sub) => sub.nodes)
+  const indexedNodesCount = allNodes.length
+  const hubRootsCount = allNodes.filter((node) => node.kind === 'root' || node.kind === 'hub').length
+  const endpointCount = allNodes.length - hubRootsCount
+  const syncDate = chart.lastSyncedAt ? chart.lastSyncedAt.slice(0, 10) : 'live'
 
   return (
     <div className="sitemap-page">
-      <section className="sitemap-hero" data-header-hero aria-labelledby="sitemap-title">
-        <Topography className="sitemap-hero__topography" />
+      {/* ====================================================================
+          HERO — ARCHITECTURAL BLUEPRINT HEADER
+          ==================================================================== */}
+      <section className="ia-hero" data-header-hero aria-labelledby="sitemap-title">
+        <Topography className="ia-hero__topography" />
 
-        <div className="container-content sitemap-hero__inner">
+        <div className="container-content ia-hero__inner">
           <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Sitemap' }]} />
 
-          <p className="sitemap-hero__eyebrow">
-            <span aria-hidden>Waymarked route — Sitemap</span>
-            <span className="sitemap-hero__eyebrow-coord">27.9881° N · 86.9250° E</span>
-          </p>
+          <div className="ia-hero__badges">
+            <span className="ia-badge ia-badge--code">
+              HG-MAP-01 · Visual IA Map <span aria-hidden="true">{'//'}</span> Blueprint Grade
+            </span>
+            <span className="ia-badge ia-badge--sync">
+              <span className="ia-badge__dot" aria-hidden="true" />
+              Live Architecture Sync <span aria-hidden="true">{'//'}</span> auto-synced {syncDate}
+            </span>
+          </div>
 
-          <h1 id="sitemap-title" className="sitemap-hero__title">
-            Every trail on the site,<br />
-            <em>paced out.</em>
+          <h1 id="sitemap-title" className="ia-hero__title">
+            Visual Sitemap &amp; <em>Information Flow</em>
           </h1>
 
-          <p className="sitemap-hero__lead">
-            From the front door to the summit register — everything {siteName} publishes, paced out
-            waypoint by waypoint, altitude and path included.
+          <p className="ia-hero__lead">
+            Full-funnel structural blueprint of {siteName}. Interactive node architecture, wireframe
+            topology, route specifications, and machine feeds for every production surface.
           </p>
 
-          <dl className="sitemap-hero__stats">
-            <div className="sitemap-hero__stat">
-              <dt className="sitemap-hero__stat-value">{totalRows}</dt>
-              <dd className="sitemap-hero__stat-label">waypoints</dd>
+          <dl className="ia-hero__metrics">
+            <div className="ia-metric">
+              <dt className="ia-metric__label">Indexed Nodes</dt>
+              <dd className="ia-metric__value">{indexedNodesCount}</dd>
             </div>
-            <div className="sitemap-hero__stat">
-              <dt className="sitemap-hero__stat-value">9</dt>
-              <dd className="sitemap-hero__stat-label">landscape benches</dd>
+            <div className="ia-metric">
+              <dt className="ia-metric__label">Hub Roots</dt>
+              <dd className="ia-metric__value">{hubRootsCount}</dd>
             </div>
-            <div className="sitemap-hero__stat">
-              <dt className="sitemap-hero__stat-value">{formatElevation(summit)}</dt>
-              <dd className="sitemap-hero__stat-label">m to the register</dd>
+            <div className="ia-metric">
+              <dt className="ia-metric__label">Route Endpoints</dt>
+              <dd className="ia-metric__value">{endpointCount}</dd>
+            </div>
+            <div className="ia-metric">
+              <dt className="ia-metric__label">Core Subsystems</dt>
+              <dd className="ia-metric__value">{subsystems.length}</dd>
             </div>
           </dl>
         </div>
-
-        <div className="container-content sitemap-hero__profile-block">
-          <div className="sitemap-hero__profile-caption">
-            <p className="sitemap-hero__profile-title">
-              <Footprints size={14} aria-hidden />
-              The route at a glance
-            </p>
-            <p className="sitemap-hero__profile-note">
-              Every waypoint is a live link · altitude in metres · profile not to scale
-            </p>
-          </div>
-          <div className="sitemap-hero__profile-scroll">
-            <SitemapProfile points={profilePoints} />
-          </div>
-        </div>
-
-        <div className="container-content sitemap-hero__bottom">
-          <span>{siteName.toUpperCase()} · NEPAL</span>
-          <span aria-hidden>ROUTE / SITEMAP — CHART 01 · {pad(totalRows)} WAYPOINTS</span>
-        </div>
       </section>
 
-      <SitemapGuide layers={layers} />
+      {/* ====================================================================
+          INTERACTIVE EXPLORER + 01 ARCHITECTURAL TAXONOMY
+          ==================================================================== */}
+      <SitemapGuide subsystems={subsystems} rootNode={rootNode} />
 
-      <section className="sitemap-cta" aria-labelledby="sitemap-cta-heading">
-        <div className="container-content sitemap-cta__inner">
-          <div className="sitemap-cta__copy">
-            <p className="sitemap-cta__eyebrow">Off the route</p>
-            <h2 id="sitemap-cta-heading" className="sitemap-cta__title">
-              Need something <em>off the route?</em>
+      {/* ====================================================================
+          CRAWLER & ENGINE DISTRIBUTION — PROTOCOL FEEDS
+          ==================================================================== */}
+      <section className="ia-protocol" aria-labelledby="ia-protocol-heading">
+        <div className="container-content ia-protocol__inner">
+          <div className="ia-protocol__copy">
+            <p className="ia-protocol__eyebrow">Crawler &amp; Engine Distribution</p>
+            <h2 id="ia-protocol-heading" className="ia-protocol__title">
+              Engine Protocol &amp; Sitemap XML Feed
             </h2>
-            <p className="sitemap-cta__text">
-              The enquiry desk takes one working day. Tell us the route you are dreaming of — we
-              will map it, or tell you how to get there yourself.
+            <p className="ia-protocol__desc">
+              Automated search engines and LLM crawlers query the production-ready machine feeds.
+              Contains strictly indexable canonical targets with verified modification timestamps
+              and structured media. Excluded drafts and filtered archives stay dark.
             </p>
           </div>
-          <Link href="/contact" className="sitemap-cta__button">
-            Enquire about a route
-            <ArrowRight size={16} aria-hidden />
-          </Link>
+
+          <div className="ia-protocol__actions">
+            <a href="/sitemap.xml" className="ia-protocol__btn ia-protocol__btn--primary">
+              <FileCode2 size={16} aria-hidden />
+              <span>Raw sitemap.xml</span>
+              <ArrowUpRight size={15} aria-hidden />
+            </a>
+            <a href="/feed.xml" className="ia-protocol__btn ia-protocol__btn--secondary">
+              <Rss size={16} aria-hidden />
+              <span>RSS Telemetry Feed</span>
+              <ArrowUpRight size={15} aria-hidden />
+            </a>
+            <a href="/llms.txt" className="ia-protocol__btn ia-protocol__btn--secondary">
+              <FileText size={16} aria-hidden />
+              <span>LLM Index (llms.txt)</span>
+              <ArrowUpRight size={15} aria-hidden />
+            </a>
+            <Link href="/contact" className="ia-protocol__cta-link">
+              <span>Need a custom route? Contact the expedition desk</span>
+              <ArrowUpRight size={14} aria-hidden />
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -363,11 +409,15 @@ export default async function SitemapPage() {
           ]),
           webPageJsonLd({
             type: 'CollectionPage',
-            name: 'Sitemap',
+            name: 'Visual Sitemap & Information Flow',
             description: DESCRIPTION,
             url: sitePath('/sitemap'),
             siteName: settings.siteName,
             image: settings.defaultOgImage,
+            items: allNodes.map((node) => ({
+              name: node.title,
+              url: node.href,
+            })),
           }),
         ]}
       />
