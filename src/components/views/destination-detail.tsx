@@ -17,7 +17,9 @@ import { dictionary, plural, type Dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
 import { mapPageUrl, parseCoordinates } from '@/lib/coordinates'
 import type { DestinationCard as DestinationCardData, TripCard as TripCardData } from '@/lib/data'
-import { breadcrumbJsonLd, touristDestinationJsonLd } from '@/lib/seo'
+import { destinationCopyVisibility } from '@/lib/destination-copy'
+import { relatedDestinationsHeading } from '@/lib/related-destinations'
+import { breadcrumbJsonLd, itemListJsonLd, touristDestinationJsonLd } from '@/lib/seo'
 import { landscapesOf } from '@/lib/taxonomy'
 import type { Destination } from '@/payload-types'
 
@@ -53,6 +55,17 @@ export function DestinationDetail({
   // truthiness check dropped any place on the equator or the Greenwich meridian (0 is not "empty").
   const coordinates = parseCoordinates(destination.coordinates)
   const mapUrl = coordinates ? mapPageUrl(coordinates) : null
+
+  // Three CMS fields, one sentence: the live Eastern Nepal page renders its tagline as the hero
+  // lead, as the About body and again under "Getting there". `destinationCopyVisibility` drops
+  // every repeat, so each block renders only when it says something the others do not.
+  const copy = destinationCopyVisibility({
+    tagline: destination.tagline,
+    description: destination.description,
+    gettingThere: destination.gettingThere,
+  })
+  const hasCopyColumn = copy.showDescription || copy.showGettingThere
+  const hasAside = seasons.length > 0 || Boolean(destination.gallery?.length)
 
   return (
     <>
@@ -99,7 +112,7 @@ export function DestinationDetail({
           <h1 className="heading-display hero-title mt-5 max-w-4xl text-white">
             {destination.name}
           </h1>
-          {destination.tagline ? (
+          {copy.showTagline ? (
             <p className="lead hero-description mt-5 max-w-2xl text-mist">{destination.tagline}</p>
           ) : null}
 
@@ -121,25 +134,35 @@ export function DestinationDetail({
       </section>
 
       <section className="py-16 md:py-24">
-        <div className="container-content grid gap-12 lg:grid-cols-[1.6fr_1fr] lg:gap-16">
+        <div
+          className={`container-content grid gap-12 lg:gap-16${
+            hasCopyColumn && hasAside ? ' lg:grid-cols-[1.6fr_1fr]' : ''
+          }`}
+        >
           {/* Destination copy — 17px pure-black running copy (see `.single-page-body`). */}
-          <div className="single-page-body min-w-0">
-            <h2 className="heading-lg">
-              {dict.destinations.about} {destination.name}
-            </h2>
-            <div className="mt-6">
-              <RichText content={destination.description} linker={linker} />
-            </div>
+          {hasCopyColumn ? (
+            <div className="single-page-body min-w-0">
+              {copy.showDescription ? (
+                <>
+                  <h2 className="heading-lg">
+                    {dict.destinations.about} {destination.name}
+                  </h2>
+                  <div className="mt-6">
+                    <RichText content={destination.description} linker={linker} />
+                  </div>
+                </>
+              ) : null}
 
-            {destination.gettingThere ? (
-              <div className="mt-12">
-                <h3 className="heading-md">{dict.destinations.gettingThere}</h3>
-                <div className="mt-5">
-                  <RichText content={destination.gettingThere} linker={linker} />
+              {copy.showGettingThere ? (
+                <div className={copy.showDescription ? 'mt-12' : undefined}>
+                  <h3 className="heading-md">{dict.destinations.gettingThere}</h3>
+                  <div className="mt-5">
+                    <RichText content={destination.gettingThere} linker={linker} />
+                  </div>
                 </div>
-              </div>
-            ) : null}
-          </div>
+              ) : null}
+            </div>
+          ) : null}
 
           <aside className="space-y-8 lg:sticky lg:top-28 lg:self-start">
             {seasons.length ? (
@@ -222,7 +245,9 @@ export function DestinationDetail({
       {otherDestinations.length ? (
         <section className="py-16 md:py-24">
           <div className="container-content">
-            <h2 className="heading-lg mb-10">More trekking regions</h2>
+            {/* Follows what the rail actually holds: continents on a continent page, regions on a
+                region page. See `relatedDestinationsHeading`. */}
+            <h2 className="heading-lg mb-10">{relatedDestinationsHeading(destination)}</h2>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
               {otherDestinations.map((destinationItem, index) => (
                 <Reveal key={destinationItem.id} delay={index * 70}>
@@ -247,6 +272,21 @@ export function DestinationDetail({
             // The Media document, not its `url` — `schemaImageUrl()` resolves the absolute URL.
             image: destination.heroImage,
           }),
+          // The trips section as an explicit list, so the page's own structure is stated rather
+          // than left to be inferred from card markup.
+          ...(trips.length
+            ? [
+                itemListJsonLd({
+                  name: `${dict.destinations.tripsHere} ${destination.name}`,
+                  url: sitePath(`/destinations/${destination.slug}`),
+                  items: trips.map((trip) => ({
+                    name: trip.title,
+                    url: sitePath(`/trips/${trip.slug}`),
+                    description: trip.summary,
+                  })),
+                }),
+              ]
+            : []),
         ]}
       />
     </>

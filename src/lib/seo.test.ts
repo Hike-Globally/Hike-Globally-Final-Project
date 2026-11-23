@@ -24,6 +24,7 @@ const {
   buildMetadata,
   canonicalPath,
   canonicalUrl,
+  metaTitleOrFallback,
   normalizeKeywords,
   schemaImageUrl,
   seoFromDoc,
@@ -406,4 +407,52 @@ test('already branded metadata titles bypass the parent title template', () => {
   assert.deepEqual(buildMetadata({ title: 'Trails | HIKE GLOBALLY', path: '/trips' }).title, { absolute: 'Trails | HIKE GLOBALLY' })
   assert.equal(buildMetadata({ title: 'Trails', path: '/trips' }).title, 'Trails')
   assert.deepEqual(buildMetadata({ title: 'Trails · Custom Brand', siteName: 'Custom Brand', path: '/trips' }).title, { absolute: 'Trails · Custom Brand' })
+})
+
+test('a meta title that is only the subject falls back to the keyword title', () => {
+  const fallback = 'Eastern Nepal — trekking region'
+
+  // The live defect: the editor typed the destination's name into the SEO panel.
+  assert.equal(metaTitleOrFallback('Eastern Nepal', fallback, { subject: 'Eastern Nepal' }), fallback)
+  assert.equal(metaTitleOrFallback('eastern nepal', fallback, { subject: 'Eastern Nepal' }), fallback)
+  assert.equal(
+    metaTitleOrFallback('Eastern Nepal: Hike Globally', fallback, { subject: 'Eastern Nepal' }),
+    fallback,
+  )
+  assert.equal(
+    metaTitleOrFallback('Hike Globally — Eastern Nepal', fallback, { subject: 'Eastern Nepal' }),
+    fallback,
+  )
+  assert.equal(metaTitleOrFallback('   ', fallback, { subject: 'Eastern Nepal' }), fallback)
+  assert.equal(metaTitleOrFallback(null, fallback, { subject: 'Eastern Nepal' }), fallback)
+})
+
+test('a meta title that says something is kept verbatim', () => {
+  const fallback = 'Eastern Nepal — trekking region'
+
+  assert.equal(
+    metaTitleOrFallback('Kanchenjunga Base Camp Trek | Eastern Nepal', fallback, { subject: 'Eastern Nepal' }),
+    'Kanchenjunga Base Camp Trek | Eastern Nepal',
+  )
+  assert.equal(
+    metaTitleOrFallback('Eastern Nepal trekking guide', fallback, { subject: 'Eastern Nepal' }),
+    'Eastern Nepal trekking guide',
+  )
+})
+
+test('without a subject the old behaviour is unchanged', () => {
+  assert.equal(metaTitleOrFallback('Override', 'Fallback'), 'Override')
+  assert.equal(metaTitleOrFallback('', 'Fallback'), 'Fallback')
+})
+
+test('seoFromDoc applies the guard only when a subject is supplied', () => {
+  const meta = { title: 'Eastern Nepal' }
+
+  // No subject → the editor's title still wins (trips, posts and pages are unaffected).
+  assert.equal(seoFromDoc({ meta }, { title: 'Fallback' }).title, 'Eastern Nepal')
+  // With the destination as subject → the keyword fallback wins.
+  assert.equal(
+    seoFromDoc({ meta }, { title: 'Eastern Nepal — trekking region', subject: 'Eastern Nepal' }).title,
+    'Eastern Nepal — trekking region',
+  )
 })
