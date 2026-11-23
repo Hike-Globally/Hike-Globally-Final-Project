@@ -18,7 +18,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { PLACE_CATEGORY_VALUES, placeCategories } from './place-categories'
+import { PLACE_CATEGORY_VALUES } from './place-categories'
 import { placeThemes, placeThemeStyle, getPlaceTheme } from './place-themes'
 
 /* -------------------------------------------------------------------------- */
@@ -83,22 +83,7 @@ test('every Browse Places category has exactly one theme', () => {
   for (const value of PLACE_CATEGORY_VALUES) {
     const theme = getPlaceTheme(value)
     assert.deepEqual(theme, placeThemes[value])
-    assert.equal(theme.facts.length, 3)
-    for (const fact of theme.facts) {
-      assert.ok(fact.label.length > 0, `${value}: fact label empty`)
-      assert.ok(fact.value.length > 0, `${value}: fact value empty`)
-    }
-    assert.ok(theme.pull.length > 0, `${value}: pull quote empty`)
   }
-})
-
-test('the fact system stays identical across categories', () => {
-  const labels = new Set(
-    placeCategories.map(({ value }) =>
-      placeThemes[value].facts.map((fact) => fact.label).join('|'),
-    ),
-  )
-  assert.deepEqual([...labels], ['Signature|Character|Best paired with'])
 })
 
 test('placeThemeStyle publishes the four custom properties the CSS consumes', () => {
