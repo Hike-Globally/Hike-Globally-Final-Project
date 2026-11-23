@@ -15,6 +15,7 @@ import { sitePath } from '@/i18n/config'
 import { getDestinationsPage, getSettings, type DestinationCard } from '@/lib/data'
 import { breadcrumbJsonLd, buildMetadata, webPageJsonLd } from '@/lib/seo'
 import { PLACE_INDEX_PATH } from '@/lib/place-categories'
+import { destinationLocationLabel, isWorldDestination } from '@/lib/destination-groups'
 
 import './destinations.css'
 
@@ -53,6 +54,10 @@ export default async function DestinationsPage({ searchParams }: ArchiveProps) {
   const page = parsePage(search.page) ?? notFound()
   const { docs: destinations, totalPages } = await getDestinationsPage(page)
   if (page > 1 && page > totalPages) notFound()
+  const groups = [
+    { title: 'Nepal regions', destinations: destinations.filter((item) => !isWorldDestination(item)) },
+    { title: 'World regions', destinations: destinations.filter(isWorldDestination) },
+  ]
 
   return (
     /* `data-destinations-page` scopes this page's fixed description sizes (see
@@ -142,7 +147,7 @@ export default async function DestinationsPage({ searchParams }: ArchiveProps) {
               <p className="eyebrow">The atlas is taking shape</p>
               <h3 className="heading-md mt-3">No destinations are published just yet.</h3>
               <p className="mx-auto mt-3 max-w-lg description-copy leading-relaxed text-ink-60">
-                Check back soon, or tell us what kind of Himalayan journey you have in mind.
+                Check back soon, or tell us what kind of journey you have in mind.
               </p>
               <Link
                 href={sitePath('/contact')}
@@ -152,11 +157,19 @@ export default async function DestinationsPage({ searchParams }: ArchiveProps) {
               </Link>
             </div>
           ) : (
-            <div className="mt-10 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:mt-12 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-16 3xl:grid-cols-4">
-              {destinations.map((destination, index) => (
-                <Reveal key={destination.id} delay={index * 70}>
-                  <AtlasCard destination={destination} index={(page - 1) * PAGE_SIZE + index} />
-                </Reveal>
+            <div className="space-y-14 mt-10">
+              {groups.map((group) => (
+                <section key={group.title} aria-label={group.title}>
+                  <h3 className="heading-lg">{group.title}</h3>
+                  <p className="mt-2 text-small text-ink-60">{group.destinations.length} {group.destinations.length === 1 ? 'destination' : 'destinations'} on this page</p>
+                  <div className="mt-6 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-16 3xl:grid-cols-4">
+                    {group.destinations.map((destination) => (
+                      <Reveal key={destination.id} delay={destinations.indexOf(destination) * 70}>
+                        <AtlasCard destination={destination} index={(page - 1) * PAGE_SIZE + destinations.indexOf(destination)} />
+                      </Reveal>
+                    ))}
+                  </div>
+                </section>
               ))}
             </div>
           )}
@@ -238,7 +251,7 @@ function AtlasCard({ destination, index }: { destination: DestinationCard; index
           <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 sm:p-6">
             <div>
               <p className="text-label font-medium tracking-[0.15em] text-mist/85 uppercase">
-                {destination.country}
+                {destinationLocationLabel(destination)}
               </p>
               <h3 className="mt-2 font-display text-section font-medium break-words text-white">
                 {destination.name}
@@ -255,7 +268,7 @@ function AtlasCard({ destination, index }: { destination: DestinationCard; index
           </div>
         </div>
         <div className="mt-4 flex items-center justify-between gap-4 border-t border-slate-20 pt-3 text-label font-medium tracking-[0.15em] text-slate-80 uppercase">
-          <span>{destination.country}</span>
+          <span>{destinationLocationLabel(destination)}</span>
           <span className="text-slate-80">Explore region</span>
         </div>
       </Link>

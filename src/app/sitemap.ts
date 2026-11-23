@@ -1,6 +1,9 @@
 import type { MetadataRoute } from 'next'
 
-import { getSitemapSources } from '@/lib/data'
+import { getSitemapSources, getPlaceCategoryContent } from '@/lib/data'
+import { placeCategories, placeCategoryPath } from '@/lib/place-categories'
+import { canonicalUrl } from '@/lib/seo'
+import { hasHubContent } from '@/lib/hub-indexing'
 import { buildSitemap } from '@/lib/sitemap'
 
 /**
@@ -22,5 +25,12 @@ import { buildSitemap } from '@/lib/sitemap'
 export const revalidate = 3600
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  return buildSitemap(await getSitemapSources())
+  const [sources, content] = await Promise.all([
+    getSitemapSources(),
+    Promise.all(placeCategories.map((category) => getPlaceCategoryContent(category.value, 1))),
+  ])
+  const emptyPlaces = new Set(placeCategories.filter((_, index) =>
+    !hasHubContent(content[index]!),
+  ).map((category) => canonicalUrl(placeCategoryPath(category.value))))
+  return buildSitemap(sources).filter((entry) => !emptyPlaces.has(entry.url))
 }

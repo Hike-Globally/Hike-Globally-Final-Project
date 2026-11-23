@@ -17,6 +17,7 @@ import { PayloadImageFill } from '@/components/ui/payload-image'
 import { dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
 import { getPlaceCategoryContent, getSettings } from '@/lib/data'
+import { hasHubContent } from '@/lib/hub-indexing'
 import {
   PLACE_INDEX_PATH,
   getPlaceCategory,
@@ -47,7 +48,7 @@ export async function generateMetadata({
   const category = getPlaceCategory(slug)
   if (!category) notFound()
 
-  const settings = await getSettings()
+  const [settings, content] = await Promise.all([getSettings(), getPlaceCategoryContent(category.value, 1)])
 
   return buildMetadata({
     // Every search-facing string on this page says "landscape": it is one of nine parallel ways
@@ -58,6 +59,8 @@ export async function generateMetadata({
     image: placeCategoryMedia(category),
     path: sitePath(`/places/${slug}`),
     siteName: settings.siteName,
+    noIndex: !hasHubContent(content),
+    follow: true,
   })
 }
 
