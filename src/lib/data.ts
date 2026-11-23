@@ -5,6 +5,7 @@ import type { TypedLocale, Where } from 'payload'
 import { isIndexableAuthor } from '@/lib/author-profile'
 import { CACHE_TAG, REVALIDATE_SECONDS } from '@/lib/cache-tags'
 import { defaultLocale, sitePath } from '@/i18n/config'
+import { isIndexableDestination } from '@/lib/destination-indexing'
 import {
   buildLinkTargets,
   compileLinkIndex,
@@ -1370,7 +1371,7 @@ const readSitemapSources = unstable_cache(
       })),
     }
   },
-  ['sitemap-with-media-v2'],
+  ['sitemap-with-media-v3'],
   {
     tags: [
       CACHE_TAG.trips,
@@ -1448,6 +1449,7 @@ const readChartSources = unstable_cache(
             durationDays: true,
             difficulty: true,
             placeCategories: true,
+            destination: true,
             updatedAt: true,
             meta: { noIndex: true, description: true },
           },
@@ -1463,10 +1465,12 @@ const readChartSources = unstable_cache(
           sort: 'name',
           page,
           select: {
+            id: true,
             name: true,
             slug: true,
             tagline: true,
             country: true,
+            description: true,
             updatedAt: true,
             meta: { noIndex: true, description: true },
           },
@@ -1562,17 +1566,44 @@ const readChartSources = unstable_cache(
       })
       .filter((item): item is ChartNodeRecord => item !== null)
 
+    // Trips per destination id: the "is this continent a real hub?" input. Counted from the trip
+    // rows this same read already fetched, so the HTML sitemap reaches the same verdict as the
+    // page's robots meta and `/sitemap.xml` (see `src/lib/destination-indexing.ts`).
+    const tripsPerDestination = new Map<number, number>()
+    for (const trip of trips) {
+      const destination = (trip as { destination?: unknown }).destination
+      const id =
+        typeof destination === 'object' && destination !== null
+          ? (destination as { id?: unknown }).id
+          : destination
+      if (typeof id === 'number') {
+        tripsPerDestination.set(id, (tripsPerDestination.get(id) ?? 0) + 1)
+      }
+    }
+
     const destinationNodes: ChartNodeRecord[] = destinations
       .map((dest): ChartNodeRecord | null => {
         const record = dest as {
+          id?: number
           name?: string | null
           slug?: string | null
           tagline?: string | null
           country?: string | null
+          description?: unknown
           updatedAt?: string | null
           meta?: { noIndex?: boolean | null; description?: string | null } | null
         }
-        if (!record.slug || record.meta?.noIndex) return null
+        if (!record.slug) return null
+        if (
+          !isIndexableDestination({
+            slug: record.slug,
+            tripCount: typeof record.id === 'number' ? (tripsPerDestination.get(record.id) ?? 0) : 0,
+            description: record.description,
+            editorNoIndex: record.meta?.noIndex,
+          })
+        ) {
+          return null
+        }
         recordDate(record.updatedAt)
         return {
           title: record.name ?? record.slug,
@@ -1658,7 +1689,7 @@ const readChartSources = unstable_cache(
       lastSyncedAt: timestamps.length ? new Date(Math.max(...timestamps)).toISOString() : null,
     }
   },
-  ['sitemap-chart-sources-v2'],
+  ['sitemap-chart-sources-v3'],
   {
     tags: [
       CACHE_TAG.trips,
