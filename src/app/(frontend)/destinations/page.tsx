@@ -255,7 +255,7 @@ function AtlasCard({ destination, index }: { destination: DestinationCard; index
           </div>
         </div>
         <div className="mt-4 flex items-center justify-between gap-4 border-t border-slate-20 pt-3 text-label font-medium tracking-[0.15em] text-slate-80 uppercase">
-          <span>{destination.country} · Himalaya</span>
+          <span>{destination.country}</span>
           <span className="text-slate-80">Explore region</span>
         </div>
       </Link>
