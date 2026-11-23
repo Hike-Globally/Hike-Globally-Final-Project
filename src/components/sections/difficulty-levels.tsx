@@ -127,7 +127,6 @@ export function DifficultyLevels() {
                 src={level.image}
                 alt=""
                 fill
-                priority={index < 2}
                 sizes="(min-width: 1280px) 328px, (min-width: 640px) 42vw, 78vw"
                 style={{ objectPosition: level.objectPosition }}
                 className="-z-20 object-cover transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.045]"

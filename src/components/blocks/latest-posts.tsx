@@ -8,11 +8,17 @@ import type { LatestPostsBlock } from '@/payload-types'
  * section shows the tiles only; the CMS heading/subheading/view-all fields
  * are intentionally not rendered.
  */
-export async function LatestPosts({ block }: { block: LatestPostsBlock }) {
+export async function LatestPosts({
+  block,
+  opening = false,
+}: {
+  block: LatestPostsBlock
+  opening?: boolean
+}) {
   const limit = block.limit ?? 3
   const posts = await getPosts(limit)
 
   if (posts.length === 0) return null
 
-  return <StoryTiles posts={posts.slice(0, limit)} />
+  return <StoryTiles posts={posts.slice(0, limit)} priorityFirst={opening} />
 }

@@ -213,8 +213,8 @@ export default async function PlaceCategoryPage({ params }: { params: Promise<{ 
 
           {content.trips.length > 0 ? (
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {content.trips.map((trip, index) => (
-                <TripCard key={trip.id} trip={trip} priority={index === 0} className="h-full" />
+              {content.trips.map((trip) => (
+                <TripCard key={trip.id} trip={trip} className="h-full" />
               ))}
             </div>
           ) : (
@@ -269,8 +269,8 @@ export default async function PlaceCategoryPage({ params }: { params: Promise<{ 
 
           {content.posts.length > 0 ? (
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {content.posts.map((post, index) => (
-                <PostCard key={post.id} post={post} priority={index === 0} />
+              {content.posts.map((post) => (
+                <PostCard key={post.id} post={post} />
               ))}
             </div>
           ) : (
@@ -301,12 +301,11 @@ export default async function PlaceCategoryPage({ params }: { params: Promise<{ 
             action={{ href: PLACE_INDEX_PATH, label: 'Back to all places' }}
           />
           <div className="places-related-grid">
-            {related.map((item, index) => (
+            {related.map((item) => (
               <PlaceCategoryCard
                 key={item.value}
                 category={item}
                 index={placeCategories.findIndex((entry) => entry.value === item.value)}
-                priority={index === 0}
               />
             ))}
           </div>

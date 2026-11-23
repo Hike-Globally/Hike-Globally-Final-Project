@@ -13,9 +13,16 @@ const description =
 export function CuratedTripsSection({
   trips,
   action,
+  priorityFirst = false,
 }: {
   trips: TripCardData[]
   action: { href: string; label: string }
+  /**
+   * Preload the first card's cover — only for a section that *opens* the page, where that
+   * card is the LCP element. Below a hero the whole grid is below the fold, so every cover
+   * lazy-loads instead of competing with the hero for bandwidth (see `payload-image.tsx`).
+   */
+  priorityFirst?: boolean
 }) {
   const visibleTrips = trips.slice(0, HOMEPAGE_TRIP_LIMIT)
 
@@ -37,7 +44,7 @@ export function CuratedTripsSection({
             <TripCard
               key={trip.id}
               trip={trip}
-              priority={index < 3}
+              priority={priorityFirst && index === 0}
               titleClassName="ct-card-title"
               summaryClassName="ct-card-summary"
             />

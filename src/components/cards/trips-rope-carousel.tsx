@@ -34,7 +34,7 @@ export function TripsRopeCarousel({ trips, label }: { trips: TripCard[]; label?:
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
           {trips.map((trip, index) => (
             <Reveal key={trip.id} delay={index * 80}>
-              <TripCardView trip={trip} priority={index === 0} />
+              <TripCardView trip={trip} />
             </Reveal>
           ))}
         </div>

@@ -69,7 +69,7 @@ export function PlaceBento({ titleId = 'places-bento-title' }: { titleId?: strin
       </div>
 
       {placeCategories.map((category, index) => (
-        <BentoPlate key={category.value} category={category} index={index} priority={index < 3} />
+        <BentoPlate key={category.value} category={category} index={index} />
       ))}
     </div>
   )
