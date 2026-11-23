@@ -104,6 +104,9 @@ function buildSubsystems(chart: ChartSources, siteName: string): {
   ]
 
   /* 03 — Browse Places (Landscapes) */
+  const indexedPlaceCategories = placeCategories.filter(
+    (category) => (chart.placeCounts[category.value] ?? 0) > 0,
+  )
   const placeNodes: SitemapNode[] = [
     {
       title: 'Browse Places Parent Hub',
@@ -112,9 +115,9 @@ function buildSubsystems(chart: ChartSources, siteName: string): {
       description: 'Cross-cutting terrain taxonomy indexing nine distinct natural and cultural features.',
       status: '200',
       kind: 'hub',
-      meta: '9 landscapes',
+      meta: `${indexedPlaceCategories.length} landscapes`,
     },
-    ...placeCategories.map((category): SitemapNode => {
+    ...indexedPlaceCategories.map((category): SitemapNode => {
       const count = chart.placeCounts[category.value] ?? 0
       return {
         title: category.label,
@@ -123,7 +126,7 @@ function buildSubsystems(chart: ChartSources, siteName: string): {
         description: category.description,
         status: '200',
         kind: 'endpoint',
-        meta: count > 0 ? `${count} tagged` : undefined,
+        meta: `${count} tagged`,
       }
     }),
   ]

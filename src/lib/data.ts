@@ -457,6 +457,7 @@ export type PostCard = {
   title: string
   slug: string
   excerpt: string
+  content?: Blog['content']
   featuredImage: Media
   publishedAt?: string | null
   createdAt: string
@@ -889,6 +890,7 @@ export const getAllDestinationSlugs = publishedSlugsFor('destinations', CACHE_TA
 /* -------------------------------------------------------------------------- */
 
 const postCardSelect = {
+  content: true,
   title: true,
   slug: true,
   excerpt: true,

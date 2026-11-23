@@ -94,8 +94,8 @@ export function PostCard({
 
         <p className="mt-4 text-small text-slate-80">
           {authorName ? `${dict.blog.by} ${authorName}` : null}
-          {authorName ? <span aria-hidden> · </span> : null}
-          {dict.blog.readTime.replace('{minutes}', String(readingTimeMinutes(post.excerpt ?? '')))}
+          {authorName && post.content ? <span aria-hidden> · </span> : null}
+          {post.content ? dict.blog.readTime.replace('{minutes}', String(readingTimeMinutes(post.content))) : null}
         </p>
       </div>
     </article>
