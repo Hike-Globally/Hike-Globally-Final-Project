@@ -91,7 +91,7 @@ function PlaceBackdrop({ media, priority = false }: { media: Media; priority?: b
  * Purely decorative: the visible words live in the section's own heading, so
  * screen readers skip the roman numeral and its hairline (`aria-hidden`).
  */
-function ChapterMark({ numeral }: { numeral: 'I' | 'II' | 'III' | 'IV' }) {
+function ChapterMark({ numeral }: { numeral: 'I' | 'II' | 'III' }) {
   return (
     <p className="place-chapter" aria-hidden="true">
       <span className="place-chapter__num">{numeral}</span>
@@ -103,11 +103,10 @@ function ChapterMark({ numeral }: { numeral: 'I' | 'II' | 'III' | 'IV' }) {
 /**
  * `/places/<category>` — one themed, editorial page per Browse Places category.
  *
- * The shared skeleton runs as four chapters (the landscape → trips → field
- * notes → keep exploring) around a full-bleed quote interlude. What makes each
- * of the nine pages its own destination is the theme published on the root
- * element: an accent set mixed from the locked palette (`@/lib/place-themes`),
- * a survey-line glyph, a field quote and three quick facts.
+ * The shared skeleton runs as three chapters (trips → field notes → keep
+ * exploring). What makes each of the nine pages its own destination is the
+ * theme published on the root element: an accent set mixed from the locked
+ * palette (`@/lib/place-themes`) plus a survey-line glyph.
  */
 export default async function PlaceCategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -175,42 +174,14 @@ export default async function PlaceCategoryPage({ params }: { params: Promise<{ 
       </section>
 
       {/* ---------------------------------------------------------------- */}
-      {/* Chapter I — the landscape: long-form intro and the themed facts.  */}
-      {/* ---------------------------------------------------------------- */}
-      <section aria-labelledby="place-intro-heading" className="place-intro py-16 md:py-24">
-        <div className="container-content place-intro__grid">
-          <div className="place-intro__rail" aria-hidden="true">
-            <span className="place-intro__num">I</span>
-            <PlaceGlyph value={category.value} className="place-intro__glyph" />
-          </div>
-
-          <div className="place-intro__copy">
-            <h2 id="place-intro-heading" className="heading-lg">
-              The landscape
-            </h2>
-            <p className="place-intro__lead">{category.intro}</p>
-
-            <dl className="place-facts">
-              {theme.facts.map((fact) => (
-                <div key={fact.label} className="place-facts__item">
-                  <dt className="eyebrow place-facts__label">{fact.label}</dt>
-                  <dd className="place-facts__value">{fact.value}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        </div>
-      </section>
-
-      {/* ---------------------------------------------------------------- */}
-      {/* Chapter II — curated trips tagged with this landscape.            */}
+      {/* Chapter I — curated trips tagged with this landscape.             */}
       {/* ---------------------------------------------------------------- */}
       <section
         aria-labelledby="place-trips-heading"
         className="place-chapter-section place-trips py-16 md:py-24"
       >
         <div className="container-content">
-          <ChapterMark numeral="II" />
+          <ChapterMark numeral="I" />
           <SectionHeading
             eyebrow="CURATED TRIPS"
             title="Trips shaped by this landscape"
@@ -249,29 +220,14 @@ export default async function PlaceCategoryPage({ params }: { params: Promise<{ 
       <DestinationLinks regions={regionsOf(content.trips)} />
 
       {/* ---------------------------------------------------------------- */}
-      {/* Interlude — the field quote, full bleed over the landscape.       */}
-      {/* ---------------------------------------------------------------- */}
-      <figure className="place-quote">
-        <PlaceBackdrop media={media} />
-        <PlaceGlyph value={category.value} strokeWidth={1} className="place-quote__watermark" />
-
-        <div className="container-content place-quote__inner">
-          <p className="eyebrow place-quote__eyebrow">FROM THE FIELD</p>
-          <blockquote className="place-quote__text">
-            <p>{theme.pull}</p>
-          </blockquote>
-        </div>
-      </figure>
-
-      {/* ---------------------------------------------------------------- */}
-      {/* Chapter III — field notes, on the tinted band.                    */}
+      {/* Chapter II — field notes, on the tinted band.                     */}
       {/* ---------------------------------------------------------------- */}
       <section
         aria-labelledby="place-notes-heading"
         className="place-chapter-section place-band border-y border-slate-20 py-16 md:py-24"
       >
         <div className="container-content">
-          <ChapterMark numeral="III" />
+          <ChapterMark numeral="II" />
           <SectionHeading
             eyebrow="FIELD NOTES"
             title="Guides and journal entries connected to this landscape"
@@ -298,14 +254,14 @@ export default async function PlaceCategoryPage({ params }: { params: Promise<{ 
       </section>
 
       {/* ---------------------------------------------------------------- */}
-      {/* Chapter IV — more landscapes, plus the prev/next pager.           */}
+      {/* Chapter III — more landscapes, plus the prev/next pager.          */}
       {/* ---------------------------------------------------------------- */}
       <section
         aria-labelledby="more-places-heading"
         className="place-chapter-section py-16 md:py-24"
       >
         <div className="container-content">
-          <ChapterMark numeral="IV" />
+          <ChapterMark numeral="III" />
           <SectionHeading
             eyebrow="KEEP EXPLORING"
             title="Continue exploring"
