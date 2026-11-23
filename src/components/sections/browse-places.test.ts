@@ -190,6 +190,37 @@ test('the category page hero links nowhere but home and the places index', () =>
   assert.doesNotMatch(hero, /<Link[^>]*href=\{[^}]*category/)
 })
 
+test('PlaceCategoryCard always contains its fill image so related cards never cover the hero', () => {
+  const card = read('src/components/cards/place-category-card.tsx')
+  const browseCss = read('src/components/sections/browse-places.css')
+  const placesCss = read('src/app/(frontend)/places/places.css')
+
+  // `PlaceCategoryCard` is rendered on `/places/<category>` without `BrowsePlaces`
+  // (the homepage marquee). Importing `browse-places.css` from the card itself
+  // ensures `.browse-places__card` styles are always loaded on category pages;
+  // otherwise `<Image fill />` has no positioned ancestor and attaches to the
+  // initial viewport directly over the hero, turning hero clicks into category
+  // navigations.
+  assert.match(card, /import ['"]@\/components\/sections\/browse-places\.css['"]/)
+  assert.match(card, /browse-places__card[^'"]*relative[^'"]*overflow-hidden/)
+
+  const baseCardRule = browseCss.match(/\.browse-places__card\s*\{([^}]+)\}/)?.[1]
+  assert.ok(baseCardRule, '.browse-places__card rule exists')
+  assert.match(baseCardRule, /position:\s*relative/)
+  assert.match(baseCardRule, /overflow:\s*hidden/)
+
+  const baseImageRule = browseCss.match(/\.browse-places__image\s*\{([^}]+)\}/)?.[1]
+  assert.ok(baseImageRule, '.browse-places__image rule exists')
+  assert.match(baseImageRule, /object-fit:\s*cover/)
+
+  const relatedCardRule = placesCss.match(
+    /\.places-related-grid\s+\.browse-places__card\s*\{([^}]+)\}/,
+  )?.[1]
+  assert.ok(relatedCardRule, '.places-related-grid .browse-places__card rule exists')
+  assert.match(relatedCardRule, /position:\s*relative/)
+  assert.match(relatedCardRule, /overflow:\s*hidden/)
+})
+
 test('the new routes join sitemap, llms, reserved slugs and revalidation', () => {
   assert.equal(isReservedPageSlug('places'), true)
   assert.match(read('src/i18n/config.ts'), /places: 'places'/)

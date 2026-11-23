@@ -7,13 +7,19 @@ import { placeCategoryPath, type PlaceCategory } from '@/lib/place-categories'
 import { getPlaceTheme } from '@/lib/place-themes'
 import { cn } from '@/lib/utils'
 
+import '@/components/sections/browse-places.css'
+
 /**
  * One premium portrait category card.
  *
- * The same component is used by the homepage marquee and the `/places` index.
+ * The same component is used by the homepage marquee and the related-landscapes
+ * grid on `/places/<category>`. Importing `browse-places.css` here guarantees
+ * every route that renders a card ships its layout (`position: relative`,
+ * `overflow: hidden`, scrim, typography) — without it, Next's `<Image fill />`
+ * has no positioned ancestor on `/places/<category>` and stretches over the
+ * initial viewport (covering the hero with a clickable link to another category).
  * The photograph is decorative (`alt=""`) because the visible title is the
- * accessible name of the link; the frontend language runtime translates the
- * visible title and description in place.
+ * accessible name of the link.
  */
 export function PlaceCategoryCard({
   category,
@@ -40,7 +46,7 @@ export function PlaceCategoryCard({
       data-place-category-card={category.value}
       aria-hidden={decorative || undefined}
       tabIndex={decorative ? -1 : undefined}
-      className={cn('browse-places__card group', className)}
+      className={cn('browse-places__card group relative isolate block overflow-hidden', className)}
       style={
         glass
           ? ({ '--place-accent-lt': getPlaceTheme(category.value).accentLt } as CSSProperties)
@@ -55,7 +61,7 @@ export function PlaceCategoryCard({
         priority={priority}
         draggable={false}
         aria-hidden="true"
-        className={cn('browse-places__image', glass && 'browse-places__image--glass')}
+        className={cn('browse-places__image object-cover', glass && 'browse-places__image--glass')}
       />
       {!glass && <span className="browse-places__scrim" aria-hidden="true" />}
 

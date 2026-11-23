@@ -42,6 +42,9 @@
 }
 
 .places-related-grid .browse-places__card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   width: 100%;
   min-height: 0;
   aspect-ratio: 4 / 3;
