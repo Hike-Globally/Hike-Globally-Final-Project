@@ -322,16 +322,64 @@ export const buildMetadata = ({
 }
 
 /**
+ * Case-, punctuation- and whitespace-insensitive key for comparing two titles. "Eastern Nepal:
+ * Hike Globally" and "eastern nepal hike globally" collapse to the same key, so a re-typed
+ * meta title still counts as the same (thin) title.
+ */
+const titleKey = (value: string): string => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+
+/**
+ * A CMS meta title is only worth publishing when it says something the fallback does not.
+ *
+ * Editors routinely fill the SEO panel by retyping the document's name — or the name plus the
+ * brand — which produces `Eastern Nepal: Hike Globally`, a title with no keyword in it at all.
+ * That title then *overrides* the page's keyword fallback, so the page loses the one phrase it
+ * could rank for. The live Eastern Nepal page shows exactly this.
+ *
+ * So a meta title that reduces to the subject alone, or to the subject and the site name, is
+ * treated as unset and the fallback wins. Anything more specific is the editor's call and is
+ * kept verbatim. `subject` is optional: collections that do not pass it keep the old behaviour.
+ */
+export const metaTitleOrFallback = (
+  metaTitle: string | null | undefined,
+  fallbackTitle: string,
+  { subject, siteName = 'Hike Globally' }: { subject?: string | null; siteName?: string } = {},
+): string => {
+  const title = (metaTitle ?? '').trim()
+  if (!title) return fallbackTitle
+
+  const subjectKey = titleKey(subject ?? '')
+  if (!subjectKey) return title
+
+  const brandKey = titleKey(siteName)
+  const thinTitles = new Set([
+    subjectKey,
+    `${subjectKey} ${brandKey}`.trim(),
+    `${brandKey} ${subjectKey}`.trim(),
+  ])
+  return thinTitles.has(titleKey(title)) ? fallbackTitle : title
+}
+
+/**
  * Merges a document's optional SEO overrides with its fallback content.
  *
  * `keywords` comes from the document's "Keywords" section (Trips and Blog — see
  * `src/fields/keywords.ts`); documents without one simply yield an empty list.
+ *
+ * `fallback.subject` is the document's own name (a destination's `name`, a trip's `title`). When
+ * it is supplied, a meta title that is only that name — or that name plus the brand — is
+ * discarded in favour of `fallback.title` (see `metaTitleOrFallback`).
  */
 export const seoFromDoc = (
   doc: { meta?: MetaGroup; keywords?: (string | null)[] | null },
-  fallback: { title: string; description?: string | null; image?: number | Media | null },
+  fallback: {
+    title: string
+    description?: string | null
+    image?: number | Media | null
+    subject?: string | null
+  },
 ) => ({
-  title: doc.meta?.title || fallback.title,
+  title: metaTitleOrFallback(doc.meta?.title, fallback.title, { subject: fallback.subject }),
   description: doc.meta?.description || fallback.description || undefined,
   image: doc.meta?.image ?? fallback.image,
   keywords: normalizeKeywords(doc.keywords),
@@ -781,6 +829,38 @@ export const touristDestinationJsonLd = ({
       : undefined,
   }
 }
+
+/**
+ * ItemList structured data for a page whose content is a list of this site's own documents —
+ * here, a destination's trips.
+ *
+ * Google has no rich result for a plain ItemList, but it states outright what a crawler would
+ * otherwise have to infer from card markup: these trips *are* the content of this URL, in this
+ * order, at these addresses. On a continent page with a single trip that is the difference
+ * between "a page that mentions a trip" and "a list with one item".
+ */
+export const itemListJsonLd = ({
+  name,
+  url,
+  items,
+}: {
+  name: string
+  url: string
+  items: { name: string; url: string; description?: string | null }[]
+}): JsonLdInput => ({
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name,
+  url: canonicalUrl(url),
+  numberOfItems: items.length,
+  itemListElement: items.map((item, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: item.name,
+    url: canonicalUrl(item.url),
+    ...(item.description ? { description: item.description } : {}),
+  })),
+})
 
 /**
  * FAQPage structured data.

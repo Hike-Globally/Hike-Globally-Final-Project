@@ -29,6 +29,7 @@ documents here go deeper on specific areas.
 | [trip-audience.md](content/trip-audience.md)         | The _Who Is This Trip For / Not For_ cards on the trip page.                                                                 |
 | [author-expertise.md](content/author-expertise.md)   | Public author qualifications, trip itinerary experts, and site-wide publisher identity.                                      |
 | [destination-maps.md](content/destination-maps.md)   | Destination map coordinates: what editors enter, the OpenStreetMap embed, and why coordinates get a guard.                   |
+| [destinations.md](content/destinations.md)           | Destination pages: title fallbacks, the copy dedupe guard, the "More …" rail, and which continents earn an index entry.       |
 | [altitude-chart.md](content/altitude-chart.md)       | The generated altitude chart: the `place`/`altitude` itinerary fields, how the profile is computed, and the upload fallback. |
 
 ## Design
