@@ -120,7 +120,7 @@ export async function generateMetadata(): Promise<Metadata> {
     icons: faviconIcons,
     formatDetection: { telephone: false },
     other: {
-      'theme-color': '#f5f0ea',
+      'theme-color': '#183144',
     },
     alternates: {
       /**
@@ -142,7 +142,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#f5f0ea',
+  themeColor: '#183144',
   colorScheme: 'light',
   width: 'device-width',
   initialScale: 1,

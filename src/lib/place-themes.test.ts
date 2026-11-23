@@ -8,7 +8,7 @@
  *
  *   accent      ≥ 3:1   graphic/large role on paper, mist, wash and band
  *   accent-ink  ≥ 4.5:1 small-text role on the same light surfaces
- *   accent-lt   ≥ 3:1   on-dark role against ink and the hero-foot composite
+ *   accent-lt   ≥ 3:1   on-dark role against navy and the hero-foot composite
  *   ink copy    ≥ 4.5:1 on the wash panel and the tinted band
  *
  * The colour maths mirrors `scripts/design/color-math.mjs` (sRGB mix + WCAG
@@ -63,12 +63,12 @@ const contrast = (a: string, b: string): number => {
 /* Backgrounds the page composites (see places.css)                           */
 /* -------------------------------------------------------------------------- */
 
-const PAPER = '#f5f0ea'
-const MIST = '#f5f0ea'
-const INK = '#210516'
-const INK_60 = '#76636b'
-/** Hero-foot composite: the new ink wash beneath the photo scrim. */
-const HERO_FOOT = '#2e1726'
+const PAPER = '#ffffff'
+const MIST = '#f6f6f6'
+const INK = '#183144'
+const INK_60 = '#5d6f7c'
+/** Hero-foot composite: ink wash under the photo scrim (from contrast-check). */
+const HERO_FOOT = '#20384a'
 /** `color-mix(in srgb, var(--place-accent-wash) 45%, var(--color-mist))`. */
 const bandFor = (wash: string): string => mixHex(wash, MIST, 0.45)
 

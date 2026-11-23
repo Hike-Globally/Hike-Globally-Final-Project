@@ -148,14 +148,14 @@ const packingList = (groups: {
  * instead of introducing ambers and olives the UI never uses.
  */
 const HAZE_TINT = mixHex(BRAND.white, BRAND.haze, 0.4)
-const DUSK_BLUE = mixHex(BRAND.ink, BRAND.blue, 0.45)
+const DUSK_BLUE = mixHex(BRAND.ink, BRAND.deep, 0.45)
 const PALETTES: [string, string, string][] = [
-  [BRAND.ink, BRAND.blue, BRAND.paper],
-  [BRAND.ink, BRAND.earth, BRAND.haze],
+  [BRAND.ink, BRAND.deep, BRAND.mist],
+  [BRAND.ink, BRAND.slate, BRAND.haze],
   [DUSK_BLUE, BRAND.haze, HAZE_TINT],
-  [BRAND.ink, DUSK_BLUE, BRAND.paper],
-  [BRAND.ink, BRAND.earth, HAZE_TINT],
-  [BRAND.ink, BRAND.blue, BRAND.white],
+  [BRAND.ink, DUSK_BLUE, BRAND.mist],
+  [BRAND.ink, BRAND.slate, HAZE_TINT],
+  [BRAND.ink, BRAND.deep, BRAND.white],
 ]
 
 /** Deterministic pseudo-random so the same seed always produces the same scene. */

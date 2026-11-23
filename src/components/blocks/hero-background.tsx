@@ -30,7 +30,7 @@ export function HomepageHeroBackground() {
            whole ridge. */
         className="absolute inset-0 -z-10 h-full w-full scale-[1.02] object-cover object-[32%_50%] sm:object-center"
       />
-      {/* Keep the ink wash and bottom-up scrim so the bottom-aligned hero
+      {/* Keep the navy wash and bottom-up scrim so the bottom-aligned hero
           copy stays legible over the photograph. */}
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-ink/55" />
       <div aria-hidden="true" className="photo-scrim absolute inset-0 -z-10" />

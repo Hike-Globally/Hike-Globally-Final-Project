@@ -76,7 +76,7 @@ test('the bento keeps the site image treatment and a single gutter', () => {
   // One gutter variable, used by the grid's both axes.
   assert.match(css, /--bento-gap:/)
   assert.match(css, /gap: var\(--bento-gap\)/)
-  // The site's one image grade and the one ink scrim.
+  // The site's one image grade and the one navy scrim.
   assert.match(css, /filter: var\(--image-grade\)/)
   assert.match(css, /color-mix\(in srgb, var\(--color-ink\) 86%, transparent\)/)
   // No plate carries a margin of its own — the gap is the only distance between

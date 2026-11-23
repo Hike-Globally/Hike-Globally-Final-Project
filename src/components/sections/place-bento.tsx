@@ -22,7 +22,7 @@ import './place-bento.css'
  * strand a tile.
  *
  * Each photograph keeps the site's one image treatment (`--image-grade`, the
- * mist plate, the single ink scrim) and its label sits on that scrim as white
+ * mist plate, the single navy scrim) and its label sits on that scrim as white
  * display type. The category photo is decorative (`alt=""`): the visible title
  * is the accessible name of the link, exactly as on the homepage carousel.
  *

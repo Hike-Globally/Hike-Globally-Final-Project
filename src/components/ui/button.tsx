@@ -11,7 +11,7 @@ const buttonVariants = cva(
       variant: {
         default:
           'border border-btn-primary bg-btn-primary text-white shadow-xs hover:border-btn-primary-hover hover:bg-btn-primary-hover hover:shadow-sm active:border-btn-primary-active active:bg-btn-primary-active',
-        sage: 'border border-ink/15 bg-btn-accent text-btn-accent-foreground shadow-xs hover:border-ink/25 hover:bg-btn-accent-hover hover:shadow-sm active:bg-btn-accent-active',
+        sage: 'border border-white/15 bg-btn-accent text-white shadow-xs hover:border-white/25 hover:bg-btn-accent-hover hover:shadow-sm active:bg-btn-accent-active',
         paper:
           'border border-white bg-paper text-ink shadow-sm hover:border-haze-40 hover:bg-haze-20 hover:text-ink active:bg-mist',
         haze: 'border border-haze/55 bg-haze/18 text-white backdrop-blur-[2px] hover:border-white hover:bg-paper hover:text-ink active:bg-mist',
@@ -21,7 +21,7 @@ const buttonVariants = cva(
           'border border-white/45 bg-white/10 text-white backdrop-blur-[2px] hover:border-white hover:bg-paper hover:text-ink active:bg-mist',
         ghost:
           'border border-transparent bg-transparent text-ink-80 hover:border-slate-20 hover:bg-mist hover:text-ink',
-        link: 'text-deep-90 underline-offset-4 hover:text-btn-primary hover:underline',
+        link: 'text-deep underline-offset-4 hover:text-btn-primary hover:underline',
         destructive:
           'border border-destructive bg-destructive text-destructive-foreground shadow-2xs hover:border-sage-80 hover:bg-sage-80',
       },

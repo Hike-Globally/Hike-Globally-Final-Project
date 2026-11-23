@@ -497,7 +497,7 @@ test('Boxed Content supports rich-text descriptions with full editorial formatti
   assert.ok(autoLinks[0]?.closest('[data-boxed-content]'))
 })
 
-test('Boxed Content CSS uses the palette blue-grey wash with WCAG AA/AAA contrast, ungraded original photos, container-query responsiveness, and zero-gap geometry', () => {
+test('Boxed Content CSS uses #caf0f8 surface with WCAG AA/AAA contrast, ungraded original photos, container-query responsiveness, and zero-gap geometry', () => {
   const globalsCss = readFileSync(new URL('../app/(frontend)/globals.css', import.meta.url), 'utf8')
 
   const channel = (c: number) => {
@@ -521,14 +521,14 @@ test('Boxed Content CSS uses the palette blue-grey wash with WCAG AA/AAA contras
   const token = (name: string) =>
     globalsCss.match(new RegExp(`--color-${name}:\\s*(#[0-9a-fA-F]{6})\\s*;`))?.[1]
 
-  assert.match(globalsCss, /--color-boxed-surface:\s*#d8e5e7\s*;/i)
+  assert.match(globalsCss, /--color-boxed-surface:\s*#caf0f8\s*;/i)
   const surface = token('boxed-surface')
   const title = token('boxed-title')
   const copy = token('boxed-copy')
   const accent = token('boxed-accent')
 
   assert.ok(surface && title && copy && accent)
-  assert.equal(surface.toLowerCase(), '#d8e5e7')
+  assert.equal(surface.toLowerCase(), '#caf0f8')
   assert.ok(contrast(title, surface) >= 4.5, `title meets WCAG AA on ${surface}`)
   assert.ok(contrast(copy, surface) >= 4.5, `description meets WCAG AA on ${surface}`)
   assert.ok(contrast(accent, surface) >= 3, `accent rule meets 3:1 on ${surface}`)
@@ -540,7 +540,7 @@ test('Boxed Content CSS uses the palette blue-grey wash with WCAG AA/AAA contras
     globalsCss.indexOf('Single pages — running copy', boxedStart),
   )
 
-  // Palette-derived surface, ungraded original photo & container-driven responsiveness
+  // Solid #caf0f8 surface, ungraded original photo & container-driven responsiveness
   assert.match(boxedSection, /background-color:\s*var\(--color-boxed-surface\)/)
   assert.doesNotMatch(boxedSection, /background-image:/)
   assert.match(boxedSection, /\.boxed-content__photo\s*\{\s*filter:\s*none;/)

@@ -347,7 +347,7 @@ export function DeparturesCalendar({
 
             {selectedDeparture ? (
               <div className="flex items-center gap-2.5 bg-mist px-3 py-2.5 text-label text-ink">
-                <Calendar className="size-3.5 shrink-0 text-deep-90" aria-hidden />
+                <Calendar className="size-3.5 shrink-0 text-deep" aria-hidden />
                 <span className="min-w-0 truncate font-heading font-semibold">
                   {formatDepartureRange(
                     selectedDeparture.startDateKey,
@@ -398,7 +398,7 @@ export function DeparturesCalendar({
                               event.stopPropagation()
                               handleSelectDeparture(departure)
                             }}
-                            className="cursor-pointer rounded-[7px] text-left font-heading text-subhead font-semibold text-ink hover:text-deep-90"
+                            className="cursor-pointer rounded-[7px] text-left font-heading text-subhead font-semibold text-ink hover:text-deep"
                           >
                             {formatDepartureRange(departure.startDateKey, departure.endDateKey)}
                           </button>
@@ -411,7 +411,7 @@ export function DeparturesCalendar({
                             {weekdaySummary} · {departure.durationDays} {dict.common.days}
                           </span>
                           {departure.note ? (
-                            <span className="font-medium text-deep-90">· {departure.note}</span>
+                            <span className="font-medium text-deep">· {departure.note}</span>
                           ) : null}
                         </div>
                       </div>

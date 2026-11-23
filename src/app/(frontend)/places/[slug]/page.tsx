@@ -66,7 +66,7 @@ export async function generateMetadata({
 
 /**
  * The full-bleed photographic backdrop behind the hero and the quote
- * interlude — the one shared ink wash, so copy over the image keeps the
+ * interlude — the one shared navy wash, so copy over the image keeps the
  * site's documented scrim contrast wherever it sits.
  */
 function PlaceBackdrop({ media, priority = false }: { media: Media; priority?: boolean }) {

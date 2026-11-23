@@ -1,6 +1,6 @@
 /* Article outline — the sticky table of contents beside a post body.
-   A paper sheet on a warm hairline: no rounded corners, no gradient wash, no
-   shadow, and one coral marker on the row being read. */
+   A white sheet on a warm hairline: no rounded corners, no gradient wash, no
+   shadow, and one ember marker on the row being read. */
 .article-outline {
   display: flex;
   flex-direction: column;
@@ -26,7 +26,7 @@
   right: -2rem;
   width: 11rem;
   height: 9rem;
-  color: var(--color-haze-light);
+  color: var(--color-haze);
   opacity: 0.5;
   pointer-events: none;
 }

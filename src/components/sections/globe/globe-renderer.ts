@@ -27,10 +27,10 @@ import { GLOBE_DESTINATIONS, GLOBE_ROUTES, LAND_DOT_DATA } from './globe-data'
  * sits directly on whatever is behind it — here, the section's ink
  * background — with no visible rectangle or contrasting edge line.
  *
- * Colour: every shade is derived from the eight brand colours in
- * `@/lib/brand-colors` — an ink ocean lit with bright expedition blue, land dots in
+ * Colour: every shade is derived from the six brand colours in
+ * `@/lib/brand-colors` — a navy ocean lit with expedition blue, land dots in
  * paper-cooled haze, routes and atmosphere in haze, and the destination pins
- * in coral (the site's vivid warm accent).
+ * in ember (the site's one warm accent).
  *
  * Deliberately dependency-free (no three.js / globe.gl): the whole visual is a
  * dot field of ~4.5k points, five route arcs and nine markers. Canvas 2D draws
@@ -404,18 +404,18 @@ export function drawGlobe(ctx: CanvasRenderingContext2D, view: GlobeView): Proje
 
     // Pulsing halo: a soft glow plus an expanding ring that fades as it grows,
     // which reads as a live pin instead of a blurry disc over the land dots.
-    ctx.fillStyle = rgbaOf(BRAND.coral, 0.2 * visibility)
+    ctx.fillStyle = rgbaOf(BRAND.sage, 0.2 * visibility)
     ctx.beginPath()
     ctx.arc(projected.x, projected.y, 5.5, 0, TAU)
     ctx.fill()
 
-    ctx.strokeStyle = rgbaOf(BRAND.coral, 0.55 * visibility * (1 - pulse))
+    ctx.strokeStyle = rgbaOf(BRAND.sage, 0.55 * visibility * (1 - pulse))
     ctx.lineWidth = 1
     ctx.beginPath()
     ctx.arc(projected.x, projected.y, 5 + pulse * 9, 0, TAU)
     ctx.stroke()
 
-    // Pin: coral disc lifted with white until it clears 4.5:1 on the ocean,
+    // Pin: ember disc lifted with white until it clears 4.5:1 on the ocean,
     // with a near-paper core.
     ctx.fillStyle = rgbaOf(PIN, visibility)
     ctx.beginPath()

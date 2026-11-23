@@ -3,7 +3,7 @@
  *
  * No image file, no gradients, no blur: seven nested elevation loops cut from the same haze
  * the rest of the site uses, softened by a deterministic modulation (fixed phases, no randomness),
- * plus a single coral route line that climbs from the frame's bottom edge to a trig point.
+ * plus a single ember route line that climbs from the frame's bottom edge to a trig point.
  * It is deliberately static — the hero is a chart, not an animation — and it sits behind the
  * copy (`pointer-events: none`, `aria-hidden`).
  */
@@ -88,7 +88,7 @@ export function Topography({ className }: { className?: string }) {
         ))}
       </g>
 
-      {/* The route — one coral line, climbed by a surveyor's eye. */}
+      {/* The route — one ember line, climbed by a surveyor's eye. */}
       <path
         d={routePath(ROUTE)}
         fill="none"

@@ -105,7 +105,7 @@ export function InquiryForm({
           ? 'space-y-4'
           : cn(
               // The panel surface follows the section it sits in: a white card on light
-              // backgrounds, a lifted ink panel on the dark ones (the same treatment as the
+              // backgrounds, a lifted navy panel on the dark ones (the same treatment as the
               // dark section cards). A solid white panel here would put near-white labels and
               // inputs on white — i.e. unreadable.
               'grid gap-5 border p-4 sm:p-6 md:grid-cols-2 md:p-8',

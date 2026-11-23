@@ -69,7 +69,7 @@ export function DestinationDetail({
           className="-z-10"
           imageClassName="object-cover"
         />
-        {/* The shared photographic-header recipe: one flat ink wash, then the
+        {/* The shared photographic-header recipe: one flat navy wash, then the
             common bottom-up scrim the masthead sits in. */}
         <div className="absolute inset-0 -z-10 bg-ink/72" />
         <div className="photo-scrim absolute inset-0 -z-10" />
