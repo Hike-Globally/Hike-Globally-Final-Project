@@ -8,7 +8,6 @@ import {
   type AltitudeDayInput,
 } from '@/lib/altitude-profile'
 import { formatNumber } from '@/lib/format'
-import { BRAND, mixHex, OCEAN_LIT as PALETTE_OCEAN_LIT } from '@/lib/brand-colors'
 
 /**
  * ============================================================================
@@ -37,10 +36,10 @@ const HEIGHT = 448
 // now that the chart uses more of the card's height.
 const PADDING = { top: 34, right: 30, bottom: 100, left: 64 }
 
-const INK = BRAND.ink
-const SLATE = BRAND.earth
-const OCEAN_LIT = PALETTE_OCEAN_LIT
-const OCEAN_WASH = mixHex(BRAND.paper, BRAND.blue, 0.16)
+const INK = '#183144' /* ink */
+const SLATE = '#6b6767' /* slate-80 */
+const OCEAN_LIT = '#3d6f92' /* ink mixed toward deep, the globe's lit ocean */
+const OCEAN_WASH = '#dbe9f3' /* deep-20 */
 
 /** Altitude as whole metres: 3210, not "3,210" — the reference chart's denser, ungrouped form. */
 const metres = (value: number): string => String(Math.round(value))

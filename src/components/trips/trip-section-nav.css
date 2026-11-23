@@ -3,8 +3,8 @@
   top: 0;
   z-index: 40;
   border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
-  background: var(--color-paper);
-  box-shadow: 0 5px 18px color-mix(in srgb, var(--color-ink) 5%, transparent);
+  background: color-mix(in srgb, white 96%, var(--color-mist));
+  box-shadow: 0 5px 18px rgb(13 32 40 / 5%);
 }
 
 .trip-section-nav__scroll {

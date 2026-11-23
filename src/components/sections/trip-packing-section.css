@@ -3,8 +3,8 @@
    Vocabulary borrowed on purpose from `key-takeaways.css` and `trip-audience.css`, so the section
    reads as part of the same page rather than a widget dropped into it:
 
-     - the shell of each group is a paper sheet on ONE warm hairline, with no shadow;
-     - a short coral rule is filed along its top-left corner when the group is open;
+     - the shell of each group is a white sheet on ONE warm hairline, with no shadow;
+     - a short ember rule is filed along its top-left corner when the group is open;
      - each header carries a square icon chip, a quiet count and a chevron;
      - the dashboard is a single hairline grid above the lists, so the readouts sit over the kit
        the way the hero's fact strip sits under the trip title.
@@ -82,7 +82,7 @@
 }
 
 #packing-list .packing-stat dt svg {
-  color: var(--color-deep-90);
+  color: var(--color-deep);
 }
 
 #packing-list .packing-stat dd {
@@ -144,7 +144,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* A 6px track: coral fill on the same quiet mist plate used elsewhere. `appearance: none` strips
+/* A 6px track: ember fill on the same quiet mist plate used elsewhere. `appearance: none` strips
    the native look so WebKit and Gecko render identically. */
 #packing-list .packing-progress-bar {
   display: block;
@@ -236,7 +236,7 @@
   gap: clamp(0.75rem, 1.6vw, 1rem);
 }
 
-/* Each group is its own sheet. `position: relative` anchors the coral corner rule; the frame is
+/* Each group is its own sheet. `position: relative` anchors the ember corner rule; the frame is
    drawn here (not on the item's default `border-b`) so all four sides match. */
 #packing-list .packing-group {
   position: relative;
@@ -418,7 +418,7 @@
 }
 
 #packing-list .packing-item-input:checked + .packing-item-box {
-  border-color: var(--color-deep-90);
+  border-color: var(--color-deep);
   background: var(--color-deep);
   color: var(--color-paper);
 }

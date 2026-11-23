@@ -14,7 +14,7 @@ import { PayloadImageFill } from '@/components/ui/payload-image'
  * `latest-posts.css` carries the choreography in the brand tokens:
  *   • card border darkens one step (0.4s, the shared brand curve) — no lift, no shadow
  *   • cover image steps in to `scale(1.03)` (1.2s, same curve)
- *   • CTA bar wipes to ink (`::before` scaleX 0 → 1, left origin), copy turns to paper
+ *   • CTA bar wipes to navy (`::before` scaleX 0 → 1, left origin), copy turns to paper
  *   • arrow rotates `-35deg`
  *   • identical `:focus-visible` states and `prefers-reduced-motion` opt-outs
  *

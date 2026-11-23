@@ -58,7 +58,7 @@ export function DestinationCard({
         priority={priority}
         imageClassName="scale-100 transition-transform duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.035]"
       />
-      {/* One ink scrim — the site's single treatment for copy over a photograph
+      {/* One navy scrim — the site's single treatment for copy over a photograph
           (`--scrim-ink`). It is dark enough at the foot of the card that mist copy
           holds 6.7:1 even over a snowfield. A black overlay at 50% opacity sits
           over the photo and scrim. */}

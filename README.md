@@ -90,20 +90,13 @@ source of truth is `src/app/(frontend)/globals.css`. The homepage hero's first l
 exception: `Cal Sans 400` (also self-hosted), under which the Instrument Serif italic accent line
 sets the second line.
 
-| Brand colour | Hex |
-| --- | --- |
-| `paper` | `#f5f0ea` |
-| `ink` | `#210516` |
-| `blue-grey` | `#5e7993` |
-| `earth` | `#78510f` |
-| `stone` | `#bcb0b1` |
-| `gold` | `#cbaf35` |
-| `blue` | `#0393cd` |
-| `coral` | `#f53f1d` |
-
-The hex values and `paper` background were specified for this refresh. The
-names and roles shown here are inferred implementation choices; roles for the
-other seven colours have not been confirmed.
+| Token   | Hex       |
+| ------- | --------- |
+| `ink`   | `#183144` |
+| `deep`  | `#2177b5` |
+| `slate` | `#79706d` |
+| `sage`  | `#d0564d` |
+| `mist`  | `#f6f6f6` |
 
 ### Heroes
 

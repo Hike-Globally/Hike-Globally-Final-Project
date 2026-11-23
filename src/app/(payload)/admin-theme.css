@@ -3,52 +3,38 @@
    ==========================================================================
 
    Every colour, type size, weight, spacing step, radius and shadow used by the
-   admin panel is declared here exactly once. `custom.scss` only consumes these
-   variables, so changing the palette here updates the whole CMS at once.
+   admin panel is declared here exactly once. `custom.scss` only ever consumes
+   these variables — it contains no literal colours, sizes or shadows of its
+   own, so a change made in this file lands on every screen at once.
 
    Documented in docs/design/design-system.md. Change a value here, not in a component.
 
    Palette rules
    -------------
    • Strictly flat, single colours — zero gradients and zero outside palettes.
-   • Built from the eight brand colours plus white for elevated control surfaces:
-       #210516  Ink       — sidebar rail, headings, primary text
-       #F5F0EA  Paper     — workspace canvas, subtle fills, rail text
-       #5E7993  Blue-grey — accent borders, illustration and selected states
-       #78510F  Earth     — accessible muted text and warning labels
-       #BCB0B1  Stone     — neutral hairlines and quiet fills
-       #CBAF35  Gold      — warm highlights and warning accents
-       #0393CD  Blue      — bright brand blue (darkened for AA controls)
-       #F53F1D  Coral     — vivid danger / warm accent (darkened for AA text)
+   • Built exclusively on the six-colour workspace palette (plus pure white for
+     elevated card and control surfaces against the #F6F6F6 canvas):
+       #183144  Deep navy      — sidebar rail, headings, primary ink, hover anchor
+       #F6F6F6  Soft canvas    — workspace background, subtle fills, rail text
+       #87AABD  Mist steel     — rail muted ink/icons, accent borders, soft highlights
+       #79716D  Warm stone     — secondary/muted metadata, labels, neutral icons
+       #2177B5  Cerulean blue  — primary actions, active nav, links, focus
+       #CF574D  Terracotta red — destructive actions, validation errors, alerts
    ========================================================================== */
 
 :root,
 html[data-theme='light'],
 html[data-theme='dark'] {
   /* ------------------------------------------------------------------------
-     1. COLOUR — shared eight-colour palette (+ elevated white surface)
+     1. COLOUR — core six-colour palette (+ elevated white surface)
      ------------------------------------------------------------------------ */
-  --hg-ink: #210516;
-  --hg-paper: #f5f0ea;
-  --hg-blue-grey: #5e7993;
-  --hg-earth: #78510f;
-  --hg-stone: #bcb0b1;
-  --hg-gold: #cbaf35;
-  --hg-cyan: #0393cd;
-  --hg-coral: #f53f1d;
-  --hg-white: #ffffff; /* elevated cards, tables, inputs, modals */
-
-  /* Historic component-facing aliases retained during the palette refresh. */
-  --hg-navy: var(--hg-ink);
-  --hg-canvas: var(--hg-paper);
-  --hg-steel: var(--hg-blue-grey);
-  --hg-neutral: var(--hg-stone);
-  --hg-surface: var(--hg-white);
-
-  /* AA text/control shades derived from the bright palette colours. */
-  --hg-steel-muted: #6d859c; /* haze lifted for small copy on the ink rail */
-  --hg-blue: #0a709f; /* accessible blue for white labels and focus states */
-  --hg-red: #c0301b; /* accessible dark-coral text and white-label controls */
+  --hg-navy: #183144; /* 13.45:1 on #FFFFFF · 12.44:1 on #F6F6F6 */
+  --hg-canvas: #f6f6f6; /* workspace canvas & subtle surface */
+  --hg-steel: #87aabd; /* 5.45:1 on #183144 · soft accent border */
+  --hg-stone: #79716d; /* 4.78:1 on #FFFFFF · muted metadata ink */
+  --hg-blue: #2177b5; /* 4.80:1 with #FFFFFF · primary interactive */
+  --hg-red: #cf574d; /* destructive & error accent */
+  --hg-surface: #ffffff; /* elevated cards, tables, inputs, modals */
 
   /* ------------------------------------------------------------------------
      2. COLOUR — structural surfaces, borders & text aliases
@@ -58,71 +44,74 @@ html[data-theme='dark'] {
   --hg-bg-subtle: var(--hg-canvas);
   --hg-bg-inset: var(--hg-canvas);
   --hg-bg-hover: var(--hg-canvas);
-  --hg-bg-selected: rgb(3 147 205 / 18%);
+  --hg-bg-selected: rgb(135 170 189 / 18%);
 
-  --hg-border: rgb(33 5 22 / 10%);
-  --hg-border-strong: rgb(33 5 22 / 20%);
+  --hg-border: rgb(24 49 68 / 10%);
+  --hg-border-strong: rgb(24 49 68 / 20%);
   --hg-border-accent: var(--hg-steel);
   --hg-border-focus: var(--hg-blue);
 
   --hg-text: var(--hg-navy);
   --hg-text-secondary: var(--hg-navy);
-  --hg-text-muted: var(--hg-earth);
-  --hg-text-disabled: rgb(120 81 15 / 60%);
+  --hg-text-muted: var(--hg-stone);
+  --hg-text-disabled: rgb(121 113 109 / 60%);
   --hg-text-inverse: var(--hg-surface);
   --hg-text-link: var(--hg-blue);
 
   --hg-primary: var(--hg-blue);
   --hg-primary-hover: var(--hg-navy);
   --hg-primary-active: var(--hg-navy);
-  --hg-primary-soft: rgb(3 147 205 / 18%);
-  --hg-primary-soft-hover: rgb(3 147 205 / 28%);
+  --hg-primary-soft: rgb(135 170 189 / 18%);
+  --hg-primary-soft-hover: rgb(135 170 189 / 28%);
   --hg-primary-soft-border: var(--hg-steel);
 
-  /* Ornamentation for the split Publish action. Alpha variants use only the
-     palette's white/ink rather than introducing a new hue. */
+  /* Ornamentation for a solid-primary control that carries a second click
+     target (the split Publish action in the document bar): a 1px inner light
+     along the top edge, a seam between the action and its menu, and the wash
+     the menu segment takes while it is open. Alpha variants of the palette's
+     own white/navy — never a new hue. */
   --hg-primary-edge: rgb(255 255 255 / 18%);
   --hg-primary-seam: rgb(255 255 255 / 24%);
   --hg-primary-raised: rgb(255 255 255 / 12%);
 
   /* ------------------------------------------------------------------------
-     3. COLOUR — sidebar rail (ink dark anchor)
+     3. COLOUR — sidebar rail (#183144 dark anchor)
      ------------------------------------------------------------------------ */
   --hg-rail-bg: var(--hg-navy);
-  --hg-rail-border: rgb(94 121 147 / 16%);
-  --hg-rail-input-bg: rgb(245 240 234 / 7%);
-  --hg-rail-hover: rgb(94 121 147 / 14%);
+  --hg-rail-border: rgb(135 170 189 / 16%);
+  --hg-rail-input-bg: rgb(246 246 246 / 7%);
+  --hg-rail-hover: rgb(135 170 189 / 14%);
   --hg-rail-text: var(--hg-canvas);
-  --hg-rail-text-muted: var(--hg-steel-muted);
+  --hg-rail-text-muted: var(--hg-steel);
   --hg-rail-active-bg: var(--hg-blue);
   --hg-rail-active-text: var(--hg-surface);
 
   /* ------------------------------------------------------------------------
-     4. COLOUR — semantic states, derived from the brand palette
+     4. COLOUR — semantic states (derived strictly from the 6-colour palette)
      ------------------------------------------------------------------------ */
-  --hg-success-bg: rgb(3 147 205 / 10%);
+  --hg-success-bg: rgb(33 119 181 / 10%);
   --hg-success-border: var(--hg-steel);
   --hg-success-text: var(--hg-blue);
   --hg-success-solid: var(--hg-blue);
 
-  --hg-warning-bg: rgb(203 175 53 / 14%);
-  --hg-warning-border: rgb(120 81 15 / 32%);
-  --hg-warning-text: var(--hg-earth);
-  --hg-warning-solid: var(--hg-earth);
+  --hg-warning-bg: var(--hg-canvas);
+  --hg-warning-border: rgb(121 113 109 / 32%);
+  --hg-warning-text: var(--hg-stone);
+  --hg-warning-solid: var(--hg-stone);
 
-  --hg-danger-bg: rgb(245 63 29 / 10%);
-  --hg-danger-border: rgb(245 63 29 / 42%);
+  --hg-danger-bg: rgb(207 87 77 / 10%);
+  --hg-danger-border: rgb(207 87 77 / 42%);
   --hg-danger-text: var(--hg-red);
   --hg-danger-solid: var(--hg-red);
   --hg-danger-hover: var(--hg-navy);
 
-  --hg-info-bg: rgb(94 121 147 / 16%);
+  --hg-info-bg: rgb(135 170 189 / 16%);
   --hg-info-border: var(--hg-steel);
   --hg-info-text: var(--hg-navy);
   --hg-info-solid: var(--hg-blue);
 
-  --hg-focus-ring: 0 0 0 3px rgb(3 147 205 / 18%);
-  --hg-danger-ring: 0 0 0 3px rgb(245 63 29 / 18%);
+  --hg-focus-ring: 0 0 0 3px rgb(33 119 181 / 18%);
+  --hg-danger-ring: 0 0 0 3px rgb(207 87 77 / 18%);
   --hg-focus-outline: 2px solid var(--hg-blue);
   --hg-focus-outline-offset: 2px;
 
@@ -171,11 +160,11 @@ html[data-theme='dark'] {
   --hg-radius-pill: 999px;
 
   /* ------------------------------------------------------------------------
-     8. ELEVATION — three soft, neutral shadows (tinted from #210516)
+     8. ELEVATION — three soft, neutral shadows (tinted from #183144)
      ------------------------------------------------------------------------ */
-  --hg-shadow-sm: 0 1px 2px rgb(33 5 22 / 5%);
-  --hg-shadow-md: 0 2px 6px rgb(33 5 22 / 8%), 0 1px 2px rgb(33 5 22 / 4%);
-  --hg-shadow-lg: 0 10px 28px rgb(33 5 22 / 12%);
+  --hg-shadow-sm: 0 1px 2px rgb(24 49 68 / 5%);
+  --hg-shadow-md: 0 2px 6px rgb(24 49 68 / 8%), 0 1px 2px rgb(24 49 68 / 4%);
+  --hg-shadow-lg: 0 10px 28px rgb(24 49 68 / 12%);
 
   /* ------------------------------------------------------------------------
      9. LAYOUT & CONTROLS
@@ -209,7 +198,7 @@ html[data-theme='dark'] {
      --------------------------------------------------------------------------
      Payload's own components (tables, fields, drawers, popovers, toasts) are
      driven by its `--theme-*` / `--color-*` variables. Mapping every scale
-     onto the eight-colour tokens above ensures no outside hues (default greens,
+     onto the six-colour tokens above ensures no outside hues (default greens,
      ambers, Tailwind grays) ever leak into native Payload UI.
      ========================================================================== */
   --theme-bg: var(--hg-bg-app);
@@ -227,14 +216,13 @@ html[data-theme='dark'] {
   --theme-elevation-200: var(--hg-border-strong);
   --theme-elevation-250: var(--hg-steel);
   --theme-elevation-300: var(--hg-steel);
-  /* Accessible warm-neutral mid-tones; stone itself is reserved for rules. */
-  --theme-elevation-350: var(--hg-earth);
-  --theme-elevation-400: var(--hg-earth);
-  --theme-elvation-400: var(--hg-earth);
-  --theme-elevation-450: var(--hg-earth);
-  --theme-elevation-500: var(--hg-earth);
-  --theme-elevation-550: var(--hg-earth);
-  --theme-elevation-600: var(--hg-earth);
+  --theme-elevation-350: var(--hg-stone);
+  --theme-elevation-400: var(--hg-stone);
+  --theme-elvation-400: var(--hg-stone);
+  --theme-elevation-450: var(--hg-stone);
+  --theme-elevation-500: var(--hg-stone);
+  --theme-elevation-550: var(--hg-stone);
+  --theme-elevation-600: var(--hg-stone);
   --theme-elevation-650: var(--hg-navy);
   --theme-elevation-700: var(--hg-navy);
   --theme-elevation-750: var(--hg-navy);
@@ -251,12 +239,12 @@ html[data-theme='dark'] {
   --color-base-200: var(--hg-border-strong);
   --color-base-250: var(--hg-steel);
   --color-base-300: var(--hg-steel);
-  --color-base-350: var(--hg-earth);
-  --color-base-400: var(--hg-earth);
-  --color-base-450: var(--hg-earth);
-  --color-base-500: var(--hg-earth);
-  --color-base-550: var(--hg-earth);
-  --color-base-600: var(--hg-earth);
+  --color-base-350: var(--hg-stone);
+  --color-base-400: var(--hg-stone);
+  --color-base-450: var(--hg-stone);
+  --color-base-500: var(--hg-stone);
+  --color-base-550: var(--hg-stone);
+  --color-base-600: var(--hg-stone);
   --color-base-650: var(--hg-navy);
   --color-base-700: var(--hg-navy);
   --color-base-750: var(--hg-navy);
@@ -266,7 +254,7 @@ html[data-theme='dark'] {
   --color-base-950: var(--hg-navy);
   --color-base-1000: var(--hg-navy);
 
-  /* Success scale → mapped to blue/blue-grey/ink */
+  /* Success scale → mapped to Cerulean/Steel/Navy */
   --theme-success-50: var(--hg-success-bg);
   --theme-success-100: var(--hg-success-bg);
   --theme-success-150: var(--hg-success-bg);
@@ -302,14 +290,14 @@ html[data-theme='dark'] {
   --color-success-900: var(--hg-navy);
   --color-success-950: var(--hg-navy);
 
-  /* Warning scale → mapped to Earth/Gold/Paper */
+  /* Warning scale → mapped to Warm Stone/Canvas */
   --theme-warning-50: var(--hg-warning-bg);
   --theme-warning-100: var(--hg-warning-bg);
   --theme-warning-150: var(--hg-warning-bg);
   --theme-warning-250: var(--hg-warning-border);
   --theme-warning-300: var(--hg-warning-border);
-  --theme-warning-500: var(--hg-earth);
-  --theme-warning-600: var(--hg-earth);
+  --theme-warning-500: var(--hg-stone);
+  --theme-warning-600: var(--hg-stone);
   --theme-warning-650: var(--hg-navy);
   --theme-warning-800: var(--hg-navy);
 
@@ -319,12 +307,12 @@ html[data-theme='dark'] {
   --color-warning-200: var(--hg-warning-border);
   --color-warning-250: var(--hg-warning-border);
   --color-warning-300: var(--hg-warning-border);
-  --color-warning-350: var(--hg-earth);
-  --color-warning-400: var(--hg-earth);
-  --color-warning-450: var(--hg-earth);
-  --color-warning-500: var(--hg-earth);
-  --color-warning-550: var(--hg-earth);
-  --color-warning-600: var(--hg-earth);
+  --color-warning-350: var(--hg-stone);
+  --color-warning-400: var(--hg-stone);
+  --color-warning-450: var(--hg-stone);
+  --color-warning-500: var(--hg-stone);
+  --color-warning-550: var(--hg-stone);
+  --color-warning-600: var(--hg-stone);
   --color-warning-650: var(--hg-navy);
   --color-warning-700: var(--hg-navy);
   --color-warning-750: var(--hg-navy);
@@ -333,7 +321,7 @@ html[data-theme='dark'] {
   --color-warning-900: var(--hg-navy);
   --color-warning-950: var(--hg-navy);
 
-  /* Error scale → mapped to dark coral (#C0301B) */
+  /* Error scale → mapped to Terracotta Red (#CF574D) */
   --theme-error-50: var(--hg-danger-bg);
   --theme-error-100: var(--hg-danger-bg);
   --theme-error-150: var(--hg-danger-bg);
@@ -369,7 +357,7 @@ html[data-theme='dark'] {
   --color-error-900: var(--hg-navy);
   --color-error-950: var(--hg-navy);
 
-  /* Info scale → mapped to Blue-grey / Accessible Blue */
+  /* Info scale → mapped to Mist Steel / Cerulean */
   --theme-info-50: var(--hg-info-bg);
   --theme-info-500: var(--hg-blue);
 

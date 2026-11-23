@@ -75,7 +75,7 @@ export function PostCard({
             `text-card` utility, because `text-card` resolves to the *colour*
             `--color-card` (white) and would paint the title white on paper. */}
         <h3 className="post-card-title mt-3 font-heading font-semibold">
-          <Link href={href} className="transition-colors hover:text-deep-90">
+          <Link href={href} className="transition-colors hover:text-deep">
             {post.title}
           </Link>
         </h3>

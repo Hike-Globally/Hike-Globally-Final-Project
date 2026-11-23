@@ -17,7 +17,7 @@
       (`cqi`, container queries) so the wide feature and the small square both
       set their title on the same optical proportion.
    4. PHOTOGRAPHS KEEP THE SITE'S ONE TREATMENT. `--image-grade`, a paper plate
-      while loading, the single ink scrim under copy, mist/white type only.
+      while loading, the single navy scrim under copy, mist/white type only.
    ========================================================================== */
 
 .places-bento {
@@ -71,7 +71,7 @@
   transform: scale(1.045);
 }
 
-/* The one ink scrim, tuned so a plate's label always clears AA against the
+/* The one navy scrim, tuned so a plate's label always clears AA against the
    photograph underneath it (mist on ink ≥ 12:1 at the foot, ≥ 7:1 mid-plate).
    Top and bottom only — the middle of every photograph stays untouched. */
 .pb-plate__wash {
@@ -133,7 +133,7 @@
 }
 
 /* The plate's corner mark. Borderless at rest (the composition is the
-   ornament), it fills coral on hover as the plate's single warm accent. */
+   ornament), it fills ember on hover as the plate's single warm accent. */
 .pb-plate__cue {
   display: grid;
   flex: 0 0 auto;

@@ -14,8 +14,7 @@ test('the favicon uses the existing brand mark on a square, light backing', () =
   const logo = asset('/images/logo.svg').toString('utf8')
 
   assert.match(svg, /viewBox="0 0 64 64"/)
-  assert.match(svg, /<rect width="64" height="64"[^>]*fill="#F5F0EA"/)
-  assert.match(logo, /fill="#210516"/)
+  assert.match(svg, /<rect width="64" height="64"[^>]*fill="#F6F6F6"/)
   for (const [geometry] of logo.matchAll(/<path\b[^>]*\/>/g)) {
     assert.ok(svg.includes(geometry), 'the favicon must retain the original logo geometry')
   }

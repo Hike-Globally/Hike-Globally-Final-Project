@@ -58,7 +58,7 @@ function AccordionTrigger({
             // variants (`[[data-state=open]>span>&]`) pointed at a wrapper <span> that does not
             // exist — the state attribute sits on the trigger itself — so the chevron and the
             // plus/× never changed when a row opened.
-            'group/accordion focus-visible:ring-deep/35 flex flex-1 items-start justify-between gap-4 py-5 text-left text-ink transition-colors outline-none hover:text-deep-90 focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50',
+            'group/accordion focus-visible:ring-deep/35 flex flex-1 items-start justify-between gap-4 py-5 text-left text-ink transition-colors outline-none hover:text-deep focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50',
             typography,
             className,
           )}
@@ -81,7 +81,7 @@ function AccordionTrigger({
               <ChevronDownIcon aria-hidden />
             </span>
           ) : (
-            <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full border border-slate-40 text-deep-90 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[state=open]/accordion:rotate-45 [&>svg]:size-3.5">
+            <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full border border-slate-40 text-deep transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[state=open]/accordion:rotate-45 [&>svg]:size-3.5">
               <PlusIcon className="transition-transform duration-300" aria-hidden />
             </span>
           )}

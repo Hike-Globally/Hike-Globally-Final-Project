@@ -10,7 +10,7 @@
    Order of the file mirrors the design system:
      1. Base
      2. Shell (grid, sidebar column, nav toggler alignment)
-     3. Sidebar (the #210516 ink rail)
+     3. Sidebar (the #183144 rail)
      4. Top bar & breadcrumbs
      5. Page frame, collection list toolbar, search bar & filter drawers
      6. Buttons
@@ -150,7 +150,7 @@ a {
 }
 
 /* --------------------------------------------------------------------------
-   3. SIDEBAR — solid #210516 ink rail
+   3. SIDEBAR — solid #183144 rail
    -------------------------------------------------------------------------- */
 .template-default .nav {
   position: sticky;
@@ -1345,7 +1345,7 @@ html[data-theme='light'] .template-default .graphic-account--active .graphic-acc
   stroke-width: var(--hg-icon-stroke);
 }
 
-/* Primary (#0A709F → hover #210516) */
+/* Primary (#2177B5 → hover #183144) */
 .btn--style-primary {
   border-color: var(--hg-primary);
   background-color: var(--hg-primary);
@@ -1420,7 +1420,7 @@ html[data-theme='light'] .template-default .graphic-account--active .graphic-acc
   color: var(--hg-text);
 }
 
-/* Danger (#C0301B) — reserved for destructive actions */
+/* Danger (#CF574D) — reserved for destructive actions */
 .template-default .confirmation-modal.delete-document .btn--style-primary,
 .btn--style-error {
   border-color: var(--hg-danger-solid);
@@ -2052,7 +2052,7 @@ html[data-theme='light'] .template-default .graphic-account--active .graphic-acc
    typography. What broke before: the wrapper kept its own `--theme-bg` seam,
    the inner button had no colour of its own, and the chevron inherited the
    reversed `--color` from its disabled-safe fallback — hence the dark brown
-   label on a blue pill, the ink segment and the 38px-tall button
+   label on a blue pill, the off-palette navy segment and the 38px-tall button
    inside a 32px bar. */
 
 $hg-icon-publish: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 19V5'/%3E%3Cpath d='m5 12 7-7 7 7'/%3E%3C/svg%3E");
@@ -4823,7 +4823,7 @@ html:has(.hg-login-gallery) body {
   object-position: center;
 }
 
-/* One flat #210516 scrim — no gradient. */
+/* One flat #183144 scrim — no gradient. */
 .hg-login-gallery__slide::after {
   position: absolute;
   z-index: 1;

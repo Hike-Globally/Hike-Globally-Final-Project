@@ -791,7 +791,7 @@ export function RopeCarousel({
           <path
             d={layout.pathD}
             fill="none"
-            stroke={mixHex(BRAND.white, BRAND.earth, 0.45)}
+            stroke={mixHex(BRAND.white, BRAND.slate, 0.45)}
             strokeWidth={1.6}
             strokeLinecap="round"
           />

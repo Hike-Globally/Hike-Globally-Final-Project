@@ -71,7 +71,7 @@ import type { Setting, Trip } from '@/payload-types'
    ---------------------------------------------------------------------------- */
 
 /** Eyebrow for dark backgrounds (the shared `.eyebrow` utility is tuned for light ones).
-    Paper grey rather than coral: at this size the warm accent sits under 4.5:1. */
+    Paper grey rather than ember: at this size the warm accent sits under 4.5:1. */
 const eyebrowOnDark = 'font-heading text-label font-medium tracking-[0.18em] text-mist uppercase'
 
 function SectionTitle({
@@ -330,7 +330,7 @@ export function TripDetail({
             className="-z-10"
             imageClassName="object-cover"
           />
-          {/* One ink wash plus the shared photo scrim — no second, competing
+          {/* One navy wash plus the shared photo scrim — no second, competing
               gradient, and no blur behind the copy. */}
           <div className="absolute inset-0 -z-10 bg-ink/72" />
           <div className="photo-scrim pointer-events-none absolute inset-0 -z-10" />
@@ -452,7 +452,7 @@ export function TripDetail({
                   <ul className="space-y-4">
                     {trip.included.map((item) => (
                       <li key={item.id ?? item.item} className="flex items-start gap-3.5">
-                        <span className="mt-0.5 grid size-6 shrink-0 place-items-center bg-deep text-ink">
+                        <span className="mt-0.5 grid size-6 shrink-0 place-items-center bg-deep text-white">
                           <Check className="size-3.5" strokeWidth={3} aria-hidden />
                         </span>
                         <span className="text-ui leading-relaxed text-ink-80">{item.item}</span>
