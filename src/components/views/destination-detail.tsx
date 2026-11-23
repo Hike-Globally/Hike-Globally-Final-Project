@@ -8,6 +8,7 @@ import { TripCard } from '@/components/cards/trip-card'
 import { Reveal } from '@/components/motion/reveal'
 import { JsonLd } from '@/components/seo/json-ld'
 import { Breadcrumbs } from '@/components/sections/breadcrumbs'
+import { PlaceCategoryLinks } from '@/components/sections/place-category-links'
 import { CoordinatesMap } from '@/components/sections/coordinates-map'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -17,6 +18,7 @@ import { sitePath } from '@/i18n/config'
 import { mapPageUrl, parseCoordinates } from '@/lib/coordinates'
 import type { DestinationCard as DestinationCardData, TripCard as TripCardData } from '@/lib/data'
 import { breadcrumbJsonLd, touristDestinationJsonLd } from '@/lib/seo'
+import { landscapesOf } from '@/lib/taxonomy'
 import type { Destination } from '@/payload-types'
 
 const regionLabel = (region: string, dict: Dictionary): string =>
@@ -37,7 +39,9 @@ export function DestinationDetail({
   linker?: InternalLinker | null
 }) {
   const dict = dictionary
-
+  // The landscapes this region's trips actually walk through — the other half of the site's "where
+  // to go" taxonomy, linked from here so the two read as a hierarchy (see `src/lib/taxonomy.ts`).
+  const landscapes = landscapesOf(trips)
   const seasons = (destination.bestSeasons ?? []).map(
     (season) =>
       dict.destinations[
@@ -206,10 +210,19 @@ export function DestinationDetail({
         </section>
       ) : null}
 
+      {/* The region's trips, sorted by landscape instead of by region: the same journeys a visitor
+          was just offered, filed under what they walk through. */}
+      <PlaceCategoryLinks
+        values={landscapes.map((category) => category.value)}
+        eyebrow="Browse by landscape"
+        heading={`Landscapes in ${destination.name}`}
+        intro="The same trails, sorted by what you walk through rather than where you are."
+      />
+
       {otherDestinations.length ? (
         <section className="py-16 md:py-24">
           <div className="container-content">
-            <h2 className="heading-lg mb-10">{dict.destinations.listingTitle}</h2>
+            <h2 className="heading-lg mb-10">More trekking regions</h2>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4">
               {otherDestinations.map((destinationItem, index) => (
                 <Reveal key={destinationItem.id} delay={index * 70}>
