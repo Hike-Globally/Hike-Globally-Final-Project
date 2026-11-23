@@ -10,6 +10,7 @@ import { PostCard } from '@/components/cards/post-card'
 import { TripCard } from '@/components/cards/trip-card'
 import { JsonLd } from '@/components/seo/json-ld'
 import { Breadcrumbs } from '@/components/sections/breadcrumbs'
+import { DestinationLinks } from '@/components/sections/destination-links'
 import { PlaceGlyph } from '@/components/sections/place-glyph'
 import { SectionHeading } from '@/components/sections/section-heading'
 import { PayloadImageFill } from '@/components/ui/payload-image'
@@ -25,6 +26,7 @@ import {
 } from '@/lib/place-categories'
 import { getPlaceTheme, placeThemeStyle } from '@/lib/place-themes'
 import { breadcrumbJsonLd, buildMetadata, webPageJsonLd } from '@/lib/seo'
+import { regionsOf } from '@/lib/taxonomy'
 import type { Media } from '@/payload-types'
 
 import '../places.css'
@@ -48,7 +50,10 @@ export async function generateMetadata({
   const settings = await getSettings()
 
   return buildMetadata({
-    title: `${category.label} adventures`,
+    // Every search-facing string on this page says "landscape": it is one of nine parallel ways
+    // into the trips, and the region atlas (`/destinations`) is the other. A bare "Lakes
+    // adventures" let the two compete for the same queries (see `src/lib/taxonomy.ts`).
+    title: `${category.label} — treks by landscape`,
     description: category.intro,
     image: placeCategoryMedia(category),
     path: sitePath(`/places/${slug}`),
@@ -234,6 +239,11 @@ export default async function PlaceCategoryPage({ params }: { params: Promise<{ 
           )}
         </div>
       </section>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* The other half of "where to go": the regions these trips run in.    */}
+      {/* ---------------------------------------------------------------- */}
+      <DestinationLinks regions={regionsOf(content.trips)} />
 
       {/* ---------------------------------------------------------------- */}
       {/* Interlude — the field quote, full bleed over the landscape.       */}

@@ -32,7 +32,9 @@ export async function generateMetadata({
   if (!destination) return {}
 
   const seo = seoFromDoc(destination, {
-    title: destination.name,
+    // Name the taxonomy in the fallback title: "Khumbu" alone could be a place page, a trip page
+    // or a region page, and this is the region one. An editor's meta title still wins if set.
+    title: `${destination.name} — trekking region`,
     description: destination.tagline,
     image: destination.heroImage,
   })

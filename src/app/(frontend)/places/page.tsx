@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
 
 import { CtaCard } from '@/components/blocks/cta'
 import { JsonLd } from '@/components/seo/json-ld'
@@ -15,8 +17,15 @@ import './places.css'
 
 export const revalidate = 3600
 
+/**
+ * The landscape index's own description. Every search-facing string on this page says
+ * *landscape* — the one thing it is about that `/destinations` (the region atlas) is not. The two
+ * taxonomies are parallel ways into the same trips, so the copy has to make that split explicit or
+ * the hubs compete for the same "where should I go" queries (see `src/lib/taxonomy.ts`).
+ */
 const INDEX_DESCRIPTION =
-  'Nine landscapes, nine ways to choose your next route. Browse curated trips and field notes by the features that make a place unforgettable.'
+  'Nine landscapes — lakes, passes, base camps, temples — and the treks that reach them. Choose by the landscape you want to walk through, not by the region.'
+const INDEX_TITLE = 'Trekking landscapes of Nepal'
 
 /**
  * The index gets its own frontispiece: a panorama shot for this page alone, so
@@ -41,7 +50,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings()
 
   return buildMetadata({
-    title: 'Browse places',
+    title: INDEX_TITLE,
     description: INDEX_DESCRIPTION,
     image: INDEX_HERO,
     path: sitePath('/places'),
@@ -57,8 +66,8 @@ export default async function PlacesPage() {
   return (
     <div data-places-page="index">
       <PageHeader
-        eyebrow="EXPLORE BEYOND THE MAP"
-        title="Places worth the journey"
+        eyebrow="BROWSE BY LANDSCAPE · NEPAL"
+        title="Places worth the journey, by landscape"
         lead={INDEX_DESCRIPTION}
         breadcrumbs={[{ label: dict.nav.home, href: sitePath('/') }, { label: 'All places' }]}
         background={INDEX_HERO}
@@ -67,6 +76,19 @@ export default async function PlacesPage() {
             one hairline and `09 / Curated` under the standfirst. */}
         <div className="places-index__hero-meta">
           <span>09 / Curated</span>
+          {/* The other half of "where to go": `/destinations` sorts the same trips by region rather
+              than by landscape. Linking the two hubs is what makes them a hierarchy instead of two
+              pages competing for the same query (see `src/lib/taxonomy.ts`). */}
+          <Link
+            href={sitePath('/destinations')}
+            className="group inline-flex items-center gap-2 text-mist/85 transition-colors hover:text-white"
+          >
+            Choose by region
+            <ArrowRight
+              className="size-4 transition-transform duration-300 group-hover:translate-x-1"
+              aria-hidden="true"
+            />
+          </Link>
         </div>
       </PageHeader>
 
@@ -95,7 +117,7 @@ export default async function PlacesPage() {
           ]),
           webPageJsonLd({
             type: 'CollectionPage',
-            name: 'Browse places',
+            name: INDEX_TITLE,
             description: INDEX_DESCRIPTION,
             url: PLACE_INDEX_PATH,
             siteName: settings.siteName,

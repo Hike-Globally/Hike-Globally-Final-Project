@@ -14,6 +14,7 @@ import { dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
 import { getDestinationsPage, getSettings, type DestinationCard } from '@/lib/data'
 import { breadcrumbJsonLd, buildMetadata, webPageJsonLd } from '@/lib/seo'
+import { PLACE_INDEX_PATH } from '@/lib/place-categories'
 
 import './destinations.css'
 
@@ -90,9 +91,9 @@ export default async function DestinationsPage({ searchParams }: ArchiveProps) {
             ]}
           />
 
-          <p className="eyebrow mt-10 text-mist">The destination atlas · Nepal</p>
+          <p className="eyebrow mt-10 text-mist">Trekking regions · Nepal</p>
           <h1 className="heading-display hero-title mt-5 max-w-3xl text-white">
-            The Himalaya, <span className="text-mist">in all its scale.</span>
+            The Himalaya, <span className="text-mist">region by region.</span>
           </h1>
           <p className="lead hero-description mt-6 max-w-2xl text-mist">
             {dict.destinations.listingSubtitle}
@@ -112,6 +113,19 @@ export default async function DestinationsPage({ searchParams }: ArchiveProps) {
             <span className="text-small text-mist/85">
               Led by people who call these mountains home.
             </span>
+            {/* The other half of "where to go": `/places` sorts the same trips by landscape rather
+                than by region. Linking the two hubs is what makes them a hierarchy instead of two
+                pages competing for the same query (see `src/lib/taxonomy.ts`). */}
+            <Link
+              href={PLACE_INDEX_PATH}
+              className="group inline-flex items-center gap-2 border-b border-mist/45 pb-2 text-small font-medium text-white transition-colors hover:border-mist"
+            >
+              Choose by landscape
+              <ArrowRight
+                className="size-4 transition-transform duration-300 group-hover:translate-x-1"
+                aria-hidden="true"
+              />
+            </Link>
           </div>
         </div>
       </section>

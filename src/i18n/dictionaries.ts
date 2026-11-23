@@ -206,10 +206,16 @@ export const en = {
     notFound: 'That trip no longer exists.',
   },
   destinations: {
-    listingTitle: 'Destinations',
+    /**
+     * The region atlas's own name for itself. Deliberately not "Destinations": `/places` is a
+     * parallel "where to go" taxonomy, and a bare "Destinations" title let the two hubs compete
+     * for the same queries. Every search-facing string here says *region* — the one thing this
+     * page is about that `/places` is not (see `src/lib/taxonomy.ts`).
+     */
+    listingTitle: 'Trekking regions of Nepal',
     homeSectionTitle: 'Destinations in Nepal',
     listingSubtitle:
-      'Eight mountain regions, one country that rearranges your sense of scale. Start with the classics or go looking for the quiet ones.',
+      'Eight trekking regions, one country that rearranges your sense of scale. Choose a region — Khumbu, Annapurna, Mustang — and see every trip that runs there.',
     tripsCount_one: '{count} trip',
     tripsCount_other: '{count} trips',
     bestTime: 'Best time to visit',

@@ -14,9 +14,16 @@ import { cn } from '@/lib/utils'
 export function PlaceCategoryLinks({
   values,
   className,
+  eyebrow = 'Browse places',
+  heading = 'Explore related places',
+  intro = 'Follow this story into the landscapes it belongs to.',
 }: {
   values: readonly unknown[] | null | undefined
   className?: string
+  /** Overridable so a page can name the relationship — a region page says "Landscapes in Khumbu". */
+  eyebrow?: string
+  heading?: string
+  intro?: string
 }) {
   const categories = resolvePlaceCategories(values)
   if (categories.length === 0) return null
@@ -27,17 +34,12 @@ export function PlaceCategoryLinks({
       className={cn('border-y border-slate-20 bg-mist py-8 md:py-10', className)}
     >
       <div className="container-content">
-        <p className="eyebrow mb-3">Browse places</p>
+        <p className="eyebrow mb-3">{eyebrow}</p>
         <div className="flex flex-wrap items-end justify-between gap-4">
-          <h2
-            id="place-category-links-heading"
-            className="heading-md max-w-2xl text-ink"
-          >
-            Explore related places
+          <h2 id="place-category-links-heading" className="heading-md max-w-2xl text-ink">
+            {heading}
           </h2>
-          <p className="max-w-md text-small leading-relaxed text-ink-60">
-            Follow this story into the landscapes it belongs to.
-          </p>
+          <p className="max-w-md text-small leading-relaxed text-ink-60">{intro}</p>
         </div>
 
         <ul className="mt-6 flex flex-wrap gap-2">
