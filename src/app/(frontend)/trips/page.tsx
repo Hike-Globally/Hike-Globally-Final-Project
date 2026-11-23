@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { ArchivePagination } from '@/components/sections/archive-pagination'
 import {
   archiveHref,
+  hasArchiveFilters,
   parsePage,
   type ArchiveProps,
   tripFilters,
@@ -29,15 +30,22 @@ const TRIPS_HERO_IMAGE = '/images/trips/hero.jpg'
 
 export async function generateMetadata({ searchParams }: ArchiveProps): Promise<Metadata> {
   const dict = dictionary
-  const page = parsePage((await searchParams).page) ?? notFound()
+  const search = await searchParams
+  const page = parsePage(search.page) ?? notFound()
   const settings = await getSettings()
 
   return buildMetadata({
     title: page === 1 ? dict.trips.listingTitle : `${dict.trips.listingTitle} — Page ${page}`,
     description: dict.trips.listingSubtitle,
     image: settings.defaultOgImage,
+    // Filters are stripped here on purpose: a filtered view is not a URL of its own, so its
+    // canonical stays the plain listing. The robots meta below is what keeps it out of the index.
     path: archiveHref('trips', page),
     siteName: settings.siteName,
+    // `destination` × `difficulty` × `season` × `type` × `sort` is a combinatorial number of
+    // near-identical pages. Crawl them for the trips they link to; never index them.
+    noIndex: hasArchiveFilters('trips', searchString(search)),
+    follow: true,
   })
 }
 

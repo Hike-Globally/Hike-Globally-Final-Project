@@ -3,7 +3,9 @@
  *
  * The contract under test — the same one the file's own header comments promise:
  *
- *   1. every public URL appears exactly once, spelled exactly as the page's canonical;
+ *   1. every public URL appears exactly once, spelled exactly as the page's canonical — including
+ *      each page of a paginated archive (`/trips?page=2`), because `rel=prev/next` is gone and the
+ *      sitemap is what makes page 3 reachable;
  *   2. `<lastmod>` is the document's own `updatedAt`, never "the moment this was generated",
  *      and is omitted rather than invented when there is no real date to use;
  *   3. nothing noindex is listed, and no CMS page is listed under a URL that already belongs to a
@@ -265,4 +267,43 @@ test('with no content at all the sitemap is still the ten static routes', () => 
   assert.equal(entryFor(entries, ORIGIN).changeFrequency, 'weekly')
   assert.equal(entryFor(entries, `${ORIGIN}/trips`).priority, 0.8)
   assert.equal(entryFor(entries, `${ORIGIN}/trips`).changeFrequency, 'daily')
+})
+
+test('every page of a paginated archive is listed, and nothing else about it is', () => {
+  const entries = buildSitemap(
+    sources({
+      // `PAGE_SIZE` is 24, so fifty trips is three pages and the last one holds two cards.
+      trips: Array.from({ length: 50 }, (_, index) =>
+        document({ slug: `trip-${index}`, updatedAt: '2026-04-04T04:04:00.000Z' }),
+      ),
+      // Exactly one page of posts: there is no empty second page to advertise.
+      posts: Array.from({ length: 24 }, (_, index) => document({ slug: `post-${index}` })),
+      destinations: [document({ slug: 'khumbu' })],
+    }),
+  )
+
+  // Pages 2..N follow the static block, so that block stays a contiguous run.
+  assert.deepEqual(urls(entries).slice(STATIC_ROUTE_COUNT, STATIC_ROUTE_COUNT + 2), [
+    `${ORIGIN}/trips?page=2`,
+    `${ORIGIN}/trips?page=3`,
+  ])
+  assert.deepEqual(
+    urls(entries).filter((url) => url.includes('?page=')),
+    [`${ORIGIN}/trips?page=2`, `${ORIGIN}/trips?page=3`],
+  )
+
+  // The entry inherits the listing's own date and priority: page 2 changed when a trip did.
+  assert.equal(lastModifiedOf(entries, `${ORIGIN}/trips?page=2`), '2026-04-04T04:04:00.000Z')
+  assert.equal(entryFor(entries, `${ORIGIN}/trips?page=2`).priority, 0.8)
+  assert.equal(entryFor(entries, `${ORIGIN}/trips?page=2`).changeFrequency, 'daily')
+
+  // A filtered archive URL is never advertised — it is `noindex,follow`, so listing it here would
+  // contradict the page it points at.
+  for (const url of urls(entries)) {
+    assert.doesNotMatch(url, /difficulty=|destination=|season=|type=|sort=|category=/)
+  }
+
+  // One page of destinations and one page of posts: neither has a page 2 to list.
+  assert.equal(urls(entries).filter((url) => url.startsWith(`${ORIGIN}/destinations?`)).length, 0)
+  assert.equal(urls(entries).filter((url) => url.startsWith(`${ORIGIN}/blog?`)).length, 0)
 })

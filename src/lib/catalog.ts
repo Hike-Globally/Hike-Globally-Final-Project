@@ -29,6 +29,37 @@ export function archiveHref(archive: Archive, page: number, filters = '') {
   return `/${archive}${params.size ? `?${params}` : ''}`
 }
 
+/**
+ * The query parameters each archive treats as a facet.
+ *
+ * `page` is deliberately not in the list: page 2 of a listing is a different page of the same
+ * archive and deserves its own index entry, whereas `?difficulty=easy` is a narrower view of
+ * content the archive already shows — a URL worth crawling for the cards it links to, but never
+ * worth an index entry of its own.
+ */
+export const archiveFilterParams: Record<Archive, readonly string[]> = {
+  trips: ['destination', 'difficulty', 'season', 'type', 'sort'],
+  destinations: [],
+  blog: ['category'],
+}
+
+/**
+ * Whether an archive URL is a *filtered* view rather than a plain listing.
+ *
+ * Drives the robots meta on the three archive routes: filtered URLs get `noindex,follow`, so the
+ * combinations (`destination` × `difficulty` × `season` × `type` × `sort`) can be crawled for the
+ * trips they link to without ever being indexed — they would otherwise multiply one archive into
+ * thousands of thin, self-competing URLs.
+ *
+ * Any presence of the parameter counts, including a value the filters would ignore (`sort` at its
+ * default, or an unknown difficulty): such a URL renders exactly what the plain listing renders,
+ * so keeping it out of the index is the honest outcome either way.
+ */
+export function hasArchiveFilters(archive: Archive, search: string): boolean {
+  const params = new URLSearchParams(search)
+  return archiveFilterParams[archive].some((key) => params.has(key))
+}
+
 export function searchString(search: Search) {
   const params = new URLSearchParams()
   for (const [key, value] of Object.entries(search))
