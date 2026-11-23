@@ -599,10 +599,23 @@ export const touristTripJsonLd = ({
   const tripImage = schemaImageUrl(image)
   const tripGuide = personJsonLd(guide === undefined ? trip.guide : guide)
   const pageUrl = canonicalUrl(url)
-  // The trailhead, when the editor set one. `TouristTrip` is a product, not a location, so there is
-  // no coordinates property on it: the pin belongs on the `about` Place of the page that describes
-  // the trip.
+  // The trailhead, when the editor set one. `TouristTrip` is `Thing > Intangible > Trip` — an
+  // itinerary, not a location — so it has no coordinates property: the pin belongs on the
+  // `about` Place of the page that describes the trip.
   const trailhead = parseCoordinates(trip.coordinates)
+
+  /* No `offers` — and therefore no price — on this node. Deliberate, not an omission.
+   *
+   * `TouristTrip` is `Thing > Intangible > Trip`, and a price can only reach it through an
+   * `Offer`. But Hike Globally lists trips it does not sell: an `Offer` here would assert a
+   * seller, an availability and a price that no operator has confirmed through us, which is
+   * the kind of markup search engines read as misleading rather than as a rich result. The
+   * price a visitor can actually act on lives in the page's Pricing section
+   * (`TripBookingCard`), as text, and nowhere else.
+   *
+   * Do not infer a provider from the publisher, or availability from the presence of a
+   * booking link.
+   */
 
   return {
     '@context': 'https://schema.org',
@@ -630,7 +643,7 @@ export const touristTripJsonLd = ({
       dateModified: trip.updatedAt,
       // The trailhead, when the editor set one: `about` names the place the trip starts from and
       // carries its coordinates. (A `GeoCoordinates` node cannot hang off `TouristTrip` itself —
-      // the trip is a product, not a location.)
+      // the trip is an itinerary, not a location.)
       ...(trailhead
         ? {
             about: {
@@ -660,8 +673,6 @@ export const touristTripJsonLd = ({
           })),
         }
       : undefined,
-    // A listing price is not a verified operator offer. Do not infer a provider
-    // from the publisher or availability from the presence of a booking link.
     ...(destinationName
       ? {
           touristDestination: {

@@ -454,6 +454,25 @@ test('trip detail renders its expert exactly once, including full-width-only lay
   assert.equal(noGuide.querySelector('[data-author-profile]'), null)
 })
 
+test('the trip page keeps its price in the pricing section and publishes no offer', () => {
+  const document = documentOf(
+    renderToStaticMarkup(createElement(TripDetail, { trip, related: [], settings })),
+  )
+
+  // A listing price is not an operator offer: no node on the page may claim to sell the trip.
+  // `@type` can be an array, so a node typed `['TouristTrip', 'Product']` fails here as well.
+  for (const node of schemaNodes(document)) {
+    const types = Array.isArray(node['@type']) ? (node['@type'] as unknown[]) : [node['@type']]
+    assert.ok(!types.includes('Offer'), `no Offer node: ${JSON.stringify(types)}`)
+    assert.ok(!types.includes('Product'), `no Product node: ${JSON.stringify(types)}`)
+    assert.equal(node.offers, undefined, `no offers on a ${JSON.stringify(types)} node`)
+  }
+
+  // The price is still published — as the pricing section's own text, which is the one place a
+  // visitor can read it. `formatPrice(900, 'USD')`.
+  assert.match(document.body.textContent ?? '', /\$900/)
+})
+
 test('profile text cannot break out of JSON-LD or produce executable profile links', () => {
   const malicious = {
     ...author,
