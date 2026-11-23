@@ -4,13 +4,13 @@
    Structure, choreography and media queries come from the ported sample; the
    surface is redrawn in the brand tokens:
 
-     · white cards on a warm hairline (`--color-slate-20`) — no drop shadow and
+     · paper cards on a warm hairline (`--color-slate-20`) — no drop shadow and
        no lift. Hover feedback is the border darkening, the photograph stepping
-       in 3%, the CTA bar wiping to navy and the arrow turning.
+       in 3%, the CTA bar wiping to ink and the arrow turning.
      · one accent, not three: every card wipes to `--color-ink`, and a single
-       ember dot beside the category is the only warm mark in the grid.
-     · copy steps: ink titles (13.45:1), ink-60 descriptions (5.21:1),
-       slate meta (4.83:1) and slate-80 on the paper tags (5.17:1).
+       coral dot beside the category is the only warm mark in the grid.
+     · copy steps: ink titles (16.88:1), ink-60 descriptions (4.92:1),
+       earth-toned slate-80 meta and tags (6.21:1 on paper).
    ========================================================================== */
 [data-service-tiles='hg-stories'],
 [data-service-tiles='hg-stories'] * {
@@ -238,7 +238,7 @@
   transition: transform 0.5s var(--ease-brand, cubic-bezier(0.22, 1, 0.36, 1));
 }
 
-/* Wiped state: navy bar, paper copy (12.44:1). */
+/* Wiped state: ink bar, paper copy (16.88:1). */
 [data-service-tiles='hg-stories'][data-static='false']
   .st-card[data-linked='true']:focus-visible {
   outline: 0.125rem solid var(--color-deep);

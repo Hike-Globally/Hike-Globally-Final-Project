@@ -6,53 +6,50 @@
 /* ==========================================================================
    Hike Globally — design tokens
    ==========================================================================
-   Palette (locked, six colours — everything else on the site is a mix of
-   these six with white, with ink, or with each other):
+   Eight supplied hex values; the paper background is user-specified. The
+   token names and remaining role descriptions below are inferred for this
+   implementation, not role assignments confirmed by the user:
 
-     #183144  ink    deep navy    — headings, running copy, dark sections, buttons
-     #F6F6F6  mist   paper        — quiet fills, plate backgrounds, copy on dark
-     #87AABD  haze   haze blue    — illustration, on-dark secondary text, graphics
-     #79706D  slate  warm taupe   — meta copy, eyebrows, captions, hairlines
-     #2177B5  deep   expedition blue — links, focus, interactive states
-     #D0564D  sage   ember        — the one warm accent: rules, markers, fills
+     #F5F0EA  paper   warm site canvas and light surfaces
+     #210516  ink     headings, body copy and dark sections
+     #5E7993  haze    blue-grey atmosphere, illustration and linework
+     #78510F  earth   warm neutral and accessible small-text accent
+     #BCB0B1  stone   quiet neutral, borders and hairlines
+     #CBAF35  gold    warm graphic accent
+     #0393CD  blue    bright expedition blue
+     #F53F1D  coral   vivid warm accent and destination markers
 
-   The page background (--background) is pure white, #ffffff. Sections are
-   separated by hairlines and whitespace rather than by coloured bands, so the
-   six colours above never compete inside one viewport.
+   The public site background is `paper` (#F5F0EA). Pure white is reserved for
+   contrast on dark photography and selected elevated surfaces. The established
+   token names below remain available to components while mapping to this palette.
 
-   Derived steps (each one is a stated mix, so nothing drifts off-palette):
+   Derived steps (sRGB mixes from the palette, with AA shades for text):
 
-     ink-80   #465A69  ink + 20% white    7.17:1 on white — prose paragraphs
-     ink-70   #526573  ink + 25% white    6.06:1 on white
-     ink-60   #5D6F7C  ink + 30% white    5.21:1 on white — lead & meta copy
-     deep-90  #206CA4  deep + 15% ink     5.61:1 on white — hover
-     deep-80  #1F6699  deep + 25% ink     6.14:1 on white — active
-     deep-20  #DBE9F3  white + 16% deep   cool wash
-     slate-80 #6B6767  slate + 14% ink    5.17:1 on paper — meta copy on tinted panels
-     slate-40 #C9C6C5  white + 40% slate  visible rules, dividers
-     slate-20 #EAE8E8  white + 16% slate  hairlines, borders
-     sage-90  #B4504C  sage + 15% ink     5.01:1 on white — small ember text, fills
-     sage-80  #994B4A  sage + 30% ink     6.07:1 on white — hover / active
-     sage-40  #ECBBB8  white + 40% sage   highlighter, ember hairlines
-     sage-20  #F9EBEA  white + 12% sage   ember wash
-     sage-lt  #DE8982  sage + 30% white   5.13:1 on ink — small ember text on dark
-     haze-40  #DBE6EB  white + 30% haze   cool hairlines
-     haze-20  #ECF1F4  white + 16% haze   cool wash
-     mist-60  #EFEEED  white + 12% slate  chip fills, hover fills
+     ink-80   #4B3440  9.94:1 on paper — prose paragraphs
+     ink-70   #614C56  6.93:1 on paper
+     ink-60   #76636B  4.92:1 on paper — lead and metadata copy
+     deep-90  #0A709F  4.84:1 on paper — links and small blue text
+     deep-80  #0E618D  5.95:1 on paper — active / hover text
+     deep-20  #CEE1E5  paper + 16% blue — cool wash
+     slate-80 #78510F  6.21:1 on paper — earth-toned meta copy
+     slate-40 #DED6D3  paper + 40% stone — visible rules
+     slate-20 #ECE6E1  paper + 16% stone — hairlines and borders
+     sage-90  #C0301B  5.04:1 on paper — coral text and fills
+     sage-80  #AB2B1B  5.99:1 on paper — hover / active text
+     sage-40  #F5A998  paper + 40% coral — accent hairlines
+     sage-20  #F5DBD1  paper + 12% coral — warm wash
+     sage-lt  #F5745A  6.86:1 on ink — accent on dark surfaces
+     haze-40  #C8CCD0  paper + 30% haze — cool hairlines
+     haze-20  #DDDDDC  paper + 16% haze — cool wash
+     haze-lt  #6D859C  5.00:1 on ink — blue-grey text on dark surfaces
+     mist-60  #EEE8E3  paper + 12% stone — chip fills
+     mist-40  #F9F6F2  paper + 40% white — quiet raised surface
 
-   Contrast (WCAG 2.2, checked against #ffffff and #183144):
-     ink 13.45 · ink-80 7.17 · ink-70 6.06 · ink-60 5.21 · deep 4.80 ·
-     slate 4.83 · slate-80 5.58 · sage-90 5.01 — all AA for body copy on white.
-     On paper (`mist`, #f6f6f6) the same roles step one shade darker, because
-     taupe and blue both land a hair under 4.5:1 there: slate-80 5.17 and
-     deep-90 5.19 are the AA meta/link colours on a tinted panel.
-     Over a photograph, copy sits on `--scrim-ink` and is always mist or white
-     (6.71:1+) — haze and ember are never used as small text on an image.
-     sage (#D0564D, 4.10:1) and haze (#87AABD, 2.47:1) are therefore reserved
-     for large display type (AA-large, 3:1), icons and graphic marks (3:1),
-     rules and fills — never for small text on white. On ink, the roles flip:
-     mist 12.44 · white 13.45 · haze 5.45 · sage-light 5.13 are AA, while deep
-     and slate are not used as text on dark surfaces.
+   Contrast (WCAG 2.2): ink 16.88 · ink-80 9.94 · ink-70 6.93 · ink-60 4.92 ·
+   deep-90 4.84 · slate-80 6.21 · sage-90 5.04 — AA for body copy on paper.
+   The bright blue (#0393CD), blue-grey (#5E7993), coral (#F53F1D), gold and
+   stone are primarily graphic colours; accessible darker or lighter variants
+   are used when a small text role or a dark photographic surface requires it.
 
    Typography — three families:
      Display  — Instrument Serif 400 (self-hosted): hero, section and page
@@ -73,78 +70,88 @@
    Imagery — one treatment everywhere:
      photographs are graded with `--image-grade` (a whisper of desaturation and
      a touch of contrast, so a mixed library of uploads reads as one archive),
-     they sit on a paper (`mist`) plate while they load, they are framed with a
-     1px ink hairline rather than lifted with a drop shadow, and copy over a
-     photograph always sits on the same single navy scrim (`--scrim-ink`).
+     they sit on a paper plate while they load, they are framed with a 1px ink
+     hairline rather than lifted with a drop shadow, and copy over a photograph
+     always sits on the same single ink scrim (`--scrim-ink`).
 
    Hero — one band and one type scale on every page (the homepage's, promoted to
-     the whole site; see `--hero-*` in `@theme` and the `.hero-region` /
-     `.hero-title` / `.hero-description` rules further down): exactly one
-     viewport tall, a 42 → 72px display headline with its italic accent line,
-     and a 17 → 18px standfirst.
+   the whole site; see `--hero-*` in `@theme` and the `.hero-region` /
+   `.hero-title` / `.hero-description` rules further down): exactly one
+   viewport tall, a 42 → 72px display headline with its italic accent line,
+   and a 17 → 18px standfirst.
    ========================================================================== */
 
 @theme {
   /* --- Brand colours (usable as bg-ink, text-sage, border-slate …) --- */
-  /* `paper` is the pure white the page is drawn on — named so inline styles and
-     canvas code can reach it as a token instead of writing `#ffffff`. */
-  --color-paper: #ffffff;
-  --color-ink: #183144;
-  --color-deep: #2177b5;
-  --color-slate: #79706d;
-  --color-sage: #d0564d;
-  --color-mist: #f6f6f6;
-  --color-haze: #87aabd;
+  /* `paper` is the site canvas; `mist` stays as its light-surface alias for
+     existing components. White remains available for inverse copy and imagery. */
+  --color-paper: #f5f0ea;
+  --color-ink: #210516;
+  --color-deep: #0393cd;
+  --color-slate: #bcb0b1;
+  --color-sage: #f53f1d;
+  --color-mist: #f5f0ea;
+  --color-haze: #5e7993;
+  --color-earth: #78510f;
+  --color-stone: #bcb0b1;
+  --color-gold: #cbaf35;
+  --color-haze-light: #6d859c;
 
-  /* Tints and shades derived from the six brand colours (mixes documented in
-     the header above), so hovers, rules and washes always stay inside the
-     palette instead of drifting to arbitrary greys. */
-  --color-ink-80: #465a69;
-  --color-ink-70: #526573;
-  --color-ink-60: #5d6f7c;
-  --color-deep-90: #206ca4;
-  --color-deep-80: #1f6699;
-  --color-deep-20: #dbe9f3;
-  --color-slate-80: #6b6767;
-  --color-slate-40: #c9c6c5;
-  --color-slate-20: #eae8e8;
-  --color-sage-90: #b4504c;
-  --color-sage-80: #994b4a;
-  --color-sage-40: #ecbbb8;
-  --color-sage-20: #f9ebea;
-  --color-sage-light: #de8982;
-  --color-haze-40: #dbe6eb;
-  --color-haze-20: #ecf1f4;
-  --color-mist-60: #efeeed;
-  --color-mist-40: #fbfbfb;
+  /* Derived palette steps. Light mixes use paper; dark text shades are tuned
+     for WCAG AA rather than blindly tinting the vivid graphic colours. */
+  --color-ink-80: #4b3440;
+  --color-ink-70: #614c56;
+  --color-ink-60: #76636b;
+  --color-deep-90: #0a709f;
+  --color-deep-80: #0e618d;
+  --color-deep-20: #cee1e5;
+  --color-slate-80: #78510f;
+  --color-slate-60: #76636b;
+  --color-slate-40: #ded6d3;
+  --color-slate-20: #ece6e1;
+  --color-sage-90: #c0301b;
+  --color-sage-80: #ab2b1b;
+  --color-sage-40: #f5a998;
+  --color-sage-20: #f5dbd1;
+  --color-sage-light: #f5745a;
+  --color-haze-40: #c8ccd0;
+  --color-haze-20: #dddddc;
+  --color-mist-60: #eee8e3;
+  --color-mist-40: #f9f6f2;
+  --color-gold-20: #f0e8d4;
+  --color-gold-40: #e4d6a2;
+
+  /* Extra pale plates for themed landscape hubs, mixed from paper and the
+     named brand colour: blue 12% / blue 8%, coral 5% / coral 7%. */
+  --color-place-blue-wash: #d8e5e7;
+  --color-place-waterfall-wash: #e2e9e8;
+  --color-place-coral-wash: #f5e7e0;
+  --color-place-basecamp-wash: #f5e4dc;
 
   /* --- Pull-quote card -----------------------------------------------------
-     The dark, red-outlined blockquote treatment from the blockquote design
-     reference (`blockquote.png`): a near-black surface with a 2px ember-red
-     outline and 16px corners. These two are the card's own surface and edge —
-     the quote sits apart from the six brand colours rather than tinting one. */
-  --color-quote-surface: #292a2b;
-  --color-quote-edge: #e74848;
+     Ink surface and coral edge keep the quote visibly within the brand palette. */
+  --color-quote-surface: #210516;
+  --color-quote-edge: #f53f1d;
 
   /* --- Boxed Content plate -------------------------------------------------
-     Glacial sky-cyan surface (#caf0f8) paired with its sister ice-blue hairline
-     (#90e0ef), deep navy headings (#183144, 11.10:1 AAA), oceanic slate-ink
-     copy (#244357, 8.60:1 AAA), and expedition-blue accent (#1f6699, 5.07:1 AA). */
-  --color-boxed-surface: #caf0f8;
-  --color-boxed-border: #90e0ef;
-  --color-boxed-title: #183144;
-  --color-boxed-copy: #244357;
-  --color-boxed-accent: #1f6699;
+     A pale blue wash mixed from paper and the bright brand blue, with a blue-grey
+     hairline and ink copy. The accent is the AA text shade of the same blue. */
+  --color-boxed-surface: #d8e5e7;
+  --color-boxed-border: #5e7993;
+  --color-boxed-title: #210516;
+  --color-boxed-copy: #210516;
+  --color-boxed-accent: #0e618d;
 
-  /* --- Button palette & radius ---
-     Dedicated interactive tokens tuned for clear hierarchy, tactile hover/press
-     states, and >= 4.8:1 WCAG AA contrast across light and dark surfaces. */
-  --color-btn-primary: #183144;
-  --color-btn-primary-hover: #1f6699;
-  --color-btn-primary-active: #142838;
-  --color-btn-accent: #c24b38;
-  --color-btn-accent-hover: #a63c2b;
-  --color-btn-accent-active: #8f3324;
+  /* --- Button palette & radius --------------------------------------------
+     The vivid coral accent uses ink labels (5.11:1); the bright blue is darkened
+     for white-label primary hover states so every control keeps AA contrast. */
+  --color-btn-primary: #210516;
+  --color-btn-primary-hover: #0a709f;
+  --color-btn-primary-active: #170311;
+  --color-btn-accent: #f53f1d;
+  --color-btn-accent-hover: #f56246;
+  --color-btn-accent-active: #ee3a19;
+  --color-btn-accent-foreground: #210516;
   --radius-button: 7px;
 
   /* --- Typography --- */
@@ -286,8 +293,8 @@
   /* Base radius the shadcn scale derives from — 0, matching the square-cornered theme above. */
   --radius: 0px;
 
-  /* The global site background — pure white. */
-  /* Every value below is one of the six brand colours or a tint already defined
+  /* The global site background — warm paper (#F5F0EA). */
+  /* Every value below comes from the eight brand colours or a documented tint
      in `@theme` — the semantic layer adds names, never new hues. */
   --background: var(--color-paper);
   --foreground: var(--color-ink);
@@ -307,8 +314,7 @@
   --muted: var(--color-mist-60);
   --muted-foreground: var(--color-slate-80);
 
-  /* The accent slot is the ember wash, not the ember itself: shadcn paints
-     hover/focus fills with it, and a wash keeps ink copy at 11.59:1. */
+  /* The accent slot is a pale coral wash, keeping ink copy high-contrast. */
   --accent: var(--color-sage-20);
   --accent-foreground: var(--color-ink);
 
@@ -316,10 +322,8 @@
   --destructive-foreground: var(--color-paper);
 
   --border: var(--color-slate-20);
-  /* Form fields sit white-on-white, so the border is the only thing that draws
-     the component: `slate` (4.83:1) rather than the decorative hairline tint,
-     which would fall under the 3:1 a UI boundary needs. */
-  --input: var(--color-slate);
+  /* A darker earth-toned stroke keeps form boundaries visible on paper. */
+  --input: var(--color-slate-60);
   --ring: var(--color-deep);
 
   --chart-1: var(--color-ink);
@@ -390,7 +394,7 @@
   --secondary-foreground: var(--color-mist);
 
   --muted: var(--surface-sunken);
-  --muted-foreground: var(--color-haze);
+  --muted-foreground: var(--color-haze-light);
 
   --accent: var(--surface-sunken);
   --accent-foreground: var(--color-mist);
@@ -400,16 +404,16 @@
 
   --border: var(--hairline-on-dark);
   --input: var(--hairline-on-dark);
-  --ring: var(--color-haze);
+  --ring: var(--color-haze-light);
 
   --sidebar: var(--color-ink);
   --sidebar-foreground: var(--color-mist);
-  --sidebar-primary: var(--color-haze);
+  --sidebar-primary: var(--color-gold);
   --sidebar-primary-foreground: var(--color-ink);
   --sidebar-accent: var(--surface-sunken);
   --sidebar-accent-foreground: var(--color-mist);
   --sidebar-border: var(--hairline-on-dark);
-  --sidebar-ring: var(--color-haze);
+  --sidebar-ring: var(--color-haze-light);
 }
 
 @theme inline {
@@ -649,9 +653,8 @@
 }
 
 /* Eyebrow / kicker label above headings. A label, not a heading: it stays in
-   the text face at 12px with generous tracking, in the darker taupe (`slate-80`,
-   5.58:1 on paper and 5.17:1 on the mist panels it sometimes sits on — plain
-   `slate` measures 4.47:1 there and misses AA). Faces that sit on a dark
+   the text face at 12px with generous tracking, in the accessible earth tone
+   (`slate-80`, 6.21:1 on paper). Faces that sit on a dark
    section override the colour with `text-mist`. */
 @utility eyebrow {
   font-family: var(--font-heading);
@@ -728,7 +731,7 @@
   color: var(--color-ink-60);
 }
 
-/* Quiet ember highlighter behind a phrase in a heading. */
+/* Quiet coral highlighter behind a phrase in a heading. */
 @utility mark-sage {
   background-image: linear-gradient(to top, var(--color-sage-40) 34%, transparent 34%);
   padding-inline: 0.08em;
@@ -775,7 +778,7 @@
 /* --- Imagery treatment ---------------------------------------------------
    `photo-plate` is the frame every photograph sits in: a paper background that
    shows while the file loads, and a 1px ink hairline instead of a drop shadow.
-   `photo-scrim` is the one navy gradient allowed under copy on an image. */
+   `photo-scrim` is the one ink gradient allowed under copy on an image. */
 @utility photo-plate {
   position: relative;
   overflow: hidden;
@@ -847,7 +850,7 @@
     line-height: var(--text-body--line-height);
   }
   .prose-hg a {
-    @apply text-deep underline decoration-slate-40 decoration-1 underline-offset-4 transition-colors hover:text-deep-80 hover:decoration-deep;
+    @apply text-deep-90 underline decoration-slate-40 decoration-1 underline-offset-4 transition-colors hover:text-deep-80 hover:decoration-deep-90;
   }
   .prose-hg ul,
   .prose-hg ol {
@@ -968,7 +971,7 @@
     @apply my-12;
   }
   .prose-hg figcaption {
-    @apply mt-3.5 text-slate;
+    @apply mt-3.5 text-slate-80;
     /* Captions read the small role (14px, 1.6). */
     font-size: var(--text-small);
     line-height: var(--text-small--line-height);
@@ -1152,7 +1155,7 @@
    Single pages — running copy for trips, blog posts, destinations & CMS pages
    ==========================================================================
    One pixel above the site body size (16px → 17px) in ink, so long-form
-   reading copy is as legible as possible on the white page (13.45:1) without
+   reading copy is as legible as possible on the paper page (16.88:1) without
    the harshness of pure black.
 
    Only elements that inherit their type inherit this — headings, eyebrows, links,

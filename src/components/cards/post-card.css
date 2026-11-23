@@ -5,15 +5,15 @@
    `text-*` utility on the element. That is deliberate:
 
    `text-card` is NOT a font-size utility in this project. Tailwind v4 resolves
-   `text-card` against the `--color-card` theme token (the shadcn surface colour,
-   white) before it considers `--text-card` (the 20px → 24px card type role), so
-   `class="text-card"` compiles to `color: #fff`. On the white/mist card surface
-   that painted the headline white-on-white — the "Keep reading" rail on article
-   pages being the place it showed up.
+   `text-card` against the `--color-card` theme token (the shadcn surface colour)
+   before it considers `--text-card` (the 20px → 24px card type role). In the
+   light theme the surface token is paper, so `class="text-card"` paints the
+   headline the same colour as its paper card — the "Keep reading" rail on
+   article pages being the place it showed up.
 
    So the card type role is applied here as `font-size: var(--text-card)` — the
    exact same token the broken utility was meant to reach — and the colour is
-   pinned to `--color-ink` (13.45:1 on paper). Every surface that renders a
+   pinned to `--color-ink` (16.88:1 on paper). Every surface that renders a
    `PostCard` (`/blog` and the related-posts rail of `/blog/[slug]`) gets it;
    page-level scales such as `blog.css` can still override both, because a more
    specific selector wins over these.
@@ -34,7 +34,7 @@
 
 /* The whole title is the link — inherit the title's colour so the anchor cannot
    pick up a light link colour of its own, then hand the hover back to the
-   component's `hover:text-deep` utility. */
+   component's `hover:text-deep-90` utility. */
 .post-card-title a {
   color: inherit;
 }
@@ -46,7 +46,7 @@
    article, so its headlines run one step above the journal grid: 24px on phones
    → 30px from `md` up (the card role tops out at 24px). Scoped to the rail via
    `[data-related-rail]`, set once in `post-detail.tsx`, so the `/blog` listing
-   and the homepage boards keep their own scale. Ink on the mist band, 13.45:1.
+   and the homepage boards keep their own scale. Ink on the paper band, 16.88:1.
    -------------------------------------------------------------------------- */
 [data-related-rail] .post-card-title {
   color: var(--color-ink);

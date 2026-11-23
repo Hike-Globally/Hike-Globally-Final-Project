@@ -86,7 +86,7 @@ export function DifficultyLevels() {
             </span>
             <Link
               href={sitePath('/trips')}
-              className="group inline-flex items-center gap-1.5 text-small font-medium text-deep underline decoration-slate-40 decoration-1 underline-offset-4 transition-colors hover:text-deep-80 hover:decoration-deep"
+              className="group inline-flex items-center gap-1.5 text-small font-medium text-deep-90 underline decoration-slate-40 decoration-1 underline-offset-4 transition-colors hover:text-deep-80 hover:decoration-deep-90"
             >
               Explore all trips
               <ArrowUpRight
@@ -132,7 +132,7 @@ export function DifficultyLevels() {
                 className="-z-20 object-cover transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.045]"
                 aria-hidden="true"
               />
-              {/* Two navy washes, one per edge that carries copy — the level
+              {/* Two ink washes, one per edge that carries copy — the level
                   row at the top, the rung name and description at the foot.
                   A black overlay at 50% opacity sits over the photo. */}
               <div

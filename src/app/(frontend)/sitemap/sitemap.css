@@ -2,12 +2,12 @@
    Visual Sitemap & Information Flow — /sitemap
    ============================================================================
    Enterprise-grade Octopus.do visual IA blueprint adapted to Hike Globally's
-   locked six-colour palette (ink, mist, haze, slate, deep, sage), typography
+   locked eight-colour palette (paper, ink, haze, earth, stone, gold, blue, coral), typography
    (Instrument Serif + Archivo), square-cornered card geometry, and 7px button
    radius.
 
    Sections:
-     1. .ia-hero      — Dark navy blueprint header with telemetry pills & KPIs
+     1. .ia-hero      — Dark ink blueprint header with telemetry pills & KPIs
      2. .ia-workspace — Subsystem filter pills, search, Diagram/Cards/Index views,
                         and dot-grid wireframe tree canvas
      3. .ia-taxonomy  — "01 Architectural Taxonomy / Six Core Subsystems at a Glance"
@@ -86,7 +86,7 @@
 }
 
 .ia-badge--sync {
-  color: var(--color-haze);
+  color: var(--color-haze-light);
 }
 
 .ia-badge__dot {
@@ -108,7 +108,7 @@
 
 .ia-hero__title em {
   font-style: italic;
-  color: var(--color-haze);
+  color: var(--color-haze-light);
 }
 
 .ia-hero__lead {
@@ -142,7 +142,7 @@
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--color-haze);
+  color: var(--color-haze-light);
 }
 
 .ia-metric__value {
@@ -225,7 +225,7 @@
 }
 
 .ia-filter-pill[aria-pressed='true'] .ia-filter-pill__count {
-  color: var(--color-haze);
+  color: var(--color-haze-light);
 }
 
 .ia-toolbar__controls {
@@ -273,7 +273,7 @@
 .ia-search__input:focus-visible {
   outline: 2px solid var(--color-deep);
   outline-offset: 1px;
-  border-color: var(--color-deep);
+  border-color: var(--color-deep-90);
   background: var(--color-paper);
 }
 
@@ -532,7 +532,7 @@
 }
 
 .ia-node:hover {
-  border-color: var(--color-deep);
+  border-color: var(--color-deep-90);
   transform: translateY(-2px);
   box-shadow: var(--shadow-sm);
 }
@@ -749,7 +749,7 @@
   margin-left: auto;
   font-size: 0.65rem;
   font-weight: 600;
-  color: var(--color-haze);
+  color: var(--color-haze-light);
   font-variant-numeric: tabular-nums;
 }
 
@@ -873,8 +873,8 @@
 }
 
 .ia-spec-card:hover {
-  border-color: var(--color-deep);
-  border-top-color: var(--color-deep);
+  border-color: var(--color-deep-90);
+  border-top-color: var(--color-deep-90);
   transform: translateY(-2px);
   box-shadow: var(--shadow-sm);
 }
@@ -969,7 +969,7 @@
 }
 
 .ia-spec-card:hover .ia-spec-card__arrow {
-  color: var(--color-deep);
+  color: var(--color-deep-90);
   transform: translate(2px, -2px);
 }
 
@@ -1045,7 +1045,7 @@
 }
 
 .ia-index-row__title:hover {
-  color: var(--color-deep);
+  color: var(--color-deep-90);
 }
 
 .ia-index-row__desc {
@@ -1103,8 +1103,8 @@
 }
 
 .ia-index-row__open:hover {
-  border-color: var(--color-deep);
-  color: var(--color-deep);
+  border-color: var(--color-deep-90);
+  color: var(--color-deep-90);
 }
 
 /* Empty Filter State */
@@ -1232,8 +1232,8 @@
 }
 
 .ia-tax-card[data-active='true'] {
-  border-color: var(--color-deep);
-  border-top-color: var(--color-deep);
+  border-color: var(--color-deep-90);
+  border-top-color: var(--color-deep-90);
   background: var(--color-mist-40);
 }
 
@@ -1297,7 +1297,7 @@
 }
 
 .ia-tax-card__route-link:hover {
-  color: var(--color-deep);
+  color: var(--color-deep-90);
 }
 
 .ia-tax-card__route-name {
@@ -1427,7 +1427,7 @@
 .ia-protocol__btn--primary {
   background: var(--color-btn-accent);
   border: 1px solid var(--color-btn-accent);
-  color: var(--color-paper);
+  color: var(--color-btn-accent-foreground);
 }
 
 .ia-protocol__btn--primary:hover {
@@ -1460,7 +1460,7 @@
   margin-top: 0.35rem;
   font-size: 0.82rem;
   font-weight: 500;
-  color: var(--color-haze);
+  color: var(--color-haze-light);
   text-decoration: none;
 }
 

@@ -45,7 +45,7 @@ test('the trip page keeps the live map and itinerary chart, without the uploaded
   assert.match(order, /chartCard/)
   assert.doesNotMatch(tripDetail, /uploadedRouteMap|uploadedAltitudeChart|routeMap\[0\]/)
   assert.match(tripDetail, /zoom=\{9\}/)
-  assert.match(tripDetail, /if \(!intro && !coordinates && !profile\) return null/)
+  assert.match(tripDetail, /if \(!coordinates && !profile\) return null/)
 })
 
 test('the map is server-rendered: no client boundary, no map library, no API key', () => {

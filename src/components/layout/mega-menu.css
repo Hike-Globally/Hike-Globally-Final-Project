@@ -1,5 +1,5 @@
 /* ============================================================================
-   Destinations & Trips Mega Menus — dark-navy editorial panels matching
+   Destinations & Trips Mega Menus — dark ink editorial panels matching
    the existing pill nav (`--color-ink`, `--color-haze`, `--color-mist`,
    `--color-paper`) with full responsiveness across mobile, tablet, and desktop.
 
@@ -152,7 +152,7 @@
   font-weight: 600;
   letter-spacing: 0.11em;
   text-transform: uppercase;
-  color: var(--color-haze);
+  color: var(--color-haze-light);
   line-height: 1.2;
 }
 
@@ -166,7 +166,7 @@
 
 .pn-mega-arrow {
   flex-shrink: 0;
-  color: var(--color-haze);
+  color: var(--color-haze-light);
   transition: transform 0.18s ease, color 0.18s ease;
 }
 
@@ -244,7 +244,7 @@
   font-family: var(--font-sans);
   font-size: var(--text-caption);
   line-height: 1.25;
-  color: var(--color-haze);
+  color: var(--color-haze-light);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -305,9 +305,9 @@
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(24, 49, 68, 0.94) 0%,
-    rgba(24, 49, 68, 0.58) 52%,
-    rgba(24, 49, 68, 0.16) 100%
+    color-mix(in srgb, var(--color-ink) 94%, transparent) 0%,
+    color-mix(in srgb, var(--color-ink) 58%, transparent) 52%,
+    color-mix(in srgb, var(--color-ink) 16%, transparent) 100%
   );
 }
 
@@ -319,7 +319,7 @@
   padding: 0.25rem 0.625rem;
   border-radius: 9999px;
   border: 0.0625rem solid color-mix(in srgb, var(--color-mist) 22%, transparent);
-  background-color: rgba(24, 49, 68, 0.8);
+  background-color: color-mix(in srgb, var(--color-ink) 80%, transparent);
   color: var(--color-paper);
   font-family: var(--font-sans);
   font-size: 0.75rem;
@@ -342,7 +342,7 @@
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--color-haze);
+  color: var(--color-haze-light);
 }
 
 .pn-mega-dest-card-title {
@@ -434,7 +434,7 @@
 
 .pn-mega-facet-count {
   font-size: var(--text-caption);
-  color: var(--color-haze);
+  color: var(--color-haze-light);
   font-variant-numeric: tabular-nums;
 }
 
@@ -528,7 +528,7 @@
 .pn-mega-trip-scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(24, 49, 68, 0.55) 0%, transparent 55%);
+  background: linear-gradient(to top, color-mix(in srgb, var(--color-ink) 55%, transparent) 0%, transparent 55%);
 }
 
 .pn-mega-trip-region {
@@ -540,7 +540,7 @@
   padding: 0.1875rem 0.5rem;
   border-radius: 9999px;
   border: 0.0625rem solid color-mix(in srgb, var(--color-mist) 18%, transparent);
-  background-color: rgba(24, 49, 68, 0.82);
+  background-color: color-mix(in srgb, var(--color-ink) 82%, transparent);
   color: var(--color-mist);
   font-family: var(--font-sans);
   font-size: 0.6875rem;
@@ -579,7 +579,7 @@
   gap: 0.25rem 0.625rem;
   font-family: var(--font-sans);
   font-size: var(--text-caption);
-  color: var(--color-haze);
+  color: var(--color-haze-light);
   line-height: 1.2;
 }
 
@@ -655,7 +655,7 @@
   flex-shrink: 0;
   font-family: var(--font-sans);
   font-size: 0.75rem;
-  color: var(--color-haze);
+  color: var(--color-haze-light);
   font-variant-numeric: tabular-nums;
 }
 
@@ -922,7 +922,7 @@
 
 /* ============================================================================
    MOBILE & SMALL PORTRAIT TABLET SHEET (< 810px)
-   Rich responsive mega menu nested inside the full-screen navy sheet.
+   Rich responsive mega menu nested inside the full-screen ink sheet.
    ========================================================================== */
 @media (max-width: 809.98px) {
   /* Remove the plain submenu left indent so mega cards & grids align cleanly. */
@@ -1051,7 +1051,7 @@
   font-family: var(--font-sans);
   font-size: var(--text-caption);
   line-height: 1.25;
-  color: var(--color-haze);
+  color: var(--color-haze-light);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1121,7 +1121,7 @@
   padding: 0.1875rem 0.5rem;
   border-radius: 9999px;
   border: 0.0625rem solid color-mix(in srgb, var(--color-mist) 18%, transparent);
-  background-color: rgba(24, 49, 68, 0.84);
+  background-color: color-mix(in srgb, var(--color-ink) 84%, transparent);
   color: var(--color-mist);
   font-family: var(--font-sans);
   font-size: 0.6875rem;
@@ -1147,7 +1147,7 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-haze);
+  color: var(--color-haze-light);
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
@@ -1188,7 +1188,7 @@
 }
 
 .pn-mobile-chip-count {
-  color: var(--color-haze);
+  color: var(--color-haze-light);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1232,7 +1232,7 @@
   justify-content: center;
   min-height: 2.375rem;
   padding: 0.375rem 0.75rem;
-  color: var(--color-haze);
+  color: var(--color-haze-light);
   font-family: var(--font-sans);
   font-size: var(--text-caption);
   font-weight: 500;
@@ -1388,8 +1388,8 @@
 /* ============================================================================
    Premium desktop/tablet finish
    A bright, editorial surface gives the CMS imagery room to breathe and creates
-   a deliberate contrast with the navy navigation pill. Mobile keeps its existing
-   full-screen navy treatment for continuity with the compact navigation sheet.
+   a deliberate contrast with the ink navigation pill. Mobile keeps its existing
+   full-screen ink treatment for continuity with the compact navigation sheet.
    ========================================================================== */
 @media (min-width: 810px) {
   .pn-mega-wrap--destinations {
@@ -1401,26 +1401,26 @@
   }
 
   .pn-mega {
-    border: 1px solid #e5eaed;
+    border: 1px solid var(--color-slate-20);
     border-radius: 1.125rem;
-    background: #fff;
+    background: var(--color-paper);
     box-shadow:
-      0 28px 80px -34px rgba(24, 49, 68, 0.34),
-      0 8px 24px -16px rgba(24, 49, 68, 0.18);
-    color: #183144;
-    scrollbar-color: #c9d6dc transparent;
+      0 28px 80px -34px color-mix(in srgb, var(--color-ink) 34%, transparent),
+      0 8px 24px -16px color-mix(in srgb, var(--color-ink) 18%, transparent);
+    color: var(--color-ink);
+    scrollbar-color: var(--color-slate-40) transparent;
   }
 
   .pn-mega-touchbar {
     display: flex;
     min-height: 4.125rem;
     padding: 0.875rem 1.5rem;
-    border-bottom: 1px solid #e9eef0;
-    background: linear-gradient(110deg, #fff 0%, #f8fafb 100%);
+    border-bottom: 1px solid var(--color-slate-20);
+    background: linear-gradient(110deg, var(--color-paper) 0%, var(--color-mist-40) 100%);
   }
 
   .pn-mega-touchbar-title {
-    color: #183144;
+    color: var(--color-ink);
     font-size: 1.375rem;
     letter-spacing: -0.025em;
   }
@@ -1428,17 +1428,17 @@
   .pn-mega-touchbar-all {
     min-height: 2.5rem;
     padding-inline: 0.875rem;
-    border-color: #dce5e9;
-    background: #fff;
-    color: #183144;
+    border-color: var(--color-slate-40);
+    background: var(--color-paper);
+    color: var(--color-ink);
     font-size: 0.75rem;
     font-weight: 600;
   }
 
   .pn-mega-touchbar-all:hover,
   .pn-mega-touchbar-all:focus-visible {
-    border-color: #b7cbd4;
-    background: #f2f7f8;
+    border-color: var(--color-haze-40);
+    background: var(--color-haze-20);
   }
 
   .pn-mega-close {
@@ -1450,7 +1450,7 @@
   }
 
   .pn-mega-eyebrow {
-    color: #7a8d98;
+    color: var(--color-slate-80);
     font-size: 0.625rem;
     font-weight: 700;
     letter-spacing: 0.14em;
@@ -1471,55 +1471,55 @@
     padding: 0.625rem 0.75rem;
     border: 1px solid transparent;
     border-radius: 0.625rem;
-    color: #183144;
+    color: var(--color-ink);
   }
 
   .pn-mega-dest-item:hover,
   .pn-mega-dest-item:focus-visible,
   .pn-mega-dest-item[data-previewing='true'],
   .pn-mega-dest-item[data-active='true'] {
-    border-color: #e5ecef;
-    background: #f5f8f9;
+    border-color: var(--color-slate-20);
+    background: var(--color-mist-60);
   }
 
   .pn-mega-dest-name {
-    color: #183144;
+    color: var(--color-ink);
     font-size: 0.875rem;
     font-weight: 600;
     letter-spacing: -0.01em;
   }
 
   .pn-mega-dest-meta {
-    color: #788993;
+    color: var(--color-slate-80);
     font-size: 0.6875rem;
   }
 
   .pn-mega-arrow {
-    color: #80949e;
+    color: var(--color-haze-light);
   }
 
   .pn-mega-dest-item:hover .pn-mega-arrow,
   .pn-mega-dest-item:focus-visible .pn-mega-arrow,
   .pn-mega-dest-item[data-previewing='true'] .pn-mega-arrow {
-    color: #183144;
+    color: var(--color-ink);
   }
 
   .pn-mega-custom,
   .pn-mega-more {
-    border-color: #e7edef;
+    border-color: var(--color-slate-20);
   }
 
   .pn-mega-chip {
-    border-color: #e0e8eb;
-    background: #f7f9fa;
-    color: #435a67;
+    border-color: var(--color-slate-20);
+    background: var(--color-mist-40);
+    color: var(--color-ink-70);
   }
 
   .pn-mega-chip:hover,
   .pn-mega-chip:focus-visible {
-    border-color: #c7d7dd;
-    background: #edf3f5;
-    color: #183144;
+    border-color: var(--color-haze-40);
+    background: var(--color-haze-20);
+    color: var(--color-ink);
   }
 
   .pn-mega-dest-showcase .pn-mega-section-head {
@@ -1531,22 +1531,22 @@
     padding: 1.375rem;
     border: 0;
     border-radius: 0.75rem;
-    box-shadow: 0 12px 28px -20px rgba(12, 28, 38, 0.6);
+    box-shadow: 0 12px 28px -20px color-mix(in srgb, var(--color-ink) 60%, transparent);
   }
 
   .pn-mega-dest-card-scrim {
     background: linear-gradient(
       180deg,
-      rgba(14, 35, 48, 0.02) 15%,
-      rgba(14, 35, 48, 0.18) 43%,
-      rgba(14, 35, 48, 0.88) 100%
+      color-mix(in srgb, var(--color-ink) 2%, transparent) 15%,
+      color-mix(in srgb, var(--color-ink) 18%, transparent) 43%,
+      color-mix(in srgb, var(--color-ink) 88%, transparent) 100%
     );
   }
 
   .pn-mega-dest-card-badge,
   .pn-mega-trip-region {
     border-color: rgba(255, 255, 255, 0.34);
-    background: rgba(17, 39, 52, 0.65);
+    background: color-mix(in srgb, var(--color-ink) 65%, transparent);
     backdrop-filter: blur(10px);
   }
 
@@ -1574,25 +1574,25 @@
   .pn-mega-rail {
     gap: 1.375rem;
     padding-right: 1.375rem;
-    border-color: #e7edef;
+    border-color: var(--color-slate-20);
   }
 
   .pn-mega-facet-link,
   .pn-mega-more-link {
-    color: #334d5a;
+    color: var(--color-ink-70);
   }
 
   .pn-mega-facet-link:hover,
   .pn-mega-facet-link:focus-visible,
   .pn-mega-more-link:hover,
   .pn-mega-more-link:focus-visible {
-    background: #f2f6f7;
-    color: #183144;
+    background: var(--color-mist-40);
+    color: var(--color-ink);
   }
 
   .pn-mega-facet-count,
   .pn-mega-more-meta {
-    color: #84949c;
+    color: var(--color-haze-light);
   }
 
   .pn-mega-trip-grid {
@@ -1600,28 +1600,28 @@
   }
 
   .pn-mega-trip-card {
-    border-color: #e4eaed;
+    border-color: var(--color-slate-20);
     border-radius: 0.75rem;
-    background: #fff;
-    color: #183144;
-    box-shadow: 0 4px 12px -10px rgba(24, 49, 68, 0.25);
+    background: var(--color-paper);
+    color: var(--color-ink);
+    box-shadow: 0 4px 12px -10px color-mix(in srgb, var(--color-ink) 25%, transparent);
   }
 
   .pn-mega-trip-card:hover,
   .pn-mega-trip-card:focus-visible {
-    border-color: #cbd9de;
-    background: #fff;
-    box-shadow: 0 12px 24px -18px rgba(24, 49, 68, 0.34);
+    border-color: var(--color-haze-40);
+    background: var(--color-paper);
+    box-shadow: 0 12px 24px -18px color-mix(in srgb, var(--color-ink) 34%, transparent);
     transform: translateY(-2px);
   }
 
   .pn-mega-trip-media {
     aspect-ratio: 16 / 9;
-    background: #e8eef0;
+    background: var(--color-mist-60);
   }
 
   .pn-mega-trip-scrim {
-    background: linear-gradient(180deg, rgba(16, 38, 50, 0.08) 0%, transparent 62%);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--color-ink) 8%, transparent) 0%, transparent 62%);
   }
 
   .pn-mega-trip-body {
@@ -1630,26 +1630,26 @@
   }
 
   .pn-mega-trip-title {
-    color: #183144;
+    color: var(--color-ink);
     font-size: 0.8125rem;
     font-weight: 650;
     line-height: 1.35;
   }
 
   .pn-mega-trip-stats {
-    color: #71828c;
+    color: var(--color-ink-60);
   }
 
   .pn-mega-trip-foot {
-    border-color: #e9eef0;
+    border-color: var(--color-slate-20);
   }
 
   .pn-mega-trip-price {
-    color: #71828c;
+    color: var(--color-ink-60);
   }
 
   .pn-mega-trip-price strong {
-    color: #183144;
+    color: var(--color-ink);
   }
 
   .pn-mega-more-link {
@@ -1659,43 +1659,43 @@
   .pn-mega-footer {
     min-height: 4.125rem;
     padding: 0.8125rem 1.625rem;
-    border-color: #e9eef0;
-    background: #f8fafb;
+    border-color: var(--color-slate-20);
+    background: var(--color-mist-40);
   }
 
   .pn-mega-footer-note {
-    color: #6c7e88;
+    color: var(--color-ink-70);
   }
 
   .pn-mega-footer-inline {
-    color: #294b5d;
-    text-decoration-color: #aebfc6;
+    color: var(--color-deep-80);
+    text-decoration-color: var(--color-haze-40);
   }
 
   .pn-mega-footer-inline:hover,
   .pn-mega-footer-inline:focus-visible {
-    color: #183144;
-    text-decoration-color: #183144;
+    color: var(--color-ink);
+    text-decoration-color: var(--color-ink);
   }
 
   .pn-mega-footer-cta {
     min-height: 2.625rem;
     padding: 0.625rem 1rem;
     border-radius: 0.5rem;
-    background: #183144;
-    color: #fff;
+    background: var(--color-ink);
+    color: var(--color-paper);
     font-size: 0.8125rem;
     font-weight: 600;
-    box-shadow: 0 3px 8px -5px rgba(24, 49, 68, 0.75);
+    box-shadow: 0 3px 8px -5px color-mix(in srgb, var(--color-ink) 75%, transparent);
   }
 
   .pn-mega-footer-cta:hover,
   .pn-mega-footer-cta:focus-visible {
-    background: #24506a;
+    background: var(--color-deep-80);
   }
 
   .pn-mega a:focus-visible {
-    outline: 2px solid #2177b5;
+    outline: 2px solid var(--color-deep-90);
     outline-offset: 2px;
   }
 }

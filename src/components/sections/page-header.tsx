@@ -55,7 +55,7 @@ export function PageHeader({
             className="-z-10"
             imageClassName="object-cover"
           />
-          {/* One navy wash, deepened towards the foot where the h1 and lead
+          {/* One ink wash, deepened towards the foot where the h1 and lead
               sit. Measured at 4.5:1 or better for paper text even over a
               fully blown-out photograph. */}
           <div className="absolute inset-0 -z-10 bg-ink/72" />

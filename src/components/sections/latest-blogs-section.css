@@ -27,7 +27,7 @@
      3. a spring-driven preview plate follows the cursor down the index and
         cross-fades to the hovered story (desktop + fine pointer only — the
         gating lives in `blog-dispatch-board.tsx`).
-   A fourth detail, the ember rule across the foot of the lead plate, draws
+   A fourth detail, the coral rule across the foot of the lead plate, draws
    itself on hover — that is a transition, not a loop.
 
    Hover choreography is gated behind `(hover: hover) and (pointer: fine)` so a
@@ -52,7 +52,7 @@
   position: absolute;
   inset: 0;
   overflow: hidden;
-  color: var(--color-haze);
+  color: var(--color-haze-light);
   pointer-events: none;
 }
 
@@ -86,7 +86,7 @@
    markup (the hover zoom on the image inside it composes over it) and simply
    holds still. */
 
-/* Ember rule drawn across the foot of the plate on hover/focus — the board's
+/* coral rule drawn across the foot of the plate on hover/focus — the board's
    one warm accent. */
 [data-blog-dispatch] .lb-lead-rule {
   transform: scaleX(0);
@@ -107,7 +107,7 @@
   line-height: 0.8;
 }
 
-/* "Fresh" marker inside the category flag: one still ember dot. */
+/* "Fresh" marker inside the category flag: one still coral dot. */
 [data-blog-dispatch] .lb-live {
   position: relative;
   display: block;

@@ -124,7 +124,7 @@ export function PostDetail({
             className="-z-10"
             imageClassName="object-cover"
           />
-          {/* Scrims do the legibility work: one flat navy wash, so a bright sky can
+          {/* Scrims do the legibility work: one flat ink wash, so a bright sky can
               never swallow the type, plus the shared bottom-up photo scrim the
               masthead sits in. Both are `-z-10`, like the image itself, so DOM order
               is paint order. */}
@@ -248,7 +248,7 @@ export function PostDetail({
         <div className="mt-10 border-t border-slate-20 pt-6">
           <Link
             href={sitePath('/blog')}
-            className="group inline-flex items-center gap-2 text-ui font-medium text-deep transition-colors hover:text-ink"
+            className="group inline-flex items-center gap-2 text-ui font-medium text-deep-90 transition-colors hover:text-ink"
           >
             <ArrowLeft
               className="size-4 transition-transform group-hover:-translate-x-1"
@@ -283,7 +283,7 @@ export function PostDetail({
                 </div>
                 <Link
                   href={sitePath('/blog')}
-                  className="group inline-flex shrink-0 items-center gap-2 text-small font-medium text-deep transition-colors hover:text-ink"
+                  className="group inline-flex shrink-0 items-center gap-2 text-small font-medium text-deep-90 transition-colors hover:text-ink"
                 >
                   {dict.common.viewAll}
                   <ArrowUpRight

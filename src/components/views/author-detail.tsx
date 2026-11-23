@@ -103,7 +103,7 @@ export function AuthorDetail({
                       <a
                         href={link.url}
                         rel={link.rel}
-                        className="text-deep underline underline-offset-4"
+                        className="text-deep-90 underline underline-offset-4"
                       >
                         {link.label}
                       </a>

@@ -134,9 +134,10 @@ is worse than one extra regeneration.
 
 ## 6. Design system
 
-- **Palette** — `#04151f` ink, `#1d3557` deep, `#283618` slate, `#F7A230` sage, `#f8f9fa` mist,
-  exposed as Tailwind v4 tokens (`bg-ink`, `text-slate`, `bg-sage-20`, …) plus semantic aliases
-  (`card`, `border`, `ring`).
+- **Palette** — the eight supplied hex values are `#f5f0ea`, `#210516`, `#5e7993`, `#78510f`,
+  `#bcb0b1`, `#cbaf35`, `#0393cd`, and `#f53f1d`; `#f5f0ea` is the requested site background.
+  Token names and roles in the implementation are inferred, not user-confirmed. They are exposed as
+  Tailwind v4 tokens (`bg-ink`, `text-slate`, `bg-sage-20`, …) plus semantic aliases (`card`, `border`, `ring`).
 - **Type** — headings Google Sans Flex 600, body Archivo 300; a fluid scale and utility classes
   (`heading-xl`, `lead`, `eyebrow`, `.prose-hg` for rich text).
 - **shadcn/ui** — Button, Badge, Card, Input, Label, Textarea, Select, Separator, Sheet, Accordion

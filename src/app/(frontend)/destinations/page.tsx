@@ -82,7 +82,7 @@ export default async function DestinationsPage({ searchParams }: ArchiveProps) {
           aria-hidden="true"
           className="-z-20 object-cover"
         />
-        {/* One flat navy wash plus the shared photo scrim — the same recipe the
+        {/* One flat ink wash plus the shared photo scrim — the same recipe the
             trip and journal heroes use, so every photograph on the site sits under
             the same amount of ink. */}
         <div className="absolute inset-0 -z-10 bg-ink/72" aria-hidden="true" />
@@ -151,7 +151,7 @@ export default async function DestinationsPage({ searchParams }: ArchiveProps) {
               </p>
               <Link
                 href={sitePath('/contact')}
-                className="mt-6 inline-flex items-center gap-2 text-small font-medium text-deep-90 underline decoration-slate-40 decoration-1 underline-offset-4 transition-colors hover:text-deep-80 hover:decoration-deep"
+                className="mt-6 inline-flex items-center gap-2 text-small font-medium text-deep-90 underline decoration-slate-40 decoration-1 underline-offset-4 transition-colors hover:text-deep-80 hover:decoration-deep-90"
               >
                 Plan a trip with us <ArrowRight className="size-4" aria-hidden="true" />
               </Link>
@@ -188,7 +188,7 @@ export default async function DestinationsPage({ searchParams }: ArchiveProps) {
           </div>
           <Link
             href={sitePath('/contact')}
-            className="group inline-flex w-full shrink-0 items-center justify-center gap-3 bg-ink px-6 py-4 text-small font-medium text-white transition-colors hover:bg-deep sm:w-auto"
+            className="group inline-flex w-full shrink-0 items-center justify-center gap-3 bg-ink px-6 py-4 text-small font-medium text-white transition-colors hover:bg-deep-90 sm:w-auto"
           >
             Plan your trip
             <ArrowRight

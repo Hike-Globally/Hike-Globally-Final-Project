@@ -1,11 +1,11 @@
 /* ==========================================================================
-   Global footer — about and navigation columns on flat navy, closed by a
+   Global footer — about and navigation columns on flat ink, closed by a
    copyright and creator-credit bar.
 
    One colour, no gradient: the footer is the quietest surface on the site, so
    it is solid `--color-ink` with a single haze hairline along its top edge and
-   hairline-separated columns. Everything on it is mist (12.44:1) or haze
-   (5.45:1) — both AA on navy.
+   hairline-separated columns. Copy on it is paper (16.88:1) on ink; blue-grey is reserved for decorative
+   hairlines and borders.
    ========================================================================== */
 
 .hg-footer {

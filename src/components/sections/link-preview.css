@@ -15,8 +15,8 @@
   border-radius: 1.125rem;
   background: radial-gradient(
     130% 160% at 0% 0%,
-    #ffffff 0%,
-    #fcfdfe 48%,
+    var(--color-mist-40) 0%,
+    var(--color-paper) 48%,
     var(--color-haze-20) 100%
   );
   color: var(--color-ink);
@@ -173,7 +173,7 @@
 }
 
 .link-preview-price-now {
-  color: var(--color-deep);
+  color: var(--color-deep-90);
   font-family: var(--font-heading);
   font-size: 1.5rem;
   font-variant-numeric: tabular-nums;

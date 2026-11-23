@@ -92,7 +92,7 @@ function NavCaret() {
  * Desktop & Tablet (>=810px): a highlight pill rests on the tab matching the
  * current route and glides to whichever tab is hovered or tapped (spring).
  * Hovering with a mouse or tapping with touch/pen on Destinations or Trips opens
- * a viewport-clamped dark-navy mega menu directly under the track; any other tab
+ * a viewport-clamped dark ink mega menu directly under the track; any other tab
  * with manual children still uses the compact dropdown panel.
  * Mobile (<810px): the track collapses to a 56×56 burger and opens into a
  * full-screen menu. Submenus expand independently of their parent links.
@@ -701,7 +701,7 @@ export function PillNav({ logoLabel, logoHref, links, cta, megaMenu }: PillNavPr
           ) : null}
         </div>
 
-        {/* Desktop & tablet mega menu panel — one shared navy shell anchored to `.pn-track`
+        {/* Desktop & tablet mega menu panel — one shared ink shell anchored to `.pn-track`
             with live viewport bounds so it never clips horizontally or vertically. */}
         {!isMobile && megaMenu ? (
           <AnimatePresence>

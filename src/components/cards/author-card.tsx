@@ -51,7 +51,7 @@ export function AuthorCard({
 
       <div className="flex flex-1 flex-col pt-5">
         <h2 className="font-heading text-subhead font-semibold text-ink">
-          <Link href={href} className="transition-colors hover:text-deep">
+          <Link href={href} className="transition-colors hover:text-deep-90">
             {profile.name}
           </Link>
         </h2>

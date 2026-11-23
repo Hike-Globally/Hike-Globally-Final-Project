@@ -18,24 +18,34 @@ spacing step, radius or shadow.
 
 ## 1. Colour
 
-Strictly flat, single colours — **no gradients** and **no secondary palettes**.
-Every surface, border, icon, control and status state is derived from the
-six-colour workspace palette (plus pure `#FFFFFF` for elevated cards and inputs
-against the `#F6F6F6` canvas).
+The public site and Payload admin now share the **eight user-supplied brand
+colours**. The public canvas is the requested warm paper (`#F5F0EA`). The
+hex values and background choice are user-specified; token names, roles and the
+category/accent pairings are inferred implementation choices, not confirmed
+assignments. Pure white is retained only for elevated controls and inverse text;
+accessible darker shades are derived from the bright blue and coral where text
+contrast requires them.
 
-### Core six-colour palette
+| Token | Hex | Contrast / use |
+| --- | --- | --- |
+| `--hg-ink` (`--hg-navy`) | `#210516` | 16.88:1 on paper · headings, body text, dark surfaces |
+| `--hg-paper` (`--hg-canvas`) | `#F5F0EA` | Site/admin canvas and light surfaces |
+| `--hg-blue-grey` (`--hg-steel`) | `#5E7993` | 4.00:1 on paper · graphic accents, lines, borders |
+| `--hg-earth` | `#78510F` | 6.21:1 on paper · accessible muted text and warm details |
+| `--hg-stone` (`--hg-neutral`) | `#BCB0B1` | 1.86:1 on paper · quiet borders and decorative marks, not small text |
+| `--hg-gold` | `#CBAF35` | 8.86:1 on ink · warm graphic accents |
+| `--hg-cyan` | `#0393CD` | 3.06:1 on paper · bright blue graphics and large marks |
+| `--hg-coral` | `#F53F1D` | 3.30:1 on paper · vivid graphic accents and destination markers |
+| `--hg-white` (`--hg-surface`) | `#FFFFFF` | Elevated cards, tables, inputs and inverse text |
 
-| Token | Hex | Contrast | Role |
-| --- | --- | --- | --- |
-| `--hg-navy` | `#183144` | 13.45:1 on `#FFFFFF` · 12.44:1 on `#F6F6F6` | Sidebar rail surface, primary headings & body ink, button hover/active anchor, sign-in backdrop |
-| `--hg-canvas` | `#F6F6F6` | 12.44:1 on `#183144` | Workspace canvas, table headers, collapsible headers, subtle fills, sidebar rail text |
-| `--hg-steel` | `#87AABD` | 5.45:1 on `#183144` | Sidebar muted labels & icons, hover/accent borders, soft selection & span highlights |
-| `--hg-stone` | `#79716D` | 4.78:1 on `#FFFFFF` | Secondary/muted metadata, table column headers, helper text, neutral icons, draft status |
-| `--hg-blue` | `#2177B5` | 4.80:1 with `#FFFFFF` | Primary CTA buttons, active sidebar item, active tab underline, links, focus border, checkboxes, published status |
-| `--hg-red` | `#CF574D` | Destructive / alert | Delete confirmation, validation errors, required marker, error banners/toasts, sign-out hover |
-| `--hg-surface` | `#FFFFFF` | Elevated surface | Cards, tables, top bar, form inputs, popups, modals, drawers |
+### Accessible and semantic aliases
 
-### Semantic aliases
+The two bright brand colours are not used for ordinary small text on paper.
+`--hg-blue` (`#0A709F`) is the AA blue for links, focus and white-label primary
+actions (4.84:1 on paper, 5.48:1 on white). `--hg-red` (`#C0301B`) is the
+darker coral for small text and white-label destructive controls (5.04:1 on
+paper, 5.71:1 on white). `--hg-steel-muted` (`#6D859C`) is reserved for small
+copy on the ink sidebar (5.00:1).
 
 Components reference intent rather than raw tokens:
 - **Surfaces:** `--hg-bg-app`, `--hg-bg-surface`, `--hg-bg-subtle`, `--hg-bg-inset`, `--hg-bg-hover`, `--hg-bg-selected`
@@ -43,13 +53,11 @@ Components reference intent rather than raw tokens:
 - **Text:** `--hg-text`, `--hg-text-secondary`, `--hg-text-muted`, `--hg-text-disabled`, `--hg-text-inverse`, `--hg-text-link`
 - **Actions:** `--hg-primary`, `--hg-primary-hover`, `--hg-primary-active`, `--hg-primary-soft`, `--hg-primary-soft-border`
 - **Sidebar rail:** `--hg-rail-bg`, `--hg-rail-border`, `--hg-rail-input-bg`, `--hg-rail-hover`, `--hg-rail-text`, `--hg-rail-text-muted`, `--hg-rail-active-bg`, `--hg-rail-active-text`
-- **States:** `success` (`#2177B5` / `#87AABD`), `warning` (`#79716D` / `#F6F6F6`), `danger` (`#CF574D`), `info` (`#87AABD` / `#183144`)
+- **States:** success uses accessible blue/blue-grey; warning uses earth/gold; danger uses dark coral; info uses blue-grey/ink.
 
 All Payload `--theme-*` and `--color-*` scales (`base`, `elevation`, `success`,
-`warning`, `error`, `info`) map directly onto these tokens so no outside hues
-leak into built-in Payload controls.
-
----
+`warning`, `error`, `info`) map to the shared palette or its documented
+contrast-safe derivatives so Payload controls do not introduce unrelated hues.
 
 ## 2. Typography
 
@@ -83,7 +91,7 @@ Radii: `--hg-radius-control` 7px (inputs, buttons, small controls),
 `--hg-radius-card` 10px (cards, tables, modals, drawers), `--hg-radius-pill`
 999px (status badges, avatars).
 
-Elevation: three neutral shadows tinted from `#183144` — `--hg-shadow-sm`,
+Elevation: three neutral shadows tinted from `#210516` — `--hg-shadow-sm`,
 `--hg-shadow-md`, `--hg-shadow-lg`. No glows or gradients anywhere.
 
 Layout constants: sidebar `260px`, top bar `56px`, sticky document offset
@@ -97,9 +105,9 @@ on mobile), control heights `32 / 40 / 48px`, table row `52px`, icon size
 
 ### Sidebar and top bar
 
-A fixed `#183144` sidebar with grouped `#87AABD` section labels, a clean 40px
-filter bar, `#F6F6F6` navigation items, a solid `#2177B5` active state and a
-pinned account footer with `#CF574D` sign-out hover. The top bar is 56px,
+A fixed `#210516` sidebar with grouped `#5E7993` section labels, a clean 40px
+filter bar, `#F5F0EA` navigation items, a solid `#0A709F` active state and a
+pinned account footer with `#C0301B` sign-out hover. The top bar is 56px,
 `#FFFFFF`, sticky, holding breadcrumbs on the left and account access on the
 right without trailing gradient masks. When the sidebar is collapsed on desktop
 or tablet, the reopen toggle reserves dedicated inline-start space so it never
@@ -108,7 +116,7 @@ overlaps the breadcrumb home icon.
 ### Search and list controls
 
 Collection list toolbars (`.list-controls`) render chromeless directly on the
-`#F6F6F6` canvas above `.table-wrap` to avoid nested card clutter. `.search-bar`
+`#F5F0EA` canvas above `.table-wrap` to avoid nested card clutter. `.search-bar`
 allocates a dedicated 40px leading icon slot matching `.search-filter__input`'s
 inline-start padding so `.icon--search` never collides with input text, while
 `Columns` and `Filters` triggers share the same 40px control height and expand
@@ -116,8 +124,8 @@ into standalone `#FFFFFF` cards below.
 
 ### Tables and pagination
 
-One `.table-wrap` card with a sticky `#F6F6F6` header (`#79716D` uppercase
-12px/600), 52px rows, hairline dividers, `#F6F6F6` row hover and `#87AABD`
+One `.table-wrap` card with a sticky `#F5F0EA` header (`#78510F` uppercase
+12px/600), 52px rows, hairline dividers, `#F5F0EA` row hover and `#5E7993`
 soft selection wash. Pagination, item counts and per-page controls share one
 unified `.page-controls` footer card.
 
@@ -128,7 +136,7 @@ The `.doc-controls` bar holds status, timestamps, `View live page`,
 one line. It is deliberately **not** sticky (Payload's default pins it under the
 top bar): it reads as the head of the form and scrolls away with it.
 
-Publish is the only control with a solid `#2177B5` fill; it settles to `#183144`
+Publish is the only control with a solid `#0A709F` fill; it settles to `#210516`
 on hover and press. It carries an upward arrow in a fixed 16px mask slot, set
 `--hg-space-2` (8px) from the label, and the label keeps the same 16px inline
 padding as the outline buttons beside it, so the four controls read as one row
@@ -155,8 +163,8 @@ chevron wash on hover/focus).
 
 ### Forms and editors
 
-Inputs and `react-select` controls sit at 40px on `#FFFFFF` with `#87AABD`
-hover borders and `#2177B5` focus rings (internal `.rs__input` elements stay
+Inputs and `react-select` controls sit at 40px on `#FFFFFF` with `#5E7993`
+hover borders and `#0A709F` focus rings (internal `.rs__input` elements stay
 chromeless). Top-level `group` and `collapsible` sections render as single-border
 `#FFFFFF` cards; `array` and `blocks` headers use clean hairline dividers rather
 than nested header boxes. Trip-specific short-form Lexical editors use a 144px
@@ -180,8 +188,8 @@ padding because it holds reading copy.
 1. **Never hard-code** a colour, font size, spacing, radius or shadow in
    `custom.scss` — consume `var(--hg-*)` tokens only.
 2. **Single flat colours only.** No gradients, glows or outside colour ramps.
-3. **One primary action per section.** Primary buttons use `#2177B5` and settle
-   to `#183144` on hover; destructive confirmations use `#CF574D`.
+3. **One primary action per section.** Primary buttons use `#0A709F` and settle
+   to `#210516` on hover; destructive confirmations use `#C0301B`.
 4. **No nested box clutter.** Toolbars and array headers stay flat when adjacent
    to bordered cards.
 5. **Contrast and accessibility:** every interactive element keeps a visible
