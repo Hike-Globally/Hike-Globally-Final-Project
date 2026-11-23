@@ -208,6 +208,14 @@ test('destination atlas copy covers Nepal and destinations across continents', (
   assert.match(dictionary.destinations.homeSectionDescription, /Five trekking regions, one country/)
 })
 
+test('atlas card labels use the destination country without a hard-coded Himalaya suffix', () => {
+  const page = read('src/app/(frontend)/destinations/page.tsx')
+  const card = page.slice(page.indexOf('function AtlasCard('), page.indexOf('function regionName('))
+
+  assert.match(card, /<span>\{destination\.country\}<\/span>/)
+  assert.doesNotMatch(card, /Himalaya/i)
+})
+
 test('each hub links to the other, so the split is in the crawl graph', () => {
   const destinationsPage = read('src/app/(frontend)/destinations/page.tsx')
   const placesPage = read('src/app/(frontend)/places/page.tsx')
