@@ -1390,43 +1390,67 @@ export const getSitemapSources = (): Promise<SitemapSources> =>
 /* Navigation chart (the /sitemap index)                                        */
 /* -------------------------------------------------------------------------- */
 
-/** One CMS landing page as the navigation chart lists it. */
-export type ChartPage = {
+/** One node record as the /sitemap visual architecture index lists it. */
+export type ChartNodeRecord = {
   title: string
   slug: string
   summary: string | null
+  meta?: string | null
+  updatedAt?: string | null
 }
+
+/** One CMS landing page as the navigation chart lists it. */
+export type ChartPage = ChartNodeRecord
 
 /** Everything the /sitemap page prints, in one cached read. */
 export type ChartSources = {
   trips: number
   destinations: number
   posts: number
+  /** Published trips (excluding noindex). */
+  tripNodes: ChartNodeRecord[]
+  /** Published destinations (excluding noindex). */
+  destinationNodes: ChartNodeRecord[]
+  /** Published blog posts (excluding noindex). */
+  postNodes: ChartNodeRecord[]
   /** Published CMS pages, minus slugs a dedicated route owns. */
   pages: ChartPage[]
+  /** Indexable author profiles (accounts with bio or published work). */
+  authorNodes: ChartNodeRecord[]
   /** Tagged journeys per Browse Places category, by category value. */
   placeCounts: Record<string, number>
+  /** ISO date of the most recently modified indexed document, if available. */
+  lastSyncedAt: string | null
 }
 
 /**
- * The one cached reader behind the /sitemap chart page: per-collection counts, the published
- * CMS landing pages, and the per-landscape tag counts. Kept separate from the full sitemap reader
- * (`readSitemapSources` above) because that one carries gallery media for the XML file and this
- * one needs only slim rows.
+ * The one cached reader behind the /sitemap chart page: per-collection counts, every indexable
+ * document across trips, destinations, journal posts, CMS landing pages and authors, plus the
+ * per-landscape tag counts. Kept separate from the full sitemap reader (`readSitemapSources` above)
+ * because that one carries gallery media for the XML file and this one needs only slim rows.
  */
 const readChartSources = unstable_cache(
   async (): Promise<ChartSources> => {
     const payload = await getPayloadClient()
-    const [trips, destinations, posts, pages] = await Promise.all([
+    const [trips, destinations, posts, pages, authors] = await Promise.all([
       collectPages((page) =>
         payload.find({
           collection: 'trips',
           locale: SITE_LOCALE,
           depth: 0,
           limit: 500,
-          sort: 'id',
+          sort: '-featured',
           page,
-          select: { placeCategories: true },
+          select: {
+            title: true,
+            slug: true,
+            summary: true,
+            durationDays: true,
+            difficulty: true,
+            placeCategories: true,
+            updatedAt: true,
+            meta: { noIndex: true, description: true },
+          },
           where: { _status: { equals: 'published' } },
         }),
       ),
@@ -1436,9 +1460,16 @@ const readChartSources = unstable_cache(
           locale: SITE_LOCALE,
           depth: 0,
           limit: 500,
-          sort: 'id',
+          sort: 'name',
           page,
-          select: { name: true },
+          select: {
+            name: true,
+            slug: true,
+            tagline: true,
+            country: true,
+            updatedAt: true,
+            meta: { noIndex: true, description: true },
+          },
           where: { _status: { equals: 'published' } },
         }),
       ),
@@ -1448,9 +1479,17 @@ const readChartSources = unstable_cache(
           locale: SITE_LOCALE,
           depth: 0,
           limit: 500,
-          sort: 'id',
+          sort: '-publishedAt',
           page,
-          select: { placeCategories: true },
+          select: {
+            title: true,
+            slug: true,
+            excerpt: true,
+            categories: true,
+            placeCategories: true,
+            updatedAt: true,
+            meta: { noIndex: true, description: true },
+          },
           where: { _status: { equals: 'published' } },
         }),
       ),
@@ -1462,10 +1501,16 @@ const readChartSources = unstable_cache(
           limit: 500,
           sort: 'id',
           page,
-          select: { title: true, slug: true, meta: { noIndex: true, description: true } },
+          select: {
+            title: true,
+            slug: true,
+            updatedAt: true,
+            meta: { noIndex: true, description: true },
+          },
           where: { _status: { equals: 'published' } },
         }),
       ),
+      getAuthorIndex(),
     ])
 
     const placeCounts: Record<string, number> = {}
@@ -1482,35 +1527,197 @@ const readChartSources = unstable_cache(
       if (Array.isArray(categories)) categories.forEach((value) => bump(value as string))
     }
 
+    const timestamps: number[] = []
+    const recordDate = (value?: string | null) => {
+      if (!value) return
+      const parsed = Date.parse(value)
+      if (Number.isFinite(parsed)) timestamps.push(parsed)
+    }
+
+    const tripNodes: ChartNodeRecord[] = trips
+      .map((trip): ChartNodeRecord | null => {
+        const record = trip as {
+          title?: string | null
+          slug?: string | null
+          summary?: string | null
+          durationDays?: number | null
+          difficulty?: string | null
+          updatedAt?: string | null
+          meta?: { noIndex?: boolean | null; description?: string | null } | null
+        }
+        if (!record.slug || record.meta?.noIndex) return null
+        recordDate(record.updatedAt)
+        const parts: string[] = []
+        if (typeof record.durationDays === 'number' && record.durationDays > 0) {
+          parts.push(`${record.durationDays}d`)
+        }
+        if (record.difficulty) parts.push(record.difficulty.replace(/-/g, ' '))
+        return {
+          title: record.title ?? record.slug,
+          slug: record.slug,
+          summary: record.summary ?? record.meta?.description ?? null,
+          meta: parts.length ? parts.join(' · ') : null,
+          updatedAt: record.updatedAt ?? null,
+        }
+      })
+      .filter((item): item is ChartNodeRecord => item !== null)
+
+    const destinationNodes: ChartNodeRecord[] = destinations
+      .map((dest): ChartNodeRecord | null => {
+        const record = dest as {
+          name?: string | null
+          slug?: string | null
+          tagline?: string | null
+          country?: string | null
+          updatedAt?: string | null
+          meta?: { noIndex?: boolean | null; description?: string | null } | null
+        }
+        if (!record.slug || record.meta?.noIndex) return null
+        recordDate(record.updatedAt)
+        return {
+          title: record.name ?? record.slug,
+          slug: record.slug,
+          summary: record.tagline ?? record.meta?.description ?? null,
+          meta: record.country ?? null,
+          updatedAt: record.updatedAt ?? null,
+        }
+      })
+      .filter((item): item is ChartNodeRecord => item !== null)
+
+    const postNodes: ChartNodeRecord[] = posts
+      .map((post): ChartNodeRecord | null => {
+        const record = post as {
+          title?: string | null
+          slug?: string | null
+          excerpt?: string | null
+          categories?: string[] | null
+          updatedAt?: string | null
+          meta?: { noIndex?: boolean | null; description?: string | null } | null
+        }
+        if (!record.slug || record.meta?.noIndex) return null
+        recordDate(record.updatedAt)
+        const firstCategory = Array.isArray(record.categories) ? record.categories[0] : null
+        return {
+          title: record.title ?? record.slug,
+          slug: record.slug,
+          summary: record.excerpt ?? record.meta?.description ?? null,
+          meta: firstCategory ? firstCategory.replace(/-/g, ' ') : null,
+          updatedAt: record.updatedAt ?? null,
+        }
+      })
+      .filter((item): item is ChartNodeRecord => item !== null)
+
     const chartPages: ChartPage[] = pages
-      .map((page) => {
-        const record = page as { title?: string | null; slug?: string | null; meta?: { noIndex?: boolean | null; description?: string | null } | null }
-        if (!record.slug || record.meta?.noIndex || isReservedPageSlug(record.slug)) return null
+      .map((page): ChartPage | null => {
+        const record = page as {
+          title?: string | null
+          slug?: string | null
+          updatedAt?: string | null
+          meta?: { noIndex?: boolean | null; description?: string | null } | null
+        }
+        if (!record.slug || record.meta?.noIndex) return null
+        recordDate(record.updatedAt)
+        if (isReservedPageSlug(record.slug)) return null
         return {
           title: record.title ?? record.slug,
           slug: record.slug,
           summary: record.meta?.description ?? null,
+          meta: 'CMS Page',
+          updatedAt: record.updatedAt ?? null,
         }
       })
       .filter((page): page is ChartPage => page !== null)
 
+    const authorNodes: ChartNodeRecord[] = authors
+      .filter((author) =>
+        Boolean(author.slug) &&
+        isIndexableAuthor(author, { posts: author.postCount, trips: author.tripCount }),
+      )
+      .map((author) => {
+        recordDate(author.updatedAt)
+        const total = author.postCount + author.tripCount
+        return {
+          title: author.name,
+          slug: author.slug as string,
+          summary: author.jobTitle ?? author.bio ?? null,
+          meta: total > 0 ? `${total} filed` : 'Guide',
+          updatedAt: author.updatedAt ?? null,
+        }
+      })
+
     return {
-      trips: trips.length,
-      destinations: destinations.length,
-      posts: posts.length,
+      trips: tripNodes.length,
+      destinations: destinationNodes.length,
+      posts: postNodes.length,
+      tripNodes,
+      destinationNodes,
+      postNodes,
       pages: chartPages,
+      authorNodes,
       placeCounts,
+      lastSyncedAt: timestamps.length ? new Date(Math.max(...timestamps)).toISOString() : null,
     }
   },
-  ['sitemap-chart-sources-v1'],
-  { tags: [CACHE_TAG.trips, CACHE_TAG.destinations, CACHE_TAG.posts, CACHE_TAG.pages], revalidate: REVALIDATE_SECONDS },
+  ['sitemap-chart-sources-v2'],
+  {
+    tags: [
+      CACHE_TAG.trips,
+      CACHE_TAG.destinations,
+      CACHE_TAG.posts,
+      CACHE_TAG.pages,
+      CACHE_TAG.authors,
+    ],
+    revalidate: REVALIDATE_SECONDS,
+  },
 )
 
+const buildFallbackChartSources = (): ChartSources => {
+  const placeCounts: Record<string, number> = {}
+  const bump = (value: string | null | undefined) => {
+    if (!value) return
+    placeCounts[value] = (placeCounts[value] ?? 0) + 1
+  }
+  for (const trip of defaultFeaturedTrips) {
+    trip.placeCategories?.forEach(bump)
+  }
+  for (const post of defaultPosts) {
+    post.placeCategories?.forEach(bump)
+  }
+
+  return {
+    trips: defaultFeaturedTrips.length,
+    destinations: defaultFeaturedDestinations.length,
+    posts: defaultPosts.length,
+    tripNodes: defaultFeaturedTrips.map((trip) => ({
+      title: trip.title,
+      slug: trip.slug,
+      summary: trip.summary,
+      meta: `${trip.durationDays}d · ${trip.difficulty.replace(/-/g, ' ')}`,
+      updatedAt: null,
+    })),
+    destinationNodes: defaultFeaturedDestinations.map((dest) => ({
+      title: dest.name,
+      slug: dest.slug,
+      summary: dest.tagline ?? null,
+      meta: dest.country,
+      updatedAt: null,
+    })),
+    postNodes: defaultPosts.map((post) => ({
+      title: post.title,
+      slug: post.slug,
+      summary: post.excerpt,
+      meta: post.categories?.[0]?.replace(/-/g, ' ') ?? null,
+      updatedAt: null,
+    })),
+    pages: [],
+    authorNodes: [],
+    placeCounts,
+    lastSyncedAt: null,
+  }
+}
+
 export const getChartSources = (): Promise<ChartSources> =>
-  safeQuery(
-    readChartSources,
-    { trips: 0, destinations: 0, posts: 0, pages: [], placeCounts: {} },
-  )
+  safeQuery(readChartSources, buildFallbackChartSources())
 
 /* -------------------------------------------------------------------------- */
 /* llms.txt                                                                    */
