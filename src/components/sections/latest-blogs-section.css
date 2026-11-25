@@ -12,22 +12,19 @@
    scale (`home-section-title` / `home-blog-lead-title` / `home-blog-row-title`
    in `src/app/(frontend)/homepage.css`), the same split `curated-trips-section`
    uses. What lives here is everything CSS has to own — keyframes, pseudo-element
-   wipes, the cursor-following preview plate and the reduced-motion opt-outs.
+   wipes and the reduced-motion opt-outs.
 
    Everything is scoped to `[data-blog-dispatch]` (set once in
    `latest-blogs-section.tsx`), so no other surface picks these rules up.
    Square corners, the brand tokens only, and every animation stops under
    `prefers-reduced-motion` — the house rules.
 
-   The motion budget goes to three things, and only three:
+   The motion budget goes to two things:
      1. the lead plate zooms a little when the card is hovered (the always-on
         Ken Burns drift is retired — a still photograph reads calmer);
      2. an index row wipes a sheet of white behind itself, fills its waypoint,
-        lights up its stretch of the route line and slides its copy 6px right;
-     3. a spring-driven preview plate follows the cursor down the index and
-        cross-fades to the hovered story (desktop + fine pointer only — the
-        gating lives in `blog-dispatch-board.tsx`).
-   A fourth detail, the ember rule across the foot of the lead plate, draws
+        lights up its stretch of the route line and slides its copy 6px right.
+   Another detail, the ember rule across the foot of the lead plate, draws
    itself on hover — that is a transition, not a loop.
 
    Hover choreography is gated behind `(hover: hover) and (pointer: fine)` so a
@@ -36,9 +33,6 @@
    ========================================================================== */
 
 [data-blog-dispatch] {
-  /* Cursor-following preview plate. One variable, so the plate, its frames and
-     the clamping maths in `blog-dispatch-board.tsx` all read the same width. */
-  --lb-preview-w: clamp(12.5rem, 15vw, 17.5rem);
   --lb-ease: var(--ease-brand, cubic-bezier(0.22, 1, 0.36, 1));
 }
 
@@ -235,72 +229,6 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Cursor-following preview plate (desktop, fine pointer)
-   --------------------------------------------------------------------------- */
-/* Position is written by `motion` as `x`/`y` on this element (springs, so the
-   plate glides a beat behind the cursor); the centring + tilt is plain CSS on
-   the inner box, so the two never overwrite one transform. */
-[data-blog-dispatch] .lb-preview {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 30;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.35s ease;
-}
-
-[data-blog-dispatch] .lb-preview[data-active='true'] {
-  opacity: 1;
-}
-
-[data-blog-dispatch] .lb-preview-inner {
-  position: relative;
-  width: var(--lb-preview-w);
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
-  background: var(--color-ink);
-  box-shadow: var(--shadow-lg);
-  transform: translate(-50%, -50%) scale(0.9) rotate(0deg);
-  transition: transform 0.65s var(--lb-ease);
-}
-
-[data-blog-dispatch] .lb-preview[data-active='true'] .lb-preview-inner {
-  transform: translate(-50%, -50%) scale(1) rotate(-3.2deg);
-}
-
-/* Every row's plate is mounted at once and cross-faded, so the preview never
-   waits on a decode when the cursor jumps down the index. */
-[data-blog-dispatch] .lb-preview-frame {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-[data-blog-dispatch] .lb-preview-frame[data-active='true'] {
-  opacity: 1;
-}
-
-[data-blog-dispatch] .lb-preview-caption {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 0;
-  padding: 0.5rem 0.75rem;
-  background: linear-gradient(
-    to top,
-    color-mix(in srgb, var(--color-ink) 92%, transparent),
-    color-mix(in srgb, var(--color-ink) 0%, transparent)
-  );
-  color: var(--color-mist);
-  font-family: var(--font-heading);
-  font-size: var(--text-label);
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-/* ---------------------------------------------------------------------------
    Hover choreography — fine pointers only
    --------------------------------------------------------------------------- */
 @media (hover: hover) and (pointer: fine) {
@@ -329,8 +257,6 @@
 
 /* ---------------------------------------------------------------------------
    Reduced motion — the board stays exactly as legible, it simply stops moving.
-   The preview plate is never mounted at all in this case (see the component),
-   so nothing here has to hide it.
    --------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   [data-blog-dispatch] .lb-lead-rule,
@@ -338,10 +264,7 @@
   [data-blog-dispatch] .lb-row-rail,
   [data-blog-dispatch] .lb-row-body,
   [data-blog-dispatch] .lb-node,
-  [data-blog-dispatch] .lb-row-thumb,
-  [data-blog-dispatch] .lb-preview,
-  [data-blog-dispatch] .lb-preview-inner,
-  [data-blog-dispatch] .lb-preview-frame {
+  [data-blog-dispatch] .lb-row-thumb {
     transition: none !important;
   }
 
