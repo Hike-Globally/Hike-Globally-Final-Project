@@ -12,49 +12,51 @@
    Palette rules
    -------------
    • Strictly flat, single colours — zero gradients and zero outside palettes.
-   • Built exclusively on the six-colour workspace palette (plus pure white for
-     elevated card and control surfaces against the #F6F6F6 canvas):
-       #183144  Deep navy      — sidebar rail, headings, primary ink, hover anchor
-       #F6F6F6  Soft canvas    — workspace background, subtle fills, rail text
+   • Built exclusively on the eight-colour brand palette — pure white plus:
+       #01161E  Ink            — sidebar rail, headings, primary ink, hover anchor
+       #F6F6F6  Soft canvas    — subtle fills (table headers, hover, inset), rail text
        #87AABD  Mist steel     — rail muted ink/icons, accent borders, soft highlights
-       #79716D  Warm stone     — secondary/muted metadata, labels, neutral icons
-       #2177B5  Cerulean blue  — primary actions, active nav, links, focus
-       #CF574D  Terracotta red — destructive actions, validation errors, alerts
+       #79706D  Warm stone     — secondary/muted metadata, labels, neutral icons
+       #2177B5  Cerulean blue  — primary actions, active nav, links, focus, row hover
+       #C24B38  Terracotta red — destructive text & solid fills (4.82:1 on white)
+       #D0564D  Ember          — decorative danger washes, borders and rings only;
+                                 never small text (4.10:1 on white fails AA)
    ========================================================================== */
 
 :root,
 html[data-theme='light'],
 html[data-theme='dark'] {
   /* ------------------------------------------------------------------------
-     1. COLOUR — core six-colour palette (+ elevated white surface)
+     1. COLOUR — eight-colour brand palette (+ elevated white surface)
      ------------------------------------------------------------------------ */
-  --hg-navy: #183144; /* 13.45:1 on #FFFFFF · 12.44:1 on #F6F6F6 */
-  --hg-canvas: #f6f6f6; /* workspace canvas & subtle surface */
-  --hg-steel: #87aabd; /* 5.45:1 on #183144 · soft accent border */
-  --hg-stone: #79716d; /* 4.78:1 on #FFFFFF · muted metadata ink */
+  --hg-navy: #01161e; /* 18.51:1 on #FFFFFF · 17.13:1 on #F6F6F6 */
+  --hg-canvas: #f6f6f6; /* subtle fills: table headers, hover, inset — workspace is white */
+  --hg-steel: #87aabd; /* 7.50:1 on #01161E · soft accent border */
+  --hg-stone: #79706d; /* 4.83:1 on #FFFFFF · muted metadata ink */
   --hg-blue: #2177b5; /* 4.80:1 with #FFFFFF · primary interactive */
-  --hg-red: #cf574d; /* destructive & error accent */
+  --hg-red: #c24b38; /* 4.82:1 on #FFFFFF · destructive text & solid fill */
   --hg-surface: #ffffff; /* elevated cards, tables, inputs, modals */
 
   /* ------------------------------------------------------------------------
      2. COLOUR — structural surfaces, borders & text aliases
      ------------------------------------------------------------------------ */
-  --hg-bg-app: var(--hg-canvas);
+  --hg-bg-app: var(--hg-surface); /* white workspace background — cards separate by hairline + shadow */
   --hg-bg-surface: var(--hg-surface);
   --hg-bg-subtle: var(--hg-canvas);
   --hg-bg-inset: var(--hg-canvas);
   --hg-bg-hover: var(--hg-canvas);
+  --hg-bg-row-hover: rgb(33 119 181 / 5%); /* list rows under the cursor — a whisper of cerulean */
   --hg-bg-selected: rgb(135 170 189 / 18%);
 
-  --hg-border: rgb(24 49 68 / 10%);
-  --hg-border-strong: rgb(24 49 68 / 20%);
+  --hg-border: rgb(1 22 30 / 10%);
+  --hg-border-strong: rgb(1 22 30 / 20%);
   --hg-border-accent: var(--hg-steel);
   --hg-border-focus: var(--hg-blue);
 
   --hg-text: var(--hg-navy);
   --hg-text-secondary: var(--hg-navy);
   --hg-text-muted: var(--hg-stone);
-  --hg-text-disabled: rgb(121 113 109 / 60%);
+  --hg-text-disabled: rgb(121 112 109 / 60%);
   --hg-text-inverse: var(--hg-surface);
   --hg-text-link: var(--hg-blue);
 
@@ -75,7 +77,7 @@ html[data-theme='dark'] {
   --hg-primary-raised: rgb(255 255 255 / 12%);
 
   /* ------------------------------------------------------------------------
-     3. COLOUR — sidebar rail (#183144 dark anchor)
+     3. COLOUR — sidebar rail (#01161E dark anchor)
      ------------------------------------------------------------------------ */
   --hg-rail-bg: var(--hg-navy);
   --hg-rail-border: rgb(135 170 189 / 16%);
@@ -95,12 +97,12 @@ html[data-theme='dark'] {
   --hg-success-solid: var(--hg-blue);
 
   --hg-warning-bg: var(--hg-canvas);
-  --hg-warning-border: rgb(121 113 109 / 32%);
+  --hg-warning-border: rgb(121 112 109 / 32%);
   --hg-warning-text: var(--hg-stone);
   --hg-warning-solid: var(--hg-stone);
 
-  --hg-danger-bg: rgb(207 87 77 / 10%);
-  --hg-danger-border: rgb(207 87 77 / 42%);
+  --hg-danger-bg: rgb(208 86 77 / 10%);
+  --hg-danger-border: rgb(208 86 77 / 42%);
   --hg-danger-text: var(--hg-red);
   --hg-danger-solid: var(--hg-red);
   --hg-danger-hover: var(--hg-navy);
@@ -111,7 +113,7 @@ html[data-theme='dark'] {
   --hg-info-solid: var(--hg-blue);
 
   --hg-focus-ring: 0 0 0 3px rgb(33 119 181 / 18%);
-  --hg-danger-ring: 0 0 0 3px rgb(207 87 77 / 18%);
+  --hg-danger-ring: 0 0 0 3px rgb(208 86 77 / 18%);
   --hg-focus-outline: 2px solid var(--hg-blue);
   --hg-focus-outline-offset: 2px;
 
@@ -125,9 +127,9 @@ html[data-theme='dark'] {
 
   --hg-root-font-size: 100%; /* browser default: 16px */
 
-  --hg-fs-12: 0.75rem; /* metadata, table headers, helper text */
-  --hg-fs-14: 0.875rem; /* body, labels, controls, table cells */
-  --hg-fs-16: 1rem; /* section titles, card titles */
+  --hg-fs-12: 0.75rem; /* metadata, helper text, badges */
+  --hg-fs-14: 0.875rem; /* body, labels, controls, table headers */
+  --hg-fs-16: 1rem; /* section titles, card titles, table cells */
   --hg-fs-18: 1.125rem; /* panel titles */
   --hg-fs-20: 1.25rem; /* page titles */
   --hg-fs-24: 1.5rem; /* view titles (list / document) */
@@ -160,11 +162,11 @@ html[data-theme='dark'] {
   --hg-radius-pill: 999px;
 
   /* ------------------------------------------------------------------------
-     8. ELEVATION — three soft, neutral shadows (tinted from #183144)
+     8. ELEVATION — three soft, neutral shadows (tinted from #01161E)
      ------------------------------------------------------------------------ */
-  --hg-shadow-sm: 0 1px 2px rgb(24 49 68 / 5%);
-  --hg-shadow-md: 0 2px 6px rgb(24 49 68 / 8%), 0 1px 2px rgb(24 49 68 / 4%);
-  --hg-shadow-lg: 0 10px 28px rgb(24 49 68 / 12%);
+  --hg-shadow-sm: 0 1px 2px rgb(1 22 30 / 5%);
+  --hg-shadow-md: 0 2px 6px rgb(1 22 30 / 8%), 0 1px 2px rgb(1 22 30 / 4%);
+  --hg-shadow-lg: 0 10px 28px rgb(1 22 30 / 12%);
 
   /* ------------------------------------------------------------------------
      9. LAYOUT & CONTROLS
@@ -187,7 +189,7 @@ html[data-theme='dark'] {
   --hg-control-height-sm: 32px;
   --hg-control-height-md: 40px;
   --hg-control-height-lg: 48px;
-  --hg-table-row-height: 52px;
+  --hg-table-row-height: 64px;
   --hg-icon-size: 18px;
   --hg-icon-stroke: 1.75;
 
@@ -321,7 +323,7 @@ html[data-theme='dark'] {
   --color-warning-900: var(--hg-navy);
   --color-warning-950: var(--hg-navy);
 
-  /* Error scale → mapped to Terracotta Red (#CF574D) */
+  /* Error scale → mapped to Terracotta Red (#C24B38) with Ember (#D0564D) washes */
   --theme-error-50: var(--hg-danger-bg);
   --theme-error-100: var(--hg-danger-bg);
   --theme-error-150: var(--hg-danger-bg);

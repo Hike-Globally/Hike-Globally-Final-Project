@@ -20,30 +20,32 @@ spacing step, radius or shadow.
 
 Strictly flat, single colours — **no gradients** and **no secondary palettes**.
 Every surface, border, icon, control and status state is derived from the
-six-colour workspace palette (plus pure `#FFFFFF` for elevated cards and inputs
-against the `#F6F6F6` canvas).
+eight-colour brand palette. The workspace background is pure `#FFFFFF`; cards
+separate from it with hairline borders and shadows, and `#F6F6F6` is reserved
+for subtle fills (table headers, hover, inset fields).
 
-### Core six-colour palette
+### Core eight-colour palette
 
 | Token | Hex | Contrast | Role |
 | --- | --- | --- | --- |
-| `--hg-navy` | `#183144` | 13.45:1 on `#FFFFFF` · 12.44:1 on `#F6F6F6` | Sidebar rail surface, primary headings & body ink, button hover/active anchor, sign-in backdrop |
-| `--hg-canvas` | `#F6F6F6` | 12.44:1 on `#183144` | Workspace canvas, table headers, collapsible headers, subtle fills, sidebar rail text |
-| `--hg-steel` | `#87AABD` | 5.45:1 on `#183144` | Sidebar muted labels & icons, hover/accent borders, soft selection & span highlights |
-| `--hg-stone` | `#79716D` | 4.78:1 on `#FFFFFF` | Secondary/muted metadata, table column headers, helper text, neutral icons, draft status |
-| `--hg-blue` | `#2177B5` | 4.80:1 with `#FFFFFF` | Primary CTA buttons, active sidebar item, active tab underline, links, focus border, checkboxes, published status |
-| `--hg-red` | `#CF574D` | Destructive / alert | Delete confirmation, validation errors, required marker, error banners/toasts, sign-out hover |
+| `--hg-navy` | `#01161E` | 18.51:1 on `#FFFFFF` · 17.13:1 on `#F6F6F6` | Sidebar rail surface, primary headings & body ink, button hover/active anchor, sign-in backdrop |
+| `--hg-canvas` | `#F6F6F6` | 17.13:1 on `#01161E` | Subtle fills: table headers, collapsible headers, hover, inset fields, sidebar rail text |
+| `--hg-steel` | `#87AABD` | 7.50:1 on `#01161E` | Sidebar muted labels & icons, hover/accent borders, soft selection & span highlights |
+| `--hg-stone` | `#79706D` | 4.83:1 on `#FFFFFF` | Secondary/muted metadata, table column headers, helper text, neutral icons, draft status |
+| `--hg-blue` | `#2177B5` | 4.80:1 with `#FFFFFF` | Primary CTA buttons, active sidebar item, active tab underline, links, focus border, checkboxes, row hover wash, published status |
+| `--hg-red` | `#C24B38` | 4.82:1 on `#FFFFFF` | Destructive text & solid fills: delete confirmation, validation errors, required marker, error banners/toasts, sign-out hover |
+| Ember wash | `#D0564D` | Decorative only (4.10:1) | Danger background/border/ring tints (`rgb(208 86 77 / …)`) — never small text |
 | `--hg-surface` | `#FFFFFF` | Elevated surface | Cards, tables, top bar, form inputs, popups, modals, drawers |
 
 ### Semantic aliases
 
 Components reference intent rather than raw tokens:
-- **Surfaces:** `--hg-bg-app`, `--hg-bg-surface`, `--hg-bg-subtle`, `--hg-bg-inset`, `--hg-bg-hover`, `--hg-bg-selected`
+- **Surfaces:** `--hg-bg-app`, `--hg-bg-surface`, `--hg-bg-subtle`, `--hg-bg-inset`, `--hg-bg-hover`, `--hg-bg-row-hover`, `--hg-bg-selected`
 - **Borders:** `--hg-border`, `--hg-border-strong`, `--hg-border-accent`, `--hg-border-focus`
 - **Text:** `--hg-text`, `--hg-text-secondary`, `--hg-text-muted`, `--hg-text-disabled`, `--hg-text-inverse`, `--hg-text-link`
 - **Actions:** `--hg-primary`, `--hg-primary-hover`, `--hg-primary-active`, `--hg-primary-soft`, `--hg-primary-soft-border`
 - **Sidebar rail:** `--hg-rail-bg`, `--hg-rail-border`, `--hg-rail-input-bg`, `--hg-rail-hover`, `--hg-rail-text`, `--hg-rail-text-muted`, `--hg-rail-active-bg`, `--hg-rail-active-text`
-- **States:** `success` (`#2177B5` / `#87AABD`), `warning` (`#79716D` / `#F6F6F6`), `danger` (`#CF574D`), `info` (`#87AABD` / `#183144`)
+- **States:** `success` (`#2177B5` / `#87AABD`), `warning` (`#79706D` / `#F6F6F6`), `danger` (`#C24B38` text/solids, `#D0564D` washes), `info` (`#87AABD` / `#01161E`)
 
 All Payload `--theme-*` and `--color-*` scales (`base`, `elevation`, `success`,
 `warning`, `error`, `info`) map directly onto these tokens so no outside hues
@@ -58,16 +60,17 @@ with a system sans-serif fallback. Monospace is reserved for code fields.
 
 | Token | Size | Use |
 | --- | --- | --- |
-| `--hg-fs-12` | 12px | metadata, table headers, helper + error text, badges |
-| `--hg-fs-14` | 14px | body, labels, buttons, inputs, table cells |
-| `--hg-fs-16` | 16px | card / section titles |
+| `--hg-fs-12` | 12px | metadata, helper + error text, badges |
+| `--hg-fs-14` | 14px | body, labels, buttons, inputs, table headers |
+| `--hg-fs-16` | 16px | card / section titles, table cells |
 | `--hg-fs-18` | 18px | reserved for large panels |
 | `--hg-fs-20` | 20px | reserved for page titles on wide screens |
 | `--hg-fs-24` | 24px | page + view titles |
 | `--hg-fs-30` | 30px | statistic values, sign-in headline |
 
-Weights: `400` body, `500` labels / table cells / buttons, `600` headings,
-table headers, active nav item, values. **Maximum two weights per component.**
+Weights: `400` body / table cells, `500` labels / links / buttons, `600`
+headings, table headers, active nav item, values. **Maximum two weights per
+component.**
 
 Line height: `--hg-lh-tight` 1.25 (headings), `--hg-lh-snug` 1.4 (controls,
 tables), `--hg-lh-normal` 1.6 (prose).
@@ -83,12 +86,12 @@ Radii: `--hg-radius-control` 7px (inputs, buttons, small controls),
 `--hg-radius-card` 10px (cards, tables, modals, drawers), `--hg-radius-pill`
 999px (status badges, avatars).
 
-Elevation: three neutral shadows tinted from `#183144` — `--hg-shadow-sm`,
+Elevation: three neutral shadows tinted from `#01161E` — `--hg-shadow-sm`,
 `--hg-shadow-md`, `--hg-shadow-lg`. No glows or gradients anywhere.
 
 Layout constants: sidebar `260px`, top bar `56px`, sticky document offset
 `124px`, content max width `1200px`, page padding `32px` (24px on tablet, 16px
-on mobile), control heights `32 / 40 / 48px`, table row `52px`, icon size
+on mobile), control heights `32 / 40 / 48px`, table row `64px`, icon size
 `18px` at 1.75 stroke.
 
 ---
@@ -97,9 +100,9 @@ on mobile), control heights `32 / 40 / 48px`, table row `52px`, icon size
 
 ### Sidebar and top bar
 
-A fixed `#183144` sidebar with grouped `#87AABD` section labels, a clean 40px
+A fixed `#01161E` sidebar with grouped `#87AABD` section labels, a clean 40px
 filter bar, `#F6F6F6` navigation items, a solid `#2177B5` active state and a
-pinned account footer with `#CF574D` sign-out hover. The top bar is 56px,
+pinned account footer with `#C24B38` sign-out hover. The top bar is 56px,
 `#FFFFFF`, sticky, holding breadcrumbs on the left and account access on the
 right without trailing gradient masks. When the sidebar is collapsed on desktop
 or tablet, the reopen toggle reserves dedicated inline-start space so it never
@@ -108,7 +111,7 @@ overlaps the breadcrumb home icon.
 ### Search and list controls
 
 Collection list toolbars (`.list-controls`) render chromeless directly on the
-`#F6F6F6` canvas above `.table-wrap` to avoid nested card clutter. `.search-bar`
+white workspace above `.table-wrap` to avoid nested card clutter. `.search-bar`
 allocates a dedicated 40px leading icon slot matching `.search-filter__input`'s
 inline-start padding so `.icon--search` never collides with input text, while
 `Columns` and `Filters` triggers share the same 40px control height and expand
@@ -116,10 +119,11 @@ into standalone `#FFFFFF` cards below.
 
 ### Tables and pagination
 
-One `.table-wrap` card with a sticky `#F6F6F6` header (`#79716D` uppercase
-12px/600), 52px rows, hairline dividers, `#F6F6F6` row hover and `#87AABD`
-soft selection wash. Pagination, item counts and per-page controls share one
-unified `.page-controls` footer card.
+One `.table-wrap` card with a sticky `#F6F6F6` header (`#79706D` uppercase
+14px/600), 64px rows with 16px cells, hairline dividers, a soft cerulean
+(`#2177B5` at 5%) row hover and `#87AABD` soft selection wash. Boolean cells
+render as neutral pills; pagination, item counts and per-page controls share
+one unified `.page-controls` footer card.
 
 ### Document action bar and the Publish button
 
@@ -128,7 +132,7 @@ The `.doc-controls` bar holds status, timestamps, `View live page`,
 one line. It is deliberately **not** sticky (Payload's default pins it under the
 top bar): it reads as the head of the form and scrolls away with it.
 
-Publish is the only control with a solid `#2177B5` fill; it settles to `#183144`
+Publish is the only control with a solid `#2177B5` fill; it settles to `#01161E`
 on hover and press. It carries an upward arrow in a fixed 16px mask slot, set
 `--hg-space-2` (8px) from the label, and the label keeps the same 16px inline
 padding as the outline buttons beside it, so the four controls read as one row
@@ -181,7 +185,7 @@ padding because it holds reading copy.
    `custom.scss` — consume `var(--hg-*)` tokens only.
 2. **Single flat colours only.** No gradients, glows or outside colour ramps.
 3. **One primary action per section.** Primary buttons use `#2177B5` and settle
-   to `#183144` on hover; destructive confirmations use `#CF574D`.
+   to `#01161E` on hover; destructive confirmations use `#C24B38`.
 4. **No nested box clutter.** Toolbars and array headers stay flat when adjacent
    to bordered cards.
 5. **Contrast and accessibility:** every interactive element keeps a visible
