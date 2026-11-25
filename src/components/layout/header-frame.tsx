@@ -15,19 +15,14 @@ import { motion, useReducedMotion } from 'motion/react'
       Hero has been completely covered — and it is pinned over every other
       page's opening band (listing banners, page headers, article mastheads).
    2. EVERYWHERE ELSE THE HEADER HIDES AS SOON AS THE PAGE SCROLLS.
-   3. IT COMES BACK WHEN THE POINTER REACHES THE TOP BAND (`PEEK_ZONE` px).
-      Sliding the pointer away hides it again. Keyboard focus inside the header
-      and an open mobile menu also hold it in place.
-   4. TOUCH SCREENS have no pointer to park at the top, so there the header also
-      returns while scrolling up (`REVEAL_ON_SCROLL_UP`). Pointer devices keep
-      the pointer-only reveal described in the brief.
+   3. POINTER MOVEMENT DOES NOT REVEAL OR PIN THE HEADER. Keyboard focus inside
+      the header and an open navigation menu still hold it in place.
+   4. TOUCH SCREENS can bring the header back while scrolling up
+      (`REVEAL_ON_SCROLL_UP`).
    ========================================================================== */
 
 /** Selector for the element that ends a page's hero region — see note 1. */
 const HERO_MARKER = '[data-header-hero]'
-
-/** Distance from the top edge (px) at which the pointer brings the header back. */
-const PEEK_ZONE = 96
 
 /** Scroll offsets at or below this still count as "the top of the page" (px). */
 const TOP_EDGE = 8
@@ -35,7 +30,7 @@ const TOP_EDGE = 8
 /** Slack added to the measured header height when sliding it off-screen (px). */
 const HIDE_GAP = 12
 
-/** `'touch'` honours the brief on desktop; use `'all'` / `'none'` to change that. */
+/** Only touch devices reveal the header on upward scroll. */
 const REVEAL_ON_SCROLL_UP: 'none' | 'touch' | 'all' = 'touch'
 
 /* Hide = accelerate away, reveal = decelerate into place (cubic-bezier tuples). */
@@ -59,10 +54,6 @@ export function HeaderFrame({ children }: { children: ReactNode }) {
 
   /** Page is inside a marked hero region (or has not scrolled yet). */
   const [inHero, setInHero] = useState(true)
-  /** Pointer is inside the top band — the reveal gesture from the brief. */
-  const [peeking, setPeeking] = useState(false)
-  /** Pointer is on the header itself, including the dropdown panel hanging below the track. */
-  const [hovering, setHovering] = useState(false)
   /** Keyboard focus is inside the header. */
   const [focused, setFocused] = useState(false)
   /** A touch scroll-up gesture asked for the header — see note 4. */
@@ -74,7 +65,7 @@ export function HeaderFrame({ children }: { children: ReactNode }) {
   /** Travel distance when hiding — measured, so both breakpoints work. */
   const [hideDistance, setHideDistance] = useState(160)
 
-  const revealed = peeking || hovering || focused || scrollRevealed || menuOpen || panelOpen
+  const revealed = focused || scrollRevealed || menuOpen || panelOpen
   const hidden = !inHero && !revealed
 
   /* -- hero region --------------------------------------------------------- */
@@ -145,35 +136,7 @@ export function HeaderFrame({ children }: { children: ReactNode }) {
     }
   }, [syncHero])
 
-  /* -- pointer band, touch detection, menu state, layout shifts ------------- */
-
-  useEffect(() => {
-    const onPointerMove = (event: PointerEvent) => {
-      // Touch and pen taps are not a "move the mouse to the top" gesture.
-      if (event.pointerType === 'touch') return
-      setPeeking(event.clientY <= PEEK_ZONE)
-    }
-
-    // The pointer left the window (or moved up into the browser chrome).
-    const onPointerLeave = () => setPeeking(false)
-
-    // Belt and braces: a `pointerout` that reaches nothing (relatedTarget === null) also
-    // means the pointer is gone — but it fires for removed nodes too, so only trust it
-    // away from the band, where a stale reveal would be visible.
-    const onPointerOut = (event: PointerEvent) => {
-      if (event.pointerType === 'touch' || event.relatedTarget) return
-      if (event.clientY > PEEK_ZONE) setPeeking(false)
-    }
-
-    window.addEventListener('pointermove', onPointerMove, { passive: true })
-    document.documentElement.addEventListener('pointerleave', onPointerLeave)
-    document.addEventListener('pointerout', onPointerOut)
-    return () => {
-      window.removeEventListener('pointermove', onPointerMove)
-      document.documentElement.removeEventListener('pointerleave', onPointerLeave)
-      document.removeEventListener('pointerout', onPointerOut)
-    }
-  }, [])
+  /* -- touch detection, menu state, layout shifts --------------------------- */
 
   useEffect(() => {
     const query = window.matchMedia('(hover: none), (pointer: coarse)')
@@ -210,7 +173,6 @@ export function HeaderFrame({ children }: { children: ReactNode }) {
     // First paint of a page (and of every new route): forget the previous reveal state and
     // measure the opening band. A frame is cheap and guarantees the DOM is laid out.
     const frame = requestAnimationFrame(() => {
-      setPeeking(false)
       setScrollRevealed(false)
       measureHideDistance()
       syncHero()
@@ -235,15 +197,7 @@ export function HeaderFrame({ children }: { children: ReactNode }) {
     }
   }, [measureHideDistance, syncHero])
 
-  /* -- pointer / keyboard on the header itself ------------------------------ */
-
-  /**
-   * `pointerenter` / `pointerleave` fire for the whole subtree (the pill track *and* the
-   * dropdown panel, which hangs well below the top band), so a visitor can walk from a tab
-   * down into its panel without the header sliding out from under the click.
-   */
-  const onPointerEnter = () => setHovering(true)
-  const onPointerLeave = () => setHovering(false)
+  /* -- keyboard focus inside the header ------------------------------------ */
 
   const onFocus = () => setFocused(true)
 
@@ -280,8 +234,6 @@ export function HeaderFrame({ children }: { children: ReactNode }) {
       // Off-screen and out of the tab order — focus inside would otherwise scroll
       // the page back to the top to reach an element that is only visually hidden.
       inert={hidden}
-      onPointerEnter={onPointerEnter}
-      onPointerLeave={onPointerLeave}
       onFocus={onFocus}
       onBlur={onBlur}
     >
