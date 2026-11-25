@@ -42,45 +42,6 @@ function TopoContours() {
   )
 }
 
-/* Circular “expedition stamp”: the brand line set on a rotating ring around a
-   mountain mark, with the Everest-region coordinates filed underneath —
-   the journal-stamp detail the rest of the site hints at with its compass
-   rings (blog article footer, the About globe). Desktop only. */
-function ExpeditionStamp({ pathId }: { pathId: string }) {
-  const dict = dictionary
-
-  return (
-    <div aria-hidden="true" className="hidden shrink-0 flex-col items-center gap-4 lg:flex">
-      <div className="relative grid size-[8.5rem] place-items-center">
-        <span className="cta-card__stamp-disc" aria-hidden="true" />
-        <svg viewBox="0 0 120 120" className="cta-card__stamp-ring relative">
-          <defs>
-            <path
-              id={pathId}
-              d="M 60,60 m -45,0 a 45,45 0 1,1 90,0 a 45,45 0 1,1 -90,0"
-              fill="none"
-            />
-          </defs>
-          <text>
-            <textPath href={`#${pathId}`}>{dict.cta.stamp}</textPath>
-          </text>
-        </svg>
-        <span className="absolute inset-0 grid place-items-center">
-          <Mountain className="size-8" strokeWidth={1.25} style={{ color: 'var(--cta-accent)' }} />
-        </span>
-        <span
-          className="absolute inset-[1.35rem] rounded-full border"
-          style={{ borderColor: 'var(--cta-line)' }}
-        />
-      </div>
-      <p className="cta-card__coords">
-        {dict.cta.coordinates}
-        <span className="mt-1 block text-center">{dict.cta.region}</span>
-      </p>
-    </div>
-  )
-}
-
 export function CtaCard({
   eyebrow,
   heading,
@@ -96,7 +57,6 @@ export function CtaCard({
 }) {
   const dict = dictionary
   const titleId = useId()
-  const stampPathId = `${useId().replace(/:/g, '')}-stamp`
   const headingSegments = splitInlineEmphasis(heading)
   const external = link ? /^(?:https?:\/\/|mailto:|tel:)/i.test(link.href) : false
 
@@ -122,61 +82,57 @@ export function CtaCard({
               <span className="cta-card__topline" aria-hidden="true" />
 
               <div className="cta-card__inner px-5 pt-10 pb-8 sm:px-8 sm:pt-12 sm:pb-10 md:px-12 md:pt-16 lg:px-16 lg:pt-[4.5rem] 3xl:px-20">
-                <div className="flex items-start justify-between gap-10">
-                  <div className="max-w-2xl min-w-0 3xl:max-w-3xl">
-                    {eyebrow ? (
-                      <p className="cta-card__eyebrow eyebrow mb-5">
-                        <span className="cta-card__dot" aria-hidden="true" />
-                        {eyebrow}
-                      </p>
-                    ) : null}
+                <div className="max-w-2xl min-w-0 3xl:max-w-3xl">
+                  {eyebrow ? (
+                    <p className="cta-card__eyebrow eyebrow mb-5">
+                      <span className="cta-card__dot" aria-hidden="true" />
+                      {eyebrow}
+                    </p>
+                  ) : null}
 
-                    {/* An `<i>…</i>` in the heading field becomes the serif
+                  {/* An `<i>…</i>` in the heading field becomes the serif
                       italic second line (see lib/inline-emphasis.ts) — the
                       same two-voice treatment as the homepage hero. */}
-                    <h2 id={titleId} className="cta-card__title">
-                      {headingSegments.length
-                        ? headingSegments.map((segment, index) =>
-                            segment.emphasized ? (
-                              <i key={index}>{segment.text}</i>
-                            ) : (
-                              <span key={index}>{segment.text}</span>
-                            ),
-                          )
-                        : heading}
-                    </h2>
-
-                    {text ? <p className="cta-card__text lead mt-5 max-w-xl">{text}</p> : null}
-
-                    {link ? (
-                      <div className="mt-9 flex flex-wrap items-center gap-x-5 gap-y-3">
-                        <Button
-                          asChild
-                          size="lg"
-                          variant={variant === 'light' ? 'default' : 'paper'}
-                          className="cta-card__button group h-[3.25rem] px-8 text-body"
-                        >
-                          {external || link.newTab ? (
-                            <a
-                              href={link.href}
-                              target={link.newTab ? '_blank' : undefined}
-                              rel={link.newTab ? 'noopener noreferrer' : undefined}
-                            >
-                              {link.label}
-                              <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
-                            </a>
+                  <h2 id={titleId} className="cta-card__title">
+                    {headingSegments.length
+                      ? headingSegments.map((segment, index) =>
+                          segment.emphasized ? (
+                            <i key={index}>{segment.text}</i>
                           ) : (
-                            <Link href={link.href}>
-                              {link.label}
-                              <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
-                            </Link>
-                          )}
-                        </Button>
-                      </div>
-                    ) : null}
-                  </div>
+                            <span key={index}>{segment.text}</span>
+                          ),
+                        )
+                      : heading}
+                  </h2>
 
-                  <ExpeditionStamp pathId={stampPathId} />
+                  {text ? <p className="cta-card__text lead mt-5 max-w-xl">{text}</p> : null}
+
+                  {link ? (
+                    <div className="mt-9 flex flex-wrap items-center gap-x-5 gap-y-3">
+                      <Button
+                        asChild
+                        size="lg"
+                        variant={variant === 'light' ? 'default' : 'paper'}
+                        className="cta-card__button group h-[3.25rem] px-8 text-body"
+                      >
+                        {external || link.newTab ? (
+                          <a
+                            href={link.href}
+                            target={link.newTab ? '_blank' : undefined}
+                            rel={link.newTab ? 'noopener noreferrer' : undefined}
+                          >
+                            {link.label}
+                            <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+                          </a>
+                        ) : (
+                          <Link href={link.href}>
+                            {link.label}
+                            <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+                          </Link>
+                        )}
+                      </Button>
+                    </div>
+                  ) : null}
                 </div>
 
                 {/* The three quiet proofs, ruled off beneath the copy. */}

@@ -326,10 +326,6 @@ export const en = {
     replyTime: 'Replies within 24 hours',
     localGuides: 'Led by local Sherpa guides',
     smallGroups: 'Small groups, tailored to you',
-    /** Rotating stamp around the closing card's mountain mark. */
-    stamp: 'HIKE GLOBALLY · NEPAL · EST. 2012 · ',
-    coordinates: '27.9881° N · 86.9250° E',
-    region: 'Khumbu, Nepal',
   },
   notFound: {
     title: 'This trail runs out here',

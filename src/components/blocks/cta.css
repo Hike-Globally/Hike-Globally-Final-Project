@@ -155,50 +155,6 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Expedition stamp (desktop only — see the markup): a printed mark, not a
-   spinning one.
-   --------------------------------------------------------------------------- */
-[data-cta-card] .cta-card__stamp-ring {
-  width: 8.5rem;
-  height: 8.5rem;
-}
-
-[data-cta-card] .cta-card__stamp-ring text {
-  font-family: var(--font-heading);
-  /* Sized so the brand line fills the r=45 ring (circumference ≈ 283 units). */
-  font-size: var(--text-label);
-  font-weight: 600;
-  letter-spacing: 0.1375rem;
-  text-transform: uppercase;
-  fill: var(--cta-fg);
-}
-
-/* A subtle disc grounds the stamp against the gradient. */
-[data-cta-card] .cta-card__stamp-disc {
-  position: absolute;
-  inset: 0.4rem;
-  border-radius: 624.938rem;
-  background: color-mix(in srgb, var(--color-ink) 34%, transparent);
-}
-
-[data-cta-card][data-variant='sage'] .cta-card__stamp-disc {
-  background: color-mix(in srgb, var(--color-sage-80) 42%, transparent);
-}
-
-[data-cta-card][data-variant='light'] .cta-card__stamp-disc {
-  background: color-mix(in srgb, var(--color-mist) 62%, transparent);
-}
-
-[data-cta-card] .cta-card__coords {
-  font-size: var(--text-label);
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  color: var(--cta-faint);
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-/* ---------------------------------------------------------------------------
    Button — the shared `Button` variants own the look; this layer only keeps the
    card's own metrics (a taller bar, roomier padding) and quiets the shine.
    --------------------------------------------------------------------------- */
