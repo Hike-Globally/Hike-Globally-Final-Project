@@ -54,6 +54,10 @@
    display headline and its Instrument Serif italic accent line. On the
    homepage, the hero standfirst steps down from `--text-lead` to `--text-body`
    to match the reduced section intros below it. */
+[data-homepage] .hero-title i {
+  color: #C24B38;
+}
+
 [data-homepage] .hero-description {
   font-size: var(--home-hero-description-size);
   line-height: var(--text-body--line-height);
