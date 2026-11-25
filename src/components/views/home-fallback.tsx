@@ -50,7 +50,9 @@ export async function HomeFallback() {
             next journey across Nepal and destinations worldwide.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
-            <Button asChild size="lg" variant="paper">
+            {/* "Trips" — the ember accent (`sage` → `bg-btn-accent`, #C24B38),
+                matching the CMS hero's primary button on the homepage. */}
+            <Button asChild size="lg" variant="sage">
               <Link href={sitePath('/trips')}>{dict.nav.trips}</Link>
             </Button>
             <Button asChild size="lg" variant="haze">

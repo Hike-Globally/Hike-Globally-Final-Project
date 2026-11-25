@@ -116,7 +116,15 @@ export function Hero({
           {primary || secondary ? (
             <div className="mt-10 flex flex-wrap items-center gap-3">
               {primary ? (
-                <Button asChild size="lg" variant={hasImage ? 'paper' : 'default'}>
+                /* On the homepage the primary button is the "Trips" CTA, set in
+                   the ember accent (`sage` → `bg-btn-accent`, #C24B38) so it
+                   stands apart from the secondary "Plan your trip" button.
+                   Every other hero keeps its existing treatment. */
+                <Button
+                  asChild
+                  size="lg"
+                  variant={homepage ? 'sage' : hasImage ? 'paper' : 'default'}
+                >
                   <Link href={primary.href}>{primary.label}</Link>
                 </Button>
               ) : null}
