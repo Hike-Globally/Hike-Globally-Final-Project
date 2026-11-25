@@ -33,6 +33,9 @@ export function HomepageHeroBackground() {
       {/* Keep the navy wash and bottom-up scrim so the bottom-aligned hero
           copy stays legible over the photograph. */}
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-ink/55" />
+      {/* Black overlay at 0.5 opacity: darkens the photograph uniformly so the
+          hero copy pops, without changing the wash's tone. */}
+      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-black/50" />
       <div aria-hidden="true" className="photo-scrim absolute inset-0 -z-10" />
     </>
   )
