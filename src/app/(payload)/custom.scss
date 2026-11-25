@@ -10,7 +10,7 @@
    Order of the file mirrors the design system:
      1. Base
      2. Shell (grid, sidebar column, nav toggler alignment)
-     3. Sidebar (the #183144 rail)
+     3. Sidebar (the #01161E rail)
      4. Top bar & breadcrumbs
      5. Page frame, collection list toolbar, search bar & filter drawers
      6. Buttons
@@ -150,7 +150,7 @@ a {
 }
 
 /* --------------------------------------------------------------------------
-   3. SIDEBAR — solid #183144 rail
+   3. SIDEBAR — solid #01161E rail
    -------------------------------------------------------------------------- */
 .template-default .nav {
   position: sticky;
@@ -1345,7 +1345,7 @@ html[data-theme='light'] .template-default .graphic-account--active .graphic-acc
   stroke-width: var(--hg-icon-stroke);
 }
 
-/* Primary (#2177B5 → hover #183144) */
+/* Primary (#2177B5 → hover #01161E) */
 .btn--style-primary {
   border-color: var(--hg-primary);
   background-color: var(--hg-primary);
@@ -1420,7 +1420,7 @@ html[data-theme='light'] .template-default .graphic-account--active .graphic-acc
   color: var(--hg-text);
 }
 
-/* Danger (#CF574D) — reserved for destructive actions */
+/* Danger (#C24B38) — reserved for destructive actions */
 .template-default .confirmation-modal.delete-document .btn--style-primary,
 .btn--style-error {
   border-color: var(--hg-danger-solid);
@@ -1482,15 +1482,21 @@ html[data-theme='light'] .template-default .graphic-account--active .graphic-acc
   color: var(--hg-text);
 }
 
-/* The create action is the page's primary action, so it carries the solid fill. */
-.template-default .list-header__create-new-button {
+/* The create action is the page's primary action, so it carries the solid fill.
+   Payload 3.90 renders it as `list-create-new-doc__create-new-button` (the older
+   `list-header__create-new-button` class now belongs to the drawer toggler). Bulk Upload
+   and Empty Trash share the pill style in the same wrapper and stay outlined. */
+.template-default .list-header__create-new-button,
+.template-default .list-create-new-doc__create-new-button {
   margin: 0;
   border-color: var(--hg-primary);
   background-color: var(--hg-primary);
   color: var(--hg-text-inverse);
 }
 
-.template-default .list-header__create-new-button:not(.btn--disabled):not(:disabled):hover {
+.template-default .list-header__create-new-button:not(.btn--disabled):not(:disabled):hover,
+.template-default
+  .list-create-new-doc__create-new-button:not(.btn--disabled):not(:disabled):hover {
   border-color: var(--hg-primary-hover);
   background-color: var(--hg-primary-hover);
   color: var(--hg-text-inverse);
@@ -1549,11 +1555,11 @@ html[data-theme='light'] .template-default .graphic-account--active .graphic-acc
   position: sticky;
   top: 0;
   z-index: 2;
-  padding: var(--hg-space-3) var(--hg-space-4);
+  padding: var(--hg-space-4);
   border-bottom: 1px solid var(--hg-border);
   background-color: var(--hg-bg-subtle);
   color: var(--hg-text-muted);
-  font-size: var(--hg-fs-12);
+  font-size: var(--hg-fs-14);
   font-weight: var(--hg-fw-semibold);
   letter-spacing: 0.04em;
   line-height: 1.4;
@@ -1571,10 +1577,10 @@ html[data-theme='light'] .template-default .graphic-account--active .graphic-acc
 
 .template-default .table tbody td {
   height: var(--hg-table-row-height);
-  padding: var(--hg-space-3) var(--hg-space-4);
+  padding: var(--hg-space-4);
   border-bottom: 1px solid var(--hg-border);
   color: var(--hg-text);
-  font-size: var(--hg-fs-14);
+  font-size: var(--hg-fs-16);
   font-weight: var(--hg-fw-regular);
   line-height: var(--hg-lh-snug);
   vertical-align: middle;
@@ -1585,7 +1591,7 @@ html[data-theme='light'] .template-default .graphic-account--active .graphic-acc
 }
 
 .template-default .table tbody tr:hover {
-  background-color: var(--hg-bg-hover);
+  background-color: var(--hg-bg-row-hover);
 }
 
 .template-default .table tbody tr:has(input[type='checkbox']:checked) {
@@ -1602,6 +1608,20 @@ html[data-theme='light'] .template-default .graphic-account--active .graphic-acc
   color: var(--hg-text-link);
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+/* Boolean cells (e.g. Featured) render as neutral pills */
+.template-default .table .bool-cell {
+  height: var(--hg-badge-height);
+  padding: 0 var(--hg-space-3);
+  border: 1px solid var(--hg-border);
+  border-radius: var(--hg-radius-pill);
+  background-color: var(--hg-bg-inset);
+  color: var(--hg-text-muted);
+  font-family: var(--hg-font-sans);
+  font-size: var(--hg-fs-14);
+  font-weight: var(--hg-fw-medium);
+  line-height: 1;
 }
 
 .template-default .table #heading-_select,
@@ -1638,9 +1658,12 @@ html[data-theme='light'] .template-default .graphic-account--active .graphic-acc
   text-transform: inherit;
 }
 
-.template-default .sort-column__button:hover,
-.template-default .sort-column--active .sort-column__button {
+.template-default .sort-column__button:hover {
   color: var(--hg-text);
+}
+
+.template-default .sort-column--active .sort-column__button {
+  color: var(--hg-primary);
 }
 
 /* -- Unified pagination & page controls bar ------------------------------- */
@@ -4069,8 +4092,9 @@ $hg-icon-audience-not-for: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 }
 
 .hg-view-live--cell {
-  height: var(--hg-space-5);
-  padding: 0 var(--hg-space-2);
+  height: var(--hg-control-height-sm);
+  padding: 0 var(--hg-space-3);
+  font-size: var(--hg-fs-14);
 }
 
 .hg-view-live--none {
@@ -4823,7 +4847,7 @@ html:has(.hg-login-gallery) body {
   object-position: center;
 }
 
-/* One flat #183144 scrim — no gradient. */
+/* One flat #01161E scrim — no gradient. */
 .hg-login-gallery__slide::after {
   position: absolute;
   z-index: 1;
