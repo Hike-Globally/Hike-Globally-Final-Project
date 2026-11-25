@@ -1,14 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import {
-  useEffect,
-  useRef,
-  useState,
-  type FocusEvent as ReactFocusEvent,
-  type PointerEvent as ReactPointerEvent,
-} from 'react'
-import { motion, useMotionValue, useSpring } from 'motion/react'
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
 
 import { Reveal } from '@/components/motion/reveal'
@@ -29,14 +21,10 @@ import { HOMEPAGE_POST_LIMIT } from './latest-blogs-limits'
  *
  *   • the newest story is a full-bleed photographic *plate* (7 of 12 columns) —
  *     category flag, oversized Instrument-Serif index numeral, title, standfirst,
- *     byline and a "Read story" cue over a slow Ken Burns breathe;
+ *     byline and a "Read story" cue;
  *   • the stories behind it are an *index* of numbered waypoints (5 of 12) running
  *     down a hairline route, each one a whole-row link with its category, title,
- *     thumbnail and byline;
- *   • on a desktop pointer, a preview plate glides after the cursor down that
- *     index and cross-fades to the story being hovered — the one piece of theatre
- *     in the section, and the reason the index feels like a stack of photographs
- *     rather than a list of links.
+ *     thumbnail and byline.
  *
  * The index is capped at three rows (`latest-blogs-limits.ts`) — the lead plus
  * three. Three compact rows balance the plate; more of them make the index
@@ -47,17 +35,12 @@ import { HOMEPAGE_POST_LIMIT } from './latest-blogs-limits'
  * Both columns are the same height (the taller of the two sets it, the index
  * foot is pinned with `mt-auto`), so the board reads as one object at any
  * number of posts from two to four. Everything below `lg` collapses to a single
- * column and the preview plate is never mounted — a phone gets the same board,
- * minus the cursor theatre it could never use.
+ * column.
  *
- * The choreography itself (wipes, spine, waypoint fill, breathe, reduced-motion
+ * The choreography itself (wipes, spine, waypoint fill, reduced-motion
  * opt-outs) lives in `latest-blogs-section.css`; the sizes come from the homepage
- * type scale in `homepage.css`. What is here is structure, CMS content mapping and
- * the pointer-following plate.
+ * type scale in `homepage.css`. What is here is structure and CMS content mapping.
  */
-
-const clamp = (value: number, min: number, max: number): number =>
-  Math.min(max, Math.max(min, value))
 
 const postHref = (post: PostCard): string => sitePath(`/blog/${post.slug}`)
 
@@ -81,86 +64,13 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
   // the three-row maximum a property of the board itself, whatever calls it.
   const [lead, ...rest] = posts.slice(0, HOMEPAGE_POST_LIMIT)
 
-  const boardRef = useRef<HTMLDivElement | null>(null)
-  const plateRef = useRef<HTMLDivElement | null>(null)
-  const [activeRow, setActiveRow] = useState<number | null>(null)
-  const [plateEnabled, setPlateEnabled] = useState(false)
-  // The plate is *jumped* to the cursor the first time it appears instead of
-  // springing in from the board's top-left corner, then glides from there on.
-  const needsJump = useRef(true)
-
-  const plateX = useMotionValue(0)
-  const plateY = useMotionValue(0)
-  const x = useSpring(plateX, { stiffness: 260, damping: 30, mass: 0.6 })
-  const y = useSpring(plateY, { stiffness: 260, damping: 30, mass: 0.6 })
-
-  /* The preview plate only exists for a fine pointer on a wide canvas, and never
-     for a visitor who asked for less motion. Checked after mount (with listeners,
-     so rotating a tablet or toggling the OS setting is picked up) which also keeps
-     the server HTML and the first client render identical. */
-  useEffect(() => {
-    if (typeof window.matchMedia !== 'function') return
-
-    const fine = window.matchMedia('(hover: hover) and (pointer: fine)')
-    const wide = window.matchMedia('(min-width: 64rem)')
-    const calm = window.matchMedia('(prefers-reduced-motion: reduce)')
-
-    const update = (): void => setPlateEnabled(fine.matches && wide.matches && !calm.matches)
-
-    update()
-    for (const query of [fine, wide, calm]) query.addEventListener('change', update)
-    return () => {
-      for (const query of [fine, wide, calm]) query.removeEventListener('change', update)
-    }
-  }, [])
-
-  /** Board-relative point for the plate, kept inside the board so it can never
-   *  hang over the column edge and get clipped by the page. */
-  const placePlate = (pointX: number, pointY: number, jump: boolean): void => {
-    const board = boardRef.current
-    const plate = plateRef.current
-    if (!board || !plate) return
-
-    const rect = board.getBoundingClientRect()
-    const halfWidth = plate.offsetWidth / 2
-    const halfHeight = plate.offsetHeight / 2
-
-    plateX.set(clamp(pointX - rect.left, halfWidth, Math.max(halfWidth, rect.width - halfWidth)))
-    plateY.set(clamp(pointY - rect.top, halfHeight, Math.max(halfHeight, rect.height - halfHeight)))
-
-    if (jump) {
-      x.jump(plateX.get())
-      y.jump(plateY.get())
-      needsJump.current = false
-    }
-  }
-
-  const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>): void => {
-    if (!plateEnabled || activeRow === null) return
-    placePlate(event.clientX, event.clientY, needsJump.current)
-  }
-
-  /** Keyboard focus has no cursor to follow, so the plate parks beside the row
-   *  that has focus instead — the same story, reachable without a pointer. */
-  const handleRowFocus = (event: ReactFocusEvent<HTMLAnchorElement>, position: number): void => {
-    setActiveRow(position)
-    if (!plateEnabled) return
-
-    const row = event.currentTarget.getBoundingClientRect()
-    placePlate(row.left + row.width * 0.34, row.top + row.height / 2, true)
-  }
-
   if (!lead) return null
 
   const leadAuthor = postAuthor(lead)
   const leadTitleId = 'blog-dispatch-lead-title'
 
   return (
-    <div
-      ref={boardRef}
-      className="lb-board relative grid gap-10 lg:grid-cols-12 xl:gap-x-12"
-      onPointerMove={handlePointerMove}
-    >
+    <div className="lb-board relative grid gap-10 lg:grid-cols-12 xl:gap-x-12">
       {/* ------------------------------------------------------------------ */}
       {/* Lead plate                                                          */}
       {/* ------------------------------------------------------------------ */}
@@ -262,15 +172,7 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
       {rest.length ? (
         <Reveal className="min-w-0 lg:col-span-6 xl:col-span-5" delay={120}>
           <div className="lb-stack flex h-full min-w-0 flex-col">
-            {/* Leaving the *index* (not the whole column) drops the plate, so it
-                never follows the cursor down over the foot link below. */}
-            <ol
-              className="lb-rows min-w-0"
-              onPointerLeave={() => {
-                setActiveRow(null)
-                needsJump.current = true
-              }}
-            >
+            <ol className="lb-rows min-w-0">
               {rest.map((post, position) => {
                 const titleId = `blog-dispatch-row-${position}-title`
                 const author = postAuthor(post)
@@ -280,9 +182,6 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
                     <Link
                       href={postHref(post)}
                       aria-labelledby={titleId}
-                      onPointerEnter={() => setActiveRow(position)}
-                      onFocus={(event) => handleRowFocus(event, position)}
-                      onBlur={() => setActiveRow(null)}
                       className="relative z-[1] grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-4 py-5 focus-visible:outline-offset-4 sm:grid-cols-[auto_minmax(0,1fr)_auto_auto] sm:gap-x-5 sm:py-6"
                     >
                       <span className="lb-row-rail" aria-hidden="true" />
@@ -363,37 +262,6 @@ export function BlogDispatchBoard({ posts }: { posts: PostCard[] }) {
             </div>
           </div>
         </Reveal>
-      ) : null}
-
-      {/* ------------------------------------------------------------------ */}
-      {/* Cursor-following preview plate                                      */}
-      {/* ------------------------------------------------------------------ */}
-      {/* Mounted only for a fine pointer on a wide canvas (see the effect above).
-          `motion` owns the position (springs, so it glides a beat behind the
-          cursor); CSS owns the centring, tilt and scale, so neither overwrites
-          the other's transform. Every row's plate stays mounted and cross-fades,
-          so jumping down the index never waits on a decode. */}
-      {plateEnabled && rest.length ? (
-        <motion.div
-          ref={plateRef}
-          className="lb-preview"
-          data-active={activeRow !== null}
-          style={{ x, y }}
-          aria-hidden="true"
-        >
-          <div className="lb-preview-inner">
-            {rest.map((post, position) => (
-              <div key={post.id} className="lb-preview-frame" data-active={activeRow === position}>
-                <PayloadImageFill
-                  media={post.featuredImage}
-                  alt=""
-                  sizes="(min-width: 120rem) 320px, 280px"
-                />
-                <span className="lb-preview-caption">{postCategory(post) ?? dict.nav.blog}</span>
-              </div>
-            ))}
-          </div>
-        </motion.div>
       ) : null}
     </div>
   )
