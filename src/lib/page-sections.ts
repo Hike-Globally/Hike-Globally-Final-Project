@@ -5,25 +5,24 @@ import { MULTI_URL_PREVIEW_NAME, type MultiUrlPreviewSource } from './multi-url-
 /** Shared by the CMS and public/preview renderers. Order is document-specific. */
 export const tripSectionOptions = [
   { label: 'Hero & trip facts', value: 'hero' },
-  // The primary trip-story sequence, also used by the sticky section navigation.
+  // The frontend trip-story sequence; audience renders For, then Not For.
+  { label: 'Key Takeaways', value: 'keyTakeaways' },
   { label: 'Overview', value: 'overview' },
   { label: 'Highlights', value: 'highlights' },
+  { label: 'Why Choose This Trek', value: 'whyChoose' },
+  { label: 'Who is this trip for / not for', value: 'audience' },
   { label: 'Itinerary', value: 'itinerary' },
   { label: 'Essential information', value: 'information' },
   { label: 'Hotels Near Destination', value: 'hotelsNearDestination' },
+  { label: 'Included / not included', value: 'inclusions' },
+  { label: 'Original route map and altitude chart', value: 'routeMap' },
+  { label: 'Packing list', value: 'packing' },
   { label: 'Departures', value: 'departures' },
   { label: 'FAQs', value: 'faqs' },
-  // Optional supporting sections follow the primary sequence. Existing saved layouts are
-  // normalized to this primary order at render time while these supporting rows keep their order.
-  { label: 'Key Takeaways', value: 'keyTakeaways' },
-  { label: 'Why Choose This Trek', value: 'whyChoose' },
-  { label: 'Who is this trip for / not for', value: 'audience' },
+  { label: 'Gallery', value: 'gallery' },
+  // Optional supporting rows retain their saved order after the main trip content.
   { label: 'Link preview', value: 'linkPreview' },
   { label: MULTI_URL_PREVIEW_NAME, value: 'multiUrlPreview' },
-  { label: 'Original route map and altitude chart', value: 'routeMap' },
-  { label: 'Included / not included', value: 'inclusions' },
-  { label: 'Packing list', value: 'packing' },
-  { label: 'Gallery', value: 'gallery' },
   { label: 'Inquiry form', value: 'inquiry' },
   { label: 'Related trips', value: 'related' },
 ]
@@ -108,15 +107,20 @@ export function resolvePageSections(
  */
 export function orderTripPageSections(sections: PageSection[]): PageSection[] {
   const primaryOrder = [
+    'keyTakeaways',
     'overview',
     'highlights',
+    'whyChoose',
     'audience',
     'itinerary',
-    'hotelsNearDestination',
     'information',
+    'hotelsNearDestination',
+    'inclusions',
     'routeMap',
+    'packing',
     'departures',
     'faqs',
+    'gallery',
   ]
   const primary = new Set(primaryOrder)
   const edgeSections = new Set(['hero', 'inquiry', 'related'])
@@ -124,7 +128,7 @@ export function orderTripPageSections(sections: PageSection[]): PageSection[] {
   const hero = take('hero')
   const body = primaryOrder.flatMap(take)
   const supporting = sections.filter(({ kind }) => !primary.has(kind) && !edgeSections.has(kind))
-  const closing = sections.filter(({ kind }) => kind === 'inquiry' || kind === 'related')
+  const closing = [...take('inquiry'), ...take('related')]
 
   return [...hero, ...body, ...supporting, ...closing]
 }

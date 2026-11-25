@@ -151,76 +151,80 @@ test('full-width sections can be interleaved with body sections without changing
   assert.deepEqual(groups[2].sections, [{ kind: 'itinerary' }, { kind: 'html' }])
 })
 
-test('trip: default primary sections follow the sticky navigation sequence', () => {
-  const kinds = defaultPageSections(tripSectionOptions).map(({ kind }) => kind)
-  assert.deepEqual(kinds.slice(0, 8), [
-    'hero',
-    'overview',
-    'highlights',
-    'itinerary',
-    'information',
-    'hotelsNearDestination',
-    'departures',
-    'faqs',
-  ])
+const tripContentOrder = [
+  'hero',
+  'keyTakeaways',
+  'overview',
+  'highlights',
+  'whyChoose',
+  'audience', // Renders Who Is This Trip For, then Who Is This Trip Not For.
+  'itinerary',
+  'information',
+  'hotelsNearDestination',
+  'inclusions',
+  'routeMap',
+  'packing',
+  'departures',
+  'faqs',
+  'gallery',
+]
+
+test('trip: default and legacy layouts follow the requested frontend content flow', () => {
+  const expected = [...tripContentOrder, 'linkPreview', 'inquiry', 'related']
+  assert.deepEqual(
+    defaultPageSections(tripSectionOptions).map(({ kind }) => kind),
+    expected,
+  )
+  for (const layout of [undefined, null, [], defaultPageSections(tripSectionOptions)]) {
+    assert.deepEqual(
+      orderTripPageSections(resolvePageSections(layout, tripSectionOptions)).map(
+        ({ kind }) => kind,
+      ),
+      expected,
+    )
+  }
 })
 
-test('trip: existing CMS layouts render primary sections in canonical order and retain extras', () => {
-  const saved = [
+test('trip: saved layouts render in canonical order without mutating content or losing extras', () => {
+  const saved: PageSection[] = [
     { kind: 'related' },
     { id: 'custom-first', kind: 'html', html: '<p>First custom block</p>' },
-    { kind: 'faqs' },
-    { kind: 'routeMap' },
-    { kind: 'audience' },
-    { kind: 'itinerary' },
-    { kind: 'overview' },
-    { kind: 'keyTakeaways' },
-    { kind: 'highlights' },
-    { kind: 'departures' },
-    { kind: 'information' },
-    { kind: 'hotelsNearDestination' },
+    { id: 'preview-one', kind: 'linkPreview', linkPreviewUrl: '/trips/example' },
+    ...tripContentOrder.toReversed().map((kind) => ({ kind })),
     { id: 'custom-second', kind: 'html', html: '<p>Second custom block</p>' },
-    { kind: 'hero' },
+    { id: 'preview-two', kind: 'multiUrlPreview' },
     { kind: 'inquiry' },
-  ] satisfies PageSection[]
-
+  ]
+  const snapshot = structuredClone(saved)
   const ordered = orderTripPageSections(saved)
   assert.deepEqual(
     ordered.map(({ kind }) => kind),
-    [
-      'hero',
-      'overview',
-      'highlights',
-      'audience',
-      'itinerary',
-      'hotelsNearDestination',
-      'information',
-      'routeMap',
-      'departures',
-      'faqs',
-      'html',
-      'keyTakeaways',
-      'html',
-      'related',
-      'inquiry',
-    ],
+    [...tripContentOrder, 'html', 'linkPreview', 'html', 'multiUrlPreview', 'inquiry', 'related'],
   )
+  assert.deepEqual(saved, snapshot, 'does not mutate the saved layout')
+  assert.equal(ordered.length, saved.length)
+  for (const section of saved) assert.ok(ordered.includes(section), 'preserves row content')
+  assert.deepEqual(orderTripPageSections(ordered), ordered, 'ordering is idempotent')
+  const groups = groupPageSections(ordered, ['hero', 'inquiry', 'related'])
   assert.deepEqual(
-    ordered.filter(({ kind }) => kind === 'html').map(({ id }) => id),
-    ['custom-first', 'custom-second'],
+    groups.flatMap(({ sections }) => sections),
+    ordered,
   )
 })
 
-test('trip: optional core sections can still be omitted from a saved layout', () => {
-  const layout = defaultPageSections(tripSectionOptions).filter(
-    ({ kind }) => !['highlights', 'audience', 'hotelsNearDestination', 'routeMap', 'departures'].includes(kind),
-  )
-  assert.deepEqual(
-    orderTripPageSections(layout)
-      .slice(0, 5)
-      .map(({ kind }) => kind),
-    ['hero', 'overview', 'itinerary', 'information', 'faqs'],
-  )
+test('trip: hidden sections remain hidden when normalizing a saved layout', () => {
+  for (const hidden of tripContentOrder) {
+    const layout = defaultPageSections(tripSectionOptions).filter(({ kind }) => kind !== hidden)
+    const ordered = orderTripPageSections(resolvePageSections(layout, tripSectionOptions))
+    assert.equal(
+      ordered.some(({ kind }) => kind === hidden),
+      false,
+    )
+    assert.deepEqual(
+      ordered.map(({ kind }) => kind),
+      [...tripContentOrder.filter((kind) => kind !== hidden), 'linkPreview', 'inquiry', 'related'],
+    )
+  }
 })
 
 test('the Link preview row owns the card, so it is a URL field inside the row', () => {

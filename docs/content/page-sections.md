@@ -12,8 +12,18 @@ The trip booking sidebar remains alongside body content, and the blog table of c
 
 ## Who is this trip for / not for
 
-Trips have a **Who is this trip for / not for** row directly after **Highlights**. It renders the two
-audience cards edited in the **Who Is This Trip For** and **Who Is This Trip Not For** panels. Migration
+The trip frontend (including draft preview) normalizes enabled sections into this flow:
+**Key Takeaways → Trip Overview → Key Highlights → Why Choose This Trek → Who Is This Trip For →
+Who Is This Trip Not For → Itinerary → Essential Info → Hotels Near Destination →
+Inclusion/Exclusion → Live Map and Altitude Charts → Packing List → Departures → FAQs → Gallery**.
+Related Trips closes the page after any inquiry band. Custom HTML and link-preview rows retain
+their relative saved order after Gallery and before the closing bands. Removing a row still hides
+that section; normalization does not add missing rows or alter their content. Blog layouts retain
+their document-specific ordering.
+
+Trips have a single **Who is this trip for / not for** row after **Why Choose This Trek** in this
+frontend flow. It renders the For card before the Not For card, using the content edited in the
+**Who Is This Trip For** and **Who Is This Trip Not For** panels. Migration
 `20261107_120000_trip_audience` adds this row after Highlights in every trip layout that was already
 saved. See `docs/content/trip-audience.md`.
 
