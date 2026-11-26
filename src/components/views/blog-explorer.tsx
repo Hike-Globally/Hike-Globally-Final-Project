@@ -1,10 +1,8 @@
-'use client'
-
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { archiveHref, filterQuery } from '@/lib/catalog'
-import { blogCategoryOptions } from '@/lib/blog-categories'
 
+import { blogCategoryOptions } from '@/lib/blog-categories'
+import { archiveHref, filterQuery } from '@/lib/catalog'
+import { BlogArchiveFilter } from '@/components/views/blog-archive-filter'
 import { PayloadImageFill } from '@/components/ui/payload-image'
 import { sitePath } from '@/i18n/config'
 import { blogCategoryLabel, dictionary } from '@/i18n/dictionaries'
@@ -58,9 +56,9 @@ function ArchiveCard({
               {blog.by} {author}
             </li>
           )}
-          {post.content ? <li>
-            {blog.readTime.replace('{minutes}', String(readingTimeMinutes(post.content)))}
-          </li> : null}
+          {post.content ? (
+            <li>{blog.readTime.replace('{minutes}', String(readingTimeMinutes(post.content)))}</li>
+          ) : null}
         </ul>
       </div>
     </article>
@@ -68,7 +66,8 @@ function ArchiveCard({
 }
 
 export function BlogExplorer({ posts, category }: { posts: PostCard[]; category: string }) {
-  const router = useRouter()
+  // Keep the cards and their CMS content on the server. Only the category selector needs
+  // client-side navigation, so a long archive doesn't hydrate every card and article body.
   // Repeat the reference's feature + three-card row without changing post order.
   const groups = Array.from({ length: Math.ceil(posts.length / 4) }, (_, index) =>
     posts.slice(index * 4, index * 4 + 4),
@@ -76,24 +75,16 @@ export function BlogExplorer({ posts, category }: { posts: PostCard[]; category:
 
   return (
     <>
-      <div className="blog-archive-filter">
-        <select
-          aria-label="Filter by topic"
-          value={category}
-          onChange={(event) =>
-            router.push(archiveHref('blog', 1, filterQuery({ category: event.target.value })), {
-              scroll: false,
-            })
-          }
-        >
-          <option value="all">{dictionary.blog.allCategories}</option>
-          {blogCategoryOptions.map(({ value: topic }) => (
-            <option key={topic} value={topic}>
-              {blogCategoryLabel(topic)}
-            </option>
-          ))}
-        </select>
-      </div>
+      <BlogArchiveFilter
+        category={category}
+        allLabel={dictionary.blog.allCategories}
+        options={blogCategoryOptions.map(({ value }) => ({
+          value,
+          label: blogCategoryLabel(value),
+          href: archiveHref('blog', 1, filterQuery({ category: value })),
+        }))}
+        allHref={archiveHref('blog', 1)}
+      />
       <div className="blog-archive-rows" aria-live="polite">
         {!posts.length && <p>{dictionary.common.noResultsTitle}</p>}
         {groups.map(([lead, ...rest], index) => (
