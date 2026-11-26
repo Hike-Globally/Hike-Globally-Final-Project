@@ -86,10 +86,7 @@ test('only content that starts entirely below the fold is hidden for the animati
 })
 
 test('Reveal arms the animation after mount and reveals on any overlap', () => {
-  const source = readFileSync(
-    new URL('../components/motion/reveal.tsx', import.meta.url),
-    'utf8',
-  )
+  const source = readFileSync(new URL('../components/motion/reveal.tsx', import.meta.url), 'utf8')
 
   // The first client render matches the server: `hidden` is false until an effect decides.
   assert.match(source, /const \[hidden, setHidden\] = useState\(false\)/)
@@ -98,7 +95,10 @@ test('Reveal arms the animation after mount and reveals on any overlap', () => {
     /typeof IntersectionObserver === 'undefined' \|\|/,
     'the server/client visibility fork that caused the hydration-split must stay gone',
   )
-  assert.match(source, /shouldAnimateOnMount\(element\.getBoundingClientRect\(\)\.top, window\.innerHeight\)/)
+  assert.match(
+    source,
+    /shouldAnimateOnMount\(element\.getBoundingClientRect\(\)\.top, window\.innerHeight\)/,
+  )
 
   // A page that is already scrolled (reload restoring the position, or a visitor who moved
   // before hydration) keeps everything visible: no content is removed mid-page.
@@ -106,8 +106,12 @@ test('Reveal arms the animation after mount and reveals on any overlap', () => {
 
   // A ratio threshold can never be met by a section taller than ~8 viewports, so a long
   // Essential Information block would stay hidden forever. Any overlap must reveal.
-  assert.match(source, /threshold: 0/)
-  assert.doesNotMatch(source, /threshold: 0\.12/)
+  const observerSource = readFileSync(
+    new URL('../components/motion/reveal-observer.ts', import.meta.url),
+    'utf8',
+  )
+  assert.match(observerSource, /threshold: 0/)
+  assert.doesNotMatch(observerSource, /threshold: 0\.12/)
 
   // Unchanged behaviour: reduced motion users just get the content, and the CSS animation
   // contract with the rest of the site (distance/delay/duration) is preserved.

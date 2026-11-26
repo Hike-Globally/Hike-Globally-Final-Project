@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ElementType, type ReactNode } from 'react'
 
 import { cn } from '@/lib/utils'
+import { observeReveal } from './reveal-observer'
 
 type RevealProps = {
   children: ReactNode
@@ -93,24 +94,18 @@ export function Reveal({
     const element = ref.current
     if (!element) return
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setHidden(false)
-            if (once) observer.unobserve(entry.target)
-          } else if (!once) {
-            setHidden(true)
-          }
-        }
-      },
-      // `threshold: 0` — reveal on the first pixel of overlap. See the note above for why a
-      // ratio threshold silently skipped tall sections.
-      { threshold: 0, rootMargin: '0px 0px -8% 0px' },
-    )
+    // All reveals share one observer with the same threshold and root margin. Each still has
+    // its own callback, so replaying reveals and once-only reveals keep their original behavior.
+    const unsubscribe = observeReveal(element, (entry) => {
+      if (entry.isIntersecting) {
+        setHidden(false)
+        if (once) unsubscribe()
+      } else if (!once) {
+        setHidden(true)
+      }
+    })
 
-    observer.observe(element)
-    return () => observer.disconnect()
+    return unsubscribe
   }, [armed, once])
 
   return (
