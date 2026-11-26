@@ -8,7 +8,7 @@ import {
 } from './trip-filters'
 
 export const PAGE_SIZE = 24
-export type Archive = 'trips' | 'destinations' | 'blog'
+export type Archive = 'trips' | 'destinations' | 'blog' | 'news'
 export type Search = Record<string, string | string[] | undefined>
 export type ArchiveProps = { searchParams: Promise<Search> }
 export type CatalogPage<T> = { docs: T[]; totalPages: number; totalDocs: number }
@@ -41,6 +41,7 @@ export const archiveFilterParams: Record<Archive, readonly string[]> = {
   trips: ['destination', 'difficulty', 'season', 'type', 'sort'],
   destinations: [],
   blog: ['category'],
+  news: ['category'],
 }
 
 /**

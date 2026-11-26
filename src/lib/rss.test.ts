@@ -22,7 +22,7 @@ const parse = (posts: RssPost[] = []) => new JSDOM(buildRssFeed(posts, options),
 test('RSS 2.0 has channel metadata, a self link, UTF-8 text, and well-formed escaped summaries', () => {
   const document = parse([post({ title: 'Trekking & café <tips> 🏔', excerpt: 'A <script>alert("x")</script> & a trail\u0001' })])
   assert.equal(document.querySelector('rss')?.getAttribute('version'), '2.0')
-  assert.equal(document.querySelector('channel > title')?.textContent, 'Hike Globally — Blog')
+  assert.equal(document.querySelector('channel > title')?.textContent, 'Hike Globally — Blog & News')
   assert.equal(document.querySelector('channel > link')?.textContent, 'https://hikeglobally.com/blog')
   assert.equal(document.querySelector('channel > description')?.textContent, options.tagline)
   assert.equal(document.querySelector('language')?.textContent, 'en')
@@ -85,24 +85,24 @@ test('database reader filters before limiting, uses public access, and fetches n
   const requests: Record<string, unknown>[] = []
   const payload = { find: async (query: Record<string, unknown>) => {
     requests.push(query)
-    return { docs: requests.length === 1 ? [post()] : [post({ slug: 'legacy', publishedAt: null })] }
+    return { docs: requests.length % 2 === 1 ? [post()] : [post({ slug: 'legacy', publishedAt: null })] }
   } } as unknown as Pick<Payload, 'find'>
   const posts = await readRssPosts(payload)
-  assert.equal(posts.length, 2)
-  assert.equal(requests.length, 2)
+  assert.equal(posts.length, 4)
+  assert.equal(requests.length, 4)
   for (const [index, request] of requests.entries()) {
-    assert.equal(request.collection, 'blog')
+    assert.equal(request.collection, index < 2 ? 'blog' : 'news')
     assert.equal(request.depth, 0)
     assert.equal(request.limit, 50)
     assert.equal(request.overrideAccess, false)
-    assert.deepEqual(request.sort, index === 0 ? ['-publishedAt', '-createdAt', 'id'] : ['-createdAt', 'id'])
+    assert.deepEqual(request.sort, index % 2 === 0 ? ['-publishedAt', '-createdAt', 'id'] : ['-createdAt', 'id'])
     assert.deepEqual(request.where, { and: [
       { _status: { equals: 'published' } }, { 'meta.noIndex': { not_equals: true } },
-      { publishedAt: { exists: index === 0 } },
+      { publishedAt: { exists: index % 2 === 0 } },
     ] })
     assert.doesNotMatch(JSON.stringify(request.select), /content|author|email|password/)
   }
-  assert.equal(parse(posts).querySelectorAll('item').length, 2)
+  assert.equal(parse(posts).querySelectorAll('item').length, 4)
 })
 
 test('autodiscovery lives in the root head and the feed cannot become a CMS landing-page sitemap entry', () => {

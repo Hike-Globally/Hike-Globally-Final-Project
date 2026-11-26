@@ -120,6 +120,16 @@ const richText = (...nodes: LexicalNode[]): RichTextValue => ({
   root: { type: 'root', format: '', indent: 0, version: 1, direction: 'ltr', children: nodes },
 })
 
+/** A centered pull-quote — rendered as a blockquote by the rich-text renderer. */
+const quote = (value: string): LexicalNode => ({
+  type: 'quote',
+  version: 1,
+  format: '',
+  indent: 0,
+  direction: 'ltr',
+  children: [paragraph(value)],
+})
+
 /**
  * A packing list filed into the three accordions the trip page renders — Clothing and Footwear,
  * Trekking Equipment, Personal Items. Seeded this way so a fresh install demonstrates the grouped
@@ -1743,6 +1753,186 @@ const run = async () => {
 
   console.log(`  ✓ Created ${postData.length} journal posts`)
 
+  /* ---------- news ---------- */
+  type NewsSeedCategory =
+    | 'world-news'
+    | 'travel'
+    | 'adventure'
+    | 'culture'
+    | 'wildlife'
+    | 'sustainability'
+    | 'industry'
+
+  const newsData = [
+    {
+      title: 'New permits required for Everest Base Camp trekkers from 2026',
+      keywords: [
+        'everest base camp permit 2026',
+        'nepal trekking permit changes',
+        'khumbu pasang lhamu permit',
+      ],
+      excerpt:
+        'From 1 January 2026 every Khumbu trekker needs a registered permit and a licensed guide. Here is what changes, and what it costs.',
+      categories: ['world-news', 'travel'],
+      featured: true,
+      content: richText(
+        paragraph(
+          'Nepal has confirmed that, from the start of the 2026 spring season, all trekkers in the Khumbu region must carry a registered permit and be accompanied by a licensed guide. The move ends unguided solo trekking in the national park and brings the region in line with rules already in force in parts of the Annapurna and Manaslu areas.',
+        ),
+        heading('What is new'),
+        bulletList([
+          'A single Khumbu Pasang Lhamu Rural Municipality permit replaces the old staggered checkpoints.',
+          'Trekkers must be registered with a licensed operator before the Lukla flight.',
+          'Independent, guide-less trekking is no longer permitted inside the park boundary.',
+        ]),
+        quote(
+          'The mountain has always been shared. Making sure everyone on it is accounted for is simply good stewardship.',
+        ),
+        heading('What it means for you'),
+        paragraph(
+          'For travellers, the change is mostly paperwork handled by your operator. Expect a slightly earlier start to the booking process and a small increase in the permit fee, offset by better rescue coordination and clearer trail data.',
+        ),
+      ),
+    },
+    {
+      title: 'Nepal opens two new tea-house routes in the Annapurna region',
+      keywords: ['annapurna new trekking routes', 'nepal tea house trek', 'annapurna circuit update'],
+      excerpt:
+        'Two community-run trails now link traditional villages north of Pokhara, cutting crowding on the classic circuit.',
+      categories: ['travel', 'adventure'],
+      featured: false,
+      content: richText(
+        paragraph(
+          'Two new tea-house routes have opened in the Annapurna region, built and maintained by local communities rather than large lodges. Both branch off the established circuit and reward the extra day with quieter ridgelines and homestay cooking.',
+        ),
+        heading('The two routes'),
+        bulletList([
+          'A three-day loop through the Gurung villages above Sikles, with a ridge camp at 3,200 m.',
+          'A four-day traverse from Australian Camp to the Kali Gandaki, crossing two unmarked cols.',
+        ]),
+        heading('Why it matters'),
+        paragraph(
+          'Crowding on the main Annapurna trail has been a quiet complaint for years. Spreading trekkers across more villages keeps the experience and the income distributed.',
+        ),
+      ),
+    },
+    {
+      title: 'Study finds Himalayan glaciers losing ice faster than predicted',
+      keywords: ['himalayan glacier melt', 'climate change himalaya', 'glacier retreat nepal'],
+      excerpt:
+        'A decade-long survey of 150 glaciers shows thinning rates 30% above the previous worst-case model.',
+      categories: ['world-news', 'wildlife'],
+      featured: false,
+      content: richText(
+        paragraph(
+          'A new survey of 150 Himalayan glaciers finds they are thinning roughly 30% faster than the worst-case climate models had projected. The implications reach far beyond the mountains: nearly two billion people rely on glacial meltwater for part of the year.',
+        ),
+        heading('What the data shows'),
+        bulletList([
+          'Median thinning of 0.5 m per year across the sampled glaciers.',
+          'Accelerating loss at mid-altitudes, where most trekking happens.',
+          'Earlier and less predictable snowmelt feeding the major rivers.',
+        ]),
+        quote('The Himalayas are the water tower of Asia. What happens here does not stay here.'),
+        heading('For trekkers'),
+        paragraph(
+          'Routes that were reliably snowbound are opening earlier, and a few high passes now need different timing than the guidebooks suggest. We are updating our itineraries season by season rather than year by year.',
+        ),
+      ),
+    },
+    {
+      title: 'How local guides are reshaping sustainable trekking',
+      keywords: ['sustainable trekking nepal', 'responsible tourism himalaya', 'community tourism'],
+      excerpt:
+        'A new generation of Nepali-led operators is putting wages, waste and local benefit at the centre of every trip.',
+      categories: ['sustainability', 'culture'],
+      featured: false,
+      content: richText(
+        paragraph(
+          'The most interesting shift in Himalayan travel is not a new route but who is leading it. A growing number of Nepali-owned operators are rebuilding trekking around fair wages, carry-out waste policies and village-level benefit sharing.',
+        ),
+        heading('What good looks like'),
+        bulletList([
+          'Porter loads weighed at the trailhead, every time.',
+          'Insurance and proper gear provided to the whole crew.',
+          'A fixed share of trip revenue returned to the trail villages.',
+        ]),
+        heading('Why it lasts'),
+        paragraph(
+          'When the benefit is local and visible, communities protect the trails themselves. That is a more durable kind of sustainability than any certificate on a wall.',
+        ),
+      ),
+    },
+    {
+      title: 'New direct flight links Kathmandu with a second European hub',
+      keywords: ['kathmandu new flight europe', 'nepal aviation 2026', 'fly to nepal'],
+      excerpt:
+        'A thrice-weekly service cuts the typical Europe–Kathmandu journey by a full connection and several hours.',
+      categories: ['industry', 'travel'],
+      featured: false,
+      content: richText(
+        paragraph(
+          'A new thrice-weekly direct flight between Kathmandu and a second major European hub has begun operations, removing the usual Gulf or Middle-East connection for many travellers and shaving several hours off the journey.',
+        ),
+        heading('What changes for travellers'),
+        bulletList([
+          'One fewer connection and no overnight in a transit hotel for most Europe departures.',
+          'More predictable arrival times for the tight Lukla flight window.',
+          'Slightly higher peak-season fares as demand settles.',
+        ]),
+        heading('Our advice'),
+        paragraph(
+          'Book the international leg and the Lukla connection on the same day only if you have a buffer. Weather delays at Lukla are common, and a missed connection is easier to absorb with a night in Kathmandu.',
+        ),
+      ),
+    },
+    {
+      title: 'Wildlife sightings up in Langtang after a quiet season',
+      keywords: ['langtang wildlife', 'red panda langtang', 'himalayan wildlife trek'],
+      excerpt:
+        'Guides report a marked rise in red panda and pheasant sightings along the upper Langtang trail this autumn.',
+      categories: ['wildlife', 'adventure'],
+      featured: false,
+      content: richText(
+        paragraph(
+          'After a quiet season, guides working the upper Langtang trail are reporting a clear uptick in wildlife sightings — red pandas near the tree line, flocks of colourful pheasants, and the occasional Himalayan tahr on the high slopes.',
+        ),
+        heading('Why now'),
+        bulletList([
+          'Lower visitor numbers last year gave the forest a rest.',
+          'A good mast year for the oak and rhododendron has fed more of the food chain.',
+          'Community patrols have reduced snaring along the main ridge.',
+        ]),
+        quote('You do not come to Langtang for the summit. You come for the forest waking up.'),
+        heading('Seeing it responsibly'),
+        paragraph(
+          'Early starts and a quiet pace are the best wildlife strategy. We keep groups small on this trail and ask everyone to stay on the path so the undergrowth keeps doing its job.',
+        ),
+      ),
+    },
+  ] satisfies Array<Record<string, unknown> & { categories: NewsSeedCategory[] }>
+
+  for (const [index, post] of newsData.entries()) {
+    await payload.create({
+      collection: 'news',
+
+      data: {
+        ...post,
+        slug: post.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        featuredImage: imageAt(index + 6),
+        author: authorId,
+        publishedAt: new Date(Date.now() - (index + 1) * 5 * 24 * 60 * 60 * 1000).toISOString(),
+        meta: {
+          title: post.title,
+          description: post.excerpt,
+        },
+        _status: 'published',
+      } satisfies RequiredDataFromCollectionSlug<'news'>,
+    })
+  }
+
+  console.log(`  ✓ Created ${newsData.length} news articles`)
+
   /* ---------- pages ---------- */
   const homeBlocks = (): Page['blocks'] => {
     const copy = {
@@ -2029,6 +2219,7 @@ const run = async () => {
         },
         { link: { label: 'Places', type: 'custom', url: '/places' } },
         { link: { label: 'Journal', type: 'custom', url: '/blog' } },
+        { link: { label: 'News', type: 'custom', url: '/news' } },
         { link: { label: 'About', type: 'custom', url: '/about' } },
       ],
       actions: [{ link: { label: 'Plan your trip', type: 'custom', url: '/contact' } }],
@@ -2063,6 +2254,7 @@ const run = async () => {
           links: [
             { link: { label: 'About us', type: 'custom', url: '/about' } },
             { link: { label: 'Journal', type: 'custom', url: '/blog' } },
+            { link: { label: 'News', type: 'custom', url: '/news' } },
             { link: { label: 'Contact', type: 'custom', url: '/contact' } },
             { link: { label: 'Sitemap', type: 'custom', url: '/sitemap' } },
           ],

@@ -5,6 +5,7 @@ import { useDocumentInfo, useRowLabel } from '@payloadcms/ui'
 import {
   blogSectionOptions,
   linkPreviewAddress,
+  newsSectionOptions,
   tripSectionOptions,
   type PageSection,
 } from '@/lib/page-sections'
@@ -19,7 +20,12 @@ import {
 export default function PageSectionLabel() {
   const { data, rowNumber } = useRowLabel<PageSection>()
   const { collectionSlug } = useDocumentInfo()
-  const options = collectionSlug === 'blog' ? blogSectionOptions : tripSectionOptions
+  const options =
+    collectionSlug === 'blog'
+      ? blogSectionOptions
+      : collectionSlug === 'news'
+        ? newsSectionOptions
+        : tripSectionOptions
 
   let label: string | undefined
   if (data.kind === 'html') {

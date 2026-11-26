@@ -6,6 +6,8 @@ import { absoluteUrl, canonicalUrl } from './seo'
 export const RSS_FEED_PATH = '/feed.xml'
 export const RSS_POST_LIMIT = 50
 
+export type RssCollection = 'blog' | 'news'
+
 export type RssPost = {
   title?: string | null
   slug?: string | null
@@ -15,32 +17,42 @@ export type RssPost = {
   updatedAt?: string | null
   _status?: 'draft' | 'published' | null
   meta?: { noIndex?: boolean | null } | null
+  /** Which hub the item links to — blog posts and news articles live under different paths. */
+  collection?: RssCollection
 }
 
 /** Summary-only feed: no rich-text bodies, uploads, private author emails, or demo fallback data. */
 export async function readRssPosts(payload: Pick<Payload, 'find'>): Promise<RssPost[]> {
   // Query dated and legacy undated posts separately. PostgreSQL sorts NULL dates first for DESC;
   // one limited query could otherwise crowd recent posts out with old, undated records.
-  const results = await Promise.all([true, false].map((hasPublicationDate) => payload.find({
-    collection: 'blog',
-    locale: defaultLocale,
-    depth: 0,
-    limit: RSS_POST_LIMIT,
-    sort: hasPublicationDate ? ['-publishedAt', '-createdAt', 'id'] : ['-createdAt', 'id'],
-    overrideAccess: false,
-    where: {
-      and: [
-        { _status: { equals: 'published' } },
-        { 'meta.noIndex': { not_equals: true } },
-        { publishedAt: { exists: hasPublicationDate } },
-      ],
-    },
-    select: {
-      title: true, slug: true, excerpt: true, publishedAt: true,
-      createdAt: true, updatedAt: true, _status: true, meta: { noIndex: true },
-    },
-  })))
-  return results.flatMap((result) => result.docs)
+  const results = await Promise.all(
+    (['blog', 'news'] as RssCollection[]).flatMap((collection) =>
+      [true, false].map((hasPublicationDate) =>
+        payload
+          .find({
+            collection,
+            locale: defaultLocale,
+            depth: 0,
+            limit: RSS_POST_LIMIT,
+            sort: hasPublicationDate ? ['-publishedAt', '-createdAt', 'id'] : ['-createdAt', 'id'],
+            overrideAccess: false,
+            where: {
+              and: [
+                { _status: { equals: 'published' } },
+                { 'meta.noIndex': { not_equals: true } },
+                { publishedAt: { exists: hasPublicationDate } },
+              ],
+            },
+            select: {
+              title: true, slug: true, excerpt: true, publishedAt: true,
+              createdAt: true, updatedAt: true, _status: true, meta: { noIndex: true },
+            },
+          })
+          .then((result) => result.docs.map((doc) => ({ ...doc, collection }))),
+      ),
+    ),
+  )
+  return results.flat()
 }
 
 /** XML 1.0 text, including protection against invalid control characters and lone surrogates. */
@@ -64,7 +76,7 @@ export function buildRssFeed(
     .filter((post) => post._status !== 'draft' && !post.meta?.noIndex && post.slug?.trim() && post.title?.trim())
     .map((post) => ({
       post,
-      url: canonicalUrl(`/blog/${post.slug}`),
+      url: canonicalUrl(`/${post.collection ?? 'blog'}/${post.slug}`),
       published: timestamp(post.publishedAt) ?? timestamp(post.createdAt),
     }))
     .sort((a, b) => (b.published ?? -Infinity) - (a.published ?? -Infinity))
@@ -80,7 +92,7 @@ export function buildRssFeed(
     return [updated, published].filter((date): date is number => date !== undefined)
   })
   const lastBuildDate = updates.length ? new Date(Math.max(...updates)).toUTCString() : undefined
-  const title = `${siteName} — Blog`
+  const title = `${siteName} — Blog & News`
 
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',

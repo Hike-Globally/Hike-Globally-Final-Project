@@ -5,6 +5,7 @@ import { routes, sitePath } from '@/i18n/config'
 import { getAllPageSlugs, getFooter, getSettings } from '@/lib/data'
 import { resolveLink, type ResolvedLink } from '@/lib/links'
 import { withPlacesFooterLink } from '@/lib/places-navigation'
+import { withNewsFooterLink } from '@/lib/news-navigation'
 import { mailtoHref, protectedEmailHtmlProps } from '@/lib/public-email'
 import type { Setting } from '@/payload-types'
 
@@ -322,11 +323,18 @@ export async function Footer() {
   )
 
   const rightColumns: FooterColumn[] = [
-    ...withPlacesFooterLink(cmsColumns.length ? columnsWithSitemap : fallbackColumns, {
-      href: sitePath('/places'),
-      label: dict.nav.places,
-      newTab: false,
-    }),
+    ...withNewsFooterLink(
+      withPlacesFooterLink(cmsColumns.length ? columnsWithSitemap : fallbackColumns, {
+        href: sitePath('/places'),
+        label: dict.nav.places,
+        newTab: false,
+      }),
+      {
+        href: sitePath('/news'),
+        label: dict.nav.news,
+        newTab: false,
+      },
+    ),
     ...(cmsColumns.length && !hasCompanyColumn && !hasAbout
       ? [
           {

@@ -48,6 +48,7 @@ export const en = {
     destinations: 'Destinations',
     places: 'Places',
     blog: 'Journal',
+    news: 'News',
     inquiry: 'Plan your trip',
     contact: 'Contact',
   },
@@ -286,6 +287,52 @@ export const en = {
     categoryTripReports: 'Trip reports',
     categoryNews: 'News',
   },
+  news: {
+    listingTitle: 'Travel news & dispatches',
+    listingSubtitle:
+      'Updates from the Himalaya and beyond — new routes, park rules, and the stories worth following.',
+    /** Eyebrow of the `/news` hero band, above the display headline. */
+    heroEyebrow: 'Dispatches from the Himalaya',
+    /** Side note beside the hero's jump link, as on `/trips` and `/destinations`. */
+    heroNote: 'Reported by the guides who are there.',
+    featured: 'Featured dispatch',
+    latest: 'Latest news',
+    readTime: '{minutes} min read',
+    readStory: 'Read story',
+    /** Foot of the homepage news index — the column-level link to `/news`. */
+    browseNews: 'Browse the news',
+    by: 'By',
+    publishedOn: 'Published',
+    similarNews: 'Similar news',
+    similarNewsSubtitle: 'More dispatches worth your time.',
+    backToNews: 'Back to news',
+    fieldNotes: 'News',
+    inThisStory: 'In this article',
+    readingProgress: 'Article reading progress',
+    aboutAuthor: 'The voice behind the report',
+    planningEyebrow: 'Your next trail',
+    planningTitle: 'The best stories are still ahead.',
+    planningText:
+      'Dreaming beyond the page? Our local guides will help you find the route that feels like yours.',
+    planningLink: 'Plan your trip',
+    /** Heading of the article's FAQ section — the same wording as on trip and post pages. */
+    faqs: 'Frequently Asked Questions',
+    notFound: 'That article no longer exists.',
+    allCategories: 'All topics',
+    /** Newsletter capture shown beside a single article. */
+    newsletterTitle: 'Sign up for weekly updates',
+    newsletterText:
+      'A short, useful note from the trail every week — new routes, gear we trust, and the occasional summit selfie.',
+    newsletterEmail: 'Email*',
+    newsletterCta: 'SUBSCRIBE NOW',
+    categoryWorldNews: 'World news',
+    categoryTravel: 'Travel',
+    categoryAdventure: 'Adventure',
+    categoryCulture: 'Culture',
+    categoryWildlife: 'Wildlife & nature',
+    categorySustainability: 'Sustainability',
+    categoryIndustry: 'Industry',
+  },
   inquiry: {
     title: 'Plan your trip',
     subtitle: 'Tell us what you have in mind and we’ll help point you in the right direction.',
@@ -389,3 +436,14 @@ export const blogCategoryLabelForDictionary = (value: string, dict: Dictionary):
 
 export const blogCategoryLabel = (value: string): string =>
   blogCategoryLabelForDictionary(value, dictionary)
+
+/**
+ * Human label for a news category value — the news-side twin of `blogCategoryLabelForDictionary`.
+ * The category filter on `/news` and the `articleSection` of a NewsArticle's markup both need the
+ * same readable name for `'world-news'`, so the lookup lives here rather than in a component.
+ */
+export const newsCategoryLabelForDictionary = (value: string, dict: Dictionary): string =>
+  ((dict.news as Record<string, string>)[categoryKey(value)] as string | undefined) ?? value
+
+export const newsCategoryLabel = (value: string): string =>
+  newsCategoryLabelForDictionary(value, dictionary)

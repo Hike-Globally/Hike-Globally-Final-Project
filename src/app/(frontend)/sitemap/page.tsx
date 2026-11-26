@@ -167,6 +167,15 @@ function buildSubsystems(chart: ChartSources, siteName: string): {
       meta: chart.posts ? `${chart.posts} articles` : undefined,
     },
     {
+      title: 'News — Dispatches Hub',
+      href: sitePath('/news'),
+      path: '/news',
+      description: 'Route openings, permit changes, and mountain-news dispatches reported from the field.',
+      status: '200',
+      kind: 'hub',
+      meta: chart.news ? `${chart.news} articles` : undefined,
+    },
+    {
       title: 'Authors & Mountain Guides Hub',
       href: sitePath('/authors'),
       path: '/authors',
@@ -184,6 +193,17 @@ function buildSubsystems(chart: ChartSources, siteName: string): {
         status: '200',
         kind: 'endpoint',
         meta: post.meta ?? undefined,
+      }),
+    ),
+    ...chart.newsNodes.map(
+      (article): SitemapNode => ({
+        title: article.title,
+        href: sitePath(`/news/${article.slug}`),
+        path: sitePath(`/news/${article.slug}`),
+        description: article.summary ?? 'Mountain-news dispatch from the field.',
+        status: '200',
+        kind: 'endpoint',
+        meta: article.meta ?? undefined,
       }),
     ),
     ...chart.authorNodes.map(

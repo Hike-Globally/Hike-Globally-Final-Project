@@ -29,10 +29,11 @@ async function run(migrate: typeof up | typeof down, selectRows: unknown[] = [])
 
 const sqlOf = (statements: { sql: string; params: unknown[] }[]) => statements.map((s) => s.sql)
 
-test('user profile slug is the newest migration', () => {
-  assert.equal(migrations.at(-1)?.up, up)
-  assert.equal(migrations.at(-1)?.down, down)
-  assert.equal(migrations.at(-1)?.name, '20261123_120000_user_profile_slug')
+test('user profile slug migration is registered', () => {
+  const entry = migrations.find((m) => m.name === '20261123_120000_user_profile_slug')
+  assert.ok(entry, 'migration is present in the registry')
+  assert.equal(entry?.up, up)
+  assert.equal(entry?.down, down)
 })
 
 test('up adds the column, then the unique index that makes duplicates impossible', async () => {

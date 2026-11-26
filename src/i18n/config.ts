@@ -45,6 +45,7 @@ export const routes = {
   trips: 'trips',
   destinations: 'destinations',
   blog: 'blog',
+  news: 'news',
   places: 'places',
   inquiry: 'inquiry',
   contact: 'contact',

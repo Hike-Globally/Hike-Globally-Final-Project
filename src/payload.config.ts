@@ -8,6 +8,7 @@ import sharp from 'sharp'
 
 import { Blog } from './collections/Blog'
 import { Destinations } from './collections/Destinations'
+import { News } from './collections/News'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Redirections } from './collections/Redirections'
@@ -169,7 +170,7 @@ export default buildConfig({
     tablesFilter: [`!${MEDIA_FILES_TABLE}`],
   }),
 
-  collections: [Users, Media, Destinations, Trips, Blog, Pages, Redirections],
+  collections: [Users, Media, Destinations, Trips, Blog, News, Pages, Redirections],
   globals: [Header, Footer, Settings],
 
   // The site is English-only, so Payload is configured with a single locale: the admin shows no

@@ -43,6 +43,17 @@ export const blogSectionOptions = [
   { label: 'Related posts', value: 'related' },
 ]
 
+export const newsSectionOptions = [
+  { label: 'Hero & article details', value: 'hero' },
+  { label: 'Article body & table of contents', value: 'content' },
+  // Added with the link preview card: the same repeatable row as posts, used to drop a card into
+  // the article body.
+  { label: 'Link preview', value: 'linkPreview' },
+  { label: MULTI_URL_PREVIEW_NAME, value: 'multiUrlPreview' },
+  { label: 'FAQs', value: 'faqs' },
+  { label: 'Similar news', value: 'related' },
+]
+
 export type PageSection = MultiUrlPreviewSource & {
   id?: string | null
   kind: string

@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 
 import { MAX_KEYWORDS } from '@/fields/keywords'
 import { htmlLang, ogLocale } from '@/i18n/config'
-import type { Blog, Destination, Media, Trip } from '@/payload-types'
+import type { Blog, Destination, Media, News, Trip } from '@/payload-types'
 import { authorPath, authorProfile, type PublicAuthor } from './author-profile'
 import { parseCoordinates } from './coordinates'
 import { lexicalToPlainText, truncate } from './format'
@@ -577,6 +577,68 @@ export const breadcrumbJsonLd = (items: { name: string; url: string }[]): JsonLd
   })),
 })
 
+/**
+ * The one article builder behind `blogPostingJsonLd` and `newsArticleJsonLd`: a journal post is a
+ * `BlogPosting`, a news article a `NewsArticle` — same fields, different node type.
+ */
+const articleJsonLd = ({
+  type,
+  post,
+  url,
+  author,
+  authorName,
+  image,
+  siteName,
+  organizationLogo,
+  organizationSocials,
+  categories,
+}: {
+  type: 'BlogPosting' | 'NewsArticle'
+  post: Blog | News
+  url: string
+  /** Defaults to the post's populated author relationship. */
+  author?: PublicAuthor | number | null
+  /** Fallback for callers that only know the author's name. */
+  authorName?: string | null
+  /** Media document, media id or an already-absolute URL — resolved by `schemaImageUrl()`. */
+  image?: number | Media | string | null
+  siteName: string
+  /** The publisher's configured logo; resolved to an absolute URL, with the site logo fallback. */
+  organizationLogo?: number | Media | string | null
+  organizationSocials?: { url: string }[] | null
+  /** Human-readable category names, published as `articleSection`. */
+  categories?: string[]
+}): JsonLdInput => {
+  const articleImage = schemaImageUrl(image)
+  const body = lexicalToPlainText(post.content)
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': type,
+    headline: truncate(post.meta?.title || post.title, 110),
+    description: post.meta?.description || post.excerpt,
+    url: canonicalUrl(url),
+    mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl(url) },
+    image: articleImage ? [articleImage] : undefined,
+    datePublished: post.publishedAt ?? post.createdAt,
+    dateModified: post.updatedAt,
+    inLanguage: htmlLang,
+    // The "Keywords" section of the post, in the order the editor wrote it.
+    keywords: normalizeKeywords(post.keywords).join(', ') || undefined,
+    articleSection: categories?.length ? categories : undefined,
+    wordCount: body ? body.split(/\s+/).length : undefined,
+    author:
+      personJsonLd(author === undefined ? post.author : author) ??
+      (authorName?.trim() ? { '@type': 'Person', name: authorName.trim() } : undefined),
+    publisher: publisherJsonLd({
+      name: siteName,
+      logo: organizationLogo,
+      socials: organizationSocials,
+    }),
+    articleBody: truncate(body, 4000),
+  }
+}
+
 export const blogPostingJsonLd = ({
   post,
   url,
@@ -602,36 +664,58 @@ export const blogPostingJsonLd = ({
   organizationSocials?: { url: string }[] | null
   /** Human-readable category names, published as `articleSection`. */
   categories?: string[]
-}): JsonLdInput => {
-  const articleImage = schemaImageUrl(image)
-  const body = lexicalToPlainText(post.content)
+}): JsonLdInput =>
+  articleJsonLd({
+    type: 'BlogPosting',
+    post,
+    url,
+    author,
+    authorName,
+    image,
+    siteName,
+    organizationLogo,
+    organizationSocials,
+    categories,
+  })
 
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: truncate(post.meta?.title || post.title, 110),
-    description: post.meta?.description || post.excerpt,
-    url: canonicalUrl(url),
-    mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl(url) },
-    image: articleImage ? [articleImage] : undefined,
-    datePublished: post.publishedAt ?? post.createdAt,
-    dateModified: post.updatedAt,
-    inLanguage: htmlLang,
-    // The "Keywords" section of the post, in the order the editor wrote it.
-    keywords: normalizeKeywords(post.keywords).join(', ') || undefined,
-    articleSection: categories?.length ? categories : undefined,
-    wordCount: body ? body.split(/\s+/).length : undefined,
-    author:
-      personJsonLd(author === undefined ? post.author : author) ??
-      (authorName?.trim() ? { '@type': 'Person', name: authorName.trim() } : undefined),
-    publisher: publisherJsonLd({
-      name: siteName,
-      logo: organizationLogo,
-      socials: organizationSocials,
-    }),
-    articleBody: truncate(body, 4000),
-  }
-}
+export const newsArticleJsonLd = ({
+  post,
+  url,
+  author,
+  authorName,
+  image,
+  siteName,
+  organizationLogo,
+  organizationSocials,
+  categories,
+}: {
+  post: News
+  url: string
+  /** Defaults to the article's populated author relationship. */
+  author?: PublicAuthor | number | null
+  /** Fallback for callers that only know the author's name. */
+  authorName?: string | null
+  /** Media document, media id or an already-absolute URL — resolved by `schemaImageUrl()`. */
+  image?: number | Media | string | null
+  siteName: string
+  /** The publisher's configured logo; resolved to an absolute URL, with the site logo fallback. */
+  organizationLogo?: number | Media | string | null
+  organizationSocials?: { url: string }[] | null
+  /** Human-readable category names, published as `articleSection`. */
+  categories?: string[]
+}): JsonLdInput =>
+  articleJsonLd({
+    type: 'NewsArticle',
+    post,
+    url,
+    author,
+    authorName,
+    image,
+    siteName,
+    organizationLogo,
+    organizationSocials,
+    categories,
+  })
 
 export const touristTripJsonLd = ({
   trip,

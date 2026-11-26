@@ -1,0 +1,93 @@
+import Link from 'next/link'
+
+import { PayloadImageFill } from '@/components/ui/payload-image'
+import { dictionary, newsCategoryLabel } from '@/i18n/dictionaries'
+import { sitePath } from '@/i18n/config'
+import type { NewsCard as NewsCardData } from '@/lib/data'
+import { formatDate, readingTimeMinutes } from '@/lib/format'
+import { cn } from '@/lib/utils'
+
+// Reuses the PostCard's stylesheet: a news card is the same object with wire-copy
+// labels and its own URL space.
+import './post-card.css'
+
+export function NewsCard({
+  post,
+  priority = false,
+  featured = false,
+  className,
+}: {
+  post: NewsCardData
+  priority?: boolean
+  featured?: boolean
+  className?: string
+}) {
+  const dict = dictionary
+  const href = sitePath(`/news/${post.slug}`)
+  const authorName = post.author && typeof post.author !== 'number' ? post.author.name : null
+  const category = post.categories?.[0]
+  const categoryLabel = category ? newsCategoryLabel(category) : null
+
+  return (
+    <article
+      className={cn(
+        'group flex h-full flex-col',
+        featured ? 'lg:flex-row lg:items-center lg:gap-10' : '',
+        className,
+      )}
+    >
+      <Link
+        href={href}
+        className={cn(
+          'photo-plate relative block',
+          featured ? 'lg:w-[58%]' : '',
+          featured ? 'aspect-[16/10]' : 'aspect-[16/11]',
+        )}
+      >
+        <PayloadImageFill
+          media={post.featuredImage}
+          sizes={
+            featured
+              ? '(min-width: 1024px) 55vw, 92vw'
+              : '(min-width: 1280px) 33vw, (min-width: 768px) 45vw, 92vw'
+          }
+          priority={priority}
+          imageClassName="transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
+        />
+      </Link>
+
+      <div className={cn('flex flex-1 flex-col', featured ? 'pt-6 lg:w-[42%] lg:pt-0' : 'pt-5')}>
+        <div className="flex items-center gap-3 text-label tracking-[0.12em] text-slate-80 uppercase">
+          {categoryLabel ? <span className="text-deep-90">{categoryLabel}</span> : null}
+          {categoryLabel ? <span aria-hidden>·</span> : null}
+          <time dateTime={(post.publishedAt ?? post.createdAt) as string}>
+            {formatDate(post.publishedAt ?? post.createdAt)}
+          </time>
+        </div>
+
+        <h3 className="post-card-title mt-3 font-heading font-semibold">
+          <Link href={href} className="transition-colors hover:text-deep">
+            {post.title}
+          </Link>
+        </h3>
+
+        <p
+          className={cn(
+            'post-card-description mt-3 card-description-copy leading-relaxed text-ink-60',
+            featured ? '' : 'line-clamp-3',
+          )}
+        >
+          {post.excerpt}
+        </p>
+
+        <p className="mt-4 text-small text-slate-80">
+          {authorName ? `${dict.news.by} ${authorName}` : null}
+          {authorName && post.content ? <span aria-hidden> · </span> : null}
+          {post.content
+            ? dict.news.readTime.replace('{minutes}', String(readingTimeMinutes(post.content)))
+            : null}
+        </p>
+      </div>
+    </article>
+  )
+}

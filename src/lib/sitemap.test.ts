@@ -31,7 +31,7 @@ const PLACE_URLS = [
   `${ORIGIN}/places`,
   ...placeCategories.map((category) => `${ORIGIN}/places/${category.value}`),
 ]
-const STATIC_ROUTE_COUNT = 10 + PLACE_URLS.length
+const STATIC_ROUTE_COUNT = 11 + PLACE_URLS.length
 
 const document = (overrides: Partial<SitemapDocument> = {}): SitemapDocument => ({
   slug: 'a-document',
@@ -69,18 +69,19 @@ test('URLs are the canonical spelling of each page', () => {
   )
 
   // The homepage is the bare origin — byte for byte what Next.js prints in its <link rel="canonical">.
-  assert.deepEqual(urls(entries).slice(0, 8), [
+  assert.deepEqual(urls(entries).slice(0, 9), [
     ORIGIN,
     `${ORIGIN}/trips`,
     `${ORIGIN}/destinations`,
     `${ORIGIN}/blog`,
+    `${ORIGIN}/news`,
     `${ORIGIN}/contact`,
     `${ORIGIN}/about`,
     `${ORIGIN}/privacy`,
     `${ORIGIN}/terms`,
   ])
 
-  assert.deepEqual(urls(entries).slice(8), [
+  assert.deepEqual(urls(entries).slice(9), [
     `${ORIGIN}/sitemap`,
     `${ORIGIN}/authors`,
     ...PLACE_URLS,
@@ -132,6 +133,7 @@ test('two documents sharing a slug still produce one entry for that URL', () => 
     `${ORIGIN}/trips`,
     `${ORIGIN}/destinations`,
     `${ORIGIN}/blog`,
+    `${ORIGIN}/news`,
     `${ORIGIN}/contact`,
     `${ORIGIN}/about`,
     `${ORIGIN}/privacy`,

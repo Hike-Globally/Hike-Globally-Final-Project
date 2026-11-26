@@ -81,7 +81,7 @@ import { resolveRichTextLink } from './rich-text-links'
 /* -------------------------------------------------------------------------- */
 
 /** The collections the index is built from, in descending linking priority. */
-export type InternalLinkCollection = 'trips' | 'destinations' | 'blog' | 'pages'
+export type InternalLinkCollection = 'trips' | 'destinations' | 'blog' | 'news' | 'pages'
 
 /**
  * One document that can be linked *to*, reduced to what the index needs.
@@ -203,6 +203,7 @@ export const COLLECTION_WEIGHT: Record<InternalLinkCollection, number> = {
   trips: 3,
   destinations: 2,
   blog: 1,
+  news: 1,
   pages: 0,
 }
 
