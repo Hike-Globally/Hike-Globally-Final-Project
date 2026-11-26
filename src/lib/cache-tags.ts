@@ -18,6 +18,8 @@ export const CACHE_TAG = {
   destination: (slug: string) => `destination:${slug}`,
   posts: 'posts',
   post: (slug: string) => `post:${slug}`,
+  news: 'news',
+  new: (slug: string) => `news:${slug}`,
   pages: 'pages',
   page: (slug: string) => `page:${slug}`,
   /** Public author profile pages (`/authors`, `/authors/<slug>`). */

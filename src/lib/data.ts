@@ -20,6 +20,7 @@ import type {
   Footer,
   Header,
   Media,
+  News,
   Page,
   Setting,
   Trip,
@@ -96,7 +97,7 @@ async function safeQuery<T>(query: () => Promise<T>, fallback: T): Promise<T> {
   }
 }
 
-type PreviewableCollection = 'blog' | 'destinations' | 'pages' | 'trips'
+type PreviewableCollection = 'blog' | 'destinations' | 'pages' | 'trips' | 'news'
 
 /** Uncached Local API lookup used only after the authenticated preview route enables Draft Mode. */
 async function findDocumentBySlug<T>(
@@ -415,6 +416,126 @@ export const defaultPosts: PostCard[] = [
   },
 ]
 
+export const defaultNews: NewsCard[] = [
+  /* Newest-first, matching the `-publishedAt` sort `getNews()` runs against the database, so the
+     database-less archive shows the same feed a seeded one does. The six entries mirror the six
+     articles the seed script creates, and cycle the three shipped photos. */
+  {
+    id: 1,
+    title: 'New permits required for Everest Base Camp trekkers from 2026',
+    slug: 'new-permits-required-for-everest-base-camp-trekkers-from-2026',
+    excerpt:
+      'From 1 January 2026 every Khumbu trekker needs a registered permit and a licensed guide. Here is what changes, and what it costs.',
+    featuredImage: {
+      id: 401,
+      url: '/images/admin/himalaya-01.jpg',
+      alt: 'Trekkers on the Everest Base Camp trail with snowy peaks behind',
+      updatedAt: '2026-01-05T00:00:00.000Z',
+      createdAt: '2026-01-05T00:00:00.000Z',
+    } as Media,
+    author: { id: 1, name: 'Dawa Sherpa' },
+    categories: ['world-news', 'travel'],
+    publishedAt: '2026-01-05T00:00:00.000Z',
+    createdAt: '2026-01-05T00:00:00.000Z',
+    featured: true,
+  },
+  {
+    id: 2,
+    title: 'Nepal opens two new tea-house routes in the Annapurna region',
+    slug: 'nepal-opens-two-new-tea-house-routes-in-the-annapurna-region',
+    excerpt:
+      'Two community-run trails now link traditional villages north of Pokhara, cutting crowding on the classic circuit.',
+    featuredImage: {
+      id: 402,
+      url: '/images/admin/himalaya-02.jpg',
+      alt: 'Tea-house lodges along a terraced hillside in the Annapurna region',
+      updatedAt: '2026-01-04T00:00:00.000Z',
+      createdAt: '2026-01-04T00:00:00.000Z',
+    } as Media,
+    author: { id: 2, name: 'Pasang Lhamu' },
+    categories: ['travel', 'adventure'],
+    publishedAt: '2026-01-04T00:00:00.000Z',
+    createdAt: '2026-01-04T00:00:00.000Z',
+    featured: false,
+  },
+  {
+    id: 3,
+    title: 'Study finds Himalayan glaciers losing ice faster than predicted',
+    slug: 'study-finds-himalayan-glaciers-losing-ice-faster-than-predicted',
+    excerpt:
+      'A decade-long survey of 150 glaciers shows thinning rates 30% above the previous worst-case model.',
+    featuredImage: {
+      id: 403,
+      url: '/images/admin/himalaya-03.jpg',
+      alt: 'A receding glacier flowing between dark mountain walls',
+      updatedAt: '2026-01-03T00:00:00.000Z',
+      createdAt: '2026-01-03T00:00:00.000Z',
+    } as Media,
+    author: { id: 1, name: 'Dawa Sherpa' },
+    categories: ['world-news', 'wildlife'],
+    publishedAt: '2026-01-03T00:00:00.000Z',
+    createdAt: '2026-01-03T00:00:00.000Z',
+    featured: false,
+  },
+  {
+    id: 4,
+    title: 'How local guides are reshaping sustainable trekking',
+    slug: 'how-local-guides-are-reshaping-sustainable-trekking',
+    excerpt:
+      'A new generation of Nepali-led operators is putting wages, waste and local benefit at the centre of every trip.',
+    featuredImage: {
+      id: 404,
+      url: '/images/admin/himalaya-01.jpg',
+      alt: 'A local guide leading trekkers across a high suspension bridge',
+      updatedAt: '2026-01-02T00:00:00.000Z',
+      createdAt: '2026-01-02T00:00:00.000Z',
+    } as Media,
+    author: { id: 2, name: 'Pasang Lhamu' },
+    categories: ['sustainability', 'culture'],
+    publishedAt: '2026-01-02T00:00:00.000Z',
+    createdAt: '2026-01-02T00:00:00.000Z',
+    featured: false,
+  },
+  {
+    id: 5,
+    title: 'New direct flight links Kathmandu with a second European hub',
+    slug: 'new-direct-flight-links-kathmandu-with-a-second-european-hub',
+    excerpt:
+      'A thrice-weekly service cuts the typical Europe–Kathmandu journey by a full connection and several hours.',
+    featuredImage: {
+      id: 405,
+      url: '/images/admin/himalaya-02.jpg',
+      alt: 'An airliner on the tarmac at Tribhuvan International Airport',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      createdAt: '2026-01-01T00:00:00.000Z',
+    } as Media,
+    author: { id: 1, name: 'Dawa Sherpa' },
+    categories: ['industry', 'travel'],
+    publishedAt: '2026-01-01T00:00:00.000Z',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    featured: false,
+  },
+  {
+    id: 6,
+    title: 'Wildlife sightings up in Langtang after a quiet season',
+    slug: 'wildlife-sightings-up-in-langtang-after-a-quiet-season',
+    excerpt:
+      'Guides report a marked rise in red panda and pheasant sightings along the upper Langtang trail this autumn.',
+    featuredImage: {
+      id: 406,
+      url: '/images/admin/himalaya-03.jpg',
+      alt: 'A red panda perched in a rhododendron branch',
+      updatedAt: '2025-12-31T00:00:00.000Z',
+      createdAt: '2025-12-31T00:00:00.000Z',
+    } as Media,
+    author: { id: 2, name: 'Pasang Lhamu' },
+    categories: ['wildlife', 'adventure'],
+    publishedAt: '2025-12-31T00:00:00.000Z',
+    createdAt: '2025-12-31T00:00:00.000Z',
+    featured: false,
+  },
+]
+
 /* -------------------------------------------------------------------------- */
 /* Types describing the *shape* of each query result                            */
 /* -------------------------------------------------------------------------- */
@@ -464,6 +585,21 @@ export type PostCard = {
   createdAt: string
   categories?: Blog['categories']
   placeCategories?: PlaceCategoryValue[] | null
+  featured?: boolean | null
+  author?: number | ({ id: number; name: string; avatar?: number | Media | null } | null)
+}
+
+/** A news article as the archive and cards render it — the news twin of {@link PostCard}. */
+export type NewsCard = {
+  id: number
+  title: string
+  slug: string
+  excerpt: string
+  content?: News['content']
+  featuredImage: Media
+  publishedAt?: string | null
+  createdAt: string
+  categories?: News['categories']
   featured?: boolean | null
   author?: number | ({ id: number; name: string; avatar?: number | Media | null } | null)
 }
@@ -904,6 +1040,19 @@ const postCardSelect = {
   author: true,
 } as const
 
+const newsCardSelect = {
+  content: true,
+  title: true,
+  slug: true,
+  excerpt: true,
+  featuredImage: true,
+  publishedAt: true,
+  createdAt: true,
+  categories: true,
+  featured: true,
+  author: true,
+} as const
+
 export const getPosts = (limit = 100): Promise<PostCard[]> =>
   safeQuery(
     unstable_cache(
@@ -932,7 +1081,7 @@ export const getRssPosts = (): Promise<RssPost[]> =>
     unstable_cache(
       async () => readRssPosts(await getPayloadClient()),
       ['rss-posts'],
-      { tags: [CACHE_TAG.posts], revalidate: REVALIDATE_SECONDS },
+      { tags: [CACHE_TAG.posts, CACHE_TAG.news], revalidate: REVALIDATE_SECONDS },
     ),
     [],
   )
@@ -1023,6 +1172,125 @@ export const getRelatedPosts = (post: Blog, limit = 3): Promise<PostCard[]> =>
   )
 
 export const getAllPostSlugs = publishedSlugsFor('blog', CACHE_TAG.posts)
+
+/* -------------------------------------------------------------------------- */
+/* News                                                                        */
+/* -------------------------------------------------------------------------- */
+
+export const getNews = (limit = 100): Promise<NewsCard[]> =>
+  safeQuery(
+    unstable_cache(
+      async () => {
+        const payload = await getPayloadClient()
+        const result = await payload.find({
+          collection: 'news',
+          locale: SITE_LOCALE,
+          depth: 1,
+          limit,
+          sort: '-publishedAt',
+          where: { _status: { equals: 'published' } },
+          select: newsCardSelect,
+        })
+        return result.docs as unknown as NewsCard[]
+      },
+      ['news'],
+      { tags: [CACHE_TAG.news], revalidate: REVALIDATE_SECONDS },
+    ),
+    defaultNews.slice(0, limit),
+  )
+
+export const getFeaturedNews = (limit = 3): Promise<NewsCard[]> =>
+  safeQuery(
+    unstable_cache(
+      async () => {
+        const payload = await getPayloadClient()
+        const result = await payload.find({
+          collection: 'news',
+          locale: SITE_LOCALE,
+          depth: 1,
+          limit,
+          sort: '-publishedAt',
+          where: { and: [{ _status: { equals: 'published' } }, { featured: { equals: true } }] },
+          select: newsCardSelect,
+        })
+        return result.docs as unknown as NewsCard[]
+      },
+      ['news', 'featured', String(limit)],
+      { tags: [CACHE_TAG.news], revalidate: REVALIDATE_SECONDS },
+    ),
+    defaultNews.filter((post) => post.featured).slice(0, limit),
+  )
+
+export const getNewsArticle = cache(
+  async (slug: string, includeDraft = false): Promise<News | null> => {
+    if (includeDraft) {
+      return safeQuery(() => findDocumentBySlug<News>('news', slug, 2, true), null)
+    }
+
+    const publishedSlugs = await getAllNewsSlugs()
+    if (!publishedSlugs.includes(slug)) return null
+
+    return safeQuery(
+      unstable_cache(
+        () => findDocumentBySlug<News>('news', slug, 2, false),
+        ['news-article', slug],
+        {
+          tags: [CACHE_TAG.news, CACHE_TAG.new(slug)],
+          revalidate: REVALIDATE_SECONDS,
+        },
+      ),
+      null,
+    )
+  },
+)
+
+export const getRelatedNews = (post: News, limit = 3): Promise<NewsCard[]> =>
+  safeQuery(
+    unstable_cache(
+      async () => {
+        const payload = await getPayloadClient()
+        const manual = Array.isArray(post.relatedPosts) ? post.relatedPosts : []
+        const manualIds = manual
+          .map((item) => (typeof item === 'number' ? item : item?.id))
+          .filter((id): id is number => typeof id === 'number' && id !== post.id)
+
+        if (manualIds.length > 0) {
+          const result = await payload.find({
+            collection: 'news',
+            locale: SITE_LOCALE,
+            depth: 1,
+            limit,
+            sort: '-publishedAt',
+            where: { and: [{ _status: { equals: 'published' } }, { id: { in: manualIds } }] },
+            select: newsCardSelect,
+          })
+          if (result.docs.length > 0) return result.docs as unknown as NewsCard[]
+        }
+
+        const result = await payload.find({
+          collection: 'news',
+          locale: SITE_LOCALE,
+          depth: 1,
+          limit,
+          sort: '-publishedAt',
+          where: {
+            and: [
+              { _status: { equals: 'published' } },
+              { id: { not_equals: post.id } },
+              ...(post.categories?.length ? [{ categories: { in: post.categories } }] : []),
+            ],
+          },
+          select: newsCardSelect,
+        })
+        return result.docs as unknown as NewsCard[]
+      },
+      ['news', 'related', String(post.id)],
+      { tags: [CACHE_TAG.news], revalidate: REVALIDATE_SECONDS },
+    ),
+    [],
+  )
+
+export const getAllNewsSlugs = publishedSlugsFor('news', CACHE_TAG.news)
 
 /* -------------------------------------------------------------------------- */
 /* Authors — public profile pages at /authors/<slug>                            */
@@ -1347,10 +1615,11 @@ export const getAllPageSlugs = async () =>
 const readSitemapSources = unstable_cache(
   async (): Promise<SitemapSources> => {
     const payload = await getPayloadClient()
-    const [trips, destinations, posts, pages, authors] = await Promise.all([
+    const [trips, destinations, posts, news, pages, authors] = await Promise.all([
       readSitemapDocuments(payload, 'trips'),
       readSitemapDocuments(payload, 'destinations'),
       readSitemapDocuments(payload, 'blog'),
+      readSitemapDocuments(payload, 'news'),
       readSitemapDocuments(payload, 'pages'),
       getAuthorIndex(),
     ])
@@ -1358,6 +1627,7 @@ const readSitemapSources = unstable_cache(
       trips,
       destinations,
       posts,
+      news,
       pages,
       // A bare account has no landing page worth crawling; `published()` drops it below. The
       // profile page reaches the same verdict for its own robots meta, so the two never disagree.
@@ -1377,6 +1647,7 @@ const readSitemapSources = unstable_cache(
       CACHE_TAG.trips,
       CACHE_TAG.destinations,
       CACHE_TAG.posts,
+      CACHE_TAG.news,
       CACHE_TAG.pages,
       CACHE_TAG.authors,
     ],
@@ -1408,12 +1679,15 @@ export type ChartSources = {
   trips: number
   destinations: number
   posts: number
+  news: number
   /** Published trips (excluding noindex). */
   tripNodes: ChartNodeRecord[]
   /** Published destinations (excluding noindex). */
   destinationNodes: ChartNodeRecord[]
   /** Published blog posts (excluding noindex). */
   postNodes: ChartNodeRecord[]
+  /** Published news articles (excluding noindex). */
+  newsNodes: ChartNodeRecord[]
   /** Published CMS pages, minus slugs a dedicated route owns. */
   pages: ChartPage[]
   /** Indexable author profiles (accounts with bio or published work). */
@@ -1433,7 +1707,7 @@ export type ChartSources = {
 const readChartSources = unstable_cache(
   async (): Promise<ChartSources> => {
     const payload = await getPayloadClient()
-    const [trips, destinations, posts, pages, authors] = await Promise.all([
+    const [trips, destinations, posts, news, pages, authors] = await Promise.all([
       collectPages((page) =>
         payload.find({
           collection: 'trips',
@@ -1491,6 +1765,25 @@ const readChartSources = unstable_cache(
             excerpt: true,
             categories: true,
             placeCategories: true,
+            updatedAt: true,
+            meta: { noIndex: true, description: true },
+          },
+          where: { _status: { equals: 'published' } },
+        }),
+      ),
+      collectPages((page) =>
+        payload.find({
+          collection: 'news',
+          locale: SITE_LOCALE,
+          depth: 0,
+          limit: 500,
+          sort: '-publishedAt',
+          page,
+          select: {
+            title: true,
+            slug: true,
+            excerpt: true,
+            categories: true,
             updatedAt: true,
             meta: { noIndex: true, description: true },
           },
@@ -1638,6 +1931,29 @@ const readChartSources = unstable_cache(
       })
       .filter((item): item is ChartNodeRecord => item !== null)
 
+    const newsNodes: ChartNodeRecord[] = news
+      .map((article): ChartNodeRecord | null => {
+        const record = article as {
+          title?: string | null
+          slug?: string | null
+          excerpt?: string | null
+          categories?: string[] | null
+          updatedAt?: string | null
+          meta?: { noIndex?: boolean | null; description?: string | null } | null
+        }
+        if (!record.slug || record.meta?.noIndex) return null
+        recordDate(record.updatedAt)
+        const firstCategory = Array.isArray(record.categories) ? record.categories[0] : null
+        return {
+          title: record.title ?? record.slug,
+          slug: record.slug,
+          summary: record.excerpt ?? record.meta?.description ?? null,
+          meta: firstCategory ? firstCategory.replace(/-/g, ' ') : null,
+          updatedAt: record.updatedAt ?? null,
+        }
+      })
+      .filter((item): item is ChartNodeRecord => item !== null)
+
     const chartPages: ChartPage[] = pages
       .map((page): ChartPage | null => {
         const record = page as {
@@ -1680,21 +1996,24 @@ const readChartSources = unstable_cache(
       trips: tripNodes.length,
       destinations: destinationNodes.length,
       posts: postNodes.length,
+      news: newsNodes.length,
       tripNodes,
       destinationNodes,
       postNodes,
+      newsNodes,
       pages: chartPages,
       authorNodes,
       placeCounts,
       lastSyncedAt: timestamps.length ? new Date(Math.max(...timestamps)).toISOString() : null,
     }
   },
-  ['sitemap-chart-sources-v3'],
+  ['sitemap-chart-sources-v4'],
   {
     tags: [
       CACHE_TAG.trips,
       CACHE_TAG.destinations,
       CACHE_TAG.posts,
+      CACHE_TAG.news,
       CACHE_TAG.pages,
       CACHE_TAG.authors,
     ],
@@ -1740,6 +2059,14 @@ const buildFallbackChartSources = (): ChartSources => {
       meta: post.categories?.[0]?.replace(/-/g, ' ') ?? null,
       updatedAt: null,
     })),
+    news: defaultNews.length,
+    newsNodes: defaultNews.map((article) => ({
+      title: article.title,
+      slug: article.slug,
+      summary: article.excerpt,
+      meta: article.categories?.[0]?.replace(/-/g, ' ') ?? null,
+      updatedAt: null,
+    })),
     pages: [],
     authorNodes: [],
     placeCounts,
@@ -1755,9 +2082,9 @@ export const getChartSources = (): Promise<ChartSources> =>
 /* -------------------------------------------------------------------------- */
 
 /**
- * A `select`ed row as the four collections spell it: a trip has `title`/`summary`, a destination
- * `name`/`tagline`, a post `excerpt`, and every collection carries `meta.noIndex` plus the meta
- * description an editor may have written.
+ * A `select`ed row as the five collections spell it: a trip has `title`/`summary`, a destination
+ * `name`/`tagline`, a post or news article `excerpt`, and every collection carries `meta.noIndex`
+ * plus the meta description an editor may have written.
  */
 type LlmsTxtRecord = {
   title?: string | null
@@ -1884,6 +2211,28 @@ const readLlmsTxtPosts = unstable_cache(
   { tags: [CACHE_TAG.posts], revalidate: REVALIDATE_SECONDS },
 )
 
+const readLlmsTxtNews = unstable_cache(
+  async () => {
+    const payload = await getPayloadClient()
+    const rows = await collectPages((page) =>
+      payload.find({
+        collection: 'news',
+        locale: SITE_LOCALE,
+        depth: 0,
+        limit: 500,
+        sort: 'id',
+        page,
+        select: { title: true, slug: true, excerpt: true, meta: true },
+        where: { _status: { equals: 'published' } },
+      }),
+    )
+
+    return rows.map(toLlmsTxtDocument)
+  },
+  ['llms-txt-news'],
+  { tags: [CACHE_TAG.news], revalidate: REVALIDATE_SECONDS },
+)
+
 const readLlmsTxtPages = unstable_cache(
   async () => {
     const payload = await getPayloadClient()
@@ -1915,14 +2264,15 @@ const readLlmsTxtPages = unstable_cache(
  * still answers with the static pages instead of failing the build.
  */
 export const getLlmsTxtSources = async (): Promise<LlmsTxtSources> => {
-  const [trips, destinations, posts, pages] = await Promise.all([
+  const [trips, destinations, posts, news, pages] = await Promise.all([
     safeQuery(readLlmsTxtTrips, []),
     safeQuery(readLlmsTxtDestinations, []),
     safeQuery(readLlmsTxtPosts, []),
+    safeQuery(readLlmsTxtNews, []),
     safeQuery(readLlmsTxtPages, []),
   ])
 
-  return { trips, destinations, posts, pages }
+  return { trips, destinations, posts, news, pages }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -1944,7 +2294,7 @@ export const internalLinkHref = (
 }
 
 /**
- * What the four queries below pull per document: only what a phrase can be built from.
+ * What the queries below pull per document: only what a phrase can be built from.
  *
  * The phrases are the ones an editor typed into **Keyword For Internal Linking**
  * (`internalLinkKeywords`); the title, the slug and the SEO `keywords` are no longer phrase
@@ -2004,8 +2354,8 @@ const toInternalLinkRecord = (
 /**
  * Every document the site can link *to*, for automated internal keyword linking.
  *
- * Four queries in parallel, shaped like `getSitemapSources()` above it, and cached under one key
- * tagged with all four collections: publishing, renaming or unpublishing a trip purges the index
+ * Five queries in parallel, shaped like `getSitemapSources()` above it, and cached under one key
+ * tagged with all five collections: publishing, renaming or unpublishing a trip purges the index
  * along with the pages that link to it, so a slug change cannot leave auto-links pointing at a URL
  * that no longer exists. `src/hooks/revalidate.ts` already fires those tags — nothing new to wire.
  */
@@ -2027,10 +2377,11 @@ const readInternalLinkTargets = unstable_cache(
         }),
       )
 
-    const [trips, destinations, posts, pages] = await Promise.all([
+    const [trips, destinations, posts, news, pages] = await Promise.all([
       query('trips'),
       query('destinations'),
       query('blog'),
+      query('news'),
       query('pages'),
     ])
 
@@ -2038,12 +2389,19 @@ const readInternalLinkTargets = unstable_cache(
       ...trips.map((doc) => toInternalLinkRecord('trips', doc)),
       ...destinations.map((doc) => toInternalLinkRecord('destinations', doc)),
       ...posts.map((doc) => toInternalLinkRecord('blog', doc)),
+      ...news.map((doc) => toInternalLinkRecord('news', doc)),
       ...pages.map((doc) => toInternalLinkRecord('pages', doc)),
     ].filter((record): record is InternalLinkRecord => record !== null)
   },
   ['internal-link-targets'],
   {
-    tags: [CACHE_TAG.trips, CACHE_TAG.destinations, CACHE_TAG.posts, CACHE_TAG.pages],
+    tags: [
+      CACHE_TAG.trips,
+      CACHE_TAG.destinations,
+      CACHE_TAG.posts,
+      CACHE_TAG.news,
+      CACHE_TAG.pages,
+    ],
     revalidate: REVALIDATE_SECONDS,
   },
 )
@@ -2128,7 +2486,11 @@ export type Author = Pick<User, 'id' | 'name'> & { avatar?: number | Media | nul
 function archiveReader<T>(
   collection: Archive,
   tag: string,
-  select: typeof tripCardSelect | typeof destinationCardSelect | typeof postCardSelect,
+  select:
+    | typeof tripCardSelect
+    | typeof destinationCardSelect
+    | typeof postCardSelect
+    | typeof newsCardSelect,
 ) {
   return unstable_cache(
     async (page: number, order: string, conditions: Where[]): Promise<CatalogPage<T>> => {
@@ -2156,6 +2518,7 @@ const readDestinationsPage = archiveReader<DestinationCard>(
   destinationCardSelect,
 )
 const readPostsPage = archiveReader<PostCard>('blog', CACHE_TAG.posts, postCardSelect)
+const readNewsPage = archiveReader<NewsCard>('news', CACHE_TAG.news, newsCardSelect)
 function demoPage<T>(docs: T[], page: number): CatalogPage<T> {
   return {
     docs: docs.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
@@ -2178,6 +2541,21 @@ export const getPostsPage = (page: number, category: string) =>
       ),
     demoPage(
       defaultPosts.filter(
+        (post) => category === 'all' || post.categories?.some((c) => c === category),
+      ),
+      page,
+    ),
+  )
+export const getNewsPage = (page: number, category: string) =>
+  safeQuery(
+    () =>
+      readNewsPage(
+        page,
+        '-publishedAt',
+        category === 'all' ? [] : [{ categories: { in: [category] } }],
+      ),
+    demoPage(
+      defaultNews.filter(
         (post) => category === 'all' || post.categories?.some((c) => c === category),
       ),
       page,

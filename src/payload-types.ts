@@ -72,6 +72,7 @@ export interface Config {
     destinations: Destination;
     trips: Trip;
     blog: Blog;
+    news: News;
     pages: Page;
     redirections: Redirection;
     'payload-kv': PayloadKv;
@@ -90,6 +91,7 @@ export interface Config {
     destinations: DestinationsSelect<false> | DestinationsSelect<true>;
     trips: TripsSelect<false> | TripsSelect<true>;
     blog: BlogSelect<false> | BlogSelect<true>;
+    news: NewsSelect<false> | NewsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     redirections: RedirectionsSelect<false> | RedirectionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -414,74 +416,44 @@ export interface Destination {
 export interface Trip {
   id: number;
   title: string;
-  /**
-   * Auto-generated from the title. Edit carefully — changing it changes the live URL.
-   */
   slug?: string | null;
   guide?: (number | null) | User;
-  /**
-   * Drag rows to set the page order. Link preview and Multi-URL Preview rows are repeatable; empty sections stay hidden.
-   */
   pageSections?:
     | {
         kind:
           | 'hero'
+          | 'keyTakeaways'
           | 'overview'
           | 'highlights'
+          | 'whyChoose'
+          | 'audience'
           | 'itinerary'
           | 'information'
           | 'hotelsNearDestination'
+          | 'inclusions'
+          | 'routeMap'
+          | 'packing'
           | 'departures'
           | 'faqs'
-          | 'keyTakeaways'
-          | 'whyChoose'
-          | 'audience'
+          | 'gallery'
           | 'linkPreview'
           | 'multiUrlPreview'
-          | 'routeMap'
-          | 'inclusions'
-          | 'packing'
-          | 'gallery'
           | 'inquiry'
           | 'related'
           | 'html';
         heading?: string | null;
-        /**
-         * Published exactly as written: <script> tags, <style> blocks, iframes, forms and any other embed are kept and run on the public page. External scripts load in the order you paste them, so a widget’s loader can be followed by its init call. Only paste code you trust — it runs for every visitor with this site’s full rights. The optional heading above is the one thing rendered as plain text.
-         */
         html?: string | null;
-        /**
-         * The page this card links to — the only field that matters here. Paste a full address, or a path on this site such as /trips/annapurna-base-camp. Image, title and description are read from that page. Leave it empty and no card is shown. Pages on other sites open in a new tab.
-         */
         linkPreviewUrl?: string | null;
-        /**
-         * Leave empty to use the page’s own title.
-         */
         linkPreviewTitle?: string | null;
-        /**
-         * Leave empty to use the page’s own description. Shown on one line.
-         */
         linkPreviewDescription?: string | null;
-        /**
-         * Shown in bold. Written exactly as it should appear.
-         */
         linkPreviewPrice?: string | null;
-        /**
-         * Optional. Shown struck through before the price.
-         */
         linkPreviewOriginalPrice?: string | null;
         multiPreviewHeading?: string | null;
         multiPreviewDescription?: string | null;
         multiPreviewLayout?: ('list' | 'slider' | 'carousel') | null;
         multiPreviewAnimation?: ('fade' | 'rise' | 'slide' | 'zoom' | 'reveal' | 'none') | null;
-        /**
-         * Add up to 12 URLs, then drag to reorder. Blank rows are hidden.
-         */
         multiPreviewLinks?:
           | {
-              /**
-               * Use a site path or a public https:// address. The linked page supplies the card details.
-               */
               linkPreviewUrl?: string | null;
               linkPreviewTitle?: string | null;
               linkPreviewDescription?: string | null;
@@ -503,9 +475,6 @@ export interface Trip {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Use the block menu to insert Boxed Content: upload an image and add a heading and description for a responsive, image-left feature.
-   */
   description?: {
     root: {
       type: string;
@@ -538,9 +507,6 @@ export interface Trip {
     | 'strenuous-extreme'
     | 'extreme';
   bestSeasons?: ('spring' | 'summer' | 'autumn' | 'winter')[] | null;
-  /**
-   * Choose one or more categories. Tagged trips and articles appear on the matching place pages; leave empty to exclude this document.
-   */
   placeCategories?:
     | (
         | 'lakes'
@@ -568,9 +534,6 @@ export interface Trip {
       }[]
     | null;
   tripForHeading?: string | null;
-  /**
-   * Insert Boxed Content from the toolbar’s block menu for an image-and-copy feature inside this panel.
-   */
   tripForDescription?: {
     root: {
       type: string;
@@ -587,9 +550,6 @@ export interface Trip {
     [k: string]: unknown;
   } | null;
   tripNotForHeading?: string | null;
-  /**
-   * Insert Boxed Content from the toolbar’s block menu for an image-and-copy feature inside this panel.
-   */
   tripNotForDescription?: {
     root: {
       type: string;
@@ -609,18 +569,12 @@ export interface Trip {
     | {
         day: number;
         title: string;
-        /**
-         * The short place name plotted under this day on the altitude chart — "Namche Bazaar", not "Phakding to Namche Bazaar (3,440 m)". Left empty, the chart prints "Day n" instead.
-         */
         place?: string | null;
         description: string;
         image1?: (number | null) | Media;
         image2?: (number | null) | Media;
         image3?: (number | null) | Media;
         accommodation?: string | null;
-        /**
-         * Metres above sea level at the highest point reached on this day — a pass, a viewpoint, a summit — not where you sleep. Two or more days with an altitude are drawn as the trip’s altitude chart.
-         */
         altitude?: number | null;
         food?: ('included' | 'not-included') | null;
         id?: string | null;
@@ -647,18 +601,9 @@ export interface Trip {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Add one entry per nearby hotel. Each entry appears as an open accordion; include the location, facilities, and useful booking details in its content.
-   */
   hotelsNearDestination?:
     | {
-        /**
-         * Displayed as this hotel’s accordion heading.
-         */
         heading: string;
-        /**
-         * Describe the hotel and its distance from the destination. Add Link preview or Multi-URL Preview blocks for booking links when useful.
-         */
         content: {
           root: {
             type: string;
@@ -692,21 +637,10 @@ export interface Trip {
     };
     [k: string]: unknown;
   } | null;
-  routeMap?: (number | null) | Media;
-  /**
-   * Pins the live map shown between the Original route map and the Altitude chart. Right-click the trailhead (or the place the route starts from) in Google Maps → “Copy coordinates”, then paste the pair — the first number is latitude. Leave both empty and the section shows only your two images, as before.
-   */
   coordinates?: {
-    /**
-     * −90 (south) to 90 (north). The first number of a pasted pair.
-     */
     latitude?: number | null;
-    /**
-     * −180 (west) to 180 (east). The second number of a pasted pair.
-     */
     longitude?: number | null;
   };
-  altitudeChart?: (number | null) | Media;
   departureDates?:
     | {
         startDate: string;
@@ -809,9 +743,6 @@ export interface Trip {
   relatedTrips?: (number | Trip)[] | null;
   bookingLink?: {
     link?: {
-      /**
-       * Visible text of the link. Empty = use the linked document’s title.
-       */
       label?: string | null;
       type?: ('reference' | 'custom') | null;
       reference?:
@@ -835,29 +766,11 @@ export interface Trip {
     };
   };
   featured?: boolean | null;
-  /**
-   * The phrases you want this page to rank for. Type one, press Enter, repeat — up to 20. Write them the way a traveller would search ("everest base camp trek cost"), lead with the most important, and use the same wording in the title and copy. They are published as meta keywords, as Open Graph article tags and in the structured data.
-   */
   keywords?: string[] | null;
-  /**
-   * The phrases that should become a link to this page wherever they appear in another page's copy. Type one, press Enter, repeat — up to 20. These are the only phrases used: the SEO keywords, the title and the slug are not linked automatically. Matching is exact (case-insensitive), so write the phrase the way it appears in the copy. Leave this empty to stop this page being linked to.
-   */
   internalLinkKeywords?: string[] | null;
-  /**
-   * Override the automatically generated title/description and social preview.
-   */
   meta?: {
-    /**
-     * Aim for 50–60 characters. Falls back to the page title.
-     */
     title?: string | null;
-    /**
-     * Aim for 140–160 characters. Falls back to the excerpt/summary.
-     */
     description?: string | null;
-    /**
-     * 1200×630px recommended. Falls back to the hero/cover image.
-     */
     image?: (number | null) | Media;
     noIndex?: boolean | null;
   };
@@ -999,13 +912,7 @@ export interface HeroBlock {
 export interface Blog {
   id: number;
   title: string;
-  /**
-   * Auto-generated from the title. Edit carefully — changing it changes the live URL.
-   */
   slug?: string | null;
-  /**
-   * Drag rows to set the page order. Link preview and Multi-URL Preview rows are repeatable; empty sections stay hidden.
-   */
   pageSections?:
     | {
         kind:
@@ -1020,42 +927,18 @@ export interface Blog {
           | 'related'
           | 'html';
         heading?: string | null;
-        /**
-         * Published exactly as written: <script> tags, <style> blocks, iframes, forms and any other embed are kept and run on the public page. External scripts load in the order you paste them, so a widget’s loader can be followed by its init call. Only paste code you trust — it runs for every visitor with this site’s full rights. The optional heading above is the one thing rendered as plain text.
-         */
         html?: string | null;
-        /**
-         * The page this card links to — the only field that matters here. Paste a full address, or a path on this site such as /trips/annapurna-base-camp. Image, title and description are read from that page. Leave it empty and no card is shown. Pages on other sites open in a new tab.
-         */
         linkPreviewUrl?: string | null;
-        /**
-         * Leave empty to use the page’s own title.
-         */
         linkPreviewTitle?: string | null;
-        /**
-         * Leave empty to use the page’s own description. Shown on one line.
-         */
         linkPreviewDescription?: string | null;
-        /**
-         * Shown in bold. Written exactly as it should appear.
-         */
         linkPreviewPrice?: string | null;
-        /**
-         * Optional. Shown struck through before the price.
-         */
         linkPreviewOriginalPrice?: string | null;
         multiPreviewHeading?: string | null;
         multiPreviewDescription?: string | null;
         multiPreviewLayout?: ('list' | 'slider' | 'carousel') | null;
         multiPreviewAnimation?: ('fade' | 'rise' | 'slide' | 'zoom' | 'reveal' | 'none') | null;
-        /**
-         * Add up to 12 URLs, then drag to reorder. Blank rows are hidden.
-         */
         multiPreviewLinks?:
           | {
-              /**
-               * Use a site path or a public https:// address. The linked page supplies the card details.
-               */
               linkPreviewUrl?: string | null;
               linkPreviewTitle?: string | null;
               linkPreviewDescription?: string | null;
@@ -1069,14 +952,8 @@ export interface Blog {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Shown on cards and used as the meta description fallback.
-   */
   excerpt: string;
   featuredImage: number | Media;
-  /**
-   * The post body. Insert Link preview, Multi-URL Preview, or Boxed Content from the toolbar’s block menu to place a card, a collection of URLs, or an image-and-copy feature among your text. Tables are available from the toolbar’s “+” menu (or type /table): pick rows and columns, then use the hover handles to add, remove, merge or resize. Handy for gear comparisons, cost breakdowns and at-a-glance facts.
-   */
   content?: {
     root: {
       type: string;
@@ -1143,9 +1020,6 @@ export interface Blog {
     | null;
   author: number | User;
   publishedAt?: string | null;
-  /**
-   * Drives the category filter on /blog.
-   */
   categories?:
     | (
         | 'trekking-guides'
@@ -1158,9 +1032,6 @@ export interface Blog {
         | 'news'
       )[]
     | null;
-  /**
-   * Choose one or more categories. Tagged trips and articles appear on the matching place pages; leave empty to exclude this document.
-   */
   placeCategories?:
     | (
         | 'lakes'
@@ -1174,37 +1045,13 @@ export interface Blog {
         | 'temples'
       )[]
     | null;
-  /**
-   * Leave empty to auto-fill with the most recent posts.
-   */
   relatedPosts?: (number | Blog)[] | null;
-  /**
-   * Featured posts are pinned on /blog and can be highlighted on the homepage.
-   */
   featured?: boolean | null;
-  /**
-   * The phrases you want this page to rank for. Type one, press Enter, repeat — up to 20. Write them the way a traveller would search ("everest base camp trek cost"), lead with the most important, and use the same wording in the title and copy. They are published as meta keywords, as Open Graph article tags and in the structured data.
-   */
   keywords?: string[] | null;
-  /**
-   * The phrases that should become a link to this page wherever they appear in another page's copy. Type one, press Enter, repeat — up to 20. These are the only phrases used: the SEO keywords, the title and the slug are not linked automatically. Matching is exact (case-insensitive), so write the phrase the way it appears in the copy. Leave this empty to stop this page being linked to.
-   */
   internalLinkKeywords?: string[] | null;
-  /**
-   * Override the automatically generated title/description and social preview.
-   */
   meta?: {
-    /**
-     * Aim for 50–60 characters. Falls back to the page title.
-     */
     title?: string | null;
-    /**
-     * Aim for 140–160 characters. Falls back to the excerpt/summary.
-     */
     description?: string | null;
-    /**
-     * 1200×630px recommended. Falls back to the hero/cover image.
-     */
     image?: (number | null) | Media;
     noIndex?: boolean | null;
   };
@@ -1487,6 +1334,127 @@ export interface CtaBlock {
   blockType: 'cta';
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news".
+ */
+export interface News {
+  id: number;
+  title: string;
+  slug?: string | null;
+  pageSections?:
+    | {
+        kind: 'hero' | 'content' | 'linkPreview' | 'multiUrlPreview' | 'faqs' | 'related' | 'html';
+        heading?: string | null;
+        html?: string | null;
+        linkPreviewUrl?: string | null;
+        linkPreviewTitle?: string | null;
+        linkPreviewDescription?: string | null;
+        linkPreviewPrice?: string | null;
+        linkPreviewOriginalPrice?: string | null;
+        multiPreviewHeading?: string | null;
+        multiPreviewDescription?: string | null;
+        multiPreviewLayout?: ('list' | 'slider' | 'carousel') | null;
+        multiPreviewAnimation?: ('fade' | 'rise' | 'slide' | 'zoom' | 'reveal' | 'none') | null;
+        multiPreviewLinks?:
+          | {
+              linkPreviewUrl?: string | null;
+              linkPreviewTitle?: string | null;
+              linkPreviewDescription?: string | null;
+              linkPreviewPrice?: string | null;
+              linkPreviewOriginalPrice?: string | null;
+              linkPreviewImage?: (number | null) | Media;
+              linkPreviewImageUrl?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  excerpt: string;
+  featuredImage: number | Media;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  faqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  bestTimeToTrekFaqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  requiredPermitsFaqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  trekkerSafetyFaqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  packingListFaqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  altitudeSicknessFaqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  accommodationFaqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  author: number | User;
+  publishedAt?: string | null;
+  categories?:
+    ('world-news' | 'travel' | 'adventure' | 'culture' | 'wildlife' | 'sustainability' | 'industry')[] | null;
+  relatedPosts?: (number | News)[] | null;
+  featured?: boolean | null;
+  keywords?: string[] | null;
+  internalLinkKeywords?: string[] | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    image?: (number | null) | Media;
+    noIndex?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
  * Send an old URL to its new home. Active rules are matched on the path only (a trailing slash is ignored) and the visitor’s query string is kept.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1565,6 +1533,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'blog';
         value: number | Blog;
+      } | null)
+    | ({
+        relationTo: 'news';
+        value: number | News;
       } | null)
     | ({
         relationTo: 'pages';
@@ -1880,14 +1852,12 @@ export interface TripsSelect<T extends boolean = true> {
         id?: T;
       };
   whyChooseThisTrek?: T;
-  routeMap?: T;
   coordinates?:
     | T
     | {
         latitude?: T;
         longitude?: T;
       };
-  altitudeChart?: T;
   departureDates?:
     | T
     | {
@@ -2093,6 +2063,113 @@ export interface BlogSelect<T extends boolean = true> {
   publishedAt?: T;
   categories?: T;
   placeCategories?: T;
+  relatedPosts?: T;
+  featured?: T;
+  keywords?: T;
+  internalLinkKeywords?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        noIndex?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news_select".
+ */
+export interface NewsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  pageSections?:
+    | T
+    | {
+        kind?: T;
+        heading?: T;
+        html?: T;
+        linkPreviewUrl?: T;
+        linkPreviewTitle?: T;
+        linkPreviewDescription?: T;
+        linkPreviewPrice?: T;
+        linkPreviewOriginalPrice?: T;
+        multiPreviewHeading?: T;
+        multiPreviewDescription?: T;
+        multiPreviewLayout?: T;
+        multiPreviewAnimation?: T;
+        multiPreviewLinks?:
+          | T
+          | {
+              linkPreviewUrl?: T;
+              linkPreviewTitle?: T;
+              linkPreviewDescription?: T;
+              linkPreviewPrice?: T;
+              linkPreviewOriginalPrice?: T;
+              linkPreviewImage?: T;
+              linkPreviewImageUrl?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  excerpt?: T;
+  featuredImage?: T;
+  content?: T;
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  bestTimeToTrekFaqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  requiredPermitsFaqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  trekkerSafetyFaqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  packingListFaqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  altitudeSicknessFaqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  accommodationFaqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  author?: T;
+  publishedAt?: T;
+  categories?: T;
   relatedPosts?: T;
   featured?: T;
   keywords?: T;

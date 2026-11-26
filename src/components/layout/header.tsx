@@ -6,6 +6,7 @@ import { getDestinations, getHeader, getSettings, getTrips } from '@/lib/data'
 import { resolveLink } from '@/lib/links'
 import { buildMegaMenuData } from '@/lib/mega-menu'
 import { withPlacesHeaderLink } from '@/lib/places-navigation'
+import { withNewsHeaderLink } from '@/lib/news-navigation'
 
 /**
  * Site header — the pill dropdown nav ported from `Header-Sample.html`,
@@ -70,12 +71,20 @@ export async function Header() {
       <PillNav
         logoLabel={settings.siteName}
         logoHref={sitePath('/')}
-        links={withPlacesHeaderLink(fallbackLinks, {
-          href: sitePath('/places'),
-          label: dict.nav.places,
-          newTab: false,
-          children: [],
-        })}
+        links={withNewsHeaderLink(
+          withPlacesHeaderLink(fallbackLinks, {
+            href: sitePath('/places'),
+            label: dict.nav.places,
+            newTab: false,
+            children: [],
+          }),
+          {
+            href: sitePath('/news'),
+            label: dict.nav.news,
+            newTab: false,
+            children: [],
+          },
+        )}
         cta={cta}
         megaMenu={megaMenu}
       />

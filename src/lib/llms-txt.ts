@@ -75,6 +75,7 @@ export type LlmsTxtSources = {
   trips: LlmsTxtDocument[]
   destinations: LlmsTxtDocument[]
   posts: LlmsTxtDocument[]
+  news: LlmsTxtDocument[]
   pages: LlmsTxtDocument[]
 }
 
@@ -83,6 +84,7 @@ export const EMPTY_LLMS_TXT_SOURCES: LlmsTxtSources = {
   trips: [],
   destinations: [],
   posts: [],
+  news: [],
   pages: [],
 }
 
@@ -253,6 +255,10 @@ export const buildLlmsTxt = (
     entry(clean(document.title), sitePath(`/blog/${document.slug}`), document.summary ?? ''),
   )
 
+  const news = listed(sources.news).map((document) =>
+    entry(clean(document.title), sitePath(`/news/${document.slug}`), document.summary ?? ''),
+  )
+
   // `home`, `trips`, `blog` and the rest have a route of their own, so a page document with one of
   // those slugs has no URL to print — the same rule `/sitemap.xml` applies.
   const pages = listed(sources.pages)
@@ -291,6 +297,7 @@ export const buildLlmsTxt = (
     section('Trips', trips),
     section('Destinations', destinations),
     section('Journal', posts),
+    section('News', news),
     section('Places', placeEntries()),
     section('Pages', pageEntries),
     section('Optional', optionalEntries),

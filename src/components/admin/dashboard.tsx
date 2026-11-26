@@ -9,11 +9,12 @@ import {
   Images,
   MapPin,
   Mountain,
+  Newspaper,
   Plus,
 } from 'lucide-react'
 
-type DashboardCollection = 'trips' | 'destinations' | 'blog' | 'pages'
-type CountCollection = 'trips' | 'destinations' | 'blog' | 'media'
+type DashboardCollection = 'trips' | 'destinations' | 'blog' | 'pages' | 'news'
+type CountCollection = 'trips' | 'destinations' | 'blog' | 'media' | 'news'
 
 type ActivityItem = {
   title: string
@@ -72,17 +73,29 @@ export default async function AdminDashboard({ initPageResult, user }: AdminView
     }
   }
 
-  const [tripCount, destinationCount, storyCount, mediaCount, trips, destinations, stories, pages] =
-    await Promise.all([
-      count('trips'),
-      count('destinations'),
-      count('blog'),
-      count('media'),
-      recentFor('trips'),
-      recentFor('destinations'),
-      recentFor('blog'),
-      recentFor('pages'),
-    ])
+  const [
+    tripCount,
+    destinationCount,
+    storyCount,
+    mediaCount,
+    newsCount,
+    trips,
+    destinations,
+    stories,
+    pages,
+    news,
+  ] = await Promise.all([
+    count('trips'),
+    count('destinations'),
+    count('blog'),
+    count('media'),
+    count('news'),
+    recentFor('trips'),
+    recentFor('destinations'),
+    recentFor('blog'),
+    recentFor('pages'),
+    recentFor('news'),
+  ])
 
   const activity: ActivityItem[] = [
     ...(trips?.docs ?? []).map((doc) => ({
@@ -103,6 +116,13 @@ export default async function AdminDashboard({ initPageResult, user }: AdminView
       title: 'title' in doc && typeof doc.title === 'string' ? doc.title : 'Untitled field note',
       kind: 'Field note',
       href: `/admin/collections/blog/${doc.id}`,
+      updatedAt: doc.updatedAt,
+      status: doc._status === 'published' ? ('published' as const) : ('draft' as const),
+    })),
+    ...(news?.docs ?? []).map((doc) => ({
+      title: 'title' in doc && typeof doc.title === 'string' ? doc.title : 'Untitled article',
+      kind: 'News',
+      href: `/admin/collections/news/${doc.id}`,
       updatedAt: doc.updatedAt,
       status: doc._status === 'published' ? ('published' as const) : ('draft' as const),
     })),
@@ -152,6 +172,13 @@ export default async function AdminDashboard({ initPageResult, user }: AdminView
       icon: BookOpen,
     },
     {
+      label: 'News',
+      value: newsCount,
+      detail: 'Dispatches & updates',
+      href: '/admin/collections/news',
+      icon: Newspaper,
+    },
+    {
       label: 'Media assets',
       value: mediaCount,
       detail: 'Images and video',
@@ -172,6 +199,12 @@ export default async function AdminDashboard({ initPageResult, user }: AdminView
       detail: 'Share a story or guide',
       href: '/admin/collections/blog/create',
       icon: BookOpen,
+    },
+    {
+      label: 'Publish a news article',
+      detail: 'Share a dispatch or update',
+      href: '/admin/collections/news/create',
+      icon: Newspaper,
     },
     {
       label: 'Add a destination',

@@ -9,6 +9,7 @@ import {
   LogOut,
   MapPin,
   Mountain,
+  Newspaper,
   PanelBottom,
   PanelLeftClose,
   PanelTop,
@@ -43,6 +44,7 @@ export type RailIconName =
   | 'destinations'
   | 'external'
   | 'media'
+  | 'news'
   | 'pages'
   | 'panel-bottom'
   | 'panel-top'
@@ -64,6 +66,7 @@ const icons: Record<RailIconName, LucideIcon> = {
   destinations: MapPin,
   external: ExternalLink,
   media: Images,
+  news: Newspaper,
   pages: FileText,
   'panel-bottom': PanelBottom,
   'panel-top': PanelTop,

@@ -41,6 +41,7 @@ const PLACEMENTS: Record<string, Placement> = {
   'collections:trips': { icon: 'trips', order: 10, section: 'content' },
   'collections:destinations': { icon: 'destinations', order: 20, section: 'content' },
   'collections:blog': { icon: 'blog', order: 30, section: 'content' },
+  'collections:news': { icon: 'news', order: 35, section: 'content' },
   'collections:pages': { icon: 'pages', order: 40, section: 'content' },
   'collections:redirections': { icon: 'redirects', order: 10, section: 'seo' },
   'collections:media': { icon: 'media', order: 10, section: 'library' },

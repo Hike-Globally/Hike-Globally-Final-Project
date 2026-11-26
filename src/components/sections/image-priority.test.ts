@@ -44,6 +44,8 @@ function listTsx(relative: string): string[] {
 const OPENING_COVER_ALLOWLIST = [
   // `/blog` opens on a text-only intro, so the featured lead card is the page's LCP image.
   'src/components/views/blog-explorer.tsx',
+  // Same card anatomy on `/news`: text-only intro, then the featured lead card as the LCP image.
+  'src/components/views/news-explorer.tsx',
   // The admin login's CSS carousel has its first slide on screen at load; the rest are off-stage.
   'src/components/admin/login-gallery.tsx',
 ]

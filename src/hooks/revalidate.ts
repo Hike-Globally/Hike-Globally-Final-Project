@@ -39,7 +39,7 @@ import {
  */
 
 type RevalidateConfig = {
-  collection: 'trips' | 'destinations' | 'blog' | 'pages'
+  collection: 'trips' | 'destinations' | 'blog' | 'pages' | 'news'
   /** URL segment of the listing page, e.g. 'trips'. */
   segment: string
   /** Extra tags to invalidate (a trip change also affects destination pages and the homepage). */
@@ -53,7 +53,9 @@ const collectionTag = (collection: RevalidateConfig['collection']): string =>
       ? CACHE_TAG.destinations
       : collection === 'blog'
         ? CACHE_TAG.posts
-        : CACHE_TAG.pages
+        : collection === 'news'
+          ? CACHE_TAG.news
+          : CACHE_TAG.pages
 
 const documentTag = (collection: RevalidateConfig['collection'], slug: string): string =>
   collection === 'trips'
@@ -62,7 +64,9 @@ const documentTag = (collection: RevalidateConfig['collection'], slug: string): 
       ? CACHE_TAG.destination(slug)
       : collection === 'blog'
         ? CACHE_TAG.post(slug)
-        : CACHE_TAG.page(slug)
+        : collection === 'news'
+          ? CACHE_TAG.new(slug)
+          : CACHE_TAG.page(slug)
 
 const revalidateDocument = async ({
   collection,
@@ -174,6 +178,12 @@ const postHooks = createRevalidateHooks({
 
 const pageHooks = createRevalidateHooks({ collection: 'pages', segment: '' })
 
+const newsHooks = createRevalidateHooks({
+  collection: 'news',
+  segment: 'news',
+  extraTags: [CACHE_TAG.pages],
+})
+
 export const revalidateTrip = tripHooks.afterChange
 export const revalidateTripDelete = tripHooks.afterDelete
 
@@ -182,6 +192,9 @@ export const revalidateDestinationDelete = destinationHooks.afterDelete
 
 export const revalidatePost = postHooks.afterChange
 export const revalidatePostDelete = postHooks.afterDelete
+
+export const revalidateNews = newsHooks.afterChange
+export const revalidateNewsDelete = newsHooks.afterDelete
 
 export const revalidatePage = pageHooks.afterChange
 export const revalidatePageDelete = pageHooks.afterDelete

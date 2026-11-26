@@ -7,6 +7,7 @@ import { AboutHikeGlobally } from '@/components/sections/about-hike-globally'
 import { DifficultyLevels } from '@/components/sections/difficulty-levels'
 import { BrowsePlaces } from '@/components/sections/browse-places'
 import { LatestBlogsSection } from '@/components/sections/latest-blogs-section'
+import { LatestNewsSection } from '@/components/sections/latest-news-section'
 
 import { Cta } from './cta'
 import { Faq } from './faq'
@@ -32,6 +33,9 @@ type Block = NonNullable<Page['blocks']>[number]
  *    section can be neither duplicated nor dropped by a drag in the admin. The board is fixed
  *    at one lead plate plus three index rows (see `latest-blogs-limits.ts`), so the block's
  *    `limit` does not size it; that field still drives the tile grid on other pages.
+ *  - the news index (`LatestNewsSection`) is likewise not a CMS block: it follows the journal
+ *    board in the fixed editorial sequence, so the homepage always closes with wire copy
+ *    before "Plan your trip".
  *
  * Enforced at render time so the rules hold regardless of what the CMS page contains.
  */
@@ -130,6 +134,7 @@ export async function BlockRenderer({
             <AboutHikeGlobally />
             <HomepageDestinations />
             <LatestBlogsSection />
+            <LatestNewsSection />
             {inquiryBlock ? renderBlock(inquiryBlock, 0, false, false, false, linker) : null}
           </>
         )

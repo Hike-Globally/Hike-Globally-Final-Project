@@ -1,0 +1,173 @@
+/* ============================================================================
+   Latest News — the homepage news index.
+   ----------------------------------------------------------------------------
+   A quiet newspaper row directly under the journal board: three headline cards
+   with hairline borders, square corners, brand tokens only. The journal above
+   owns the choreography; this section earns its place by staying calm.
+
+   Headline and card *sizes* are not in here: the section headline comes from
+   the homepage type scale (`home-section-title` / `home-section-intro` in
+   `src/app/(frontend)/homepage.css`). Everything is scoped to
+   `[data-news-index]` (set once in `latest-news-section.tsx`), so no other
+   surface picks these rules up.
+
+   One transition — the card border deepens and the cover steps in a touch, on
+   the shared brand curve — and it is gated behind `(hover: hover) and
+   (pointer: fine)` so a thumb tap never leaves a card stuck in its hovered
+   state. `prefers-reduced-motion` stops what little motion there is.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ layout */
+
+[data-news-index] .ln-grid {
+  display: grid;
+  gap: 1.75rem;
+}
+
+@media (min-width: 810px) {
+  [data-news-index] .ln-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+[data-news-index] .ln-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--color-haze-40);
+  background: var(--color-paper);
+  transition: border-color 0.4s var(--ease-brand, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-news-index] .ln-card:hover,
+  [data-news-index] .ln-card:focus-visible {
+    border-color: var(--color-haze);
+  }
+}
+
+/* ------------------------------------------------------------------- media */
+
+[data-news-index] .ln-media {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background: var(--color-haze-20);
+}
+
+[data-news-index] .ln-image {
+  object-fit: cover;
+  transition: transform 1.2s var(--ease-brand, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-news-index] .ln-card:hover .ln-image,
+  [data-news-index] .ln-card:focus-visible .ln-image {
+    transform: scale(1.03);
+  }
+}
+
+/* -------------------------------------------------------------------- body */
+
+[data-news-index] .ln-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+[data-news-index] .ln-eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-60);
+}
+
+[data-news-index] .ln-tag {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+[data-news-index] .ln-title {
+  font-size: 1.25rem;
+  line-height: 1.3;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+[data-news-index] .ln-excerpt {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-ink-70);
+  /* Three lines, then a clean cut — the card stays a headline, not an article. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+
+[data-news-index] .ln-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-haze-20);
+  font-size: 0.8125rem;
+  color: var(--color-ink-60);
+}
+
+[data-news-index] .ln-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  color: var(--color-ink);
+}
+
+[data-news-index] .ln-cta svg {
+  transition: transform 0.4s var(--ease-brand, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-news-index] .ln-card:hover .ln-cta svg,
+  [data-news-index] .ln-card:focus-visible .ln-cta svg {
+    transform: translateX(4px);
+  }
+}
+
+/* --------------------------------------------------------------------- foot */
+
+[data-news-index] .ln-foot-link {
+  margin-top: 2rem;
+}
+
+[data-news-index] .ln-foot-link a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--color-haze);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-news-index] .ln-card,
+  [data-news-index] .ln-image,
+  [data-news-index] .ln-cta svg {
+    transition: none;
+  }
+}

@@ -141,6 +141,7 @@ test('spells links the way the canonical tag and the sitemap do', () => {
       trips: [{ slug: 'everest-base-camp' }],
       destinations: [{ slug: 'khumbu' }],
       posts: [{ slug: 'training-for-altitude' }],
+      news: [],
       pages: [{ slug: 'gear-list' }],
       authors: [],
     }).map((entry) => entry.url),

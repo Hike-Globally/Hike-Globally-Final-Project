@@ -4,11 +4,11 @@ import { defaultLocale } from '@/i18n/config'
 import type { Media } from '@/payload-types'
 import { destinationNoIndexReason } from './destination-indexing'
 import type { SitemapDocument } from './sitemap'
-import { blogSectionOptions, resolvePageSections, tripSectionOptions, type PageSection } from './page-sections'
+import { blogSectionOptions, newsSectionOptions, resolvePageSections, tripSectionOptions, type PageSection } from './page-sections'
 import { sitemapAssetUrl, sitemapMedia } from './sitemap-media'
 import { HOME_HERO_IMAGE_URL } from './site-assets'
 
-export type SitemapCollection = 'trips' | 'destinations' | 'blog' | 'pages'
+export type SitemapCollection = 'trips' | 'destinations' | 'blog' | 'news' | 'pages'
 type Upload = number | Media | null
 
 type SitemapRecord = {
@@ -73,8 +73,9 @@ export function sitemapDocument(
     if (visible.has('gallery')) uploads.push(...(record.gallery ?? []).map(({ image }) => image))
   } else if (collection === 'destinations') {
     uploads.push(record.heroImage, ...(record.gallery ?? []).slice(0, 4).map(({ image }) => image))
-  } else if (collection === 'blog') {
-    if (kinds(blogSectionOptions).has('hero')) uploads.push(record.featuredImage)
+  } else if (collection === 'blog' || collection === 'news') {
+    const sectionOptions = collection === 'blog' ? blogSectionOptions : newsSectionOptions
+    if (kinds(sectionOptions).has('hero')) uploads.push(record.featuredImage)
   } else {
     // The homepage's first hero uses a bundled photograph instead of the CMS background.
     let firstHero = true
@@ -107,6 +108,7 @@ const select = {
   trips: { ...base, heroImage: true, gallery: { image: true }, pageSections: { kind: true } },
   destinations: { ...base, heroImage: true, gallery: { image: true }, description: true },
   blog: { ...base, featuredImage: true, pageSections: { kind: true } },
+  news: { ...base, featuredImage: true, pageSections: { kind: true } },
   pages: {
     ...base,
     blocks: {

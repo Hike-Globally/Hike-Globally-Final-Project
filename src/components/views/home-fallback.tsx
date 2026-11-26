@@ -12,6 +12,7 @@ import { HeroScrollCover } from '@/components/motion/hero-scroll-cover'
 import { DifficultyLevels } from '@/components/sections/difficulty-levels'
 import { BrowsePlaces } from '@/components/sections/browse-places'
 import { LatestBlogsSection } from '@/components/sections/latest-blogs-section'
+import { LatestNewsSection } from '@/components/sections/latest-news-section'
 import { Button } from '@/components/ui/button'
 import { dictionary } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
@@ -78,9 +79,9 @@ export async function HomeFallback() {
   const destinationsSection = <HomepageDestinations />
 
   // The homepage ends at the "Plan your trip" card — nothing after it. The journal
-  // board always sits immediately before it, so reading the latest field notes is the
-  // last thing a visitor does before being asked to plan a trip. The card is the
-  // shared `CtaCard` (see blocks/cta.tsx), so this fallback closing moment is the
+  // board and the news index always sit immediately before it, so reading the latest
+  // field notes is the last thing a visitor does before being asked to plan a trip. The card is
+  // the shared `CtaCard` (see blocks/cta.tsx), so this fallback closing moment is the
   // same cinematic card a CMS `cta` block renders.
   const inquirySection = (
     <CtaCard
@@ -92,10 +93,11 @@ export async function HomeFallback() {
     />
   )
 
-  // Journal board + "Plan your trip", in that order, whichever branch renders them.
+  // Journal board, news index + "Plan your trip", in that order, whichever branch renders them.
   const closingSections = (
     <>
       <LatestBlogsSection />
+      <LatestNewsSection />
       {inquirySection}
     </>
   )

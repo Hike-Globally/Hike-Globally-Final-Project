@@ -74,6 +74,8 @@ const expectedStructuredData: Record<string, string[]> = {
   'src/app/(frontend)/trips/[slug]/page.tsx': ['breadcrumbJsonLd', 'touristTripJsonLd'],
   'src/app/(frontend)/blog/page.tsx': ['breadcrumbJsonLd', 'webPageJsonLd'],
   'src/app/(frontend)/blog/[slug]/page.tsx': ['breadcrumbJsonLd', 'blogPostingJsonLd'],
+  'src/app/(frontend)/news/page.tsx': ['breadcrumbJsonLd', 'webPageJsonLd'],
+  'src/app/(frontend)/news/[slug]/page.tsx': ['breadcrumbJsonLd', 'newsArticleJsonLd'],
   'src/app/(frontend)/destinations/page.tsx': ['breadcrumbJsonLd', 'webPageJsonLd'],
   'src/app/(frontend)/destinations/[slug]/page.tsx': [
     'breadcrumbJsonLd',

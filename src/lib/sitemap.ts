@@ -57,6 +57,7 @@ export type SitemapSources = {
   trips: SitemapDocument[]
   destinations: SitemapDocument[]
   posts: SitemapDocument[]
+  news: SitemapDocument[]
   pages: SitemapDocument[]
   /**
    * Author profile pages. `noIndex` is set on a bare account (no bio, no published work), which
@@ -71,6 +72,7 @@ export const EMPTY_SITEMAP_SOURCES: SitemapSources = {
   trips: [],
   destinations: [],
   posts: [],
+  news: [],
   pages: [],
   authors: [],
 }
@@ -122,6 +124,13 @@ const STATIC_ROUTES: {
     changeFrequency: 'daily',
     feeds: ['posts'],
     archive: 'posts',
+  },
+  {
+    path: sitePath(routes.news),
+    priority: 0.8,
+    changeFrequency: 'daily',
+    feeds: ['news'],
+    archive: 'news',
   },
   // Nothing but the copy an editor writes on the inquiry page itself, so no `<lastmod>` is claimed.
   { path: sitePath(routes.contact), priority: 0.8, changeFrequency: 'daily', feeds: [] },
@@ -182,6 +191,12 @@ const DOCUMENT_ROUTES: {
     changeFrequency: 'weekly',
   },
   {
+    key: 'news',
+    path: (slug) => sitePath(`/news/${slug}`),
+    priority: 0.7,
+    changeFrequency: 'weekly',
+  },
+  {
     key: 'pages',
     path: (slug) => sitePath(`/${slug}`),
     priority: 0.6,
@@ -227,6 +242,7 @@ export const buildSitemap = (
     trips: published(sources.trips),
     destinations: published(sources.destinations),
     posts: published(sources.posts),
+    news: published(sources.news),
     pages: published(sources.pages),
     authors: published(sources.authors),
   }
