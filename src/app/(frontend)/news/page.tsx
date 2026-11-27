@@ -17,6 +17,8 @@ import { newsCategoryOptions } from '@/lib/news-categories'
 import { getNewsPage, getSettings } from '@/lib/data'
 import { breadcrumbJsonLd, buildMetadata, webPageJsonLd } from '@/lib/seo'
 
+import '../blog/blog.css'
+
 export const revalidate = 3600
 
 export async function generateMetadata({ searchParams }: ArchiveProps): Promise<Metadata> {
@@ -50,7 +52,6 @@ export default async function NewsPage({ searchParams }: ArchiveProps) {
   return (
     <div data-news-page="">
       <header className="blog-archive-intro">
-        <p className="eyebrow text-slate-80">{dict.news.heroEyebrow}</p>
         <h1>{dict.news.listingTitle}</h1>
         <p>{dict.news.listingSubtitle}</p>
       </header>

@@ -9,10 +9,6 @@ import type { NewsCard } from '@/lib/data'
 import { formatDate, readingTimeMinutes } from '@/lib/format'
 import { newsCategoryOptions } from '@/lib/news-categories'
 
-// The news archive reads as the journal archive's sibling: same card anatomy,
-// same filter, same grouping. The styles live with the blog page.
-import '@/app/(frontend)/blog/blog.css'
-
 // Archive-only card: the shared NewsCard keeps its layout on other pages.
 function ArchiveCard({
   post,

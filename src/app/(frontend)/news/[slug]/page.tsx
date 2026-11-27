@@ -7,6 +7,7 @@ import {
   createInternalLinker,
   getAllNewsSlugs,
   getNewsArticle,
+  getNews,
   getRelatedNews,
   getSettings,
 } from '@/lib/data'
@@ -61,8 +62,10 @@ export default async function NewsArticlePage({ params }: { params: Promise<{ sl
 
   if (!post) notFound()
 
-  const [related, settings, linker] = await Promise.all([
+  const [related, latestNews, settings, linker] = await Promise.all([
     getRelatedNews(post, 3),
+    // Fetch one extra so excluding this article still leaves five recent stories.
+    getNews(6),
     getSettings(),
     /**
      * Automated internal keyword linking (see `src/lib/internal-links.ts`): mentions of other
@@ -72,5 +75,9 @@ export default async function NewsArticlePage({ params }: { params: Promise<{ sl
     createInternalLinker({ collection: 'news', id: post.id }),
   ])
 
-  return <NewsDetail post={post} related={related} settings={settings} linker={linker} />
+  const recent = latestNews.filter((item) => item.id !== post.id).slice(0, 5)
+
+  return (
+    <NewsDetail post={post} related={related} recent={recent} settings={settings} linker={linker} />
+  )
 }

@@ -1,4 +1,6 @@
-[data-blog-page] {
+/* Both archives share the same canvas, header clearance, and editorial rhythm. */
+[data-blog-page],
+[data-news-page] {
   --archive-muted: #515b61;
   --archive-rule: #d9d9d6;
   --archive-row-space: clamp(2rem, 4.4vw, 4.25rem);

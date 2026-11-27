@@ -1193,7 +1193,7 @@ export const getNews = (limit = 100): Promise<NewsCard[]> =>
         })
         return result.docs as unknown as NewsCard[]
       },
-      ['news'],
+      ['news', String(limit)],
       { tags: [CACHE_TAG.news], revalidate: REVALIDATE_SECONDS },
     ),
     defaultNews.slice(0, limit),
