@@ -319,12 +319,7 @@ export const en = {
     faqs: 'Frequently Asked Questions',
     notFound: 'That article no longer exists.',
     allCategories: 'All topics',
-    /** Newsletter capture shown beside a single article. */
-    newsletterTitle: 'Sign up for weekly updates',
-    newsletterText:
-      'A short, useful note from the trail every week — new routes, gear we trust, and the occasional summit selfie.',
-    newsletterEmail: 'Email*',
-    newsletterCta: 'SUBSCRIBE NOW',
+    recentNews: 'Recent News',
     categoryWorldNews: 'World news',
     categoryTravel: 'Travel',
     categoryAdventure: 'Adventure',
@@ -357,7 +352,7 @@ export const en = {
     successText: 'Thank you for getting in touch. We’ll be in contact about your enquiry.',
     successBackHome: 'Back to the homepage',
     successBrowseTrips: 'Browse more trips',
-    privacyNote: 'We only use your details to answer your enquiry. No newsletters, no resale.',
+    privacyNote: 'We only use your details to answer your enquiry. Your details are never sold.',
     openWhatsApp: 'Chat on WhatsApp',
     emailUs: 'Email us directly',
     callUs: 'Call us',

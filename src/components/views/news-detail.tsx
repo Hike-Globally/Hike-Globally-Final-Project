@@ -22,6 +22,7 @@ import { Breadcrumbs } from '@/components/sections/breadcrumbs'
 import { FaqSection } from '@/components/sections/faq-section'
 import { LinkPreviewSection } from '@/components/sections/link-preview-section'
 import { MultiUrlPreviewSection } from '@/components/sections/multi-url-preview-section'
+import { RecentNews } from '@/components/sections/recent-news'
 import { PayloadImage, PayloadImageFill } from '@/components/ui/payload-image'
 import { dictionary, newsCategoryLabel } from '@/i18n/dictionaries'
 import { sitePath } from '@/i18n/config'
@@ -67,11 +68,13 @@ function TopographicLines() {
 export function NewsDetail({
   post,
   related,
+  recent,
   settings,
   linker,
 }: {
   post: News
   related: NewsCardData[]
+  recent: NewsCardData[]
   settings: Pick<Setting, 'siteName' | 'logo' | 'socials'>
   /**
    * The page's automated internal keyword linking, created by the route (see
@@ -88,10 +91,11 @@ export function NewsDetail({
   const allHeadings = getArticleHeadings(post.content)
   const headings = allHeadings.filter((heading) => heading.label)
   const headingIds = allHeadings.map((heading) => heading.id)
-  // Keep the masthead and article on the same left edge, with or without an outline.
+  // Keep the masthead and article on the same left edge, including stories without headings.
+  const hasSidebar = headings.length > 0 || recent.length > 0
   const contentWidthClassName = cn(
     'mx-auto max-w-[44rem]',
-    headings.length > 0 && 'lg:max-w-[68rem]',
+    hasSidebar && 'lg:max-w-[68rem]',
   )
 
   // News articles use the trip FAQ categories, so this is the same grouping the trip and post
@@ -315,38 +319,40 @@ export function NewsDetail({
             </Fragment>
           ))
           if (group.fullWidth) return <Fragment key={groupIndex}>{content}</Fragment>
-          const hasOutline =
-            headings.length > 0 && group.sections.some(({ kind }) => kind === 'content')
+          const showSidebar =
+            hasSidebar && group.sections.some(({ kind }) => kind === 'content')
           return (
             <Fragment key={groupIndex}>
               <section className="bg-white py-12 md:py-20" aria-labelledby="news-title">
                 <div className="container-content">
-                  {/* Two columns only from `lg` up, because the outline that occupies the right-hand
-                column is a desktop affordance. Below that the article keeps its single
-                44rem reading measure instead of stretching to the wider grid. */}
+                  {/* Preserve the reading measure on mobile; the news rail sits alongside on desktop. */}
                   <div
                     className={cn(
-                      hasOutline ? contentWidthClassName : 'mx-auto max-w-[44rem]',
-                      hasOutline &&
+                      showSidebar ? contentWidthClassName : 'mx-auto max-w-[44rem]',
+                      showSidebar &&
                         'lg:grid lg:grid-cols-[minmax(0,44rem)_18rem] lg:gap-x-12 lg:gap-y-0',
                     )}
                   >
-                    {/* Keep the reading outline beside the story on desktop, not above it on mobile. */}
-                    {hasOutline ? (
-                      <aside className="hidden lg:sticky lg:top-32 lg:col-start-2 lg:row-start-1 lg:block lg:self-start">
-                        <ArticleTableOfContents
-                          headings={headings}
-                          label={dict.news.inThisStory}
-                          eyebrow={dict.news.fieldNotes}
-                          readingTime={dict.news.readTime.replace('{minutes}', String(minutes))}
-                        />
-                      </aside>
-                    ) : null}
-
                     {/* The article body — 17px pure-black running copy (see `.single-page-body`). */}
                     <div className="single-page-body min-w-0 lg:col-start-1 lg:row-start-1">
                       {content}
                     </div>
+
+                    {showSidebar ? (
+                      <aside className="mt-10 space-y-8 lg:col-start-2 lg:row-start-1 lg:mt-0 lg:self-start">
+                        {headings.length > 0 ? (
+                          <div className="hidden lg:block">
+                            <ArticleTableOfContents
+                              headings={headings}
+                              label={dict.news.inThisStory}
+                              eyebrow={dict.news.fieldNotes}
+                              readingTime={dict.news.readTime.replace('{minutes}', String(minutes))}
+                            />
+                          </div>
+                        ) : null}
+                        <RecentNews posts={recent} />
+                      </aside>
+                    ) : null}
                   </div>
                 </div>
               </section>
