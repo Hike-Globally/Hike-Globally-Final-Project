@@ -104,12 +104,13 @@ Two things worth knowing, because they are what made the block appear to vanish:
   right of the toolbar — it lists Link preview, Multi-URL Preview and Boxed Content), or
 - type `/boxed` in the body and pick **Boxed Content** from the slash menu.
 
-It needs a **Heading** (120 characters), a **Description** (900 characters) and an **Image**
-chosen from the media library; the image's alt text is what screen readers announce. The block
-renders nothing at all until the heading or description has text, so a half-filled draft never
-leaves an empty image well on the public page. Its heading joins the article's table of contents
-and reading time like any other subheading, and the description is included in the post's
-plain-text SEO copy.
+It needs a **Heading** (120 characters) and a **Description**; an **Image** chosen from the
+media library is optional — leave it out to publish a copy-only block, which renders as a single
+full-width copy column. When an image is set, its alt text is what screen readers announce. The
+block renders nothing at all until the heading or description has text, so a half-filled draft
+never leaves an empty image well on the public page. Its heading joins the article's table of
+contents and reading time like any other subheading, and the description is included in the
+post's plain-text SEO copy.
 
 No migration is involved: the block is stored in the existing rich-text JSON.
 
