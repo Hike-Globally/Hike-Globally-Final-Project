@@ -67,7 +67,8 @@ test('Boxed Content is available in the shared Trip and Blog rich-text editor', 
   const upload = fields.find((field) => 'name' in field && field.name === 'image')
   assert.ok(heading?.type === 'text' && heading.required)
   assert.ok(description?.type === 'richText' && description.required && description.editor)
-  assert.ok(upload?.type === 'upload' && upload.required)
+  // The image is optional so admins can publish a copy-only Boxed Content block.
+  assert.ok(upload?.type === 'upload' && !upload.required)
   assert.equal(upload.relationTo, 'media')
   assert.deepEqual(upload.filterOptions, { mimeType: { contains: 'image/' } })
 

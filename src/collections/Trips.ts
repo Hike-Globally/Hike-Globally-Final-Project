@@ -129,7 +129,7 @@ export const Trips: CollectionConfig = {
       label: 'Overview',
       admin: {
         description:
-          'Use the block menu to insert Boxed Content: upload an image and add a heading and description for a responsive, image-left feature.',
+          'Use the block menu to insert Boxed Content: add a heading and description (an image is optional) for a responsive feature.',
       },
     },
 

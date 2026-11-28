@@ -160,11 +160,13 @@ export const inlineBoxedContentBlock: Block = {
       label: 'Image',
       type: 'upload',
       relationTo: 'media',
-      required: true,
+      // Optional: admins can publish a Boxed Content block with copy alone. The public renderer
+      // already degrades to a single full-width copy column when no image is attached.
+      required: false,
       filterOptions: { mimeType: { contains: 'image/' } },
       admin: {
         description:
-          'Choose an image from the media library. Its alt text is used for accessibility.',
+          'Optional. Choose an image from the media library; without one the block renders as copy only. When set, its alt text is used for accessibility.',
       },
     },
   ],
